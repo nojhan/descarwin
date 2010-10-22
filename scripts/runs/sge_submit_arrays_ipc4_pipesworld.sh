@@ -29,27 +29,18 @@ function sge_submit_array_ipc()
     mkdir -p $res/plans
     mkdir -p $res/gens
 
-    # list the available domain files in the sub-tree of this directory
-    # default: do not consider ADL
-    # domains=`find $base_rep -wholename "*/SimpleTime/*.pddl" -print | grep -v "SimpleTime.*[0-9]" | grep -v adl`
-    #domains=`find $base_rep -wholename "*/Strips/*.pddl" -print | grep -v adl`
-    # domains=`find $base_rep -wholename "*/Strips/*.pddl" -print | grep -v adl ; find $base_rep -wholename "*/SimpleTime/*.pddl" -print | grep -v "SimpleTime.*[0-9]" | grep -v adl`
-
-    domains=""
     if [ $options == 0 ] ; then
-	domains=`find $base_rep -wholename "*/SimpleTime/*.pddl" -print | grep -v "SimpleTime.*[0-9]" | grep -v adl`
+	echo "ERROR, the temporal domain requires fluents"
     else
-	domains=`find $base_rep -wholename "*/Strips/*.pddl" -print | grep -v adl`
-    fi
-    
-    for domain in $domains; do
+	domain=`$base_rep/STRIPS/DOMAIN.PDDL`
+        # list the available instance files in the sub-tree of this directory
+	instances=`find $base_rep -name "*" | grep -v "DOMAIN"`
 
-        cptr=0
-	
-	for i in `seq 20`; do
+	for i in $instances; do
+	    
+	    cptr=0
 
-	    instance=`dirname $domain`/pfile$i
-	    if test -r $instance && test -r $domain; then
+	    if test -r $i && test -r $domain; then
 
             # parent directory
 		d=`basename $domain .pddl`
@@ -64,17 +55,16 @@ function sge_submit_array_ipc()
 		echo $cmd2
             #./run_wrapper.sh $domain $instance $options
             #./run_wrapper_jack.sh $domain $instance $options
-		$cmd1
-		$cmd2
+#		$cmd1
+#		$cmd2
 
 		cptr=$((cptr+1))
 	    else
 		echo "ERROR, instance or domain files cannot be open: $instance"
 	    fi
-	done # i
-    done # domain
-
-    echo "$((cptr*runs)) runs submitted"
+	done # instance
+    fi
+	echo "$((cptr*runs)) runs submitted"
 }
 
 
@@ -85,8 +75,7 @@ function sge_submit_array_ipc()
 # nb of differents runs for each instance
 runs=11
 
-# IPC3
 
-sge_submit_array_ipc "/tools/pddl/ipc/IPC3/" 0 $runs "tempo-sat"
-sge_submit_array_ipc "/tools/pddl/ipc/IPC3/" 1 $runs "seq-sat"
+# IPC4 STRIPS
+sge_submit_array_ipc "/tools/pddl/ipc/IPC4/DOMAINS/PIPESWORLD/NOTANKAGE_NONTEMPORAL" 1 $runs "seq-sat"
 
