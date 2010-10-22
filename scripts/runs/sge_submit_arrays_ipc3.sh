@@ -53,8 +53,8 @@ function sge_submit_array_ipc()
 
             # parent directory
 		d=`basename $domain .pddl`
-echo $d
-echo $i
+		echo $d
+		echo $i
             # submit an array of *runs jobs
             # additional arguments are in $options
 		cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $options $res"
