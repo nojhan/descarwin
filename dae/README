@@ -1,0 +1,20 @@
+
+In order to compile the code, you will have to:
+
+1) install ParadisEO: 
+    http://paradiseo.gforge.inria.fr/
+    https://gforge.inria.fr/projects/paradiseo
+
+2) get a copy of CPT/YAHSP
+
+3) cp install-dist.cmake install.cmake
+
+4) edit install.cmake to suit your configuration
+
+5) type:
+    cmake .
+    make
+
+This will create a "dae" binary, to get help, type:
+    ./dae -h
+

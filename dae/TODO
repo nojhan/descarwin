@@ -1,0 +1,115 @@
+
+À VÉRIFIER
+
+* n'utiliser l_max qu'à l'init, et ne pas l'utiliser comme limite pour addgoal
+* voir s'il ne faudrait pas maintenir une size à part pour les classes héritées de std::list (en l'état, l'implémentation GNU ne le fait pas et l'accès à size() se fait en O(n))
+* décider entre le cross-over aveugle ou le cross-over qui trie les dates
+* remplacer b_max par un temps CPU limite?
+* faire des tests pour vérifier si on autorise des individus sans decomposition (daex_init.h:45)
+    * laisser faire le hasard?
+    * inclure au moins un seul à l'init?
+* construction incrémentale des Decomposition permettant d'inclure une étape de propagation pour renseigner l'heuristique des dates au plus tot : 
+    * permettrait des opérateurs de variation moins aveugles
+* voir si le l_max ne pourrait pas etre initialisé à partir du nombre total de date au plus tot (calculé par H1 dans lors de l'init)
+    * très domaine dépendant, donc à tester
+* construction progressive de la décomposition pour permettre une propagation mise à jour des dates au plus tot entre chaque goal intermédiaire à partir des états découverts
+    * facile à faire dans yahsp
+    * difficile dans DaE, car alors la chronopartition sera propre à chaque individu évalué
+    * ne pourra etre utilisée qu'après par les opérateurs de mutation, donc on doit avoir une chronopartion par décomposition, mise à jour à chaque évaluation
+* dans addAtom, voir s'il ne faudrait pas relacher la contrainte d'égalité de date entre le nouvel atome choisi et la date du goal, peut-etre un <= serait plus approprié, vu que les dates des goal ne sont pas forcément ordonnées, ou alors avec un radius autour de la date du goal ?
+
+----------------------------------
+
+À FAIRE
+
+* regarder avec yahsp la distribution de la longueur des plans
+* supprimer les goals qui ne sont pas nécéssaires :
+    * goals intermédiaires triviaux (sous-plan vide)
+    * cycles triviaux (goal dans un état, puis autres goals, puis retour sur goal précédent => on peut supprimer les intermédiaires)
+* choisir le radius en fonction du nombre de date possibles (par exemple 20%)
+* dans l'init, autoriser des décompositions vides
+    * au moins un à l'init?
+    * en considérant qu'il sera gardé ou viré par la sélection
+* séparer random_atom_change et random_atom_add (dans addatom) et les mettre dans deux opérateurs différents
+* dans addgoal et crossover: découper avant le sous-plan qui a nécéssité le plus de noeuds lors de l'évaluation, penser à garder l'aspect aléatoire
+* nécéssiterait de sauver les étapes de résolutions intermédiaires : fitness en plusieurs parties (une pour chaque goal)
+    * permettrait d'améliorer grandement la rapidité d'évaluation
+    * éventuellement, voir si on peut modifier les opérateurs de variations qui ne modifient pas la décomposition avant un sous-plan qui a été difficile à trouver
+    * éventuellement, maintenir un tableau associatif des couples (<état initial,état final>=>sous-plan) pour éviter de recalculer des sous-plans déjà calculés à d'autres moments
+    * mémoriser la graine aléatoire utilisée par yahsp, pour garantir le meme comportement entre deux évaluations
+* s'il apparait des pb de mémoire, penser que yahsp garde en mémoire la liste complète des tous les états qu'il a rencontré. On peut supprimer cette structure si nécéssaire sans réduire l'efficacité de yahsp.
+
+----------------------------------
+
+À FAIRE DANS UNE PROCHAINE VERSION
+
+* Simplifier la classe atom, de manière à ne garder qu'un pointeur vers la structure de donnée correspondante dans le sous-solveur
+* Supprimer toute la hierarchie utilisée pour l'affichage et utiliser une API d'affichage provenant du solveur
+* Ajouter la possibilité d'avoir une liste de functor attachés à l'atome permettant de récupérer différentes propriétés (date au plus tot, landmarks, ...)
+* Vincent pourra implémenter une vérification lors de la compréssion: vérifier qu'on ne rencontre pas deux fois le meme état dans la décomposition (auquel cas on veut supprimer les goals intermédiaires)
+
+----------------------------------
+
+Besoins en interface :
+
+* idéalement : passer les variables globales de yahsp à travers une classe, wrapper, i.e. pour faire des "context.fluents" au lieu de juste "fluents"
+
+TimeVal
+Fluent*
+
+pddl_load
+    goal_state[i]->init
+    cpt_main()
+    fluents[i]->atom->predicate->name
+    fluents[i]->atom->predicate->terms_nb
+    fluents[i]->atom->terms_nb
+    fluents[i]->atom->terms[j]->types_nb
+    fluents[i]->atom->terms[j]->types[k]->name
+    fluents[i]->atom->terms[j]->name
+    fluents[i]->init 
+   
+dae_cpt-yahsp
+    SolutionPlan
+    plan->makespan
+    plan->backtracks
+    plan->steps_nb 
+    plan->steps[i]->action->parameters_nb 
+    plan->steps[i]->action->parameters[j]->name
+    plan->steps[i]->action->ope->name
+    opt.pddl21
+    plan->steps[i]->action->rdur.t
+    plan->steps[i]->action->dur.t
+    plan->steps[i]->init
+    fluents_nb 
+    goal_state_nb
+    bitarray_get( ..., goal_state[i] ) 
+ 
+    operators
+        fluent->atom->predicate->name
+        fluent->atom->terms_nb
+        fluent->atom->terms[i]
+        term.name
+
+
+dae_yahsp
+    BitArray
+    bitarray_get( ..., fluents[i] )
+    fluent_name(fluents[i])
+
+    yahsp_reset()
+    plan_free( plans[p] )
+    plans_nb
+    cpt_malloc( plans, ...)
+    Fluent
+    bitarray_create( fluents_nb )
+    fluents_nb
+    cpt_search( init_state, init_state_nb, ... )
+    solution_plan->steps_nb
+    solution_plan->makespan 
+    solution_plan->backtracks 
+    plans[plans_nb++] = solution_plan
+    cpt_search( init_state, init_state_nb, goal_state, goal_state_nb, ...)
+
+daex_utils
+    fmutex
+

@@ -1,0 +1,54 @@
+cmake_minimum_required(VERSION 2.4)
+
+if(COMMAND cmake_policy)
+      cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
+
+# include the install configuration file where are defined the main variables
+INCLUDE(${CMAKE_SOURCE_DIR}/install.cmake)
+
+
+# define project name
+PROJECT(DAEX CXX)
+
+# include the sources
+
+INCLUDE_DIRECTORIES(${PARADISEO_EO_SRC_DIR}/src)
+INCLUDE_DIRECTORIES(${CPT_SRC_DIR})
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
+
+
+# where CMake can find the libraries
+
+LINK_DIRECTORIES(${PARADISEO_EO_BIN_DIR}/lib)
+LINK_DIRECTORIES(${CPT_LIB_DIR})
+
+# Build type : None, Debug, Release
+SET( CMAKE_BUILD_TYPE Debug )
+
+SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG" )
+
+# target
+
+ADD_EXECUTABLE(dae dae.cpp) 
+ADD_DEPENDENCIES(dae daex)
+
+ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp) 
+ADD_DEPENDENCIES(test_chronopartition daex)
+
+ADD_EXECUTABLE(test_b_max test_b_max.cpp) 
+ADD_DEPENDENCIES(test_b_max daex)
+
+# link librairies for the executable
+
+TARGET_LINK_LIBRARIES(dae daex cpt gmp eo eoutils gcov) 
+
+TARGET_LINK_LIBRARIES(test_chronopartition daex cpt gmp eo eoutils gcov) 
+TARGET_LINK_LIBRARIES(test_b_max daex cpt gmp eo eoutils gcov) 
+
+
+# process to sources
+
+SUBDIRS(src)
+

@@ -1,0 +1,159 @@
+
+#ifndef __DAE_BIND_YAHSP_CPT_H__
+#define __DAE_BIND_YAHSP_CPT_H__
+
+#include <string>
+#include <eo>
+
+#include "utils/pddl_load.h"
+#include "core/decomposition.h"
+#include "utils/posix_timer.h"
+
+/***** En-tetes C *****/
+extern "C" {
+#include <src/structs.h>
+#include <src/plan.h>
+}
+
+//! Convertit un TimeVal en string, en utilisant print_time de CPT/YAHSP
+std::string timeValToString( TimeVal x );
+
+//! Convertit un plan CPT/YAHSP en plan DAEx
+//daex::Plan convertPlanCptToDae( SolutionPlan plan );
+
+//! Affectation de pointeurs depuis les atomes DAEx vers leur équivalent CPT/YAHSP
+void bindDaeYahspCpt( daex::pddlLoad & pddl, std::string solver = SOLVER_YAHSP );
+
+//! Teste si un Fluent (CPT/YAHSP) est égal à un Atome (DAEx)
+/* Comparateur pour la recherche, utilisé par std::find dans bindDaeYahspCpt
+ */
+bool operator==( const Fluent * fluent, const daex::Atom & atom );
+
+//! Teste si un terme (CPT/YAHSP) est différent d'un objet (DAEx)
+/* Comparateur pour la recherche, utilisé dans operator==
+ */
+bool operator!=( const PDDLTerm & term, const daex::pddlObject & object );
+
+
+//! Classe de base pour l'évaluation avec CPT ou YAHSP
+/* Regroupe uniquement le code et les déclarations en commun.
+ * Note : L'operator() et le calcul de distance sont virtuels purs, 
+ * il doivent etre implémentés.
+ */
+class daeCptYahspEval : public eoEvalFunc<daex::Decomposition>
+{
+public:
+     
+  daeCptYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10000, unsigned int b_max_last = 30000, double fitness_weight = 10, double fitness_penalty = 1e60 ) :
+        _l_max( l_max_ ),
+        _b_max_in(b_max_in),
+        _b_max_last( b_max_last),
+      _unknown_parameter(fitness_weight),
+      _fitness_penalty( fitness_penalty )
+    {
+        // hors ligne, car l'accesseur en profite pour modifier opt.max_backtracks
+        b_max( b_max_in );
+    }
+
+    virtual ~daeCptYahspEval() {}
+
+public:
+    unsigned int l_max() const { return _l_max; }
+    void l_max( unsigned int l ) { _l_max = l; }
+
+    unsigned int b_max() const { return _b_max; }
+    void b_max( unsigned int b ) 
+    { 
+        _b_max = b;
+        opt.max_backtracks = b;
+    }
+
+
+public:
+    //! Proxy EO aec appels aux timers
+    /*virtual*/ void operator() ( daex::Decomposition & decompo ) 
+    {
+        pre_call( decompo );
+        call( decompo );
+        post_call( decompo );
+    }
+
+    //! Code de l'évaluation proprement dite de la décomposition
+    virtual void call( daex::Decomposition & decompo ) = 0;
+
+protected:
+
+    /*virtual*/ void pre_call( daex::Decomposition & decompo ) 
+    {
+        _timer_eval.restart();
+    }
+
+    /*virtual*/ void post_call( daex::Decomposition & decompo )
+    {
+        decompo.plan().time_eval( _timer_eval.get() );
+        decompo.plan().search_steps( _B );
+    }
+
+protected:
+
+    //! Renvoie le nombre d'atomes communs entre le goal final et un goal donné
+    /* Cette méthode est virtuelle pure car elle est implémentée différemment
+     * dans CPT et dans YAHSP, du fait des structures de données différentes
+     * utilisées pour maintenir l'état courant.
+     */
+    unsigned int distance_to_goal_Hamming( BitArray state );
+
+
+    //! Fitness des décompositions dont on arrive à construire le plan
+    //! Note: the call to decomposition.fitness(...) automatically validate the fitness
+    double fitness_feasible( daex::Decomposition & decompo );
+
+
+    //! Fitness des décompositions dont on arrive pas à construire le plan
+    //! Note: the call to decomposition.fitness(...) automatically validate the fitness
+    double fitness_unfeasible( daex::Decomposition & decompo, BitArray state );
+
+    double fitness_unfeasible_too_long( );
+    double fitness_unfeasible_intermediate( );
+    double fitness_unfeasible_final( );
+
+protected:
+    //! Paramètre pondérant le compteur k lors du calcul de fitness quand le plan n'est pas trouvé
+    // TODO qualité de la pondération ? pourquoi ce paramètre et pourquoi fixé à 10 ?
+    double _unknown_parameter;
+
+    double _fitness_penalty;
+
+    //! Taille maximum d'une décomposition
+    unsigned int _l_max;
+
+    //! Current number of backtracks/nodes allowed
+    unsigned int _b_max;
+
+    //! b_max for searchs within the decomposition
+    unsigned int _b_max_in;
+    
+    //! b_max for the very last search towards the end goal
+    unsigned int _b_max_last;
+
+protected:
+
+    //! compteur de goals
+    unsigned int _k;
+
+    //! compteur de goals utiles
+    unsigned int _u;
+
+    //! compteur des tentatives de recherche
+    unsigned int _B;
+
+protected:
+
+    PosixTimer _timer_eval;
+    PosixTimer _timer_subsolver;
+
+}; // class daeCptYahspEval
+
+
+#endif // __DAE_BIND_YAHSP_CPT_H__
+
