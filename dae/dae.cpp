@@ -15,6 +15,7 @@
 #include <ga.h>
 #include <utils/eoParserLogger.h>
 #include <utils/eoLogger.h>
+#include <utils/eoFeasibleRatioStat.h>
 
 #include "daex.h"
 #include "evaluation/yahsp.h"
@@ -146,7 +147,7 @@ int main ( int argc, char* argv[] )
             "Unknown weight in the feasible and unfeasible fitness computation", 'W', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "fitness_weight" << fitness_weight << std::endl;
 
-    unsigned int fitness_penalty = parser.createParam( (unsigned int)10, "fitness-penalty", 
+    unsigned int fitness_penalty = parser.createParam( (unsigned int)2, "fitness-penalty", 
             "Penalty in the unfeasible fitnesses computation", 'w', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "fitness_penalty" << fitness_penalty << std::endl;
 
@@ -440,11 +441,14 @@ int main ( int argc, char* argv[] )
     eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
 
     eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false) );
+    
+    eoFeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
 
     // compute stas at each generation
     checkpoint.add( best_stat );
     checkpoint.add( median_stat );
     checkpoint.add( iqr_stat );
+    checkpoint.add( feasible_stat );
     
 
     // get the best plan only if it improve the fitness
@@ -463,6 +467,7 @@ int main ( int argc, char* argv[] )
         cout_monitor.add( best_stat );
         cout_monitor.add( median_stat );
         cout_monitor.add( iqr_stat );
+        cout_monitor.add( feasible_stat );
         
         // the checkpoint should call the monitor at every generation
         checkpoint.add( cout_monitor );
