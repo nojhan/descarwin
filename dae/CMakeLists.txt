@@ -40,12 +40,16 @@ ADD_DEPENDENCIES(test_chronopartition daex)
 ADD_EXECUTABLE(test_b_max test_b_max.cpp) 
 ADD_DEPENDENCIES(test_b_max daex)
 
+ADD_EXECUTABLE(test_stats test_stats.cpp) 
+ADD_DEPENDENCIES(test_stats daex)
+
 # link librairies for the executable
 
 TARGET_LINK_LIBRARIES(dae daex cpt gmp eo eoutils gcov) 
 
 TARGET_LINK_LIBRARIES(test_chronopartition daex cpt gmp eo eoutils gcov) 
 TARGET_LINK_LIBRARIES(test_b_max daex cpt gmp eo eoutils gcov) 
+TARGET_LINK_LIBRARIES(test_stats daex cpt gmp eo eoutils gcov) 
 
 
 # process to sources
