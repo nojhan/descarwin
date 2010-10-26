@@ -81,9 +81,9 @@ int main ( int argc, char* argv[] )
 {
     struct rlimit limit;
     getrlimit(RLIMIT_AS, &limit);
-    std::cout << "Maximum size of the process virtual memory (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
+    eo::log << eo::logging << "Maximum size of the process virtual memory (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
     getrlimit(RLIMIT_DATA, &limit);
-    std::cout << "Maximum size of the process   data segment (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
+    eo::log << eo::logging << "Maximum size of the process   data segment (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
 
     /*
     limit.rlim_cur=100000000;
@@ -372,7 +372,7 @@ int main ( int argc, char* argv[] )
     daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
 
     // counter, for checkpointing
-    eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_yahsp );
+    eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_yahsp, "Eval.\t" );
 
     // an eval that raises an exception if maxtime is reached
     eoEvalTimeThrowException<daex::Decomposition> eval_maxtime( eval_counter, max_seconds );
@@ -435,12 +435,12 @@ int main ( int argc, char* argv[] )
 
     // get best fitness
     // for us, has the form "fitness feasibility" (e.g. "722367 1")
-    eoBestFitnessStat<daex::Decomposition> best_stat;
+    eoBestFitnessStat<daex::Decomposition> best_stat("Best");
     
     // TODO implement a better nth_element stat
     eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
 
-    eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false) );
+    eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false), "IQR" );
     
     eoFeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
 
@@ -460,7 +460,8 @@ int main ( int argc, char* argv[] )
     checkpoint.add( best_plan );
     
     // display the stats on std::cout
-    eoStdoutMonitor cout_monitor(false); // verbose ?
+    // ostream & out, bool _verbose=true, std::string _delim = "\t", unsigned int _width=20, char _fill=' ' 
+    eoOStreamMonitor cout_monitor( std::clog, false, "\t", 10, ' '); 
 
     if( eo::log.getLevelSelected() >= eo::progress ) {
         cout_monitor.add( eval_counter );
@@ -541,9 +542,11 @@ int main ( int argc, char* argv[] )
 
     eo::log << eo::progress << "OK" << std::endl;
 
+    eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
 
     eo::log << eo::progress << "Start the search..." << std::endl;
     eo::log.flush();
+
 
 #ifndef NDEBUG
     eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
