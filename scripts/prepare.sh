@@ -18,17 +18,17 @@ cp eo_${today}.zip $here
 
 # archive current version of DAE
 cd ~/code/descarwin/
-svn export dae/ dae_${today}
+svn export trunk/dae/ dae_${today}
 zip -r dae_${today}.zip dae_${today}
 cp dae_${today}.zip $here
 
 # copy the binaries
-cp dae/build/dae $here
+cp trunk/dae/build/dae $here
 cp DAEx1.0/DAEx/DAEx $here/dae_jack
 cp DAEx1.0/DAEx/parametre $here
 
 # copy scripts that manages the campaign
-cp dae/scripts/* $here
+cp trunk/scripts/runs/* $here
 
 cd $here
 
