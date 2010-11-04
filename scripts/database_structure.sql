@@ -1,4 +1,15 @@
 
+-- Descarwin tables creation script
+--
+-- tested with PostgreSQL 8.1.22 (on a Red Hat Entreprise Linux: 8.1.22-1.el5_5.1)
+--   install postgresql-server and postgresql
+--   use the postgres user: su - postgres
+--   create a database: createdb test
+--   import the script: psql -d test -a -f database_structure.sql
+-- 
+-- NOTE: with PostgreSQL, the PRIMARY KEY statement create an implicit index called "<table name>_pkey"
+--       (e.g. algorithm_pkey), this is a feature.
+
 --------------------------
 -- TERMINAL DATA TABLES --
 --------------------------
