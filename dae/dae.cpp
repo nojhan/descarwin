@@ -200,7 +200,7 @@ int main ( int argc, char* argv[] )
 
 
     // Variation
-    unsigned int radius = parser.createParam( (unsigned int)5, "radius", 
+    unsigned int radius = parser.createParam( (unsigned int)2, "radius", 
             "Number of neighbour goals to consider for the addGoal mutation", 'R', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "radius" << radius << std::endl;
 
