@@ -173,6 +173,9 @@ int main ( int argc, char* argv[] )
 
 
     // Other
+    unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
+    unsigned int maxtry_mutex = 0;     // deactivated by default: should try every candidates
+    /*
     unsigned int maxtry_candidate = parser.createParam( (unsigned int)11, "maxtry-candidate", 
             "Maximum number of atoms to try when searching for a candidate in the changeAtom mutation", 'y', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxtry_candidate" << maxtry_candidate << std::endl;
@@ -181,9 +184,19 @@ int main ( int argc, char* argv[] )
     unsigned int maxtry_mutex = parser.createParam( (unsigned int)11, "maxtry-mutex", 
             "Maximum number of atoms to try when searching for mutexes in the changeAtom mutation", 'z', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxtry_mutex" << maxtry_mutex << std::endl;
+    */
 
     std::string plan_file = parser.createParam( (std::string)"plan.ipc", "plan-file", "Plan file backup", 'F', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plan-file" << plan_file << std::endl;
+
+    // this parameter is automatically set by call to do_make_pop, with a default value of 20
+    // but we want another default value, thus we set it here, and change the parameter after the call to the parser
+    unsigned int pop_size = 100;
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "pop_size" << pop_size << std::endl;
+    // the eoValueParam function that permits to set the default value takes a string, thus we have to convert
+    std::stringstream tmp;
+    tmp << pop_size;
+    std::string pop_size_str = tmp.str(); // use this in eoValueParam.defValue
 
 
     // Variation
@@ -260,6 +273,10 @@ int main ( int argc, char* argv[] )
              eoInitFixedLength< eoBit<double> > fake_init(1, uGen);
 
              eoPop< eoBit<double> > fake_pop = do_make_pop( parser, state, fake_init );
+
+             // change the default value of pop_size, before making help
+             parser.getParamWithLongName("popSize")->defValue(pop_size_str);
+
              make_help( parser );
 
              return 0;
@@ -312,6 +329,9 @@ int main ( int argc, char* argv[] )
 
     // initialisation de EO
     eoPop<daex::Decomposition> pop = do_make_pop( parser, state, init );
+
+    // change the default value of pop_size, before making help
+    //parser.getParamWithLongName("popSize").setValue( pop_size );
 
     // make help here, after the true init of the pop
     make_help( parser );
@@ -431,13 +451,13 @@ int main ( int argc, char* argv[] )
     // the checkpoint is here to get some stat during the search
     eoCheckPoint<daex::Decomposition> checkpoint( continuator );
 
-    // TODO add stats for: ratio of feasible / nfeasible, average size of the decompositions
+    // TODO add stats for: average size of the decompositions
 
     // get best fitness
     // for us, has the form "fitness feasibility" (e.g. "722367 1")
     eoBestFitnessStat<daex::Decomposition> best_stat("Best");
     
-    // TODO implement a better nth_element stat
+    // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
     eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
 
     eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false), "IQR" );
@@ -461,7 +481,7 @@ int main ( int argc, char* argv[] )
     
     // display the stats on std::cout
     // ostream & out, bool _verbose=true, std::string _delim = "\t", unsigned int _width=20, char _fill=' ' 
-    eoOStreamMonitor cout_monitor( std::clog, false, "\t", 10, ' '); 
+    eoOStreamMonitor cout_monitor( std::clog, true, "\t", 10, ' '); 
 
     if( eo::log.getLevelSelected() >= eo::progress ) {
         cout_monitor.add( eval_counter );
@@ -528,7 +548,7 @@ int main ( int argc, char* argv[] )
 
     // REPLACEMENT
     
-    // JACK : L'article indique qu'on fait un remplacement en tournoi déerministe et qu'il n'y a pas d'élistisme, on aurait alors ça :
+    // JACK : L'article indique qu'on fait un remplacement en tournoi déterministe et qu'il n'y a pas d'élistisme, on aurait alors ça :
     //eoSSGADetTournamentReplacement<daex::Decomposition> replace(5);
     
     // MAIS le code utilise un remplacement intégral des parents par le meilleur des parents+enfants, avec élitisme faible, on a donc :
