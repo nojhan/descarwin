@@ -276,6 +276,7 @@ int main ( int argc, char* argv[] )
 
              // change the default value of pop_size, before making help
              parser.getParamWithLongName("popSize")->defValue(pop_size_str);
+             parser.getParamWithLongName("popSize")->setValue(pop_size_str);
 
              make_help( parser );
 
@@ -331,7 +332,8 @@ int main ( int argc, char* argv[] )
     eoPop<daex::Decomposition> pop = do_make_pop( parser, state, init );
 
     // change the default value of pop_size, before making help
-    //parser.getParamWithLongName("popSize").setValue( pop_size );
+    parser.getParamWithLongName("popSize")->defValue(pop_size_str);
+    parser.getParamWithLongName("popSize")->setValue(pop_size_str);
 
     // make help here, after the true init of the pop
     make_help( parser );
@@ -464,11 +466,14 @@ int main ( int argc, char* argv[] )
     
     eoFeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
 
+    eoAverageSizeStat<daex::Decomposition> asize_stat( "Av.Size" );
+
     // compute stas at each generation
     checkpoint.add( best_stat );
     checkpoint.add( median_stat );
     checkpoint.add( iqr_stat );
     checkpoint.add( feasible_stat );
+    checkpoint.add( asize_stat );
     
 
     // get the best plan only if it improve the fitness
@@ -489,6 +494,7 @@ int main ( int argc, char* argv[] )
         cout_monitor.add( median_stat );
         cout_monitor.add( iqr_stat );
         cout_monitor.add( feasible_stat );
+        cout_monitor.add( asize_stat );
         
         // the checkpoint should call the monitor at every generation
         checkpoint.add( cout_monitor );
@@ -571,6 +577,8 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
     eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
 #endif
+
+    std::clog << "pop size= " << pop.size() << std::endl;
 
     try {
         dae( pop );
