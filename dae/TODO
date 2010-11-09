@@ -1,31 +1,26 @@
 
-À VÉRIFIER
+TODO
 
-* n'utiliser l_max qu'à l'init, et ne pas l'utiliser comme limite pour addgoal
-* voir s'il ne faudrait pas maintenir une size à part pour les classes héritées de std::list (en l'état, l'implémentation GNU ne le fait pas et l'accès à size() se fait en O(n))
-* décider entre le cross-over aveugle ou le cross-over qui trie les dates
-* remplacer b_max par un temps CPU limite?
-* faire des tests pour vérifier si on autorise des individus sans decomposition (daex_init.h:45)
-    * laisser faire le hasard?
-    * inclure au moins un seul à l'init?
-* construction incrémentale des Decomposition permettant d'inclure une étape de propagation pour renseigner l'heuristique des dates au plus tot : 
-    * permettrait des opérateurs de variation moins aveugles
-* voir si le l_max ne pourrait pas etre initialisé à partir du nombre total de date au plus tot (calculé par H1 dans lors de l'init)
-    * très domaine dépendant, donc à tester
-* construction progressive de la décomposition pour permettre une propagation mise à jour des dates au plus tot entre chaque goal intermédiaire à partir des états découverts
-    * facile à faire dans yahsp
-    * difficile dans DaE, car alors la chronopartition sera propre à chaque individu évalué
-    * ne pourra etre utilisée qu'après par les opérateurs de mutation, donc on doit avoir une chronopartion par décomposition, mise à jour à chaque évaluation
-* dans addAtom, voir s'il ne faudrait pas relacher la contrainte d'égalité de date entre le nouvel atome choisi et la date du goal, peut-etre un <= serait plus approprié, vu que les dates des goal ne sont pas forcément ordonnées, ou alors avec un radius autour de la date du goal ?
+CODE
 
-----------------------------------
+* add a generic function to compute any quantile of the nodes distibution at the init phase
+    * do a parameter setting on the quantile position with a max b_max of 10000
 
-À FAIRE
+* multi-core implementation by Caner Candan
+    * first in DAE
+    * if it works in PEO
+* fix the max of nodes numbers during the init around the quantile next to the max best quantile of all instances
+* choose a sub-set of instances
+    * in 24h, Matthias says we can do a parameter setting for ~5 instances
+* get the sub-set of all the parameters that have an impact on the results
+* use an eoBinOp instead of the eoQuadOp for the crossover?
+    * beware that to get the original behaviour one should do an explicit copy of the oher individual 
+        * this introduce a new parameter: the probability to put the copy
 
-* regarder avec yahsp la distribution de la longueur des plans
 * supprimer les goals qui ne sont pas nécéssaires :
     * goals intermédiaires triviaux (sous-plan vide)
     * cycles triviaux (goal dans un état, puis autres goals, puis retour sur goal précédent => on peut supprimer les intermédiaires)
+
 * choisir le radius en fonction du nombre de date possibles (par exemple 20%)
 * dans l'init, autoriser des décompositions vides
     * au moins un à l'init?
@@ -39,9 +34,41 @@
     * mémoriser la graine aléatoire utilisée par yahsp, pour garantir le meme comportement entre deux évaluations
 * s'il apparait des pb de mémoire, penser que yahsp garde en mémoire la liste complète des tous les états qu'il a rencontré. On peut supprimer cette structure si nécéssaire sans réduire l'efficacité de yahsp.
 
+
+EXPERIMENTS
+
+* check distribution of used nodes number versus iterations and position in the decomposition
+* check the entropy of sort of the decompositions versus iterations
+* check existence duration of a given decomposition
+* check distribution of mutexes atoms
+* check correlation of last_reached versus iterations
+
+* regarder avec yahsp la distribution de la longueur des plans
+* décider entre le cross-over aveugle ou le cross-over qui trie les dates
+* remplacer b_max par un temps CPU limite?
+* faire des tests pour vérifier si on autorise des individus sans decomposition (daex_init.h:45)
+    * laisser faire le hasard?
+    * inclure au moins un seul à l'init?
+* dans addAtom, voir s'il ne faudrait pas relacher la contrainte d'égalité de date entre le nouvel atome choisi et la date du goal, peut-etre un <= serait plus approprié, vu que les dates des goal ne sont pas forcément ordonnées, ou alors avec un radius autour de la date du goal ?
+
 ----------------------------------
 
-À FAIRE DANS UNE PROCHAINE VERSION
+MAYBE TO BE DONE
+
+* n'utiliser l_max qu'à l'init, et ne pas l'utiliser comme limite pour addgoal
+* voir s'il ne faudrait pas maintenir une size à part pour les classes héritées de std::list (en l'état, l'implémentation GNU ne le fait pas et l'accès à size() se fait en O(n))
+* construction incrémentale des Decomposition permettant d'inclure une étape de propagation pour renseigner l'heuristique des dates au plus tot : 
+    * permettrait des opérateurs de variation moins aveugles
+* voir si le l_max ne pourrait pas etre initialisé à partir du nombre total de date au plus tot (calculé par H1 dans lors de l'init)
+    * très domaine dépendant, donc à tester
+* construction progressive de la décomposition pour permettre une propagation mise à jour des dates au plus tot entre chaque goal intermédiaire à partir des états découverts
+    * facile à faire dans yahsp
+    * difficile dans DaE, car alors la chronopartition sera propre à chaque individu évalué
+    * ne pourra etre utilisée qu'après par les opérateurs de mutation, donc on doit avoir une chronopartion par décomposition, mise à jour à chaque évaluation
+
+----------------------------------
+
+TODO BUT LATER
 
 * Simplifier la classe atom, de manière à ne garder qu'un pointeur vers la structure de donnée correspondante dans le sous-solveur
 * Supprimer toute la hierarchie utilisée pour l'affichage et utiliser une API d'affichage provenant du solveur
@@ -50,66 +77,15 @@
 
 ----------------------------------
 
-Besoins en interface :
+DONE
 
-* idéalement : passer les variables globales de yahsp à travers une classe, wrapper, i.e. pour faire des "context.fluents" au lieu de juste "fluents"
+* re-implementation of Jack's code, tested and debugged, now works
+* database structure
+* stat on average size of the decomposition
+* suppress the maxtry-* parameters from the code, use the deterministic algorithm
+* verify that every parametershave the correct default value
+    * set the default pop size to 100 instead 20
+        * remove the do_make_pop and do everything by hand so as to be sure of the default parameters and when the status is dumped
+* compile DAE statically with all libraries
 
-TimeVal
-Fluent*
-
-pddl_load
-    goal_state[i]->init
-    cpt_main()
-    fluents[i]->atom->predicate->name
-    fluents[i]->atom->predicate->terms_nb
-    fluents[i]->atom->terms_nb
-    fluents[i]->atom->terms[j]->types_nb
-    fluents[i]->atom->terms[j]->types[k]->name
-    fluents[i]->atom->terms[j]->name
-    fluents[i]->init 
-   
-dae_cpt-yahsp
-    SolutionPlan
-    plan->makespan
-    plan->backtracks
-    plan->steps_nb 
-    plan->steps[i]->action->parameters_nb 
-    plan->steps[i]->action->parameters[j]->name
-    plan->steps[i]->action->ope->name
-    opt.pddl21
-    plan->steps[i]->action->rdur.t
-    plan->steps[i]->action->dur.t
-    plan->steps[i]->init
-    fluents_nb 
-    goal_state_nb
-    bitarray_get( ..., goal_state[i] ) 
- 
-    operators
-        fluent->atom->predicate->name
-        fluent->atom->terms_nb
-        fluent->atom->terms[i]
-        term.name
-
-
-dae_yahsp
-    BitArray
-    bitarray_get( ..., fluents[i] )
-    fluent_name(fluents[i])
-
-    yahsp_reset()
-    plan_free( plans[p] )
-    plans_nb
-    cpt_malloc( plans, ...)
-    Fluent
-    bitarray_create( fluents_nb )
-    fluents_nb
-    cpt_search( init_state, init_state_nb, ... )
-    solution_plan->steps_nb
-    solution_plan->makespan 
-    solution_plan->backtracks 
-    plans[plans_nb++] = solution_plan
-    cpt_search( init_state, init_state_nb, goal_state, goal_state_nb, ...)
-
-daex_utils
-    fmutex
 
