@@ -29,6 +29,12 @@ SET( CMAKE_BUILD_TYPE Debug )
 
 SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG" )
 
+# make a static exe
+# FIXME this is a ugly ha as it assume that the linker is gcc-compatible
+# there must be a more elegant way to do that with CMake, maybe with:
+# LINK_SEARCH_END_STATIC ?
+SET(CMAKE_EXE_LINKER_FLAGS -static)
+
 # target
 
 ADD_EXECUTABLE(dae dae.cpp) 
