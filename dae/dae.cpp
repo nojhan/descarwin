@@ -121,6 +121,18 @@ int main ( int argc, char* argv[] )
     // un total de 20 paramètres
 
     // Initialization
+    unsigned int pop_size = parser.createParam( (unsigned int)100, "popSize", "Population Size", 'P', "Evolution Engine").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "pop_size" << pop_size << std::endl;
+    
+
+    unsigned int seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' ).value();
+    if ( seed == 0) {
+        seed = time(0);
+    }
+    rng.reseed( seed );
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "seed" << seed << std::endl;
+
+
     unsigned int l_max_init_coef = parser.createParam( (unsigned int)2, "lmax-initcoef", 
             "l_max will be set to the size of the chrono partition * this coefficient", 'C', "Initialization" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "l_max_init_coef" << l_max_init_coef << std::endl;
@@ -189,15 +201,6 @@ int main ( int argc, char* argv[] )
     std::string plan_file = parser.createParam( (std::string)"plan.ipc", "plan-file", "Plan file backup", 'F', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plan-file" << plan_file << std::endl;
 
-    // this parameter is automatically set by call to do_make_pop, with a default value of 20
-    // but we want another default value, thus we set it here, and change the parameter after the call to the parser
-    unsigned int pop_size = 100;
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "pop_size" << pop_size << std::endl;
-    // the eoValueParam function that permits to set the default value takes a string, thus we have to convert
-    std::stringstream tmp;
-    tmp << pop_size;
-    std::string pop_size_str = tmp.str(); // use this in eoValueParam.defValue
-
 
     // Variation
     unsigned int radius = parser.createParam( (unsigned int)2, "radius", 
@@ -262,29 +265,8 @@ int main ( int argc, char* argv[] )
             "Maximum number of iterations", 'x', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxgens" << maxgens << std::endl;
 
-
-    //unsigned int seed = parser.createParam((unsigned int)0, "seed", "Random seed", 'R', "General").value();
-    //rng.reseed( seed );
-    for( unsigned int i=0; i < argc; i++ ) {
-
-        if( std::strcmp( argv[i], "-h") == 0 ) {
-
-             eoUniformGenerator<bool> uGen;
-             eoInitFixedLength< eoBit<double> > fake_init(1, uGen);
-
-             eoPop< eoBit<double> > fake_pop = do_make_pop( parser, state, fake_init );
-
-             // change the default value of pop_size, before making help
-             parser.getParamWithLongName("popSize")->defValue(pop_size_str);
-             parser.getParamWithLongName("popSize")->setValue(pop_size_str);
-
-             make_help( parser );
-
-             return 0;
-        }
-
-    }
-    //see "make_help( parser );" below
+    
+    make_help( parser );
 
 
     /***********
@@ -328,15 +310,8 @@ int main ( int argc, char* argv[] )
     eo::log << eo::debug << std::endl;
 #endif
 
-    // initialisation de EO
-    eoPop<daex::Decomposition> pop = do_make_pop( parser, state, init );
-
-    // change the default value of pop_size, before making help
-    parser.getParamWithLongName("popSize")->defValue(pop_size_str);
-    parser.getParamWithLongName("popSize")->setValue(pop_size_str);
-
-    // make help here, after the true init of the pop
-    make_help( parser );
+    // randomly generate the population with the init operator
+    eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
 
     eo::log << eo::progress << "OK" << std::endl;
     
