@@ -55,17 +55,18 @@ void print_results( eoPop<daex::Decomposition> pop)
     eo::log << eo::warnings << FORMAT_LEFT_FILL_WIDTH(30) << "voluntary context switches"   << usage.ru_nvcsw                << std::endl;
     eo::log << eo::warnings << FORMAT_LEFT_FILL_WIDTH(30) << "involuntary context switches" << usage.ru_nivcsw               << std::endl;
 
+    // the pop being unsorted, sorting it before getting the first is more efficient
+    // than using best_element (that uses std::max_element)
     pop.sort();
 
-    std::cout << std::endl << pop[0] << std::endl;
-    std::cout << std::endl << pop[0].plan() << std::endl;
-    //std::cout << pop.best_element().plan() << std::endl;
+    std::cout << std::endl << pop.front() << std::endl;
+    std::cout << std::endl << pop.front().plan() << std::endl;
 
-    double subsolver_time = 0;
+    //double subsolver_time = 0;
     unsigned int subsolver_steps = 0;
     for( unsigned int i=0; i < pop.size(); i++ ) {
         for( unsigned int j=0; j < pop[i].subplans().size(); j++ ) {
-             subsolver_time += pop[i].subplan(j).time_subsolver();
+             //subsolver_time += pop[i].subplan(j).time_subsolver();
              subsolver_steps += pop[i].subplan(j).search_steps();
         }
     }
@@ -266,7 +267,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxgens" << maxgens << std::endl;
 
     unsigned int maxruns = parser.createParam( (unsigned int)1, "runs-max", 
-            "Maximum number of runs, if > 1, will do multi-start", 'r', "Stopping criterions" ).value();
+            "Maximum number of runs, if x==0: no limit, if x>1: will do multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
 
@@ -383,8 +384,8 @@ int main ( int argc, char* argv[] )
     eo::log << eo::progress << "OK" << std::endl;
 
     // TODO Sachant qu'on les a déjà évalués avec un b_max élevé, on ne veut pas les réévaluer avec un b_max plus petit, donc on ne réévalue pas après l'init
-    //eoPopLoopEval<daex::Decomposition> pop_eval( eval_counter );
-    //eval( pop, pop );
+    //eoPopLoopEval<daex::Decomposition> pop_eval( eval_maxtime );
+    //pop_eval( pop, pop );
 
 
     /********************
@@ -557,43 +558,66 @@ int main ( int argc, char* argv[] )
     eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
 #endif
 
+    // best decomposition of all the runs, in case of multi-start
+    // start at the best element of the init
+    daex::Decomposition best = pop.best_element();
     unsigned int run = 0;
 
-    try {
-        while( run < maxruns ) {
+    try { 
+
+        while( 1 ) {
 
             eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
 
             // start a search
             dae( pop );
 
-            pop.sort();
-            daex::Decomposition best = pop.front(); 
+            // remember the best of all runs
+            daex::Decomposition best_of_run = pop.best_element();
+
+            // note: operator> is overloaded in EO, don't be afraid: we are minimizing
+            if( best.fitness() > best_of_run.fitness() ) { 
+               best = best_of_run;
+            }
+
+            // TODO handle the case when we have several best decomposition with the same fitness but different plans?
+            // TODO use previous searches to re-estimate a better b_max?
+
+            // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
+            run++;
+            if( run >= maxruns && maxruns != 0 ) {
+                break;
+            }
 
             // Once the bmax is known, there is no need to re-estimate it,
             // thus we re-init ater the first search, because the pop has already been created before,
             // when we were trying to estimate the b_max.
-            eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
+            pop = eoPop<daex::Decomposition>( pop_size, init );
+            
+            // evaluate
+            eoPopLoopEval<daex::Decomposition> pop_eval( eval_maxtime );
+            pop_eval( pop, pop );
 
-            // ugly hack to maintain elitism accross re-starts
-            pop.pop_back();
-            pop.push_back( best );
-
+            // reset run's continuator counters
             steadyfit.totalGenerations( mingen, steadygen );
             maxgen.totalGenerations( maxgens );
 
-            run++;
         }
 
     } catch( std::exception& e ) {
         eo::log << eo::warnings << e.what() << std::endl;
         eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
+
+        // push the best result, in case it was not in the last run
+        pop.push_back( best );
         print_results( pop );
         return 0;
     }
 
     eo::log << eo::progress << "... end of search" << std::endl;
 
+    // push the best result, in case it was not in the last run
+    pop.push_back( best );
     print_results( pop );
 
     return 0;
