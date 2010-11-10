@@ -247,7 +247,7 @@ int main ( int argc, char* argv[] )
 
     // Stopping criterions
     unsigned int max_seconds = parser.createParam( (unsigned int)10800, "max-seconds", 
-            "Maximum number of seconds to run", 'i', "Stopping criterions" ).value(); // 10800 seconds = 30 minutes
+            "Maximum number of seconds for the whole search", 'i', "Stopping criterions" ).value(); // 10800 seconds = 30 minutes
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
 
 
@@ -264,6 +264,11 @@ int main ( int argc, char* argv[] )
     unsigned int maxgens = parser.createParam( (unsigned int)1000, "gen-max", 
             "Maximum number of iterations", 'x', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxgens" << maxgens << std::endl;
+
+    unsigned int maxruns = parser.createParam( (unsigned int)1, "runs-max", 
+            "Maximum number of runs, if > 1, will do multi-start", 'r', "Stopping criterions" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
+
 
     
     make_help( parser );
@@ -545,7 +550,6 @@ int main ( int argc, char* argv[] )
 
     eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
 
-    eo::log << eo::progress << "Start the search..." << std::endl;
     eo::log.flush();
 
 
@@ -553,10 +557,33 @@ int main ( int argc, char* argv[] )
     eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
 #endif
 
-    std::clog << "pop size= " << pop.size() << std::endl;
+    unsigned int run = 0;
 
     try {
-        dae( pop );
+        while( run < maxruns ) {
+
+            eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
+
+            // start a search
+            dae( pop );
+
+            pop.sort();
+            daex::Decomposition best = pop.front(); 
+
+            // Once the bmax is known, there is no need to re-estimate it,
+            // thus we re-init ater the first search, because the pop has already been created before,
+            // when we were trying to estimate the b_max.
+            eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
+
+            // ugly hack to maintain elitism accross re-starts
+            pop.pop_back();
+            pop.push_back( best );
+
+            steadyfit.totalGenerations( mingen, steadygen );
+            maxgen.totalGenerations( maxgens );
+
+            run++;
+        }
 
     } catch( std::exception& e ) {
         eo::log << eo::warnings << e.what() << std::endl;
