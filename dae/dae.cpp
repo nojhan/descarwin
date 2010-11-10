@@ -576,7 +576,7 @@ int main ( int argc, char* argv[] )
             daex::Decomposition best_of_run = pop.best_element();
 
             // note: operator> is overloaded in EO, don't be afraid: we are minimizing
-            if( best.fitness() > best_of_run.fitness() ) { 
+            if( best_of_run.fitness() > best.fitness() ) { 
                best = best_of_run;
             }
 
