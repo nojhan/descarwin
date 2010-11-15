@@ -169,6 +169,13 @@ int main ( int argc, char* argv[] )
             "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_init" << b_max_init << std::endl;
 
+    double b_max_quantile = parser.createParam( (double)0.5, "bmax-quantile", 
+            "Quantile to use for estimating b_max (in [0,1], 0.5=median)", 'Q', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_quantile" << b_max_quantile << std::endl;
+    if( b_max_quantile < 0 || b_max_quantile > 1 ) {
+        std::cout << "bmax-quantile must be a double in [0,1] (=" << b_max_quantile << ") type --help for usage." << std::endl;
+        exit(1);
+    }
 
     unsigned int b_max_fixed = parser.createParam( (unsigned int)0, "bmax-fixed", 
             "Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0", 'b', "Evaluation" ).value();
@@ -304,9 +311,10 @@ int main ( int argc, char* argv[] )
     // l'initialisation se fait en fonction de la liste des dates au plus tot possibles (start time set)
     // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
     daex::Init init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
-
+    
     eo::log << eo::logging << std::endl;
     eo::log << eo::logging << "\tChrono partition size: " << pddl.chronoPartitionAtom().size() << std::endl;
+    eo::log << eo::logging << "\tl_max: " << init.l_max() << std::endl;
 
 #ifndef NDEBUG
     eo::log << eo::debug << "\tChrono partition dates(#atoms): ";
@@ -345,7 +353,7 @@ int main ( int argc, char* argv[] )
         eval_init( pop, pop );
 
         // estimate the b_max from the eval results
-        b_max_in = eval_yahsp_init.estimate_b_max();
+        b_max_in = eval_yahsp_init.estimate_b_max( b_max_quantile );
 
     // if we want a fixed b_max for the whole search
     } else { // if b_max_in != 0
@@ -434,28 +442,6 @@ int main ( int argc, char* argv[] )
     // the checkpoint is here to get some stat during the search
     eoCheckPoint<daex::Decomposition> checkpoint( continuator );
 
-    // TODO add stats for: average size of the decompositions
-
-    // get best fitness
-    // for us, has the form "fitness feasibility" (e.g. "722367 1")
-    eoBestFitnessStat<daex::Decomposition> best_stat("Best");
-    
-    // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
-    eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
-
-    eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false), "IQR" );
-    
-    eoFeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
-
-    eoAverageSizeStat<daex::Decomposition> asize_stat( "Av.Size" );
-
-    // compute stas at each generation
-    checkpoint.add( best_stat );
-    checkpoint.add( median_stat );
-    checkpoint.add( iqr_stat );
-    checkpoint.add( feasible_stat );
-    checkpoint.add( asize_stat );
-    
 
     // get the best plan only if it improve the fitness
     // note: fitness is different from the makespan!
@@ -467,15 +453,49 @@ int main ( int argc, char* argv[] )
     
     // display the stats on std::cout
     // ostream & out, bool _verbose=true, std::string _delim = "\t", unsigned int _width=20, char _fill=' ' 
-    eoOStreamMonitor cout_monitor( std::clog, true, "\t", 10, ' '); 
+    eoOStreamMonitor cout_monitor( std::cout, "\t", 10, ' '); 
+
+
+    // get best fitness
+    // for us, has the form "fitness feasibility" (e.g. "722367 1")
+    eoBestFitnessStat<daex::Decomposition> best_stat("Best");
+
+    //eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false), "IQR" );
+    eoInterquartileRangeStat<daex::Decomposition> iqr_f( std::make_pair(0.0,false), "IQR_f" );
+    eoInterquartileRangeStat<daex::Decomposition> iqr_uf( std::make_pair(0.0,false), "IQR_uf" );
+    eoDualStatSwitch<daex::Decomposition,eoInterquartileRangeStat<daex::Decomposition> > dual_iqr( iqr_f, iqr_uf, "\t" );
+ 
+    // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
+    eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
+    /*
+    eoNthElementFitnessStat<daex::Decomposition> median_f( pop.size() / 2, "Median_f" ); 
+    eoNthElementFitnessStat<daex::Decomposition> median_uf( pop.size() / 2, "Median_uf" ); 
+    eoDualStatSwitch<daex::Decomposition,eoNthElementFitnessStat<daex::Decomposition> > dual_median( median_f, median_uf, "\t/\t" );
+    */
+
+    eoFeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
+
+    eoAverageSizeStat<daex::Decomposition> asize_stat( "Av.Size" );
 
     if( eo::log.getLevelSelected() >= eo::progress ) {
+
+        // compute stas at each generation
+        checkpoint.add( best_stat );
+        checkpoint.add( feasible_stat );
+        checkpoint.add( asize_stat );
+        checkpoint.add( median_stat );
+        //checkpoint.add( dual_median );
+        //checkpoint.add( iqr_stat );
+        checkpoint.add( dual_iqr );
+    
         cout_monitor.add( eval_counter );
         cout_monitor.add( best_stat );
-        cout_monitor.add( median_stat );
-        cout_monitor.add( iqr_stat );
-        cout_monitor.add( feasible_stat );
         cout_monitor.add( asize_stat );
+        cout_monitor.add( feasible_stat );
+        cout_monitor.add( median_stat );
+        //cout_monitor.add( dual_median );
+        //cout_monitor.add( iqr_stat );
+        cout_monitor.add( dual_iqr );
         
         // the checkpoint should call the monitor at every generation
         checkpoint.add( cout_monitor );
@@ -601,11 +621,11 @@ int main ( int argc, char* argv[] )
             // reset run's continuator counters
             steadyfit.totalGenerations( mingen, steadygen );
             maxgen.totalGenerations( maxgens );
-
         }
 
+
     } catch( std::exception& e ) {
-        eo::log << eo::warnings << e.what() << std::endl;
+        eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
         eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
 
         // push the best result, in case it was not in the last run
