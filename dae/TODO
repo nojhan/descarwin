@@ -3,8 +3,9 @@ TODO
 
 CODE
 
-* add a generic function to compute any quantile of the nodes distibution at the init phase
-    * do a parameter setting on the quantile position with a max b_max of 10000
+* implement two IQR/median statistics:
+    * for feasible fitness
+    * for unfeaible fitness
 
 * multi-core implementation by Caner Candan
     * first in DAE
@@ -37,11 +38,16 @@ CODE
 
 EXPERIMENTS
 
+* do a parameter setting on the quantile for the estimation of b_max with a max b_max of 10000
 * check distribution of used nodes number versus iterations and position in the decomposition
 * check the entropy of sort of the decompositions versus iterations
 * check existence duration of a given decomposition
 * check distribution of mutexes atoms
 * check correlation of last_reached versus iterations
+* check if there is a diversity loss during iterations,
+    * and correlations with fitness, plan structure and decomposition structure
+        * necessitate to know how to quantify those structures
+        * and/or distances
 
 * regarder avec yahsp la distribution de la longueur des plans
 * décider entre le cross-over aveugle ou le cross-over qui trie les dates
@@ -87,5 +93,6 @@ DONE
     * set the default pop size to 100 instead 20
         * remove the do_make_pop and do everything by hand so as to be sure of the default parameters and when the status is dumped
 * compile DAE statically with all libraries
-
+* add a loop for multi-start
+* add a generic function to compute any quantile of the nodes distribution at the init phase
 
