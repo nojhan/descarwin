@@ -467,25 +467,26 @@ void daeYahspEvalInit::step_recorder() {
 
 
 //! Le b_max est calculé comme la médiane du nombre total de noeuds parcourus sur l'ensemble de tous les appels à yahsp 
-//lors d'une première phase d'initialisation
-unsigned int daeYahspEvalInit::estimate_b_max()
+//! lors d'une première phase d'initialisation
+unsigned int daeYahspEvalInit::estimate_b_max( double quantile /* = 0.5 */ )
 {
     assert( node_numbers.size() > 0 );
 
-    unsigned int nth = node_numbers.size() / 2; // division euclidienne, indicage à 0 => prend l'élément supérieur
+    //unsigned int nth = node_numbers.size() / 2; // division euclidienne, indicage à 0 => prend l'élément supérieur
+    unsigned int nth = static_cast<unsigned int>( ceil( static_cast<double>( node_numbers.size() ) * quantile ) );
 
     // JACK use a simple computation of the median (rounding in case of an even size)
     
     // code version:
-    return node_numbers[ nth ];
+    //return node_numbers[ nth ];
 
     // suggested version: use a linear interpolation in case of even size
-    /*
+    
     if( node_numbers.size() % 2 != 0 ) { // impair
 
         std::nth_element( node_numbers.begin(), node_numbers.begin() + nth,  node_numbers.end() );
 
-        // l'élélement central est la médiane
+        // l'element central est la médiane
         return node_numbers[nth];
 
     } else { // pair
@@ -500,8 +501,7 @@ unsigned int daeYahspEvalInit::estimate_b_max()
         
         // la moyenne des éléments centraux
         return ( m1 + m2 ) / 2;
-    }
-    */
+    } 
 }
 
 

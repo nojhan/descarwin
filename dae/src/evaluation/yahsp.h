@@ -101,7 +101,7 @@ public:
 
     //! Le b_max est calculé comme la médiane du nombre total de noeuds parcourus sur l'ensemble de tous les appels à yahsp 
     //lors d'une première phase d'initialisation
-    unsigned int estimate_b_max();
+    unsigned int estimate_b_max( double quantile = 0.5 );
 
 protected:
     //! Distribution des nombres de noeuds utilisés dans les résolutions
