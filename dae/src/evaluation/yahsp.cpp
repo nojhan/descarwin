@@ -475,6 +475,10 @@ unsigned int daeYahspEvalInit::estimate_b_max( double quantile /* = 0.5 */ )
     //unsigned int nth = node_numbers.size() / 2; // division euclidienne, indicage à 0 => prend l'élément supérieur
     unsigned int nth = static_cast<unsigned int>( ceil( static_cast<double>( node_numbers.size() ) * quantile ) );
 
+    if( nth == 0 || nth == node_numbers.size()-1 ) {
+        eo::log << eo::warnings << "WARNING: while estimating the b_max, the quantile at " << quantile << " returns the " << nth << "th element (size=" << node_numbers.size() << ")" << std::endl;
+    }
+
     // JACK use a simple computation of the median (rounding in case of an even size)
     
     // code version:
@@ -499,8 +503,9 @@ unsigned int daeYahspEvalInit::estimate_b_max( double quantile /* = 0.5 */ )
         std::nth_element( node_numbers.begin(), node_numbers.begin() + nth - 1,  node_numbers.end() );
         m2 = node_numbers[nth-1];
         
-        // la moyenne des éléments centraux
-        return ( m1 + m2 ) / 2;
+        // mean of center elements
+        // with rounding, because the b_max should be an uint
+        return static_cast<unsigned int>( ceil( static_cast<double>( m1 + m2 ) / 2.0 ) );
     } 
 }
 
