@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-#include <algorithm>
 #include <iterator>
 #include <list>
 #include <cassert>

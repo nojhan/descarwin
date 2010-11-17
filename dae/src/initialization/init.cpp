@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <algorithm>
 
 #include "init.h"
 
@@ -38,7 +39,6 @@ void Init::operator()( Decomposition & decompo )
 
     std::vector<TimeVal> t_candidates;
     t_candidates.reserve( decompo_nb );
-    make_heap( t_candidates.begin(), t_candidates.end() );
 
     // JACK effectue le tirage des dates _avec remise_, il essaye au plus 11*size fois de tirer d'autres dates que celles déjà choisies 
     // tire des dates au hasard dans la chrono partition
@@ -51,14 +51,12 @@ void Init::operator()( Decomposition & decompo )
         std::advance( it, rng.random( _times_tmp.size() ) );
 
         t_candidates.push_back(*it); 
-        // en utilisant les helpers machin_heap on permet un tri en log(n)
-        std::push_heap( t_candidates.begin(), t_candidates.end() );
 
         _times_tmp.erase( it );
     }
 
-    // trie le vecteur (perd les propriétés de heap)
-    std::sort_heap( t_candidates.begin(), t_candidates.end() );
+    // trie le vecteur
+    std::sort( t_candidates.begin(), t_candidates.end() );
 
 
 
