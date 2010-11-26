@@ -31,7 +31,7 @@ function sge_submit_array_ipc()
 
     # list the available domain files in the sub-tree of this directory
     # default: do not consider ADL, NUMERIC and CYBERSEC
-    domains=`find $base_rep -type f -name *-domain.pddl | sed 's#^.#/#' | sort  | grep -v adl | grep -v numeric | grep -v cybersec`
+    domains=`find $base_rep -type f -name *-domain.pddl | sed 's#^.#/#' | sort  | grep -v adl | grep -v numeric | grep -v cybersec|grep -v p0`
     # + only problem within [01-09], add: | grep p0`
 
     for domain in $domains; do
@@ -50,14 +50,15 @@ function sge_submit_array_ipc()
             i=`basename $instance .pddl`
 
             # b_max quantiles
-            for q in `seq 1 9`; do
+            for q in `seq 1 1 9`; do
                 # submit an array of *runs jobs
                 # additional arguments are in $options
-                cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N ${d}_0.${q}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_bmax_quantile.sh $domain $instance $options $res $q"
+                dshort=`echo $d | head -c 4`
+                cmd="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N ${dshort}_${q}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_bmax_quantile.sh $domain $instance $options $res $q"
                 
-                echo $cmd1
-                ./run_wrapper.sh $domain $instance $options $res $q
-                #$cmd1
+                echo $cmd
+                #./run_bmax_quantile.sh $domain $instance $options $res $q
+                $cmd
 
                 cptr=$((cptr+1))
 
@@ -67,7 +68,7 @@ function sge_submit_array_ipc()
         fi
     done # domain
 
-    echo "$((cptr*runs)) runs submitted"
+    echo "$((cptr*runs*9)) runs submitted"
 }
 
 
