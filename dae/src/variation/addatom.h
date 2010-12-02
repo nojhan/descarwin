@@ -2,6 +2,8 @@
 #ifndef __DAEX_MUTATION_ADDATOM_H__
 #define __DAEX_MUTATION_ADDATOM_H__
 
+#include <algorithm>
+
 #include "utils/pddl_load.h"
 #include "core/atom.h"
 #include "core/goal.h"
@@ -55,7 +57,7 @@ public:
 
                 // tentative d'ajout d'un nouvel atome non mutex avec aucun des atomes du goal privé du candidat
                 //std::vector<Atom*>::const_iterator icandidate = draw_until_nomutex( at_date, goal, std::min( _maxtry_search_mutex, at_date.size() ) );
-                std::vector<Atom*>::const_iterator icandidate = draw_until_nomutex( at_date, decompo.iter_at(k)->begin(), decompo.iter_at(k)->end(), std::min( _maxtry_search_mutex, at_date.size() ) );
+                std::vector<Atom*>::const_iterator icandidate = draw_until_nomutex( at_date, decompo.iter_at(k)->begin(), decompo.iter_at(k)->end(), std::min( _maxtry_search_mutex, static_cast<unsigned int>(at_date.size()) ) );
                 if( icandidate != at_date.end() ) {
 #ifndef NDEBUG
                     eo::log << eo::xdebug << std::endl << "\tbefore:" << decompo << std::endl;
@@ -73,7 +75,7 @@ public:
                 r = rng.uniform();
                 if( r < _proba_change ) {
                     //icandidate = draw_until_nomutex( at_date, goal, std::min( _maxtry_search_mutex, at_date.size() ) );
-                    icandidate = draw_until_nomutex( at_date, decompo.iter_at(k)->begin(), decompo.iter_at(k)->end(), std::min( _maxtry_search_mutex, at_date.size() ) );
+                    icandidate = draw_until_nomutex( at_date, decompo.iter_at(k)->begin(), decompo.iter_at(k)->end(), std::min( _maxtry_search_mutex, static_cast<unsigned int>(at_date.size()) ) );
                     if( icandidate != at_date.end() ) {
 #ifndef NDEBUG
                         eo::log << eo::xdebug << std::endl << "\tbefore:" << decompo << std::endl;
