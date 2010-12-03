@@ -96,6 +96,8 @@ public:
         node_numbers.reserve( pop_size * l_max );        
     }
 
+    void call( daex::Decomposition & decompo );
+
     //! Récupère le nombre de noeuds utilisés par une résolution avec yahsp
     void step_recorder();
 

@@ -4,6 +4,7 @@
 #include <utility>
 #include <sstream>
 #include <stdexcept>
+#include <numeric>
 
 #include "yahsp.h"
 #include "utils/utils.h"
@@ -392,13 +393,13 @@ void daeYahspEval::call( daex::Decomposition & decompo )
             b_max( _b_max_last );
 
             unsigned int code = solve_next( decompo, goal_state, goal_state_nb  );
-	    decompo.fitness( std::make_pair( fitness_unfeasible_final(), false ) );
+            decompo.fitness( std::make_pair( fitness_unfeasible_final(), false ) );
 
 
             if( code == PLAN_FOUND ) {
                 
                 compress( decompo );
-		decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
+                decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
 
 
 #ifndef NDEBUG
@@ -453,6 +454,26 @@ void daeYahspEval::free_yahsp_structures()
 /**************************************************************************************************************
  * YAHSP EVAL INIT
  **************************************************************************************************************/
+
+
+void daeYahspEvalInit::call( daex::Decomposition & decompo ) 
+{
+#ifndef NDEBUG
+    eo::log << eo::logging << std::endl << "init decompo nodes nb: ";
+    eo::log.flush();
+#endif
+
+    int prev = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
+
+    daeYahspEval::call( decompo );
+    
+    int next = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
+
+#ifndef NDEBUG
+    eo::log << eo::logging << "     (" << next - prev << ")";
+#endif
+}
+
 
 //! Récupère le nombre de noeuds utilisés par une résolution avec yahsp
 void daeYahspEvalInit::step_recorder() {
