@@ -289,7 +289,7 @@ int main ( int argc, char* argv[] )
     // PDDL
 
     // parse les pddl
-    // FIXME ATTENTION : il y a une otion cachée dans l'init qui précise à yahsp si on est en temporel ou en séquentiel, il faut la régler correctement en fonction du problème visé
+    // FIXME ATTENTION : il y a une option cachée dans l'init qui précise à yahsp si on est en temporel ou en séquentiel, il faut la régler correctement en fonction du problème visé
     eo::log << eo::progress << "Load the instance..." << std::endl;
     eo::log.flush();
     

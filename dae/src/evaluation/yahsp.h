@@ -51,7 +51,7 @@ public:
 
 public:
     virtual void step_recorder() {}
-
+    virtual void step_recorder_fail() {}
 
 public:
     void call( daex::Decomposition & decompo ); 
@@ -93,13 +93,14 @@ public:
 	    double fitness_penalty = 1e6
 	    ) : daeYahspEval( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty ) 
     {
-        node_numbers.reserve( pop_size * l_max );        
+      node_numbers.reserve( pop_size * l_max );
     }
 
     void call( daex::Decomposition & decompo );
 
     //! Récupère le nombre de noeuds utilisés par une résolution avec yahsp
     void step_recorder();
+    void step_recorder_fail();
 
     //! Le b_max est calculé comme la médiane du nombre total de noeuds parcourus sur l'ensemble de tous les appels à yahsp 
     //lors d'une première phase d'initialisation

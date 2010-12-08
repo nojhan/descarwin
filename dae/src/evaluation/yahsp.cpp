@@ -33,9 +33,9 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 
 daeYahspEval::daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10000, unsigned int b_max_last = 30000, double fitness_weight = 10, double fitness_penalty = 1e6  ) : 
   daeCptYahspEval(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty),
-        _previous_state( NULL ),
-        _intermediate_goal_state(NULL),
-        _intermediate_goal_state_nb(0)
+  _previous_state( NULL ),
+  _intermediate_goal_state(NULL),
+  _intermediate_goal_state_nb(0)
 {
     // some init steps are not done here, but in pddl_load.cpp
     // notably the call to cpt_main
@@ -125,6 +125,8 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
 
       //decompo.fitness( std::make_pair( fitness_unfeasible( decompo, _previous_state ), false ) );
 
+      //      std::cout << "stats.evaluated_nodes = " << stats.evaluated_nodes << std::endl;
+      step_recorder_fail();
 
 #ifndef NDEBUG
         eo::log << eo::debug << "x";
@@ -480,6 +482,14 @@ void daeYahspEvalInit::step_recorder() {
     
     node_numbers.push_back( static_cast<int>( solution_plan->backtracks ) ); // TODO SolutionPlan->backtracks est codé comme un double dans plan.h
 
+#ifndef NDEBUG
+    eo::log << eo::logging << " " << node_numbers.back();
+    eo::log.flush();
+#endif
+}
+
+void daeYahspEvalInit::step_recorder_fail() {
+      node_numbers.push_back(stats.evaluated_nodes);
 #ifndef NDEBUG
     eo::log << eo::logging << " " << node_numbers.back();
     eo::log.flush();

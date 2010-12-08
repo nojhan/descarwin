@@ -13,11 +13,8 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
                           std::vector<std::string> solver_args /* = std::vector<std::string>()*/  
         )
 {
-    assert( solver == SOLVER_YAHSP || 
-            solver == SOLVER_CPT );
-
-    assert( heuristic_start_times == HEURISTIC_H1 ||
-            heuristic_start_times == HEURISTIC_H2 );
+    assert( solver == SOLVER_YAHSP || solver == SOLVER_CPT );
+    assert( heuristic_start_times == HEURISTIC_H1 || heuristic_start_times == HEURISTIC_H2 );
 
     // yahsp + seq + heuristique 1 + nodebug
     // vecteur contenant l'ensemble des options à passer à CPT
@@ -48,10 +45,10 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     if( solver == SOLVER_YAHSP ) {
 
         // use suboptimal yahsp search (yahsp / yahsp / y)
-        cpt_call.push_back( "-yahsp" );
+        cpt_call.push_back( "-yahsp" ); 
 
         // Enables h2-based fluent mutexes in yahsp (fluent-mutexes / fm / F)
-        cpt_call.push_back( "-fluent-mutexes" );
+	//        cpt_call.push_back( "-fluent-mutexes" ); BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 
 
         // Maximum number of backtracks <x> allowed.
         // TODO vérifier que yahsp ne différencie pas -maxbb et -maxb

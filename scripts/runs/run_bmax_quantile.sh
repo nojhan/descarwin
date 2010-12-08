@@ -21,7 +21,7 @@ echo "----------------------------------------------------------------------"
 echo "Run dae on $d : $i, run $r, b_max quantile $q" 1>&2
 echo "----------------------------------------------------------------------"
 
-cmd="./dae --max-seconds=1799 --domain=$domain --instance=$instance --seed=$s --status=$res/status/dae_status.${d}_${i}_q${q}_r$r --sequential=$3 --plan-file=$res/plans/dae_plan_${d}_${i}_q${q}_r$r --verbose=logging --bmax-quantile=${q}"
+cmd="./dae --max-seconds=1799 --domain=$domain --instance=$instance --seed=$s --status=$res/status/dae_status.${d}_${i}_q${q}_r$r --sequential=$3 --plan-file=$res/plans/dae_plan_${d}_${i}_q${q}_r$r --verbose=logging --bmax-quantile=${q} --runs-max=0"
 
 
 echo "$cmd" 1>&2
