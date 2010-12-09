@@ -48,7 +48,7 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
         cpt_call.push_back( "-yahsp" ); 
 
         // Enables h2-based fluent mutexes in yahsp (fluent-mutexes / fm / F)
-	//        cpt_call.push_back( "-fluent-mutexes" ); BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 BUG 64 
+	cpt_call.push_back( "-fluent-mutexes" );
 
         // Maximum number of backtracks <x> allowed.
         // TODO vérifier que yahsp ne différencie pas -maxbb et -maxb
