@@ -27,7 +27,7 @@
 #define FORMAT_LEFT_FILL_WIDTH(width) "\t" << std::left << std::setfill(LOG_FILL) << std::setw(width) 
 #define FORMAT_LEFT_FILL_W_PARAM FORMAT_LEFT_FILL_WIDTH(20)
 
-void print_results( eoPop<daex::Decomposition> pop)
+void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
 {
     struct rusage usage;
     getrusage(RUSAGE_SELF,&usage);
@@ -73,13 +73,25 @@ void print_results( eoPop<daex::Decomposition> pop)
     eo::log << eo::progress << "; DAEx sub-solver steps " << subsolver_steps << std::endl;
     //eo::log << eo::progress << "; DAEx sub-solver time " << subsolver_time << " s (u-CPU)" << std::endl;
 
-    eo::log << eo::progress << "; DAEx whole time " << usage.ru_utime.tv_sec << "." << usage.ru_utime.tv_usec << " (seconds of user time in CPU)" << std::endl;
+    eo::log << eo::progress << "; DAEx user time " << usage.ru_utime.tv_sec << "." << usage.ru_utime.tv_usec << " (seconds of user time in CPU)" << std::endl;
+    eo::log << eo::progress << "; DAEx wallclock time " << std::difftime( std::time(NULL), time_start )  << " (seconds)" << std::endl;
 }
 
 
 
 int main ( int argc, char* argv[] )
 {
+    // WALLOCK TIME COUNTER
+    time_t time_start = std::time(NULL);
+
+
+    // EO
+    eoParserLogger parser(argc, argv);
+    make_verbose(parser);
+
+    eoState state;
+
+    // SYSTEM
     struct rlimit limit;
     getrlimit(RLIMIT_AS, &limit);
     eo::log << eo::logging << "Maximum size of the process virtual memory (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
@@ -99,12 +111,7 @@ int main ( int argc, char* argv[] )
     */
 
 
-    // EO
-
-    eoParserLogger parser(argc, argv);
-    make_verbose(parser);
-
-    eoState state;
+    // PARAMETERS
 
     eo::log << eo::logging << "Parameters:" << std::endl;
 
@@ -636,7 +643,7 @@ int main ( int argc, char* argv[] )
 
         // push the best result, in case it was not in the last run
         pop.push_back( best );
-        print_results( pop );
+        print_results( pop, time_start );
         return 0;
     }
 
@@ -644,7 +651,7 @@ int main ( int argc, char* argv[] )
 
     // push the best result, in case it was not in the last run
     pop.push_back( best );
-    print_results( pop );
+    print_results( pop, time_start );
 
     return 0;
 }
