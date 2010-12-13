@@ -255,7 +255,7 @@ int main ( int argc, char* argv[] )
 
     // Stopping criterions
     unsigned int max_seconds = parser.createParam( (unsigned int)10800, "max-seconds", 
-            "Maximum number of seconds for the whole search", 'i', "Stopping criterions" ).value(); // 10800 seconds = 30 minutes
+            "Maximum number of wallclock seconds for the whole search, set it to 0 to deactivate (10800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 10800 seconds = 30 minutes
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
 
 
@@ -274,7 +274,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxgens" << maxgens << std::endl;
 
     unsigned int maxruns = parser.createParam( (unsigned int)1, "runs-max", 
-            "Maximum number of runs, if x==0: no limit, if x>1: will do multi-start", 'r', "Stopping criterions" ).value();
+            "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
 
@@ -378,6 +378,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::log.flush();
 
     // nested evals:
+    eoEvalFunc<daex::Decomposition> * p_eval;
 
     // eval that uses the correct b_max
     daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
@@ -387,7 +388,13 @@ int main ( int argc, char* argv[] )
 
     // an eval that raises an exception if maxtime is reached
     eoEvalTimeThrowException<daex::Decomposition> eval_maxtime( eval_counter, max_seconds );
-   
+ 
+    // if we do not want to add a time limit, do not add an EvalTime
+    if( max_seconds == 0 ) {
+        p_eval = & eval_counter;
+    } else {
+        p_eval = & eval_maxtime;
+    }
 
     eo::log << eo::progress << "OK" << std::endl;
 
@@ -564,8 +571,7 @@ int main ( int argc, char* argv[] )
 
 
     // ALGORITHM
-    //eoEasyEA<daex::Decomposition> dae( continuator, eval_maxtime, breed, replace );
-    eoEasyEA<daex::Decomposition> dae( checkpoint, eval_maxtime, breed, replace );
+    eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, replace );
 
     eo::log << eo::progress << "OK" << std::endl;
 
