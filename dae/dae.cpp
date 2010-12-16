@@ -262,7 +262,7 @@ int main ( int argc, char* argv[] )
 
     // Stopping criterions
     unsigned int max_seconds = parser.createParam( (unsigned int)10800, "max-seconds", 
-            "Maximum number of wallclock seconds for the whole search, set it to 0 to deactivate (10800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 10800 seconds = 30 minutes
+            "Maximum number of user seconds in CPU for the whole search, set it to 0 to deactivate (10800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 10800 seconds = 30 minutes
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
 
 
@@ -394,7 +394,8 @@ int main ( int argc, char* argv[] )
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_yahsp, "Eval.\t" );
 
     // an eval that raises an exception if maxtime is reached
-    eoEvalTimeThrowException<daex::Decomposition> eval_maxtime( eval_counter, max_seconds );
+//    eoEvalTimeThrowException<daex::Decomposition> eval_maxtime( eval_counter, max_seconds );
+    eoEvalUserTimeThrowException<daex::Decomposition> eval_maxtime( eval_counter, max_seconds );
  
     // if we do not want to add a time limit, do not add an EvalTime
     if( max_seconds == 0 ) {
