@@ -133,10 +133,13 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "pop_size" << pop_size << std::endl;
     
 
-    unsigned int seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' ).value();
-    if ( seed == 0) {
-        seed = time(0);
+    eoValueParam<unsigned int> & param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' );
+    // if one want to initialize on current time
+    if ( param_seed.value() == 0) {
+        // change the parameter itself, that will be dumped in the status file
+        param_seed.value( time(0) );
     }
+    unsigned int seed = param_seed.value();
     rng.reseed( seed );
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "seed" << seed << std::endl;
 
@@ -261,8 +264,8 @@ int main ( int argc, char* argv[] )
 
 
     // Stopping criterions
-    unsigned int max_seconds = parser.createParam( (unsigned int)10800, "max-seconds", 
-            "Maximum number of user seconds in CPU for the whole search, set it to 0 to deactivate (10800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 10800 seconds = 30 minutes
+    unsigned int max_seconds = parser.createParam( (unsigned int)1800, "max-seconds", 
+            "Maximum number of user seconds in CPU for the whole search, set it to 0 to deactivate (1800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 1800 seconds = 30 minutes
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
 
 
