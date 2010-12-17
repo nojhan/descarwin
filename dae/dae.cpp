@@ -395,22 +395,24 @@ int main ( int argc, char* argv[] )
 
     // counter, for checkpointing
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_yahsp, "Eval.\t" );
-
-    // an eval that raises an exception if maxtime is reached
-//    eoEvalTimeThrowException<daex::Decomposition> eval_maxtime( eval_counter, max_seconds );
-    eoEvalUserTimeThrowException<daex::Decomposition> eval_maxtime( eval_counter, max_seconds );
  
     // if we do not want to add a time limit, do not add an EvalTime
     if( max_seconds == 0 ) {
         p_eval = & eval_counter;
+
     } else {
-        p_eval = & eval_maxtime;
+    // an eval that raises an exception if maxtime is reached
+    /* eoEvalTimeThrowException<daex::Decomposition> * p_eval_maxtime 
+            = new eoEvalTimeThrowException<daex::Decomposition>( eval_counter, max_seconds ); */
+        eoEvalUserTimeThrowException<daex::Decomposition> * p_eval_maxtime 
+            = new eoEvalUserTimeThrowException<daex::Decomposition>( eval_counter, max_seconds );
+        p_eval = p_eval_maxtime;
     }
 
     eo::log << eo::progress << "OK" << std::endl;
 
     // TODO Sachant qu'on les a déjà évalués avec un b_max élevé, on ne veut pas les réévaluer avec un b_max plus petit, donc on ne réévalue pas après l'init
-    //eoPopLoopEval<daex::Decomposition> pop_eval( eval_maxtime );
+    //eoPopLoopEval<daex::Decomposition> pop_eval( *p_eval );
     //pop_eval( pop, pop );
 
 
@@ -632,7 +634,7 @@ int main ( int argc, char* argv[] )
             pop = eoPop<daex::Decomposition>( pop_size, init );
             
             // evaluate
-            eoPopLoopEval<daex::Decomposition> pop_eval( eval_maxtime );
+            eoPopLoopEval<daex::Decomposition> pop_eval( *p_eval );
             pop_eval( pop, pop );
 
             // reset run's continuator counters
