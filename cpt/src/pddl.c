@@ -219,6 +219,26 @@ static long predicates_cmp(PDDLPredicate *predicate1, PDDLPredicate *predicate2)
   return (long) predicate1->name - (long) predicate2->name;
 }
 
+/* static long term_name_cmp(PDDLTerm *term, const char *name) */
+/* { */
+/*   return strcmp(term->name, name); */
+/* } */
+
+/* static long terms_cmp(PDDLTerm *term1, PDDLTerm *term2) */
+/* { */
+/*   return strcmp(term1->name, term2->name); */
+/* } */
+
+/* static long predicate_name_cmp(PDDLPredicate *predicate, const char *name) */
+/* { */
+/*   return strcmp(predicate->name,name); */
+/* } */
+
+/* static long predicates_cmp(PDDLPredicate *predicate1, PDDLPredicate *predicate2) */
+/* { */
+/*   return strcmp(predicate1->name, predicate2->name); */
+/* } */
+
 
 /*  ******************************** */
 /*  *  Parsing domain and problem  * */

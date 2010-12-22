@@ -107,7 +107,9 @@ static long open_list_cmp(Node *node1, Node *node2)
 
 static long closed_list_cmp(Node *node1, Node *node2)
 {
-  CMP(node1->key, node2->key);
+  if (node1->key < node2->key) return -1;
+  if (node1->key > node2->key) return 1;
+  //CMP(node1->key, node2->key); // bug 64 bits
   return bitarray_cmp(node1->state, node2->state, fluents_nb);
 }
 
@@ -172,7 +174,9 @@ static void compute_h1_cost_yahsp(bool goal_pref)
 
 static long heuristic_cmp(Heuristic *h1, Heuristic *h2)
 {
-  CMP(h1->key, h2->key);
+  if (h1->key < h2->key) return -1;
+  if (h1->key > h2->key) return 1;
+  //CMP(h1->key, h2->key); // bug 64 bits
   return bitarray_cmp(h1->state, h2->state, fluents_nb);
 }
 

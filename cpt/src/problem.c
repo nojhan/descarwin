@@ -611,8 +611,6 @@ void create_problem(void)
   }
   end_monitor();
 
-  if (opt.yahsp) return;
-
   if (opt.print_actions) {
     print_pddl_types(stdout, pddl_domain);
     FOR(a, actions) { print_complete_action(a); } EFOR;
@@ -621,6 +619,8 @@ void create_problem(void)
     FOR(r, resources) { print_resource(r); } EFOR;
 #endif
   }
+
+  if (opt.yahsp) return;
 
   begin_monitor("Variables creation");
   causals_nb = end_action->prec_nb;
