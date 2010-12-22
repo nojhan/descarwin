@@ -44,12 +44,7 @@ class daeCptYahspEval : public eoEvalFunc<daex::Decomposition>
 {
 public:
      
-  daeCptYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10000, unsigned int b_max_last = 30000, double fitness_weight = 10, double fitness_penalty = 1e60 ) :
-        _l_max( l_max_ ),
-        _b_max_in(b_max_in),
-        _b_max_last( b_max_last),
-      _unknown_parameter(fitness_weight),
-      _fitness_penalty( fitness_penalty )
+  daeCptYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10000, unsigned int b_max_last = 30000, double fitness_weight = 10, double fitness_penalty = 1e60 ) : _l_max( l_max_ ), _b_max_in(b_max_in),_b_max_last( b_max_last),_unknown_parameter(fitness_weight),_fitness_penalty( fitness_penalty )
     {
         // hors ligne, car l'accesseur en profite pour modifier opt.max_backtracks
         b_max( b_max_in );

@@ -32,10 +32,7 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 }
 
 daeYahspEval::daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10000, unsigned int b_max_last = 30000, double fitness_weight = 10, double fitness_penalty = 1e6  ) : 
-  daeCptYahspEval(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty),
-  _previous_state( NULL ),
-  _intermediate_goal_state(NULL),
-  _intermediate_goal_state_nb(0)
+  daeCptYahspEval(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty), _previous_state( NULL ), _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
 {
     // some init steps are not done here, but in pddl_load.cpp
     // notably the call to cpt_main
@@ -66,7 +63,6 @@ daeYahspEval::~daeYahspEval()
  **************************************************************************************************************/
 unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb )
 {
-
     // copy the current_state of yahsp in _previous_state, 
     // in order to compute the distance between those two states
     // during the bad fitness computation
@@ -108,12 +104,28 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
      * Il n'y a donc pas besoin de mettre à jour l'état courant passé en premier
      * argument à cpt_search.
      */
-    unsigned int return_code = 
-        cpt_search( init_state, init_state_nb, 
-                    next_state, next_state_nb,
-                    false, false, false );
+    /*
+    BitArray my_initial_bitstate = bitarray_create(fluents_nb);
+    FOR(f, init_state) { bitarray_set(my_initial_bitstate, f); } EFOR;
 
+    eo::log << eo::logging << "init_state=";
+    for( unsigned int i = 0; i < init_state_nb; ++i ) {
+      eo::log << eo::logging << fluent_name(init_state[i]);
+    }
 
+    eo::log << eo::logging << "my_initial_bitstate=";
+    for( unsigned int i = 0; i < (fluents_nb - 1) / __WORDSIZE + 1; ++i ) {
+      eo::log << eo::logging << my_initial_bitstate[i] << " ";
+    }
+
+    eo::log << eo::logging << "next_state=";
+    for( unsigned int i = 0; i < next_state_nb; ++i ) {
+      eo::log << eo::logging << fluent_name(next_state[i]);
+    }
+    */
+    unsigned int return_code = cpt_search( init_state, init_state_nb, next_state, next_state_nb, false, false, false );
+
+    //    eo::log << eo::logging << "\t\treturn code: " << return_code << std::endl;
 
 #ifndef NDEBUG
     eo::log << eo::xdebug << "ok" << std::endl;
@@ -124,8 +136,9 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
     if( return_code == NO_PLAN || return_code == GOALS_MUTEX ) {
 
       //decompo.fitness( std::make_pair( fitness_unfeasible( decompo, _previous_state ), false ) );
-
       //      std::cout << "stats.evaluated_nodes = " << stats.evaluated_nodes << std::endl;
+      //      eo::log << eo::logging << " FAIL: " << decompo << std::endl;
+
       step_recorder_fail();
 
 #ifndef NDEBUG
@@ -370,6 +383,9 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                 // le compilateur demande à expliciter le template pour fluents, 
                 // car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
                 _intermediate_goal_state[i] =  (*iatom)->fluent_of<Fluent*>( "yahsp" );
+
+		//		eo::log << eo::logging << " Goal atom : " << fluent_name((*iatom)->fluent_of<Fluent*>( "yahsp" ))  << std::endl;
+
                 i++;
             }
 
@@ -427,11 +443,11 @@ void daeYahspEval::free_yahsp_structures()
     eo::log << eo::xdebug << "\t\tfree plans...";
     eo::log.flush();
 #endif
-
+    // On ne libère plus les sous-plans vu qu'on pointe dessus dans la solution
     // libère la variable globale "plans", utilisée par yahsp lors de la compression
-    for( unsigned int p=0; p < plans_nb; ++p ) {
-        plan_free( plans[p] );
-    }
+    //    for( unsigned int p=0; p < plans_nb; ++p ) {
+    //        plan_free( plans[p] );
+    //    }
     
     plans_nb = 0;
     

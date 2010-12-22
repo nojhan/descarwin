@@ -73,7 +73,7 @@ public:
             os << "; Decomposition " << best_decompo << std::endl;
 
             std::cout << "; Decomposition " << best_decompo << std::endl;
-            /*
+            
             
             os << "; sub-plans :" << std::endl;
             os << "; ******************************************************* " << std::endl;
@@ -87,7 +87,7 @@ public:
                 os << subplan << std::endl;
             }
             os << "; ******************************************************* " << std::endl;
-            */
+            
 #endif
             os << plan;
             value() = os.str();
