@@ -33,7 +33,7 @@ SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG" )
 # FIXME this is a ugly ha as it assume that the linker is gcc-compatible
 # there must be a more elegant way to do that with CMake, maybe with:
 # LINK_SEARCH_END_STATIC ?
-SET(CMAKE_EXE_LINKER_FLAGS -static)
+SET(CMAKE_EXE_LINKER_FLAGS "-fopenmp")
 
 # target
 

@@ -45,8 +45,11 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     if( solver == SOLVER_YAHSP ) {
 
         // use suboptimal yahsp search (yahsp / yahsp / y)
-        cpt_call.push_back( "-yahsp" ); 
+        cpt_call.push_back( "-yahsp" );
 
+	// -yashp now has one argument (for multicore)
+        cpt_call.push_back( "1" ); 
+	
         // Enables h2-based fluent mutexes in yahsp (fluent-mutexes / fm / F)
 	cpt_call.push_back( "-fluent-mutexes" );
 
