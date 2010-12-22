@@ -126,8 +126,16 @@ static Resource *instantiate_resource(PDDLDomain *domain, PDDLAtom *atom, PDDLTe
 
 static long atoms_cmp(PDDLAtom *atom1, PDDLAtom *atom2)
 {
-  if (atom1->predicate != atom2->predicate) return (long) atom1->predicate - (long) atom2->predicate;
-  return memcmp(atom1->terms, atom2->terms, atom1->terms_nb * sizeof(PDDLTerm *));
+  /* if (atom1->predicate != atom2->predicate) return (long) atom1->predicate - (long) atom2->predicate; */
+  /* /\* if (atom1->predicate < atom2->predicate) return -1; *\/ */
+  /* /\* if (atom1->predicate > atom2->predicate) return 1; *\/ */
+  /* return memcmp(atom1->terms, atom2->terms, atom1->terms_nb * sizeof(PDDLTerm *)); */
+  
+  if (atom1->predicate != atom2->predicate) return strcmp(atom1->predicate->name, atom2->predicate->name);
+  FOR2(t1, atom1->terms, t2, atom2->terms) {
+    if (t1 != t2) return strcmp(t1->name, t2->name);
+  } EFOR;
+  return 0;
 }
 
 static long litterals_cmp(PDDLLitteral *litteral1, PDDLLitteral *litteral2)

@@ -35,7 +35,6 @@ struct Node {
   TimeVal makespan;
   VECTOR(YStep, steps);
   VECTOR(Action *, applicable);
-  bool to_destroy;
 };
 
 typedef struct Heuristic Heuristic;
@@ -119,22 +118,12 @@ static Node *open_list_insert(Node *node)
   return (Node *) gdsl_rbtree_insert(open_list, node, &gdsl_return);
 }
 
-static Node *to_destroy[10000];
-static size_t to_destroy_nb;
-
 static Node *closed_list_insert(Node *node)
 {
   int gdsl_return;
   ulong i;
   for (i = 0; i < (ulong) (fluents_nb -1) / __WORDSIZE + 1; i++) node->key ^= node->state[i] * (i + 1);
-/*   Node *n = */ gdsl_rbtree_insert(closed_list, node, &gdsl_return);
-/*   if (0&&gdsl_return != GDSL_INSERTED) { */
-/*     if (node->makespan < n->makespan) { */
-/*       n->makespan = node->makespan; */
-/*       //to_destroy[to_destroy_nb++] = node; */
-/*       return node; */
-/*     } */
-/*   } */
+  gdsl_rbtree_insert(closed_list, node, &gdsl_return);
    return gdsl_return == GDSL_INSERTED ? node : ({ node_free(node); (Node *) NULL; });
 }
 
@@ -413,10 +402,7 @@ static Node *yahsp_plan()
       if ((son = compute_node(son))) return son;
       if (stats.evaluated_nodes >= opt.max_backtracks) return NULL;
     } EFOR;
-    //if (node->to_destroy) node_free(node); else 
     cpt_free(node->applicable);
-    FOR(n, to_destroy) { gdsl_rbtree_remove(open_list, n); node_free(n); } EFOR;
-    to_destroy_nb = 0;
   }
   return NULL;
 }
@@ -482,12 +468,12 @@ int yahsp_main()
     } EFOR;
     node = node->ancestor;
   }
-  
+
   qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);
   plan->backtracks = stats.evaluated_nodes;
 
   solution_plan = plan;
-  
+
   gdsl_rbtree_flush(open_list);
   gdsl_rbtree_flush(closed_list);
 
@@ -495,6 +481,33 @@ int yahsp_main()
 }
 
 int yahsp_compress_plans()
+{
+  SolutionPlan *plan = cpt_calloc(plan, 1);
+
+  FOR(p, plans) { plan->steps_nb += p->steps_nb; } EFOR;
+  cpt_malloc(plan->steps, plan->steps_nb);
+  plan->steps_nb = 0;
+  FOR(p, plans) {
+    FOR(s, p->steps) {
+      *cpt_calloc(plan->steps[plan->steps_nb++], 1) = *s;
+      s = plan->steps[plan->steps_nb - 1];
+      s->init = 0;
+      RFOR(s2, plan->steps) {
+	if (action_must_precede(s2->action, s->action)) {
+	  maximize(s->init, s2->end);
+	  if (s->init == plan->makespan) break;
+	}
+      } EFOR;
+      s->end = s->init + duration(s->action);
+      maximize(plan->makespan, s->end);
+    } EFOR;
+  } EFOR;
+  qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);
+  solution_plan = plan;
+  return PLAN_FOUND;
+}
+
+int yahsp_compress_plans2()
 {
   SolutionPlan *plan = cpt_calloc(plan, 1);
 
