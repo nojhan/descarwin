@@ -51,7 +51,7 @@ void trace_end_bound(long nodes, long backtracks, double time)
 void trace_restart(long nodes, long backtracks, double time, TimeVal bound)
 {
   printf("%ld  ---  %ld  ---  %.2f\nBound : ", nodes, backtracks, time);
-  print_time(stdout, bound);
+  print_time(stdout, bound - (opt.pddl21 ? pddl_domain->precision.t : 0));
   printf("  ---  ");
 }
 
@@ -99,8 +99,12 @@ void trace_search_stats(double search_time, double total_time)
       trace(normal, "World size : %ldK\n", world_size() / 1000);
       trace(normal, "Nodes/sec : %.2f\n", nb_nodes() / search_time);
     }
-    trace(normal, "Search time : %.2f\n", search_time);
-    trace(normal, "Total time : %.2f\n", total_time);
+    double wctime = omp_get_wtime() - stats.wcsearch;
+    trace(normal, "Search us time : %.2f\n", search_time);
+    trace(normal, "Search wc time : %.2f\n", wctime);
+    trace(normal, "Core utility : %.2f\n", mini(100, search_time * 100 / (wctime * mini(opt.yahsp_threads, omp_get_num_procs()))));
+    trace(normal, "Total us time : %.2f\n", total_time);
+    trace(normal, "Total wc time : %.2f\n", omp_get_wtime() - stats.wctime);
     trace(normal, "\n");
   }
 }

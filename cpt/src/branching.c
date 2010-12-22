@@ -15,6 +15,7 @@
 #include "plan.h"
 #include "trace_planner.h"
 #include "globs.h"
+#include "comparison.h"
 #include "heuristics.h"
 #include "branching.h"
 
@@ -64,8 +65,6 @@ static bool (*make_choice) (Choice *c);
    (c->choice1 = c0, c->choice2 = a0,					\
     c->direction = ({ Comparison test = dir; test == Better || (opt.random && test == Equal && rand() % 2 == 0); }), \
     c->propagate = propagate_##type##_choice, stats.type##_choices++, true))
-
-#define preferred(comp, ties) ({ Comparison test = comp; test == Worse ? false : !opt.random ? test == Better : test == Better ? (ties = 1) : rand() % ++ties == 0; })
 
 #define _inith(h, o) h = h##_##o
 #define _init_heuristic(o)						\
@@ -289,7 +288,8 @@ static bool supports_first(Choice *c)
 
 static bool mutex_first(Choice *c)
 {
-  return (choose_mutex(c) || /* choose_conflict(c) ||  */choose_support(c));
+  //return (choose_mutex(c) || /* choose_conflict(c) ||  */choose_support(c));
+  return (choose_mutex(c) || choose_conflict(c) || choose_support(c));
 }
 
 void search(void)

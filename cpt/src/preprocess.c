@@ -43,8 +43,6 @@ static void compute_reachability_f(Fluent *f, bool areachable[], bool freachable
 /*****************************************************************************/
 
 
-bool test = false, test2 = false;
-
 static void compute_reachability_a(Action *a, bool areachable[], bool freachable[], long reached_prec[])
 {
   if (!get_areachable(a)) {
@@ -106,6 +104,8 @@ void compute_distance_boosting(void)
 	//if (prod->ac_constraints_nb != 0 && prod->ac_constraints[0]->fluent == c->fluent) goto end;
 	FOR(f, cons->add) { if (!consumes(prod, f)) goto end; } EFOR;
 	FOR(f, prod->add) { if (!edeletes(cons, f)) goto end; } EFOR;
+	// added : consumer can delete smth that was true before producer
+	if (opt.pddl21) FOR(f, cons->del) { if (!edeletes(prod, f)) goto end; } EFOR;
 	inter_nb = 0;
 	FORCOUPLE(f, prod->add, a, f->consumers) {
 	  if (a->id > 1 && !inter_used[a->id] && !edeletes(a, c->fluent)) {

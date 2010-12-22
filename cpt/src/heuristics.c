@@ -10,17 +10,9 @@
 #include "cpt.h"
 #include "structs.h"
 #include "globs.h"
+#include "comparison.h"
 #include "heuristics.h"
-
-
-/*---------------------------------------------------------------------------*/
-/* Local Macros                                                              */
-/*---------------------------------------------------------------------------*/
-
-
-#define LESS(x, y) NEST( typeof(x) _a = x; typeof(y) _b = y; if (_a < _b) return Better; if (_a > _b) return Worse; )
-#define GREATER(x, y) NEST( typeof(x) _a = x; typeof(y) _b = y; if (_a > _b) return Better; if (_a < _b) return Worse; )
-#define PREFER(exp1, exp2) NEST( bool _e1 = exp1, _e2 = exp2; if (_e1 && _e2) return Better; if (!_e1 && !_e2) return Worse; )
+#include "trace.h"
 
 
 /*****************************************************************************/
@@ -41,6 +33,12 @@ TimeVal minprec(Action *a)
   return first_start(a);
 }
 
+TimeVal maxprec(Action *a)
+{
+  while (a->pddl21_next) a = a->pddl21_next;
+  return first_start(a);
+}
+
 Comparison is_best_action_optimal(Action *a, Action *a0, Causal *c)
 {
   PREFER(a->used, !a0->used);
@@ -52,6 +50,8 @@ Comparison is_best_action_optimal(Action *a, Action *a0, Causal *c)
   //GREATER(last_start(a), last_start(a0));
   //GREATER(first_start(a), first_start(a0));
   //LESS(last_start(a) - first_start(a), last_start(a0) - first_start(a0));
+
+  //LESS(first_start(a), first_start(a0));
   if (opt.pddl21) LESS(minprec(a), minprec(a0));
   else LESS(first_start(a), first_start(a0));
   LESS(duration(a), duration(a0));
@@ -69,7 +69,10 @@ Comparison is_best_support_optimal(Causal *c, Action *a, Causal *c0, Action *a0)
     PREFER(c == last_conflict_candidate, c0 != last_conflict_candidate);
   }
   if (opt.wdeg) GREATER(wdeg2(c), wdeg2(c0));
+  //GREATER(maxprec(a), maxprec(a0));
+  //GREATER(minprec(a), minprec(a0));
   GREATER(first_start(a), first_start(a0));
+  //GREATER(first_start(c), first_start(c0));
   LESS(slack_ac(a, c), slack_ac(a0, c0));
   return Equal;
 }

@@ -274,7 +274,7 @@ void compute_init_h2_cost(void)
   FORMIN(a, actions, 0) { 
     a->init = get_ainit(a); 
     FOR(f, a->add) { 
-      if (a->init < MAXCOST) minimize(f->init, a->init+ duration(a)); 
+      if (a->init < MAXCOST) minimize(f->init, a->init + duration(a)); 
     } EFOR; 
   } EFOR;
 }
@@ -385,8 +385,8 @@ void compute_init_edeletes(void)
   } EFOR;
 
   FOR(f, fluents) {
-    //f->init = (fmutex(f, f) ? MAXCOST : 0);
-    if (fmutex(f, f) == MAXCOST) f->init = MAXCOST;
+    if (fmutex(f, f) == MAXCOST) 
+      f->init = MAXCOST;
   } EFOR;
  
 }
@@ -406,11 +406,11 @@ static void compute_edeletes(TimeVal ainit[], bool areachable[])
 	  FORCOUPLE(f1, a->add, f2, a->add) { update_cost_edeletes(f1, f2, areachable); } EFORCOUPLE;
 	  set_ainit(a, 0);
 	}
-	FOR(f, fluents) {
-	  if (!edeletes(a, f)) {
-	    FOR(f2, a->prec) { if (fmutex(f, f2)) goto end2; } EFOR;
-	    set_edeletes(a, f);
-	    FOR(f2, a->add) { update_cost_edeletes(f, f2, areachable); } EFOR;
+	FOR(f1, fluents) {
+	  if (!edeletes(a, f1)) {
+	    FOR(f2, a->prec) { if (fmutex(f1, f2)) goto end2; } EFOR;
+	    set_edeletes(a, f1);
+	    FOR(f2, a->add) { update_cost_edeletes(f1, f2, areachable); } EFOR;
 	  }
 	end2:;
 	} EFOR;
@@ -422,13 +422,13 @@ static void compute_edeletes(TimeVal ainit[], bool areachable[])
 
 void compute_relevance(TimeVal bnd)
 {
-  if (opt.relevance) {
+  if (!opt.pddl21 && opt.relevance) {
     FOR(a, actions) { a->init = 0; } EFOR;
     compute_action_relevance(end_action, bnd);
     FORMIN(a, actions, 2) { update_sup_a(a, a->init); } EFOR;
   } else
     FOR(a, actions) {
-      update_sup_a(a, first_start(end_action) - delta_aa(a, end_action));
+      update_sup_a(a, last_end(end_action) - delta_aa(a, end_action));
     } EFOR;
 }
 

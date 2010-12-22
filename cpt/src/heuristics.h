@@ -11,9 +11,6 @@
 #define HEURISTICS_H
 
 
-typedef enum {Better, Equal, Worse} Comparison;
-
-
 extern Comparison is_best_action_optimal(Action *a, Action *a0, Causal *c);
 extern Comparison is_best_support_optimal(Causal *c, Action *a, Causal *c0, Action *a0);
 extern Comparison is_best_conflict_optimal(Causal *c, Action *a, Causal *c0, Action *a0);

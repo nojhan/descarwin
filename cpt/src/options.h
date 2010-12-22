@@ -79,6 +79,9 @@ struct Option {
   long verbosity;
   bool wdeg;
   bool yahsp;
+  long yahsp_threads;
+  long yahsp_teams;
+  long yahsp_strategy;
 };
 
 extern Option opt;

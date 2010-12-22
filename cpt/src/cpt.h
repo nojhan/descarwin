@@ -22,7 +22,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <gmp.h>
+#include <omp.h>
 
 
 #define VALUE_SHORT
@@ -81,12 +83,15 @@ struct TimeStruct {
 
 #define NEST(body...) do { body } while (0)
 
-#define maxi(a, b) ({ typeof(a) x = (a); typeof(b) y = (b); (x > y ? x : y); })
-#define mini(a, b) ({ typeof(a) x = (a); typeof(b) y = (b); (x < y ? x : y); })
-#define maximize(a, b) NEST( typeof(b) y = (b); if ((a) < y) (a) = y; )
-#define minimize(a, b) NEST( typeof(b) y = (b); if ((a) > y) (a) = y; )
+#define maxi(a, b) ({ typeof(a) _x = (a); typeof(b) _y = (b); (_x > _y ? _x : _y); })
+#define mini(a, b) ({ typeof(a) _x = (a); typeof(b) _y = (b); (_x < _y ? _x : _y); })
+/* #define maximize(a, b) NEST( typeof(b) _y = (b); if ((a) < _y) (a) = _y; ) */
+/* #define minimize(a, b) NEST( typeof(b) _y = (b); if ((a) > _y) (a) = _y; ) */
+#define maximize(a, b) NEST( typeof(&a) _x = (&a); typeof(b) _y = (b); if (*_x < _y) *_x = _y; )
+#define minimize(a, b) NEST( typeof(&a) _x = (&a); typeof(b) _y = (b); if (*_x > _y) *_x = _y; )
 
-#define exchange(a, b) NEST( typeof(a) tmp = a; a = b ; b = tmp; )
+
+#define exchange(a, b) NEST( typeof(a) _tmp = a; a = b ; b = _tmp; )
 
 
 #define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res)) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })

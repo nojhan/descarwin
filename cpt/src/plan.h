@@ -22,7 +22,7 @@
 #ifdef WALLCLOCK_TIME
 
 #include <time.h>
-#define TIMER(x) clock_t x##_start
+#define TIMER(x) static clock_t x##_start
 #define start_timer(x) NEST( x##_start = clock(); )
 #define get_timer(x) ((clock() - x##_start) / (double) CLOCKS_PER_SEC)
 
@@ -76,6 +76,8 @@ struct Statistics {
   TIMER(search);
   TIMER(total);
   TIMER(iteration);
+  double wctime;
+  double wcsearch;
 };
 
 
@@ -85,4 +87,6 @@ extern SolutionPlan *plan_save(Action **actions, long actions_nb, double search_
 extern void plan_free(SolutionPlan *plan);
 extern void compress_plans(bool causals, bool orderings);
 extern int precedes_in_plan(const void *s1, const void *s2);
+
+
 #endif /* PLAN_H */

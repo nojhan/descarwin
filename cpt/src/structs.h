@@ -31,7 +31,7 @@ typedef struct ResourceLocal ResourceLocal;
 struct Fluent {
   long id;
   long bit_index;
-  unsigned long int bit_mask;
+  long bit_mask;
   PDDLAtom *atom;
   Value *indac;
   TimeVal *pair_cost;

@@ -89,6 +89,7 @@ SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
   SolutionPlan *plan = cpt_malloc(plan, 1);
   plan->steps_nb = 0;
   plan->search_time = search_time;
+  plan->makespan = 0;
   cpt_malloc(plan->steps, actions_nb - 2);
   FOR(a, actions) {
     if (a->id > 1) {
@@ -102,9 +103,10 @@ SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
 #endif
       step->init = first_start(a);
       step->end = last_start(a);
+      maximize(plan->makespan,  first_start(a) + (opt.pddl21 ? a->rdur.t : duration(a)));
     }
   } EFOR;
-  plan->makespan = first_start(end_action) - (opt.pddl21 ? pddl_domain->precision.t : 0);
+  //plan->makespan = first_start(end_action) - (opt.pddl21 ? pddl_domain->precision.t : 0);
   qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);
 
   FOR(s, plan->steps) { 

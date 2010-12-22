@@ -14,11 +14,11 @@ EXEDIR = ../bin
 LIBDIR = ../lib
 LIBINCDIR = ../include
 
-CFLAGS =  -O3 -Wall -g
+CFLAGS =  -O3 -Wall -g -fopenmp
 EXE     	= $(EXEDIR)/cpt
 RATP     	= $(EXEDIR)/cpt-ratp
 LIB      	= $(LIBDIR)/libcpt.a
-LDLIBS   =  -lm -lgmp 
+LDLIBS   =  -lm -lgmp -fopenmp
 #-static
 
 FLEX_SOURCES = \

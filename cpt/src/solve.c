@@ -66,7 +66,7 @@ VECTOR(Causal *, last_conflicts);
 /*---------------------------------------------------------------------------*/
 
 
-#define print_trace(first_run) NEST( if (!first_run) trace_proc(restart, nb_nodes_run(), nb_backtracks_run(), get_timer(iteration), first_end(end_action)); )
+#define print_trace(first_run) NEST( if (!first_run) trace_proc(restart, nb_nodes_run(), nb_backtracks_run(), get_timer(iteration), last_start(end_action)); )
 
 
 /*---------------------------------------------------------------------------*/
@@ -150,6 +150,8 @@ int cpt_main(int argc, const char **argv)
 
   start_timer(stats.total);
 
+  stats.wctime = omp_get_wtime();
+
 #ifndef WALLCLOCK_TIME
   init_system(opt.timer);
 #endif
@@ -158,11 +160,13 @@ int cpt_main(int argc, const char **argv)
 
   fesetround(FE_UPWARD);
 
+  stats.wcsearch = omp_get_wtime();
+  
   if (opt.yahsp) {
     yahsp_init();
     start_timer(stats.search);
   }
-  
+
   if (opt.dae) return 0;
 
 #ifdef RATP
@@ -258,8 +262,8 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
   end_monitor();
 
   if (opt.limit_initial_propagation && propagations_limit_reached()) {
-    restore_initial_world(0);
-    return INIT_PROP_FAILED; 
+/*     restore_initial_world(0); */
+/*     return INIT_PROP_FAILED;  */
   }
   set_limit_initprop(false, 0);
 
@@ -327,8 +331,7 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
     if (new_world(false)) {
       //update_inf_a(end_action, bound);
       update_sup_a(end_action, bound);
-      FOR(a, actions) { update_sup_a(a, bound); } EFOR;
-      if (!opt.pddl21) compute_relevance(bound);
+      compute_relevance(bound);
       if (opt.shaving) { propagate(); shaving(); }
       last_conflict_candidate = NULL;
       last_conflicts_nb = 0;

@@ -89,7 +89,8 @@ static void synchronize_causal(Causal *c)
     if (c->consumer->used) make_precede(prod, c->consumer);
   } else {
     TimeVal min_cons_init = MAXTIME, min_prod_init = MAXTIME, max_prod_init = 0, max_cons_init = 0;
-    
+    int nb = 0; Action *prod;
+
     FORPROD(a, c) {
       if (last_start(a) < first_start(c) || first_start(a) > last_start(c) || cannot_precede_aa(a, c->consumer) ||
 	  first_start(c) > last_start(c->consumer) - delta_aa(a, c->consumer))
@@ -97,6 +98,8 @@ static void synchronize_causal(Causal *c)
       else {
 	ActivityConstraint *ac = find_ac_constraint(a, c->fluent);
 	if (ac != NULL) {
+	nb++;
+	prod = a;
 	  TimeVal acmin, acmax;
 	  evaluate_ac_forward(ac, maxi(first_start(a), first_start(c)) + duration(a), 
 				 mini(last_start(a), last_start(c)) + duration(a),&acmin, &acmax);
@@ -118,6 +121,10 @@ static void synchronize_causal(Causal *c)
     update_inf_c(c, min_prod_init);
     update_sup_c(c, max_prod_init);
     update_sup_a(c->consumer, max_cons_init);
+    if (nb == 1) {
+      update_inf_a(prod, first_start(c));
+      update_sup_a(prod, last_start(c));
+    }
   }
 }
 
@@ -184,6 +191,7 @@ void use_action(Action *a)
 	else if (precedes(a, a1)) protect(a, a1);
       } EFOR;
     }
+    if (opt.sequential && active_actions_nb - 2 > last_start(end_action)) { contradiction(); }
     //protect_against(a); // ici ou en dessous ?
     activate_action(a);
   }
@@ -523,3 +531,4 @@ void restrict_problem(Fluent **init, long init_nb, Fluent **goal, long goal_nb)
   opt.global_mutex_sets = gms;
   opt.complete_qualprec = cqp;
 }
+

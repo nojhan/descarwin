@@ -186,6 +186,13 @@ void print_action(Action *a)
 #endif
 }
 
+void free_ac_constraint(ActivityConstraint *ac) 
+{
+  mpq_clear(ac->min.q);
+  mpq_clear(ac->max.q);
+  cpt_free(ac);
+}
+
 void free_action(Action *a)
 {
   cpt_free(a->parameters);
@@ -212,9 +219,7 @@ void free_action(Action *a)
   }
 #endif
   FOR(ac, a->ac_constraints) {
-    mpq_clear(ac->min.q);
-    mpq_clear(ac->max.q);
-    cpt_free(ac);
+    free_ac_constraint(ac);
   } EFOR;
   cpt_free(a->ac_constraints);
   cpt_free(a);
@@ -283,7 +288,6 @@ static void create_structures(void)
   FORi(f, i, fluents) {
     f->id = i;
     bitarray_set_index(f);
-
     if (f->pair_cost) cpt_free(f->pair_cost);
     if (pass == 2) f->mutex = bitarray_create(f->id + 1);
     if (pass == 2 && opt.initial_heuristic == 2) cpt_calloc(f->pair_cost, fluents_nb);
@@ -341,6 +345,10 @@ static void create_structures(void)
 	  FOR(a2, f->consumers) { set_amutex(a, a2); } EFOR;
 	  FOR(a2, f->producers) { set_amutex(a, a2); } EFOR;
 	} EFOR;
+	if (0&&opt.pddl21) {
+	  FORPAIR(a1, a2, f->producers) { if (a1 != a2) set_amutex(a1, a2); } EFORPAIR;
+	  FORPAIR(a1, a2, f->deleters) { if (a1 != a2) set_amutex(a1, a2); } EFORPAIR;
+	}
       } EFOR;
     }
   }
@@ -424,6 +432,23 @@ static void keep_reachable(void)
   bool cont = true;
   bool reachable[fluents_nb];
 
+  if (opt.pddl21) {
+    if (opt.pddl21) FOR(a, actions) { FOR(f, a->add) { if (deletes(a, f)) a->init = MAXCOST; } EFOR; } EFOR;
+    bool loop = true;
+    while (loop) {
+      loop = false;
+      FOR(a, actions) { 
+	if (a->init != MAXCOST && a->ac_constraints && a->ac_constraints[0]->fluent->consumers) {
+	  Action *cons =  a->ac_constraints[0]->fluent->consumers[0];
+	  if (cons->init == MAXCOST && a->init != MAXCOST) {
+	    a->init = MAXCOST;
+	    loop = true;
+	  }
+	}
+      } EFOR;
+    }
+  }
+
   FORMIN(a, actions, 2) {
 #ifdef RESOURCES
     if (a->synchro) goto useful;
@@ -443,8 +468,6 @@ static void keep_reachable(void)
   useful:;
   } EFOR;
 
-  if (opt.pddl21) FOR(a, actions) { FOR(f, a->add) { if (deletes(a, f)) a->init = MAXCOST; } EFOR; } EFOR;
-
   while (cont) {
     cont = false;
 
@@ -455,10 +478,14 @@ static void keep_reachable(void)
 	FOR(f, a->del) { if (f->end != MAXCOST) reachable[f->id] = true; } EFOR;
       }
     } EFOR;
-    
-    if (opt.pddl21) {
-      FOR(a, actions) { 
-	if (a->ac_constraints && !reachable[a->ac_constraints[0]->fluent->id]) a->init = MAXCOST; 
+    // probleme avec airport 3 et parcprinter 10
+    if (0&&opt.pddl21) {
+      FOR(a, actions) {
+	if (a->init != MAXCOST && a->ac_constraints && !reachable[a->ac_constraints[0]->fluent->id])
+	  { 
+	    free_ac_constraint(a->ac_constraints[0]);
+	    if (--a->ac_constraints_nb == 0) cpt_free(a->ac_constraints);
+	  }
       } EFOR;
     }
 
@@ -475,7 +502,7 @@ static void keep_reachable(void)
 	}
       }
     } EFOR;
-      cont = false;
+/*       cont = false; */
   }  
   
   i = 0;
@@ -511,6 +538,71 @@ static void keep_reachable(void)
     error(no_plan, "Start or End has been removed");
 }
 
+
+#define realdur(a) (duration(a) + (a->pddl21_next ? a->ac_constraints[0]->min.t : 0))
+
+Action *lastac(Action *a)
+{
+  while (a->pddl21_next) a = a->pddl21_next;
+  return a;
+ }
+
+static TimeVal realdiff(Action *a1, Action *a2)
+{
+  TimeVal d = distance(a1, a2);
+  if (d == 0) return 0;
+  //if (a1->pddl21_prev &&  distance(a1->pddl21_prev, a2) == 0) return 0;
+  //if (a2->pddl21_next &&  distance(a1, a2->pddl21_next) == 0) return 0;
+  if (distance(a1, lastac(a2)) == 0) return 0;
+  while ((a1 = a1->pddl21_prev)) d += realdur(a1->pddl21_next);
+  while ((a2 = a2->pddl21_prev)) d -= realdur(a2);
+  return d;
+}
+
+static void increase_pddl21_distances()
+{
+/*   goto a; */
+  Action *x, *y;
+  TimeVal md, d;
+  FOR(a1, actions) {
+    if (!a1->pddl21_prev) {
+      FOR(a2, actions) {
+	if (a1 != a2 && !a2->pddl21_prev) {
+	  x = a1;
+	  md = 0;
+	  do {
+	    y = a2;
+	    do {
+	      maximize(md, realdiff(x, y));
+	    } while ((y = y->pddl21_next));
+	  }  while ((x = x->pddl21_next));
+	  if (md == 0) continue;
+	  x = a1;
+	  while(x) {
+	    y = a2;
+	    d = md;
+	    do {
+	      maximize(distance(x, y), d);
+	      d +=  realdur(y);
+	    } while ((y = y->pddl21_next));
+	    if ((x = x->pddl21_next))
+	      md -= x->pddl21_prev->ac_constraints[0]->min.t + duration(x);
+	  }
+	}
+      } EFOR;
+    }
+  } EFOR;
+/*  a: */
+/*   FOR(a1, actions) { */
+/*     FOR(a2, actions) { */
+/*       printf("%s ", action_name(a1)); */
+/*       printf("%s ", action_name(a2)); */
+/*       printf("%ld\n", distance(a1, a2)); */
+/*     } EFOR; */
+/*   } EFOR; */
+
+}
+
 void create_problem(void)
 {
   long causals_more = 0, max_prec = 0, max_prods = 0, nbc = 0, i;
@@ -530,6 +622,7 @@ void create_problem(void)
 #endif
   end_monitor();
 
+  trace(normal, "actions : %ld\n", actions_nb); 
   begin_monitor("Creating initial structures");
   create_structures();
   compute_reachable();
@@ -537,6 +630,7 @@ void create_problem(void)
   keep_reachable();
   create_structures();
   end_monitor();
+  trace(normal, "actions : %ld\n", actions_nb); 
 
   begin_monitor("Computing bound");
   switch (opt.initial_heuristic) {
@@ -608,6 +702,7 @@ void create_problem(void)
       found:;
       }
     } EFOR;
+    increase_pddl21_distances();
   }
   end_monitor();
 
