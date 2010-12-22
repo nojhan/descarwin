@@ -194,29 +194,29 @@ int cpt_main(int argc, const char **argv)
 
 int cpt_basic_search(void)
 {
-  char *goals[]={
-    "(fuel-level plane2 fl4)", 
-    "(fuel-level plane1 fl1)", 
-    "(at plane3 city4)", 
-    "(at plane1 city3)", 
-    "(fuel-level plane3 fl0)"};
+  /* char *goals[]={ */
+  /*   "(fuel-level plane2 fl4)",  */
+  /*   "(fuel-level plane1 fl1)",  */
+  /*   "(at plane3 city4)",  */
+  /*   "(at plane1 city3)",  */
+  /*   "(fuel-level plane3 fl0)"}; */
 
-  goal_state_nb = 0;
+  /* goal_state_nb = 0; */
 
-  int i;
-  for (i=0; i < 5; i++) {
-    FOR(f, fluents) {
-      char *n = fluent_name(f);
-      if (strcmp(n, goals[i]) == 0) 
-	  goal_state[goal_state_nb++] = f;
-    } EFOR;
-  }
+  /* int i; */
+  /* for (i=0; i < 5; i++) { */
+  /*   FOR(f, fluents) { */
+  /*     char *n = fluent_name(f); */
+  /*     if (strcmp(n, goals[i]) == 0)  */
+  /* 	  goal_state[goal_state_nb++] = f; */
+  /*   } EFOR; */
+  /* } */
 
-  FOR(f, goal_state) {
-    printf("%s %d\n", fluent_name(f), f->id);
-  } EFOR;
+  /* FOR(f, goal_state) { */
+  /*   printf("%s %d\n", fluent_name(f), f->id); */
+  /* } EFOR; */
 
-  return cpt_search(init_state, init_state_nb, goal_state, goal_state_nb, false, false, false);
+  /* return cpt_search(init_state, init_state_nb, goal_state, goal_state_nb, false, false, false); */
 
   return cpt_search(NULL, -1, NULL, -1, false, false, false);
 }
