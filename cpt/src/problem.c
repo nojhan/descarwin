@@ -59,7 +59,7 @@ static void keep_reachable(void);
 
 
 void print_time(FILE *file, TimeVal x) 
-{ print_time_incr(file, x, 0); }
+{ print_time_incr(file, x, -1); }
 
 void print_time_incr(FILE *file, TimeVal x, int step)
 {
@@ -81,7 +81,7 @@ void print_time_incr(FILE *file, TimeVal x, int step)
     mpf_t time_float, incr;
     mpf_init(time_float);
     mpf_set_q(time_float, time);
-    if (step != 0) {
+    if (step != -1 && !opt.sequential && opt.precision2) {
       mpf_init_set_str(incr, opt.precision2, 10);
       mpf_mul_ui(incr, incr, step);
       mpf_add(time_float, time_float, incr);
