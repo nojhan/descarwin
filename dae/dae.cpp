@@ -385,7 +385,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::progress << "OK" << std::endl;
 
     eo::log << eo::progress << "Creating evaluators...";
-    eo::log << eo::log.flush();
+    eo::log.flush();
 
     // nested evals:
     eoEvalFunc<daex::Decomposition> * p_eval;
@@ -408,6 +408,10 @@ int main ( int argc, char* argv[] )
             = new eoEvalUserTimeThrowException<daex::Decomposition>( eval_counter, max_seconds );
         p_eval = p_eval_maxtime;
     }
+    
+    // start the eval on the first random pop if it was not already done (in the case of bmax extimation) // TODO : optimiser en évitant de re-évaluer
+    eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+    eval_y( pop, pop );
 
     eo::log << eo::progress << "OK" << std::endl;
 

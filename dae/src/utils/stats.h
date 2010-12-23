@@ -69,18 +69,14 @@ public:
             // print the corresponding compressed plan
             std::ostringstream os;
             daex::Plan plan = best_decompo.plan_copy(); 
-#ifndef NEBDUG
+	    /*#ifndef NEBDUG
             os << "; Decomposition " << best_decompo << std::endl;
-
-            std::cout << "; Decomposition " << best_decompo << std::endl;
-            
-            
             os << "; sub-plans :" << std::endl;
             os << "; ******************************************************* " << std::endl;
             for( unsigned int i=0, end=best_decompo.subplans_size(); i<end; ++i ) {
                 os << "; subplan " << i << std::endl;
 
-                std::cout << "; subplan " << i << " / decomposition_size " << best_decompo.size() << " / subplans_size " << best_decompo.subplans_size() << std::endl;
+		//               std::cout << "; subplan " << i << " / decomposition_size " << best_decompo.size() << " / subplans_size " << best_decompo.subplans_size() << std::endl;
 
                 // copy the subplan so as to avoid a reference that would crash in CPT/print_plan
                 daex::Plan subplan = best_decompo.subplan(i);
@@ -88,7 +84,7 @@ public:
             }
             os << "; ******************************************************* " << std::endl;
             
-#endif
+	    #endif*/
             os << plan;
             value() = os.str();
         }
