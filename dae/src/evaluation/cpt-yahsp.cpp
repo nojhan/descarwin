@@ -101,9 +101,14 @@ double daeCptYahspEval::fitness_feasible( daex::Decomposition & decompo )
     unsigned int Q = solution_plan->makespan;
     assert( Q > 0 );
 
+    //    std::cout << "SEQUENTIAL=" << this->_sequential;
+
+    //    std::cout << "MAKESPAN=" << Q << "LMAX=" << _l_max << "BMAX=" << _b_max << "(" << (double)_b_max << ")";
     // JACK the code uses a factor GCD/LCM on the first makespan used, but not on the second one, while the paper uses the same makespan
     //    return (double)Q + ( (double)decompo.size() - (double)_u + 1.0 ) / (double)Q + (double)_B / (double)_l_max * (double)_b_max ;
-    return (double)Q * pddl_domain->time_gcd / pddl_domain->time_lcm + ( (double)decompo.size() - (double)_u + 1.0 ) / (double)Q + (double)_B / (double)_l_max * (double)_b_max ;
+    if (this->_sequential == true) return (double)Q + ( (double)decompo.size() - (double)_u + 1.0 ) / (double)Q + (double)_B / (double)_l_max * (double)_b_max ;
+    else return (double)Q * pddl_domain->time_gcd / pddl_domain->time_lcm + ( (double)decompo.size() - (double)_u + 1.0 ) / (double)Q + (double)_B / (double)_l_max * (double)_b_max ;
+
 }
 
 //! Fitness des décompositions dont on arrive pas à construire le plan

@@ -356,7 +356,7 @@ int main ( int argc, char* argv[] )
         // permits to compute the b_max
         // (b_max = 10 000 by default)
         // uses the same value for b_max_in and b_max_last
-        daeYahspEvalInit eval_yahsp_init( pop.size(), init.l_max(), b_max_init, b_max_init, fitness_weight, fitness_penalty );
+        daeYahspEvalInit eval_yahsp_init( pop.size(), init.l_max(), b_max_init, b_max_init, fitness_weight, fitness_penalty, is_sequential );
 
         // start the eval on the first random pop
         eoPopLoopEval<daex::Decomposition> eval_init( eval_yahsp_init );
@@ -391,7 +391,7 @@ int main ( int argc, char* argv[] )
     eoEvalFunc<daex::Decomposition> * p_eval;
 
     // eval that uses the correct b_max
-    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
 
     // counter, for checkpointing
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_yahsp, "Eval.\t" );

@@ -38,14 +38,8 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray );
 //! Évaluateur principal, à utiliser pour les itérations normales
 class daeYahspEval : public daeCptYahspEval
 {
-public:
-    daeYahspEval( 
-            unsigned int l_max_ /*= 20*/, 
-            unsigned int b_max_in /*= 10000*/, 
-            unsigned int b_max_last /*=30000*/, 
-            double fitness_weight /*= 10*/,
-	    double fitness_penalty /*1e6*/
-        );
+ public: daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10000, unsigned int b_max_last = 30000, double fitness_weight = 10, double fitness_penalty = 1e6, bool sequential = false );
+
 
     virtual ~daeYahspEval();
 
@@ -90,8 +84,9 @@ public:
             unsigned int b_max_in = 10000, 
             unsigned int b_max_last = 30000, 
             double fitness_weight = 10,
-	    double fitness_penalty = 1e6
-	    ) : daeYahspEval( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty ) 
+	    double fitness_penalty = 1e6,
+	    bool sequential = false
+	    ) : daeYahspEval( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty, sequential ) 
     {
       node_numbers.reserve( pop_size * l_max );
     }

@@ -30,9 +30,15 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 
     return out;
 }
-
-daeYahspEval::daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10000, unsigned int b_max_last = 30000, double fitness_weight = 10, double fitness_penalty = 1e6  ) : 
-  daeCptYahspEval(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty), _previous_state( NULL ), _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
+daeYahspEval::daeYahspEval( 
+            unsigned int l_max_ /*= 20*/, 
+            unsigned int b_max_in /*= 10000*/, 
+            unsigned int b_max_last /*=30000*/, 
+            double fitness_weight /*= 10*/,
+	    double fitness_penalty /*= 1e6*/,
+	    bool sequential /*= false*/
+        ) : 
+  daeCptYahspEval(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty, sequential), _previous_state( NULL ), _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
 {
     // some init steps are not done here, but in pddl_load.cpp
     // notably the call to cpt_main
@@ -236,6 +242,9 @@ void daeYahspEval::compress( daex::Decomposition & decompo )
         assert(solution_plan != NULL);
 
         // TODO pendant les tests, le plan ne peut pas etre vide, mais en compétition, cela peut arriver, auquel cas il faudra virer l'assert (penser à compiler en NDEBUG)
+
+	//	std::cout << "MAKESPAAAAN =" << solution_plan->makespan;
+
         assert(solution_plan->makespan > 0);
 
 
@@ -419,6 +428,8 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                 compress( decompo );
                 decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
 
+		//		eo::log << eo::logging << "FITNESS=" << ;
+
 
 #ifndef NDEBUG
                 eo::log << eo::debug << "*";
@@ -462,12 +473,6 @@ void daeYahspEval::free_yahsp_structures()
     // and keep the pointer within the Decompostion>Plan class
     solution_plan = NULL;
 }
-
-
-
-
-
-
 
 /**************************************************************************************************************
  * YAHSP EVAL INIT
