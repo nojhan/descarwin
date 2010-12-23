@@ -715,9 +715,9 @@ void instantiate_operators(PDDLDomain *domain)
   mpz_init(domain->time_gcd_rat);
   normalize_durations(domain);
 
-  if (opt.precision2) {
+  if (opt.pddl21 && opt.precision2) {
     char *prec = opt.precision;
-    opt.precision=NULL;
+    opt.precision = NULL;
     gdsl_queue_insert(domain->durations_queue, &domain->bound);
     gdsl_queue_insert(domain->durations_queue, &domain->precision2);
     if (opt.max_makespan) gdsl_queue_insert(domain->durations_queue, &domain->max_makespan);

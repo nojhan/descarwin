@@ -37,7 +37,8 @@ void print_plan(FILE *out, SolutionPlan *plan, bool print_synchro)
     if (!print_synchro && step->action->synchro) continue;
 #endif
     if (pddl_domain->action_costs) fprintf(out, "%ld", i);
-    else print_time(out, step->init); 
+    else if (opt.sequential) print_time(out, step->init);
+    else print_time_incr(out, step->init, i);
     fprintf(out, ": %s", action_name(step->action));
     if (1||!pddl_domain->action_costs) {
       fprintf(out, " [");

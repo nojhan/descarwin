@@ -58,7 +58,10 @@ static void keep_reachable(void);
 /*****************************************************************************/
 
 
-void print_time(FILE *file, TimeVal x)
+void print_time(FILE *file, TimeVal x) 
+{ print_time_incr(file, x, 0); }
+
+void print_time_incr(FILE *file, TimeVal x, int step)
 {
   char buffer[21];
   mpz_t num;
@@ -75,10 +78,18 @@ void print_time(FILE *file, TimeVal x)
   if (opt.rationals) {
     mpq_out_str(file, 10, time);
   } else {
-    mpf_t time_float;
+    mpf_t time_float, incr;
     mpf_init(time_float);
     mpf_set_q(time_float, time);
-    gmp_fprintf(file, "%.Ff", time_float);
+    if (step != 0) {
+      mpf_init_set_str(incr, opt.precision2, 10);
+      mpf_mul_ui(incr, incr, step);
+      mpf_add(time_float, time_float, incr);
+      gmp_fprintf(file, "%.*Ff", strlen(opt.precision2) - 2, time_float);
+      mpf_clear(incr);
+    } else {
+      gmp_fprintf(file, "%.Ff", time_float);
+    }
     mpf_clear(time_float);
   }
   mpz_clear(num);
@@ -622,7 +633,6 @@ void create_problem(void)
 #endif
   end_monitor();
 
-  trace(normal, "actions : %ld\n", actions_nb); 
   begin_monitor("Creating initial structures");
   create_structures();
   compute_reachable();
@@ -630,7 +640,6 @@ void create_problem(void)
   keep_reachable();
   create_structures();
   end_monitor();
-  trace(normal, "actions : %ld\n", actions_nb); 
 
   begin_monitor("Computing bound");
   switch (opt.initial_heuristic) {

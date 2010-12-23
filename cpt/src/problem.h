@@ -12,6 +12,7 @@
 
 
 extern void print_time(FILE *file, TimeVal x);
+extern void print_time_incr(FILE *file, TimeVal x, int step);
 extern char *fluent_name(Fluent *f);
 extern void print_fluent(Fluent *f);
 extern char *action_name(Action *a);

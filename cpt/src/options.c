@@ -270,7 +270,7 @@ void cmd_line(int argc, const char **argv)
 #endif
     case 'J': opt.limit_initial_propagation = true; opt.max_propagations = atol(optarg); 
       trace(options, "limited propagation : %ld\n", opt.max_propagations); break;
-    case 'K': opt.precision = strtok(optarg,","); opt.precision2 = strtok(NULL,","); 
+    case 'K': opt.precision = strdup(strtok(optarg,",")); opt.precision2 = strdup(strtok(NULL,",")); 
       trace(options, "temporal precision : %s,%s\n", opt.precision, opt.precision2); break;
     case 'L': opt.local_mutex_sets = true; trace(options, "enable local mutex sets\n"); break;
     case 'M': opt.global_mutex_sets = true; opt.local_mutex_sets = true; trace(options, "enable global and local mutex sets\n"); break;
