@@ -52,8 +52,10 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
 
 	// précision pour la planif temporelle. Pour IPC, 0.0001 devrait aller,
 	// à vérifier.
-        cpt_call.push_back( "-K" ); 
-        cpt_call.push_back( "0.0001,0.0001" ); 
+	if( ! is_sequential ) {
+	  cpt_call.push_back( "-K" ); 
+	  cpt_call.push_back( "0.0001,0.0001" ); 
+	}
 	
         // Enables h2-based fluent mutexes in yahsp (fluent-mutexes / fm / F)
 	cpt_call.push_back( "-fluent-mutexes" );
