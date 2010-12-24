@@ -137,7 +137,8 @@ int main ( int argc, char* argv[] )
     // if one want to initialize on current time
     if ( param_seed.value() == 0) {
         // change the parameter itself, that will be dumped in the status file
-        param_seed.value( time(0) );
+      //        param_seed.value( time(0) );
+      param_seed.value()=time(0); // EO compatibility fixed by CC on 2010.12.24
     }
     unsigned int seed = param_seed.value();
     rng.reseed( seed );
@@ -174,10 +175,11 @@ int main ( int argc, char* argv[] )
             "Penalty in the unfeasible fitnesses computation", 'w', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "fitness_penalty" << fitness_penalty << std::endl;
 
-
+    /* nonsens with the incremental strategy
     unsigned int b_max_init = parser.createParam( (unsigned int)1e4, "bmax-init", 
             "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_init" << b_max_init << std::endl;
+    */
 
     double b_max_quantile = parser.createParam( (double)0.5, "bmax-quantile", 
             "Quantile to use for estimating b_max (in [0,1], 0.5=median)", 'Q', "Evaluation" ).value();
@@ -201,6 +203,9 @@ int main ( int argc, char* argv[] )
         exit(1);
     }
 
+    double bmax_ratio = parser.createParam( (double)1, "bmax-ratio", 
+            "Satisfying proportion of feasible individuals for the computation of b_max", 'B', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "bmax-ratio" << bmax_ratio << std::endl;
 
     // Other
     unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
@@ -339,47 +344,41 @@ int main ( int argc, char* argv[] )
 
     eo::log << eo::progress << "OK" << std::endl;
     
+    // search for the minimum b_max that needed to solve most of the population 
 
-    // b_max for all the searches within the decomposition, between intermediate goals
-    unsigned int b_max_in;
+    unsigned int b_max_in=0, b_max_last, goodguys, popsize = pop.size();
 
-    // if we want to estimate the initial b_max other a first search step
+    // If we want the incremental strategy
     if( b_max_fixed == 0 ) {
-        // FIRST INIT LOOP FOR B_MAX ESTIMATION
+      eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
+      do {
+	goodguys=0;
+	b_max_in++;
+	b_max_last=static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-        eo::log << eo::progress << "Evaluation of b_max";
-        eo::log << eo::logging << " (used node numbers)";
-        eo::log << eo::progress << "...";
-        eo::log << eo::log.flush();
-
-        // An different evaluator for the first iteration
-        // permits to compute the b_max
-        // (b_max = 10 000 by default)
-        // uses the same value for b_max_in and b_max_last
-        daeYahspEvalInit eval_yahsp_init( pop.size(), init.l_max(), b_max_init, b_max_init, fitness_weight, fitness_penalty, is_sequential );
-
-        // start the eval on the first random pop
-        eoPopLoopEval<daex::Decomposition> eval_init( eval_yahsp_init );
-        eval_init( pop, pop );
-
-        // estimate the b_max from the eval results
-        b_max_in = eval_yahsp_init.estimate_b_max( b_max_quantile );
-
-    // if we want a fixed b_max for the whole search
+	daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
+	eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+	eval_y( pop, pop );
+	for (size_t i = 0; i < popsize; ++i)
+	  {
+	    if (pop[i].fitness().is_feasible()) goodguys++;
+	    else pop[i].invalidate();
+	  }
+	eo::log << eo::logging << "b_max_in= "   << b_max_in << ", current feasible ratio= " <<  ((double)goodguys/(double)popsize) << std::endl;	
+      }
+      while (((double)goodguys/(double)popsize) < bmax_ratio);
+      //      while (goodguys == 0);
     } else { // if b_max_in != 0
-        b_max_in = b_max_fixed;
-        eo::log << eo::progress << "No evaluation of b_max, fixed to...";
-        eo::log.flush();
+      b_max_in = b_max_fixed;    
+      b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
+      eo::log << eo::progress << "No evaluation of b_max, fixed to...";
+      eo::log.flush();
     }
 
-    assert( b_max_in > 0 );
+    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
+    eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+    eval_y( pop, pop );
 
-    // The b_max for the very last search towards the end goal
-    // is the estimated b_max * a given weight (3 by default)
-    unsigned int b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
-
-    assert( b_max_last > 0 );
- 
     eo::log << eo::logging << std::endl << "\tb_max for intermediate goals, b_max_in: "   << b_max_in   << std::endl;
     eo::log << eo::logging              << "\tb_max for        final goal,  b_max_last: " << b_max_last << std::endl;
     eo::log << eo::progress << "OK" << std::endl;
@@ -389,9 +388,6 @@ int main ( int argc, char* argv[] )
 
     // nested evals:
     eoEvalFunc<daex::Decomposition> * p_eval;
-
-    // eval that uses the correct b_max
-    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
 
     // counter, for checkpointing
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_yahsp, "Eval.\t" );
@@ -408,16 +404,8 @@ int main ( int argc, char* argv[] )
             = new eoEvalUserTimeThrowException<daex::Decomposition>( eval_counter, max_seconds );
         p_eval = p_eval_maxtime;
     }
-    
-    // start the eval on the first random pop if it was not already done (in the case of bmax extimation) // TODO : optimiser en évitant de re-évaluer
-    eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
-    eval_y( pop, pop );
 
     eo::log << eo::progress << "OK" << std::endl;
-
-    // TODO Sachant qu'on les a déjà évalués avec un b_max élevé, on ne veut pas les réévaluer avec un b_max plus petit, donc on ne réévalue pas après l'init
-    //eoPopLoopEval<daex::Decomposition> pop_eval( *p_eval );
-    //pop_eval( pop, pop );
 
 
     /********************
