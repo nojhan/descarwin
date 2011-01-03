@@ -379,9 +379,9 @@ int main ( int argc, char* argv[] )
         p_eval = & eval_counter;
 
     } else {
-    // an eval that raises an exception if maxtime is reached
-    /* eoEvalTimeThrowException<daex::Decomposition> * p_eval_maxtime 
-            = new eoEvalTimeThrowException<daex::Decomposition>( eval_counter, max_seconds ); */
+        // an eval that raises an exception if maxtime is reached
+        /* eoEvalTimeThrowException<daex::Decomposition> * p_eval_maxtime 
+                = new eoEvalTimeThrowException<daex::Decomposition>( eval_counter, max_seconds ); */
         eoEvalUserTimeThrowException<daex::Decomposition> * p_eval_maxtime 
             = new eoEvalUserTimeThrowException<daex::Decomposition>( eval_counter, max_seconds );
         p_eval = p_eval_maxtime;
@@ -440,7 +440,7 @@ int main ( int argc, char* argv[] )
     // get the best plan only if it improve the fitness
     // note: fitness is different from the makespan!
     // worst fitness, TODO we should use the best individual from the previous evals at init
-    eoMinimizingDualFitness worst_fitness( std::make_pair<double,bool>( DBL_MAX, 1 ) );
+    eoMinimizingDualFitness worst_fitness( std::make_pair<double,bool>( DBL_MAX, 0 ) );
     eoBestPlanImprovedStat<daex::Decomposition> best_plan( worst_fitness, "Best improved plan");
     // at each generation
     checkpoint.add( best_plan );
@@ -582,7 +582,7 @@ int main ( int argc, char* argv[] )
 
             eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
 
-            // call the checkpoint (log and stats output) on the po from the init
+            // call the checkpoint (log and stats output) on the pop from the init
             checkpoint( pop );
 
             // start a search
@@ -626,6 +626,10 @@ int main ( int argc, char* argv[] )
 
         // push the best result, in case it was not in the last run
         pop.push_back( best );
+
+        // call the checkpoint, as if it was ending a generation
+        checkpoint( pop );
+
         print_results( pop, time_start );
         return 0;
     }
