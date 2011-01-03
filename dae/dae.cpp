@@ -321,7 +321,7 @@ int main ( int argc, char* argv[] )
 
     //    eo::log << eo::progress << "OK" << std::endl;
     
-    unsigned int b_max_in=1, b_max_last, goodguys, popsize = pop.size();
+    unsigned int b_max_in=1, b_max_last, goodguys=0, popsize = pop.size();
 
     // Incremental strategy to fix bmax
     if( b_max_fixed == 0 ) {
