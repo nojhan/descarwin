@@ -578,13 +578,12 @@ int main ( int argc, char* argv[] )
 
     try { 
 
-        // call tee checkpoint (log and stats output) on the po from the init
-        checkpoint( pop );
-
         while( 1 ) {
 
             eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
 
+            // call the checkpoint (log and stats output) on the po from the init
+            checkpoint( pop );
 
             // start a search
             dae( pop );
