@@ -326,30 +326,35 @@ int main ( int argc, char* argv[] )
     unsigned int b_max_in=1, b_max_last, goodguys, popsize = pop.size();
 
     // If we want the incremental strategy
-    if( b_max_fixed == 0 ) {
-      eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
-      do {
-	goodguys=0;
-	b_max_last=static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
+    if (b_max_fixed == 0) {
+        eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
+        do {
+            goodguys = 0;
+            b_max_last = static_cast<unsigned int>(std::floor (b_max_in * b_max_last_weight));
 
-	daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
-	eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
-	eval_y( pop, pop );
-	for (size_t i = 0; i < popsize; ++i)
-	  {
-	    if (pop[i].fitness().is_feasible()) goodguys++;
-	    else pop[i].invalidate();
-	  }
-	eo::log << eo::logging << "b_max_in= "   << b_max_in << ", current feasible ratio= " <<  ((double)goodguys/(double)popsize) << std::endl;
-	b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
-      }
-      while ((((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init));
-      //      while (goodguys == 0);
+            daeYahspEval eval_yahsp (init.l_max (), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential);
+            eoPopLoopEval < daex::Decomposition > eval_y (eval_yahsp);
+            eval_y (pop, pop);
+
+            for (size_t i = 0; i < popsize; ++i) {
+                if (pop[i].fitness ().is_feasible ())
+                  goodguys++;
+                else
+                  pop[i].invalidate ();
+            }
+
+            eo::log << eo::logging << "b_max_in= " << b_max_in << ", current feasible ratio= " << ((double) goodguys / (double) popsize) << std::endl;
+            b_max_in = (unsigned int) ceil (b_max_in * b_max_increase_coef);
+        }
+
+        while ((((double) goodguys / (double) popsize) < b_max_ratio) && (b_max_in < b_max_init));
+        //      while (goodguys == 0);
+
     } else { // if b_max_in != 0
-      b_max_in = b_max_fixed;
-      b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
-      eo::log << eo::progress << "No evaluation of b_max, fixed to...";
-      eo::log.flush();
+        b_max_in = b_max_fixed;
+        b_max_last = static_cast < unsigned int >(std::floor (b_max_in * b_max_last_weight));
+        eo::log << eo::progress << "No evaluation of b_max, fixed to...";
+        eo::log.flush ();
     }
 
     daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
