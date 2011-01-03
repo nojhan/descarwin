@@ -341,7 +341,7 @@ int main ( int argc, char* argv[] )
 	    else pop[i].invalidate();
 	  }
 	eo::log << eo::logging << "b_max_in= "   << b_max_in << ", current feasible ratio= " <<  ((double)goodguys/(double)popsize) << std::endl;
-	b_max_in = ceil(b_max_in*b_max_increase_coef);
+	b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
       }
       while ((((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init));
       //      while (goodguys == 0);
@@ -573,9 +573,13 @@ int main ( int argc, char* argv[] )
 
     try { 
 
+        // call tee checkpoint (log and stats output) on the po from the init
+        checkpoint( pop );
+
         while( 1 ) {
 
             eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
+
 
             // start a search
             dae( pop );
