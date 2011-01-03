@@ -125,13 +125,11 @@ int main ( int argc, char* argv[] )
     bool is_sequential = parser.createParam( (bool)false, "sequential", "Is the problem a sequential one?", 'q', "Problem", true ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "is_sequential" << is_sequential << std::endl;
 
-
     // un total de 20 paramètres
 
     // Initialization
     unsigned int pop_size = parser.createParam( (unsigned int)100, "popSize", "Population Size", 'P', "Evolution Engine").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "pop_size" << pop_size << std::endl;
-    
 
     eoValueParam<unsigned int> & param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' );
     // if one want to initialize on current time
@@ -144,22 +142,18 @@ int main ( int argc, char* argv[] )
     rng.reseed( seed );
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "seed" << seed << std::endl;
 
-
     unsigned int l_max_init_coef = parser.createParam( (unsigned int)2, "lmax-initcoef", 
             "l_max will be set to the size of the chrono partition * this coefficient", 'C', "Initialization" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "l_max_init_coef" << l_max_init_coef << std::endl;
-
 
     unsigned int l_min = parser.createParam( (unsigned int)1, "lmin", 
             "Minimum number of goals in a decomposition", 'l', "Initialization" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "l_min" << l_min << std::endl;
 
-
     // Selection
     unsigned int toursize = parser.createParam( (unsigned int)5, "tournament", 
             "Size of the deterministic tournament for the selection", 't', "Selection" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "toursize" << toursize << std::endl;
-
 
     double offsprings = parser.createParam( (double)700, "offsprings", 
             "Number of offsprings to produces", 'f', "Selection" ).value();
@@ -175,12 +169,10 @@ int main ( int argc, char* argv[] )
             "Penalty in the unfeasible fitnesses computation", 'w', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "fitness_penalty" << fitness_penalty << std::endl;
 
-    /* nonsens with the incremental strategy
-    unsigned int b_max_init = parser.createParam( (unsigned int)1e4, "bmax-init", 
-            "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" ).value();
+    unsigned int b_max_init = parser.createParam( (unsigned int)1e4, "bmax-init", "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_init" << b_max_init << std::endl;
-    */
 
+    /* nonsense with the incremental strategy
     double b_max_quantile = parser.createParam( (double)0.5, "bmax-quantile", 
             "Quantile to use for estimating b_max (in [0,1], 0.5=median)", 'Q', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_quantile" << b_max_quantile << std::endl;
@@ -188,11 +180,9 @@ int main ( int argc, char* argv[] )
         std::cout << "bmax-quantile must be a double in [0,1] (=" << b_max_quantile << ") type --help for usage." << std::endl;
         exit(1);
     }
-
-    unsigned int b_max_fixed = parser.createParam( (unsigned int)0, "bmax-fixed", 
-            "Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0", 'b', "Evaluation" ).value();
+    */
+    unsigned int b_max_fixed = parser.createParam( (unsigned int)0, "bmax-fixed", "Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0", 'b', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_fixed" << b_max_fixed << std::endl;
-
 
     double b_max_last_weight = parser.createParam( (double)3, "bmax-last-weight",
             "Weighting for the b_max used during the last search towards the end goal (must be strictly positive)", 'T', "Evaluation" ).value();
@@ -203,9 +193,11 @@ int main ( int argc, char* argv[] )
         exit(1);
     }
 
-    double bmax_ratio = parser.createParam( (double)1, "bmax-ratio", 
-            "Satisfying proportion of feasible individuals for the computation of b_max", 'B', "Evaluation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "bmax-ratio" << bmax_ratio << std::endl;
+    double b_max_ratio = parser.createParam( 0.01, "bmax-ratio","Satisfying proportion of feasible individuals for the computation of b_max", 'J', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_ratio" << b_max_ratio << std::endl;
+
+    double b_max_increase_coef = parser.createParam( (double)2, "bmax-increase-coef", "Multiplier increment for the computation of b_max", 'K', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_increase_coef" << b_max_increase_coef << std::endl;
 
     // Other
     unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
@@ -224,7 +216,6 @@ int main ( int argc, char* argv[] )
     std::string plan_file = parser.createParam( (std::string)"plan.ipc", "plan-file", "Plan file backup", 'F', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plan-file" << plan_file << std::endl;
 
-
     // Variation
     unsigned int radius = parser.createParam( (unsigned int)2, "radius", 
             "Number of neighbour goals to consider for the addGoal mutation", 'R', "Variation" ).value();
@@ -236,53 +227,44 @@ int main ( int argc, char* argv[] )
 
     double proba_del_atom = parser.createParam( (double)0.8, "proba-del-atom", 
             "Average probability to delete an atom for the delAtom mutation", 'd', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_change" << proba_change << std::endl;
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_del_atom" << proba_del_atom << std::endl;
 
     double w_delgoal = parser.createParam( (double)1, "w-delgoal", 
             "Relative weight defining the probability to call the delGoal mutation", 'a', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "w_delgoal" << w_delgoal << std::endl;
 
-
     double w_addgoal = parser.createParam( (double)3, "w-addgoal", 
             "Relative weight defining the probability to call the addGoal mutation", 'A', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "w_addgoal" << w_addgoal << std::endl;
-
 
     double w_delatom = parser.createParam( (double)1, "w-delatom", 
             "Relative weight defining the probability to call the delAtom mutation", 'g', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "w_delatom" << w_delatom << std::endl;
 
-
     double w_addatom = parser.createParam( (double)1, "w-addatom", 
             "Relative weight defining the probability to call the addAtom mutation", 'G', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "w_addatom" << w_addatom << std::endl;
-
 
     double proba_cross = parser.createParam( (double)0.2, "proba-cross", 
             "Probability to apply a cross-over", 'c', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_cross" << proba_cross << std::endl;
 
-
     double proba_mut = parser.createParam( (double)0.8, "proba-mut", 
             "Probability to apply one of the mutation", 'm', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_mut" << proba_mut << std::endl;
-
 
     // Stopping criterions
     unsigned int max_seconds = parser.createParam( (unsigned int)1800, "max-seconds", 
             "Maximum number of user seconds in CPU for the whole search, set it to 0 to deactivate (1800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 1800 seconds = 30 minutes
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
 
-
     unsigned int mingen = parser.createParam( (unsigned int)10, "gen-min", 
             "Minimum number of iterations", 'n', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "mingen" << mingen << std::endl;
 
-
     unsigned int steadygen = parser.createParam( (unsigned int)50, "gen-steady", 
             "Number of iterations without improvement", 's', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "steadygen" << steadygen << std::endl;
-
 
     unsigned int maxgens = parser.createParam( (unsigned int)1000, "gen-max", 
             "Maximum number of iterations", 'x', "Stopping criterions" ).value();
@@ -292,10 +274,7 @@ int main ( int argc, char* argv[] )
             "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
-
-    
     make_help( parser );
-
 
     /***********
      * PARSING *
@@ -311,8 +290,6 @@ int main ( int argc, char* argv[] )
     daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, is_sequential );
     
     eo::log << eo::progress << "Load the instance...OK" << std::endl;
-
-
     eo::log << eo::progress << "Initialization...";
     eo::log.flush();
 
@@ -346,14 +323,13 @@ int main ( int argc, char* argv[] )
     
     // search for the minimum b_max that needed to solve most of the population 
 
-    unsigned int b_max_in=0, b_max_last, goodguys, popsize = pop.size();
+    unsigned int b_max_in=1, b_max_last, goodguys, popsize = pop.size();
 
     // If we want the incremental strategy
     if( b_max_fixed == 0 ) {
       eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
       do {
 	goodguys=0;
-	b_max_in++;
 	b_max_last=static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
 	daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
@@ -364,12 +340,13 @@ int main ( int argc, char* argv[] )
 	    if (pop[i].fitness().is_feasible()) goodguys++;
 	    else pop[i].invalidate();
 	  }
-	eo::log << eo::logging << "b_max_in= "   << b_max_in << ", current feasible ratio= " <<  ((double)goodguys/(double)popsize) << std::endl;	
+	eo::log << eo::logging << "b_max_in= "   << b_max_in << ", current feasible ratio= " <<  ((double)goodguys/(double)popsize) << std::endl;
+	b_max_in = ceil(b_max_in*b_max_increase_coef);
       }
-      while (((double)goodguys/(double)popsize) < bmax_ratio);
+      while ((((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init));
       //      while (goodguys == 0);
     } else { // if b_max_in != 0
-      b_max_in = b_max_fixed;    
+      b_max_in = b_max_fixed;
       b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
       eo::log << eo::progress << "No evaluation of b_max, fixed to...";
       eo::log.flush();
@@ -592,7 +569,7 @@ int main ( int argc, char* argv[] )
     // best decomposition of all the runs, in case of multi-start
     // start at the best element of the init
     daex::Decomposition best = pop.best_element();
-    unsigned int run = 0;
+    unsigned int run = 1;
 
     try { 
 
