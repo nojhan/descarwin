@@ -32,8 +32,8 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 }
 daeYahspEval::daeYahspEval( 
             unsigned int l_max_ /*= 20*/, 
-            unsigned int b_max_in /*= 10000*/, 
-            unsigned int b_max_last /*=30000*/, 
+            unsigned int b_max_in /*= 10*/, 
+            unsigned int b_max_last /*=30*/, 
             double fitness_weight /*= 10*/,
 	    double fitness_penalty /*= 1e6*/,
 	    bool sequential /*= false*/
@@ -400,7 +400,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
 
             assert( i == _intermediate_goal_state_nb );
 
-            // search a palan towards the current goal
+            // search a plan towards the current goal
             code = solve_next( decompo, _intermediate_goal_state, _intermediate_goal_state_nb  );
 	    decompo.fitness( std::make_pair( fitness_unfeasible_intermediate(), false ) );
 
@@ -414,7 +414,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         // here we have reached the last goal of the decomposition
         // we are searching towards the ultimate goal
 
-        if( code == PLAN_FOUND ) {
+        if((code == PLAN_FOUND) || (decompo.size() == 0)) {
 
             // set the b_max specific to this step
             b_max( _b_max_last );

@@ -324,6 +324,16 @@ int main ( int argc, char* argv[] )
     
     unsigned int b_max_in=1, b_max_last, goodguys=0, popsize = pop.size();
  
+    // Preventive direct call to YAHSP
+    daex::Decomposition empty_decompo;
+    daeYahspEval eval_yahsp( init.l_max(), b_max_init, b_max_init, fitness_weight, fitness_penalty, is_sequential );
+    //    empty_decompo.invalidate();
+    eval_yahsp(empty_decompo);
+    if (empty_decompo.fitness().is_feasible()) {
+      std::ofstream of(plan_file.c_str());
+      of << empty_decompo.plan();
+    }
+   
     // Incremental strategy to fix bmax
     if( b_max_fixed == 0 ) {
         eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
@@ -331,11 +341,9 @@ int main ( int argc, char* argv[] )
         while ( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
             goodguys = 0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
-
-            daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
-            eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+            daeYahspEval eval_yahsp2( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
+            eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp2 );
             eval_y( pop, pop );
-
             for (size_t i = 0; i < popsize; ++i) {
                 // unfeasible individuals are invalidated in order to be re-evaluated with a larger bmax at the next iteration but we keep the good guys.
                 if (pop[i].fitness().is_feasible()) goodguys++;
@@ -350,8 +358,8 @@ int main ( int argc, char* argv[] )
     b_max_in = b_max_fixed;
     b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
-    eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+    daeYahspEval eval_yahsp3( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
+    eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp3 );
     eval_y( pop, pop );
 
     eo::log << eo::logging << std::endl << "\tb_max for intermediate goals, b_max_in: "   << b_max_in   << std::endl;

@@ -38,7 +38,7 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray );
 //! Évaluateur principal, à utiliser pour les itérations normales
 class daeYahspEval : public daeCptYahspEval
 {
- public: daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10000, unsigned int b_max_last = 30000, double fitness_weight = 10, double fitness_penalty = 1e6, bool sequential = false );
+ public: daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e6, bool sequential = false );
 
 
     virtual ~daeYahspEval();
