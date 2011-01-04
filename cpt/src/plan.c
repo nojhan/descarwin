@@ -66,14 +66,12 @@ void print_plan(FILE *out, SolutionPlan *plan, bool print_synchro)
 void print_plan_ipc(FILE *out, SolutionPlan *plan, double total_time)
 {
   fprintf(out, "; Time %.2f\n", total_time);
-  fprintf(out, "; ParsingTime\n");
-  fprintf(out, "; NrActions\n");
-  fprintf(out, "; MakeSpan ");
-  if (!pddl_domain->action_costs) print_time(out, plan->makespan);
+  fprintf(out, "; Length %ld\n", plan->steps_nb);
+  fprintf(out, "; Makespan ");
+  print_time(out, plan->makespan);
   fprintf(out, "\n; TotalCost ");
   if (pddl_domain->action_costs) print_time(out, plan->makespan);
-  fprintf(out, "\n; MetricValue\n");
-  fprintf(out, "; PlanningTechnique\n");
+  fprintf(out, "\n");
   print_plan(out, plan, false);
 }
 

@@ -291,7 +291,7 @@ static void create_structures(void)
       a->produces = bitarray_create(fluents_nb);
       a->deletes = bitarray_create(fluents_nb);
       a->edeletes = bitarray_create(fluents_nb);
-      a->mutex = bitarray_create(a->id + 1);
+      if (opt.fluent_mutexes) a->mutex = bitarray_create(a->id + 1);
       if (!opt.optimal) a->deletes_included = bitarray_create(actions_nb);
     }
   } EFOR;
@@ -300,7 +300,7 @@ static void create_structures(void)
     f->id = i;
     bitarray_set_index(f);
     if (f->pair_cost) cpt_free(f->pair_cost);
-    if (pass == 2) f->mutex = bitarray_create(f->id + 1);
+    if (pass == 2 && opt.fluent_mutexes) f->mutex = bitarray_create(f->id + 1);
     if (pass == 2 && opt.initial_heuristic == 2) cpt_calloc(f->pair_cost, fluents_nb);
     if (pass == 3 && opt.distances == 2) cpt_calloc(f->pair_cost, fluents_nb);
   } EFOR;
@@ -343,25 +343,21 @@ static void create_structures(void)
     FOR(f, a->edel) { f->edeleters[f->edeleters_nb++] = a; set_edeletes(a, f); } EFOR;
   } EFOR;
 
-  if (pass > 1) {
-    if (opt.sequential) {
-      FORPAIR(a1, a2, actions) { set_amutex(a1, a2); } EFORPAIR;
-    } else {
-      FOR(f, fluents) {
-	FOR(a, f->deleters) {
-	  FOR(a2, f->consumers) { set_amutex(a, a2); } EFOR;
-	  FOR(a2, f->producers) { set_amutex(a, a2); } EFOR;
-	} EFOR;
-	FOR(a, f->edeleters) {
-	  FOR(a2, f->consumers) { set_amutex(a, a2); } EFOR;
-	  FOR(a2, f->producers) { set_amutex(a, a2); } EFOR;
-	} EFOR;
-	if (0&&opt.pddl21) {
-	  FORPAIR(a1, a2, f->producers) { if (a1 != a2) set_amutex(a1, a2); } EFORPAIR;
-	  FORPAIR(a1, a2, f->deleters) { if (a1 != a2) set_amutex(a1, a2); } EFORPAIR;
-	}
+  if (pass > 1 && opt.fluent_mutexes) {
+    FOR(f, fluents) {
+      FOR(a, f->deleters) {
+	FOR(a2, f->consumers) { set_amutex(a, a2); } EFOR;
+	FOR(a2, f->producers) { set_amutex(a, a2); } EFOR;
       } EFOR;
-    }
+      FOR(a, f->edeleters) {
+	FOR(a2, f->consumers) { set_amutex(a, a2); } EFOR;
+	FOR(a2, f->producers) { set_amutex(a, a2); } EFOR;
+      } EFOR;
+      if (0&&opt.pddl21) {
+	FORPAIR(a1, a2, f->producers) { if (a1 != a2) set_amutex(a1, a2); } EFORPAIR;
+	FORPAIR(a1, a2, f->deleters) { if (a1 != a2) set_amutex(a1, a2); } EFORPAIR;
+      }
+    } EFOR;
   }
 }
 
@@ -409,7 +405,7 @@ static void finalize_structures(void)
 
   // problématique avec h2 !!!!
   FORPAIR(f1, f2, fluents) {
-    unset_fmutex(f1, f2);
+    if (opt.fluent_mutexes) unset_fmutex(f1, f2);
     FOR(a1, f1->producers) {
       if (!produces(a1, f1)) continue;
       FOR(a2, f2->producers) {
@@ -417,7 +413,7 @@ static void finalize_structures(void)
 	if (produces(a1, f2) || produces(a2, f1) || (a1 != start_action && !edeletes(a1, f2)) || (a2 != start_action && !edeletes(a2, f1))) goto suite2;
       } EFOR;
     } EFOR;
-    set_fmutex(f1, f2);
+    if (opt.fluent_mutexes) set_fmutex(f1, f2);
   suite2:;
   } EFORPAIR;
 
@@ -653,13 +649,13 @@ void create_problem(void)
 /*   start_action->del_nb = 0; */
 /*   FOR(f, fluents) { if (!produces(start_action, f)) start_action->del[start_action->del_nb++] = f; } EFOR; */
   
-  if ((!opt.yahsp || opt.fluent_mutexes) && opt.initial_heuristic < 2) {
+  if (opt.fluent_mutexes && opt.initial_heuristic < 2) {
     begin_monitor("Computing e-deleters");
     compute_init_edeletes(); 
     end_monitor();
   }
   
-  if (!opt.yahsp || opt.fluent_mutexes ||  opt.initial_heuristic == 2) {
+  if (opt.fluent_mutexes ||  opt.initial_heuristic == 2) {
     begin_monitor("Finalizing e-deleters");
     create_edeletes();
     end_monitor();
@@ -670,7 +666,7 @@ void create_problem(void)
   create_structures();
   end_monitor();
 
-/*   if (opt.yahsp && !opt.fluent_mutexes && opt.initial_heuristic < 2) { */
+/*   if (!opt.fluent_mutexes && opt.initial_heuristic < 2) { */
 /*     FORPAIR(f1, f2, fluents) { */
 /*       unset_fmutex(f1, f2); */
 /*       if (f1 != f2) { */

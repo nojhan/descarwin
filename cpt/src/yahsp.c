@@ -257,7 +257,8 @@ static bool can_be_applied(Node *node, Action *a)
 
 static bool action_must_precede(Action *a1, Action *a2)
 {
-  if (/* pddl_domain->action_costs ||  */amutex(a1, a2)) return true;
+  //if (/* pddl_domain->action_costs ||  */amutex(a1, a2)) return true;
+  if (opt.sequential || amutex(a1, a2)) return true;
   FOR(f, a2->prec) { if (produces(a1, f)) return true; } EFOR;
   return false;
 }
@@ -500,32 +501,6 @@ int yahsp_compress_plans()
       } EFOR;
       s->end = s->init + duration(s->action);
       maximize(plan->makespan, s->end);
-    } EFOR;
-  } EFOR;
-  qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);
-  solution_plan = plan;
-  return PLAN_FOUND;
-}
-
-int yahsp_compress_plans2()
-{
-  SolutionPlan *plan = cpt_calloc(plan, 1);
-
-  FOR(p, plans) { plan->steps_nb += p->steps_nb; } EFOR;
-  cpt_malloc(plan->steps, plan->steps_nb);
-  plan->steps_nb = 0;
-  FOR(p, plans) {
-    FOR(s, p->steps) { 
-      s->init = 0;
-      RFOR(s2, plan->steps) {
-	if (action_must_precede(s2->action, s->action)) {
-	  maximize(s->init, s2->end);
-	  if (s->init == plan->makespan) break;
-	}
-      } EFOR;
-      s->end = s->init + duration(s->action);
-      maximize(plan->makespan, s->end);
-      *cpt_calloc(plan->steps[plan->steps_nb++], 1) = *s; 
     } EFOR;
   } EFOR;
   qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);

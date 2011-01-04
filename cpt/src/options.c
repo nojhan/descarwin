@@ -164,7 +164,7 @@ void cmd_line(int argc, const char **argv)
   opt.distance_boosting = true;
   opt.distances = 1;
   opt.computing_distances = false;
-  opt.fluent_mutexes = false;
+  opt.fluent_mutexes = true;
   opt.global_mutex_sets = false;
   opt.initial_heuristic = 0;
   opt.limit_initial_propagation = false;
@@ -243,11 +243,11 @@ void cmd_line(int argc, const char **argv)
 #endif
     case 'x': opt.limit_backtracks = true; opt.max_backtracks = atol(optarg); trace(options, "maximum backtracks/bound : %ld\n", opt.max_backtracks); break;
     case 'X': opt.limit_backtracks_all = true; opt.max_backtracks = atol(optarg); trace(options, "maximum backtracks/all : %ld\n", opt.max_backtracks); break;
-    case 'y': opt.yahsp = true; opt.pb_restrict = true; opt.yahsp_threads = atol(strtok(optarg, ",")); 
+    case 'y': { opt.yahsp = true; opt.pb_restrict = true; opt.yahsp_threads = atol(strtok(optarg, ",")); 
       char *teams = strtok(NULL, ","); opt.yahsp_teams = teams ? atol(teams) : 1;
       if (teams) { char *strategy = strtok(NULL, ","); opt.yahsp_strategy = strategy ? atol(strategy) : 0; }
       trace(options, "suboptimal yahsp search, threads : %ld, teams : %ld, strategy : %ld\n", 
-	    opt.yahsp_threads, opt.yahsp_teams, opt.yahsp_strategy); break; 
+	    opt.yahsp_threads, opt.yahsp_teams, opt.yahsp_strategy); break; }
     case 'z': opt.read_actions = true; opt.read_actions_input = (char *) optarg; trace(options, "action file : %s\n", opt.read_actions_input); break;
     case 'A': opt.landmarks = true; trace(options, "enable landmarks\n"); break;
     case 'B': opt.bad_supporters_pruning = false; trace(options, "disable bad supporters pruning\n"); break;
@@ -270,8 +270,9 @@ void cmd_line(int argc, const char **argv)
 #endif
     case 'J': opt.limit_initial_propagation = true; opt.max_propagations = atol(optarg); 
       trace(options, "limited propagation : %ld\n", opt.max_propagations); break;
-    case 'K': opt.precision = strdup(strtok(optarg,",")); opt.precision2 = strdup(strtok(NULL,",")); 
-      trace(options, "temporal precision : %s,%s\n", opt.precision, opt.precision2); break;
+    case 'K': { opt.precision = strdup(strtok(optarg,",")); 
+      char *p = strtok(NULL,","); if (p != NULL) opt.precision2 = strdup(p);
+      trace(options, "temporal precision : %s,%s\n", opt.precision, opt.precision2); break; }
     case 'L': opt.local_mutex_sets = true; trace(options, "enable local mutex sets\n"); break;
     case 'M': opt.global_mutex_sets = true; opt.local_mutex_sets = true; trace(options, "enable global and local mutex sets\n"); break;
     case 'O': opt.optimal = false; opt.complete_qualprec = true;

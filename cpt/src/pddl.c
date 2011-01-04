@@ -279,9 +279,13 @@ PDDLDomain *parse_domain(char *dom_name, char *prob_name)
     gdsl_rbtree_insert(domain->predicates_table, &predicate_eq, &lost_int);
   }
   if (domain->durative_actions) {
+    opt.sequential = false;
     predicate_total_time.name = symbol_insert(domain, "total-time"); 
     predicate_total_time.terms_nb = 0; 
     gdsl_rbtree_insert(domain->predicates_table, &predicate_total_time, &lost_int);
+  } else if (opt.yahsp) {
+    opt.sequential = true;
+    opt.fluent_mutexes = opt.dae;
   }
   parse_domain_types(domain);
   parse_domain_constants(domain, domain->token_constants, &domain->constants_domain, &domain->constants_domain_nb);
