@@ -28,9 +28,9 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
 
     // Searches a sequential plan ( sequential / seq / P )
     // TODO ne mettre l'option -seq que pour les PDDL strips et cost, et pas pour temporal (extraire l'info lors du parsing ?) avec pddl_domain->action_costs ?
-    if( is_sequential ) {
-        cpt_call.push_back( "-sequential" );
-    }
+    //if( is_sequential ) {
+    //    cpt_call.push_back( "-sequential" );
+    //}
 
     // Domain file (typed/untyped PDDL) ( ops / NULL / o )
     cpt_call.push_back( "-ops" );
@@ -52,10 +52,8 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
 
 	// précision pour la planif temporelle. Pour IPC, 0.0001 devrait aller,
 	// à vérifier.
-	if( ! is_sequential ) {
-	  cpt_call.push_back( "-K" ); 
-	  cpt_call.push_back( "0,0.0001" ); 
-	}
+	cpt_call.push_back( "-K" ); 
+	cpt_call.push_back( "0,0.0001" ); 
 	
         // Enables h2-based fluent mutexes in yahsp (fluent-mutexes / fm / F)
 	cpt_call.push_back( "-fluent-mutexes" );
