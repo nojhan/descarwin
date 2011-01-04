@@ -19,6 +19,7 @@
 
 #include "daex.h"
 #include "evaluation/yahsp.h"
+#include "utils/eoEvalBestPlanFileDump.h"
 
 
 #define LOG_LOCATION(level) eo::log << level << "in " << __FILE__ << ":" << __LINE__ << " " << __PRETTY_FUNCTION__ << std::endl; 
@@ -359,11 +360,18 @@ int main ( int argc, char* argv[] )
     eo::log << eo::progress << "Creating evaluators...";
     eo::log.flush();
 
+    // worst fitness, TODO we should use the best individual from the previous evals at init
+    // used in an eval and in checkpointing
+    eoMinimizingDualFitness worst_fitness( std::make_pair<double,bool>( DBL_MAX, 0 ) );
+
     // nested evals:
     eoEvalFunc<daex::Decomposition> * p_eval;
 
+    // dump the best solution found so far in a file
+    daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file , worst_fitness );
+
     // counter, for checkpointing
-    eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_yahsp, "Eval.\t" );
+    eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
  
     // if we do not want to add a time limit, do not add an EvalTime
     if( max_seconds == 0 ) {
@@ -430,8 +438,6 @@ int main ( int argc, char* argv[] )
 
     // get the best plan only if it improve the fitness
     // note: fitness is different from the makespan!
-    // worst fitness, TODO we should use the best individual from the previous evals at init
-    eoMinimizingDualFitness worst_fitness( std::make_pair<double,bool>( DBL_MAX, 0 ) );
     eoBestPlanImprovedStat<daex::Decomposition> best_plan( worst_fitness, "Best improved plan");
     // at each generation
     checkpoint.add( best_plan );
@@ -486,12 +492,14 @@ int main ( int argc, char* argv[] )
         checkpoint.add( cout_monitor );
     }
 
+    // Note: commented here because superseeded by the eoEvalBestPlanFileDump
     // append the plans in a file
     // std::string _filename, std::string _delim = " ", bool _keep = false, bool _header=false, bool _overwrite = false
+    /*
     eoFileMonitor file_monitor( plan_file, "\n", false, false, true);
     file_monitor.add( best_plan );
-
     checkpoint.add( file_monitor );
+    */
 
     // SELECTION
     // TODO cet opérateur, fait soit un tri de la pop (true), soit un shuffle (false), idéalement, on ne voudrait ni l'un ni l'autre, car on parcours tout, peu importe l'ordre
