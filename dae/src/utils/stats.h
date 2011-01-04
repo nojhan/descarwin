@@ -88,7 +88,8 @@ public:
             os << plan;
             value() = os.str();
         }
-        // else do nothing // Idée à creuser : retun false et sinon true : pour éviter de réécrire à chaque géneration dans le fichier. eoFileMonitor tiendrait alors en compte le retour de la fonction et si false ne fait rien.
+        // else do nothing 
+        // TODO idée à creuser : retun false et sinon true : pour éviter de réécrire à chaque géneration dans le fichier. eoFileMonitor tiendrait alors en compte le retour de la fonction et si false ne fait rien.
     }
 
 protected:
