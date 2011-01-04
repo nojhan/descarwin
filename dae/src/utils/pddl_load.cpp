@@ -54,7 +54,7 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
 	// à vérifier.
 	if( ! is_sequential ) {
 	  cpt_call.push_back( "-K" ); 
-	  cpt_call.push_back( "0.0001,0.0001" ); 
+	  cpt_call.push_back( "0,0.0001" ); 
 	}
 	
         // Enables h2-based fluent mutexes in yahsp (fluent-mutexes / fm / F)
