@@ -323,29 +323,30 @@ int main ( int argc, char* argv[] )
     //    eo::log << eo::progress << "OK" << std::endl;
     
     unsigned int b_max_in=1, b_max_last, goodguys=0, popsize = pop.size();
-
+ 
     // Incremental strategy to fix bmax
     if( b_max_fixed == 0 ) {
-      eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
+        eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
 
-      while ((((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init)) {
-	goodguys=0;
-	b_max_last=static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
+        while ( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
+            goodguys = 0;
+            b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-	daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
-	eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
-	eval_y( pop, pop );
-	for (size_t i = 0; i < popsize; ++i)
-	  { // unfeasible individuals are invalidated in order to be re-evaluated with a larger bmax at the next iteration but we keep the good guys.
-	    if (pop[i].fitness().is_feasible()) goodguys++;
-	    else pop[i].invalidate();
-	  }
-	eo::log << eo::logging << "b_max_in= "   << b_max_in << ", current feasible ratio= " <<  ((double)goodguys/(double)popsize) << std::endl;
-	b_max_fixed = b_max_in;
-	b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
-      }
-      //      while (goodguys == 0);
-    } 
+            daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
+            eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+            eval_y( pop, pop );
+
+            for (size_t i = 0; i < popsize; ++i) {
+                // unfeasible individuals are invalidated in order to be re-evaluated with a larger bmax at the next iteration but we keep the good guys.
+                if (pop[i].fitness().is_feasible()) goodguys++;
+                else pop[i].invalidate();
+            }
+            eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize) << std::endl;
+            b_max_fixed = b_max_in;
+            b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
+        } // while b_max_ratio
+    } // if b_max_fixed == 0 
+
     b_max_in = b_max_fixed;
     b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
