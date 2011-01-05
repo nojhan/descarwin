@@ -10,8 +10,8 @@
 #include <cfloat>
 
 #include <eo>
-#include <do/make_pop.h>
-#include <do/make_checkpoint.h>
+//#include <do/make_pop.h>
+//#include <do/make_checkpoint.h>
 #include <ga.h>
 #include <utils/eoParserLogger.h>
 #include <utils/eoLogger.h>
@@ -30,6 +30,7 @@
 
 void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
 {
+#ifndef NDEBUG
     struct rusage usage;
     getrusage(RUSAGE_SELF,&usage);
 
@@ -55,6 +56,7 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
     eo::log << eo::warnings << FORMAT_LEFT_FILL_WIDTH(30) << "signals received"             << usage.ru_nsignals             << std::endl;
     eo::log << eo::warnings << FORMAT_LEFT_FILL_WIDTH(30) << "voluntary context switches"   << usage.ru_nvcsw                << std::endl;
     eo::log << eo::warnings << FORMAT_LEFT_FILL_WIDTH(30) << "involuntary context switches" << usage.ru_nivcsw               << std::endl;
+#endif
 
     // the pop being unsorted, sorting it before getting the first is more efficient
     // than using best_element (that uses std::max_element)
@@ -71,11 +73,15 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
              subsolver_steps += pop[i].subplan(j).search_steps();
         }
     }
+
+#ifndef NDEBUG
     eo::log << eo::progress << "; DAEx sub-solver steps " << subsolver_steps << std::endl;
     //eo::log << eo::progress << "; DAEx sub-solver time " << subsolver_time << " s (u-CPU)" << std::endl;
 
     eo::log << eo::progress << "; DAEx user time " << usage.ru_utime.tv_sec << "." << usage.ru_utime.tv_usec << " (seconds of user time in CPU)" << std::endl;
     eo::log << eo::progress << "; DAEx wallclock time " << std::difftime( std::time(NULL), time_start )  << " (seconds)" << std::endl;
+#endif
+
 }
 
 
@@ -90,9 +96,10 @@ int main ( int argc, char* argv[] )
     eoParserLogger parser(argc, argv);
     make_verbose(parser);
 
-    eoState state;
+    //eoState state;
 
     // SYSTEM
+#ifndef NDEBUG
     struct rlimit limit;
     getrlimit(RLIMIT_AS, &limit);
     eo::log << eo::logging << "Maximum size of the process virtual memory (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
@@ -110,6 +117,7 @@ int main ( int argc, char* argv[] )
     getrlimit(RLIMIT_DATA, &limit);
     std::cout << "Maximum size of the process   data segment (soft,hard)=" << limit.rlim_cur << ", " << limit.rlim_max << std::endl;
     */
+#endif
 
 
     // PARAMETERS
@@ -285,14 +293,18 @@ int main ( int argc, char* argv[] )
 
     // parse les pddl
     // FIXME ATTENTION : il y a une option cachée dans l'init qui précise à yahsp si on est en temporel ou en séquentiel, il faut la régler correctement en fonction du problème visé
+#ifndef NDEBUG
     eo::log << eo::progress << "Load the instance..." << std::endl;
     eo::log.flush();
+#endif
     
     daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, is_sequential );
     
+#ifndef NDEBUG
     eo::log << eo::progress << "Load the instance...OK" << std::endl;
     eo::log << eo::progress << "Initialization...";
     eo::log.flush();
+#endif
 
     // lie les structures de données DAEx à celles de YAHSP
     bindDaeYahsp( pddl );
@@ -305,11 +317,11 @@ int main ( int argc, char* argv[] )
     // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
     daex::Init init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
     
+#ifndef NDEBUG
     eo::log << eo::logging << std::endl;
     eo::log << eo::logging << "\tChrono partition size: " << pddl.chronoPartitionAtom().size() << std::endl;
     eo::log << eo::logging << "\tl_max: " << init.l_max() << std::endl;
 
-#ifndef NDEBUG
     eo::log << eo::debug << "\tChrono partition dates(#atoms): ";
     for( daex::ChronoPartition::const_iterator it = pddl.chronoPartitionAtom().begin(), end = pddl.chronoPartitionAtom().end(); it != end; ++it ) {
          eo::log << eo::debug << it->first << "(" << it->second.size() << ") ";
@@ -320,8 +332,6 @@ int main ( int argc, char* argv[] )
     // randomly generate the population with the init operator
     eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
 
-    //    eo::log << eo::progress << "OK" << std::endl;
-    
     unsigned int b_max_in=1, b_max_last, goodguys=0, popsize = pop.size();
  
     // Preventive direct call to YAHSP
@@ -336,7 +346,9 @@ int main ( int argc, char* argv[] )
    
     // Incremental strategy to fix bmax
     if( b_max_fixed == 0 ) {
+#ifndef NDEBUG
         eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
+#endif
 
         while ( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
             goodguys = 0;
@@ -349,7 +361,10 @@ int main ( int argc, char* argv[] )
                 if (pop[i].fitness().is_feasible()) goodguys++;
                 else pop[i].invalidate();
             }
+#ifndef NDEBUG
             eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize) << std::endl;
+#endif
+
             b_max_fixed = b_max_in;
             b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
         } // while b_max_ratio
@@ -362,12 +377,14 @@ int main ( int argc, char* argv[] )
     eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp3 );
     eval_y( pop, pop );
 
+#ifndef NDEBUG
     eo::log << eo::logging << std::endl << "\tb_max for intermediate goals, b_max_in: "   << b_max_in   << std::endl;
     eo::log << eo::logging              << "\tb_max for        final goal,  b_max_last: " << b_max_last << std::endl;
     eo::log << eo::progress << "OK" << std::endl;
 
     eo::log << eo::progress << "Creating evaluators...";
     eo::log.flush();
+#endif
 
     // worst fitness, TODO we should use the best individual from the previous evals at init
     // used in an eval and in checkpointing
@@ -379,32 +396,44 @@ int main ( int argc, char* argv[] )
     // dump the best solution found so far in a file
     daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file , worst_fitness );
 
+#ifndef NDEBUG
     // counter, for checkpointing
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
- 
+#endif
+
     // if we do not want to add a time limit, do not add an EvalTime
     if( max_seconds == 0 ) {
+#ifndef NDEBUG
         p_eval = & eval_counter;
-
+#else
+        p_eval = & eval_bestfile;
+#endif
     } else {
         // an eval that raises an exception if maxtime is reached
         /* eoEvalTimeThrowException<daex::Decomposition> * p_eval_maxtime 
                 = new eoEvalTimeThrowException<daex::Decomposition>( eval_counter, max_seconds ); */
-        eoEvalUserTimeThrowException<daex::Decomposition> * p_eval_maxtime 
+        eoEvalUserTimeThrowException<daex::Decomposition> * p_eval_maxtime
+#ifndef NDEBUG
             = new eoEvalUserTimeThrowException<daex::Decomposition>( eval_counter, max_seconds );
+#else
+            = new eoEvalUserTimeThrowException<daex::Decomposition>( eval_bestfile, max_seconds );
+#endif
         p_eval = p_eval_maxtime;
     }
 
+#ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
+#endif
 
 
     /********************
      * EVOLUTION ENGINE *
      ********************/
-   
 
+#ifndef NDEBUG
     eo::log << eo::progress << "Algorithm instanciation...";
     eo::log.flush();
+#endif
 
     // STOPPING CRITERIA
     
@@ -444,7 +473,7 @@ int main ( int argc, char* argv[] )
     // the checkpoint is here to get some stat during the search
     eoCheckPoint<daex::Decomposition> checkpoint( continuator );
 
-
+#ifndef NDEBUG
     // get the best plan only if it improve the fitness
     // note: fitness is different from the makespan!
     eoBestPlanImprovedStat<daex::Decomposition> best_plan( worst_fitness, "Best improved plan");
@@ -509,6 +538,7 @@ int main ( int argc, char* argv[] )
     file_monitor.add( best_plan );
     checkpoint.add( file_monitor );
     */
+#endif // NDEBUG
 
     // SELECTION
     // TODO cet opérateur, fait soit un tri de la pop (true), soit un shuffle (false), idéalement, on ne voudrait ni l'un ni l'autre, car on parcours tout, peu importe l'ordre
@@ -568,14 +598,10 @@ int main ( int argc, char* argv[] )
     // ALGORITHM
     eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, replace );
 
-    eo::log << eo::progress << "OK" << std::endl;
-
-    eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
-
-    eo::log.flush();
-
-
 #ifndef NDEBUG
+    eo::log << eo::progress << "OK" << std::endl;
+    eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
+    eo::log.flush();
     eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
 #endif
 
@@ -588,10 +614,12 @@ int main ( int argc, char* argv[] )
 
         while( 1 ) {
 
+#ifndef NDEBUG
             eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
 
             // call the checkpoint (log and stats output) on the pop from the init
             checkpoint( pop );
+#endif
 
             // start a search
             dae( pop );
@@ -629,20 +657,28 @@ int main ( int argc, char* argv[] )
 
 
     } catch( std::exception& e ) {
+#ifndef NDEBUG
         eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
         eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
+#endif
+
 
         // push the best result, in case it was not in the last run
         pop.push_back( best );
 
+#ifndef NDEBUG
         // call the checkpoint, as if it was ending a generation
         checkpoint( pop );
+#endif
 
         print_results( pop, time_start );
         return 0;
     }
 
+#ifndef NDEBUG
     eo::log << eo::progress << "... end of search" << std::endl;
+#endif
+
 
     // push the best result, in case it was not in the last run
     pop.push_back( best );
