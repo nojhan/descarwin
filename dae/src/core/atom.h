@@ -111,15 +111,17 @@ public:
     {
         // (_predicate, _objects ...)
         out << "(Atom[" << atom.earliest_start_time() << "]: " << *atom._predicate << " ";
-         
-        std::vector<pddlObject*>::const_iterator it = atom._objects.begin();
-        out << *(*it);
-        it++;
-        while( it != atom._objects.end() ) {
-            out << " " << *(*it);
-            it++;
-        }
 
+	// un atome peut être d'arité 0...
+	if (!atom._objects.empty()) {
+	    std::vector<pddlObject*>::const_iterator it = atom._objects.begin();
+	    out << *(*it);
+	    it++;
+	    while( it != atom._objects.end() ) {
+                out << " " << *(*it);
+                it++;
+	    }
+	}
         out << ")";
     };
 };
