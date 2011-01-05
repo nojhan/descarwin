@@ -9,7 +9,7 @@ namespace daex
 
 void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/, 
                           unsigned int heuristic_start_times /*= HEURISTIC_H1*/,
-                          bool is_sequential /* = false*/,
+                          /*bool is_sequential,*/ /* = false */
                           std::vector<std::string> solver_args /* = std::vector<std::string>()*/  
         )
 {
@@ -248,11 +248,11 @@ pddlLoad::pddlLoad(
           std::string problem, 
           std::string solver /*= SOLVER_YAHSP*/, 
           unsigned int heuristic_start_times /*= HEURISTIC_H1*/,
-          bool is_sequential /*= false */,
+          /*bool is_sequential,*/ /*= false */
           std::vector<std::string> solver_args /* = std::vector<std::string>()*/
         ) : _domain(domain), _problem(problem)
 {
-    load_pddl( solver, heuristic_start_times, is_sequential, solver_args );
+    load_pddl( solver, heuristic_start_times, /*is_sequential,*/ solver_args );
     compute_chrono_partition();
 }
 

@@ -16,20 +16,20 @@ int main ( int argc, char* argv[] )
 
     std::string instance = parser.createParam( (std::string)"zeno10.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
     
-    bool is_sequential = parser.createParam( (bool)false, "sequential", "Is the problem a sequential one?", 'q', "Problem", true ).value();
+    //bool is_sequential = parser.createParam( (bool)false, "sequential", "Is the problem a sequential one?", 'q', "Problem", true ).value();
 
 
     std::vector<std::string> solver_args;
     solver_args.push_back("-verbosity");
     solver_args.push_back("0");
 
-    daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, is_sequential, solver_args );
+    daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, /*is_sequential,*/ solver_args );
 
     std::clog << "# Domain: " << domain << std::endl;
     std::clog << "# Instance: " << instance << std::endl;
     std::clog << "# Solver: " << SOLVER_YAHSP << std::endl;
     std::clog << "# Heuristic:" << HEURISTIC_H1 << std::endl;
-    std::clog << "# Sequential: " << is_sequential << std::endl;
+    //std::clog << "# Sequential: " << is_sequential << std::endl;
     std::clog << "# Chrono partition of " << pddl.chronoPartitionAtom().size() << " dates:" << std::endl;
 
     for( daex::ChronoPartition::const_iterator it = pddl.chronoPartitionAtom().begin(), end = pddl.chronoPartitionAtom().end(); it != end; ++it ) {

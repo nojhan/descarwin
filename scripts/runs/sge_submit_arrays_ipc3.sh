@@ -12,14 +12,13 @@ function sge_submit_array_ipc()
     # directory where to search PDDL domains and instance files 
     base_rep=$1
 
-    # additional options to give to the solver (e.g. --sequential)
-    options=$2
-
     # nb of differents runs for each instance
-    runs=$3
+    runs=$2
 
     # directory where to put everything
-    res=$4
+    res=$3
+
+    options=$4
 
     # create directories if they do not exists
     mkdir -p $res
@@ -87,6 +86,6 @@ runs=11
 
 # IPC3
 
-sge_submit_array_ipc "/tools/pddl/ipc/IPC3/" 0 $runs "tempo-sat"
-sge_submit_array_ipc "/tools/pddl/ipc/IPC3/" 1 $runs "seq-sat"
+sge_submit_array_ipc "/tools/pddl/ipc/IPC3/" $runs "tempo-sat" 0 
+sge_submit_array_ipc "/tools/pddl/ipc/IPC3/" $runs "seq-sat" 1
 

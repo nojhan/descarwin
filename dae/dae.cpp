@@ -131,8 +131,10 @@ int main ( int argc, char* argv[] )
     std::string instance = parser.createParam( (std::string)"zeno10.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "instance" << instance << std::endl;
 
+    /*
     bool is_sequential = parser.createParam( (bool)false, "sequential", "Is the problem a sequential one?", 'q', "Problem", true ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "is_sequential" << is_sequential << std::endl;
+    */
 
     // un total de 20 paramètres
 
@@ -298,7 +300,7 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
     
-    daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, is_sequential );
+    daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1/*, is_sequential*/ );
     
 #ifndef NDEBUG
     eo::log << eo::progress << "Load the instance...OK" << std::endl;
@@ -356,7 +358,7 @@ int main ( int argc, char* argv[] )
             goodguys = 0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-            daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
+            daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty/*, is_sequential*/ );
             daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file , best_fitness );
 
             eoPopLoopEval<daex::Decomposition> eval_y( eval_bestfile );
@@ -400,7 +402,7 @@ int main ( int argc, char* argv[] )
     b_max_in = b_max_fixed;
     b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
+    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty/*, is_sequential*/ );
     eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
     eval_y( pop, pop );
 

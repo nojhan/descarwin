@@ -168,6 +168,7 @@ def quality( solvers ):
                     quality_si[s] = 0
 
 
+    # FIXME divide by nb of runs or not?
     return quality_si
 
 

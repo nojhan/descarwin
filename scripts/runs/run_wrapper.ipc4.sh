@@ -5,8 +5,7 @@ ulimit -c 1
 
 domain=$1
 instance=$2
-options=$3
-res=$4
+res=$3
 
 r=$SGE_TASK_ID
 #r=2
@@ -16,7 +15,7 @@ i=`basename $instance .PDDL`
 
 echo "Run dae: $i, run $r, out $res" 1>&2
 
-cmd="./dae --max-seconds=10799 --domain=$domain --instance=$instance --seed=$s --status=$res/status/dae_status_${i}_r$r --sequential=$3 --plan-file=$res/plans/dae_plan_${i}_r$r"
+cmd="./dae --max-seconds=10799 --domain=$domain --instance=$instance --seed=$s --status=$res/status/dae_status_${i}_r$r --plan-file=$res/plans/dae_plan_${i}_r$r"
 
 
 echo "  $cmd" 1>&2

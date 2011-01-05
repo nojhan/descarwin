@@ -12,14 +12,11 @@ function sge_submit_array_ipc()
     # directory where to search PDDL domains and instance files 
     base_rep=$1
 
-    # additional options to give to the solver (e.g. --sequential)
-    options=$2
-
     # nb of differents runs for each instance
-    runs=$3
+    runs=$2
 
     # directory where to put everything
-    res=$4
+    res=$3
 
     # create directories if they do not exists
     mkdir -p $res
@@ -52,12 +49,11 @@ function sge_submit_array_ipc()
             # b_max quantiles
             for q in `seq 1 1 9`; do
                 # submit an array of *runs jobs
-                # additional arguments are in $options
                 dshort=`echo $d | head -c 4`
-                cmd="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N ${dshort}_${q}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_bmax_quantile.sh $domain $instance $options $res $q"
+                cmd="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N ${dshort}_${q}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_bmax_quantile.sh $domain $instance $res $q"
                 
                 echo $cmd
-                #./run_bmax_quantile.sh $domain $instance $options $res $q
+                #./run_bmax_quantile.sh $domain $instance $res $q
                 $cmd
 
                 cptr=$((cptr+1))
@@ -80,13 +76,13 @@ function sge_submit_array_ipc()
 runs=11
 
 # IPC6
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/tempo-sat/elevators-strips" 0 $runs "tempo-sat/elevators-strips"
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/tempo-sat/pegsol-strips" 0 $runs "tempo-sat/pegsol-strips"
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/tempo-sat/sokoban-strips" 0 $runs "tempo-sat/sokoban-strips"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/tempo-sat/elevators-strips" $runs "tempo-sat/elevators-strips"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/tempo-sat/pegsol-strips" $runs "tempo-sat/pegsol-strips"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/tempo-sat/sokoban-strips" $runs "tempo-sat/sokoban-strips"
 
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/elevators-strips" 1 $runs "seq-sat/elevators-strips"
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/pegsol-strips" 1 $runs "seq-sat/pegsol-strips"
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/sokoban-strips" 1 $runs "seq-sat/sokoban-strips"
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/openstacks-strips" 1 $runs "seq-sat/openstacks-strips"
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/scanalyzer-strips" 1 $runs "seq-sat/scanalyzer-strips"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/elevators-strips" $runs "seq-sat/elevators-strips"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/pegsol-strips" $runs "seq-sat/pegsol-strips"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/sokoban-strips" $runs "seq-sat/sokoban-strips"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/openstacks-strips" $runs "seq-sat/openstacks-strips"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/scanalyzer-strips" $runs "seq-sat/scanalyzer-strips"
 

@@ -10,14 +10,11 @@ function sge_submit_array_ipc()
     # directory where to search PDDL domains and instance files 
     base_rep=$1
 
-    # additional options to give to the solver (e.g. --sequential)
-    options=$2
-
     # nb of differents runs for each instance
-    runs=$3
+    runs=$2
 
     # directory where to put everything
-    res=$4
+    res=$3
 
     # create directories if they do not exists
     mkdir -p $res
@@ -49,14 +46,13 @@ function sge_submit_array_ipc()
             i=`basename $instance .pddl`
 
             # submit an array of *runs jobs
-            # additional arguments are in $options
-            cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $options $res"
-            cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack_${d}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $options $res"
+            cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $res"
+            cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack_${d}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $res"
             
             echo $cmd1
             echo $cmd2
-            #./run_wrapper.sh $domain $instance $options
-            #./run_wrapper_jack.sh $domain $instance $options
+            #./run_wrapper.sh $domain $instance
+            #./run_wrapper_jack.sh $domain $instance
             $cmd1
             $cmd2
 
@@ -78,54 +74,54 @@ function sge_submit_array_ipc()
 runs=11
 
 # IPC5 STRIPS
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/OPENSTACKS/STRIP" "--sequential=1" $runs "STRIPS"
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/PATHWAYS/STRIP" "--sequential=1" $runs "STRIPS"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/OPENSTACKS/STRIP" $runs "STRIPS"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/PATHWAYS/STRIP" $runs "STRIPS"
 
 # OPENSTACKS
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Time/Strips-Time/domain_p01.pddl to domain_p20.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Time/Strips-Time/p01.pddl to p20.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Time/Strips-Time" 0 $runs "tempo-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Time/Strips-Time" $runs "tempo-sat"
 
 
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Propositional/Strips/domain_p01.pddl to domain_p30.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Propositional/Strips/p01.pddl to p30.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Propositional/Strips" 1 $runs "seq-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Propositional/Strips" $runs "seq-sat"
 
 # PATHWAYS
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/pathways/Propositional/Strips/domain_p01.pddl to domain_p30.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/pathways/Propositional/Strips/p01.pddl to p30.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/pathways/Propositional/Strips" 1 $runs "seq-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/pathways/Propositional/Strips" $runs "seq-sat"
 
 # PIPESWORLD
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/pipesworld/Propositional/Strips/domain_p01.pddl to domain_p50.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/pipesworld/Propositional/Strips/p01.pddl to p50.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/pipesworld/Propositional/Strips" 1 $runs "seq-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/pipesworld/Propositional/Strips"  $runs "seq-sat"
 
 # ROVERS
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/rovers/Propositional/Strips/domain_p01.pddl to domain_p40.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/rovers/Propositional/Strips/p01.pddl to p40.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/rovers/Propositional/Strips" 1 $runs "seq-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/rovers/Propositional/Strips" $runs "seq-sat"
 
 # STORAGE
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/storage/Propositional/domain.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/storage/Propositional/p01.pddl to p30.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/storage/Propositional" 1 $runs "seq-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/storage/Propositional" $runs "seq-sat"
 
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/storage/Time/domain.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/storage/Time/p01.pddl to p30.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/storage/Time" 0 $runs "tempo-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/storage/Time" $runs "tempo-sat"
 
 # TPP
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/TPP/Propositional/domain.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/TPP/Propositional/p01.pddl to p30.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/TPP/Propositional" 1 $runs "seq-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/TPP/Propositional" $runs "seq-sat"
 
 # TRUCKS
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/trucks/Propositional/Strips/domain_p01.pddl to domain_p30.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/trucks/Propositional/Strips/p01.pddl to p30.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Propositional/Strips" 1 $runs "seq-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Propositional/Strips" $runs "seq-sat"
 
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/trucks/Time/Strips-Time/domain_p01.pddl to domain_p30.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/trucks/Time/Strips-Time/p01.pddl to p30.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Time/Strips-Time" 0 $runs "tempo-sat"
+#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Time/Strips-Time" $runs "tempo-sat"
 
