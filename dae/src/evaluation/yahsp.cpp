@@ -396,7 +396,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         // here we have reached the last goal of the decomposition
         // we are searching towards the ultimate goal
 
-        if((code == PLAN_FOUND) || (decompo.size() == 0)) {
+        if((decompo.size() == 0) || (code == PLAN_FOUND)) {
             // set the b_max specific to this step
             b_max( _b_max_last );
             unsigned int code = solve_next( decompo, goal_state, goal_state_nb  );
