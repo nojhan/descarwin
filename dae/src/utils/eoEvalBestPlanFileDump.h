@@ -21,12 +21,18 @@ class eoEvalBestPlanFileDump : public eoEvalFunc<Decomposition>
         eoEvalBestPlanFileDump(eoEvalFunc<Decomposition>& func, std::string filename, Decomposition::Fitness worst_fitness ) 
             : _func(func), _filename(filename),_best_fitness(worst_fitness)
         {
-            std::ofstream os( _filename.c_str() );
+            // to test if the file can be opened, we use the "app" mode, 
+            // thus the file is not erased (which is the case in the default "out" mode)
+            _of.open( _filename.c_str(), std::ios_base::out | std::ios_base::app );
 
-            if (!os) {
+            if ( !_of.is_open() ) {
                 std::string str = "Error, eoEvalBestFileDump could not open: " + _filename;
                 throw std::runtime_error( str );
+
+            } else {
+                _of.close();
             }
+            
         }
 
 
@@ -39,12 +45,16 @@ class eoEvalBestPlanFileDump : public eoEvalFunc<Decomposition>
                 if( eo.fitness() > _best_fitness ) {
                     _best_fitness = eo.fitness();
 
-                    std::ofstream os( _filename.c_str() );
+                    // explicitely erase the file before writing in it
+                    _of.open( _filename.c_str(), std::ios_base::out | std::ios_base::trunc );
 
                     // here, we assume that the file could be opened, as it has been tested in the constructor
                     // thus, we avoid a supplementary test in this costly evaluator
-                    //os << eo;
-                    os << eo.plan();
+                    _of << eo.plan() << std::endl;
+
+                    // TODO may we would want to write the decomposition in the output file also?
+                    
+                    _of.close();
 
                 } // if better
             } // if invalid
@@ -53,6 +63,7 @@ class eoEvalBestPlanFileDump : public eoEvalFunc<Decomposition>
     protected :
         eoEvalFunc<Decomposition>& _func;
         std::string _filename;
+        std::ofstream _of;
         Decomposition::Fitness _best_fitness;
 };
 
