@@ -31,6 +31,10 @@ public:
         eo::log << eo::xdebug << " ChangeAddAtom:" << std::endl << "\tBefore: ";
         simplePrint( eo::log << eo::xdebug, decompo );
 #endif
+
+
+	//	std::cout << "DECOMPO=" << decompo << std::endl;
+
         bool is_modified = false;
 
         for( unsigned int k=0; k < decompo.size(); ++k ) {

@@ -38,7 +38,7 @@ bool MutationAddGoal::operator() ( Decomposition & decompo )
     eo::log << eo::debug << "A";
     eo::log.flush();
 #endif
-
+    //std::cout << "DECOMPO=" << decompo << std::endl;
     // TODO introduire des faux goals pour représenter l'init et le end ? Afin d'éviter de faire des branchements conditionnels
    
     /*****************************************************************************************
