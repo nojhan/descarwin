@@ -67,7 +67,7 @@ public:
         
         if( ! plan._is_valid )
         {
-            out << "No plan has been saved";
+            out << "No plan found (decomposition is unfeasible)";
 
         } else { // if plan._is_valid
         
