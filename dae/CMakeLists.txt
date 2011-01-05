@@ -24,9 +24,6 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 LINK_DIRECTORIES(${PARADISEO_EO_BIN_DIR}/lib)
 LINK_DIRECTORIES(${CPT_LIB_DIR})
 
-# Build type : None, Debug, Release
-SET( CMAKE_BUILD_TYPE Debug )
-
 SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG" )
 
 # make a static exe
@@ -51,11 +48,11 @@ ADD_DEPENDENCIES(test_stats daex)
 
 # link librairies for the executable
 
-TARGET_LINK_LIBRARIES(dae daex cpt gmp eo eoutils gcov) 
+TARGET_LINK_LIBRARIES(dae eoutils daex cpt gmp eo gcov) 
 
-TARGET_LINK_LIBRARIES(test_chronopartition daex cpt gmp eo eoutils gcov) 
-TARGET_LINK_LIBRARIES(test_b_max daex cpt gmp eo eoutils gcov) 
-TARGET_LINK_LIBRARIES(test_stats daex cpt gmp eo eoutils gcov) 
+TARGET_LINK_LIBRARIES(test_chronopartition eoutils daex cpt gmp eo gcov) 
+TARGET_LINK_LIBRARIES(test_b_max eoutils daex cpt gmp eo gcov) 
+TARGET_LINK_LIBRARIES(test_stats eoutils daex cpt gmp eo gcov) 
 
 
 # process to sources
