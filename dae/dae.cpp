@@ -332,55 +332,65 @@ int main ( int argc, char* argv[] )
     // randomly generate the population with the init operator
     eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
 
+    // worst fitness, TODO we should use the best individual from the previous evals at init
+    // used in an eval and in checkpointing
+    eoMinimizingDualFitness worst_fitness( std::make_pair<double,bool>( DBL_MAX, 0 ) );
+
+    /************************************
+     * Incremental strategy to fix bmax 
+     ************************************/
+    
     unsigned int b_max_in=1, b_max_last, goodguys=0, popsize = pop.size();
- 
+
     // Preventive direct call to YAHSP
     daex::Decomposition empty_decompo;
     bool found = false;
 
-    /*    
-    daeYahspEval eval_yahsp1( init.l_max(), b_max_init, b_max_init, fitness_weight, fitness_penalty, is_sequential );
-    //    empty_decompo.invalidate();
-    eval_yahsp1(empty_decompo);
-    if (empty_decompo.fitness().is_feasible()) {
-      //      std::cout << "FITNESS=" << empty_decompo.fitness() << std::endl;
-      std::cout << "SOLUTION 1 =" << empty_decompo.plan() << std::endl;
-      std::ofstream of(plan_file.c_str());
-      of << empty_decompo.plan();
-      //      of.flush();
-    }
-    */
-    //    exit(1);
-    // Incremental strategy to fix bmax
     if( b_max_fixed == 0 ) {
 #ifndef NDEBUG
         eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
 #endif
+        eoMinimizingDualFitness best_fitness = worst_fitness;
 
-        while ( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
+        while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
             goodguys = 0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
+
             daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty, is_sequential );
-            eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+            daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file , best_fitness );
+
+            eoPopLoopEval<daex::Decomposition> eval_y( eval_bestfile );
             eval_y( pop, pop );
+
             for (size_t i = 0; i < popsize; ++i) {
                 // unfeasible individuals are invalidated in order to be re-evaluated with a larger bmax at the next iteration but we keep the good guys.
                 if (pop[i].fitness().is_feasible()) goodguys++;
                 else pop[i].invalidate();
             }
-	    if ((goodguys == 0) && (!found)) {
-              empty_decompo.invalidate();
-	      eval_yahsp(empty_decompo);
-	      if (empty_decompo.fitness().is_feasible()){
-		//      std::cout << "FITNESS=" << empty_decompo.fitness() << std::endl;
-		//		std::cout << "SOLUTION=" << empty_decompo.plan() << std::endl;
-		found = true;
-		std::ofstream of(plan_file.c_str());
-		of << empty_decompo.plan();
-	      }
-	    }
+
+            if ((goodguys == 0) && (!found)) {
+                empty_decompo.invalidate();
+                eval_bestfile(empty_decompo);
+                /*
+                if (empty_decompo.fitness().is_feasible()){
+                    found = true;
+                    std::ofstream of(plan_file.c_str());
+                    of << empty_decompo.plan();
+                    of.flush();
+                    of.close();
+                }
+                */
+            } // if ! goodguys && ! found
+            
+            best_fitness = eval_bestfile.best_fitness();
+
 #ifndef NDEBUG
-            eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize) << std::endl;
+            eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize);
+            eo::log << "\tbest_fitness " << best_fitness;
+            if(found) {
+                eo::log << "\tfeasible empty decomposition";
+            }
+            eo::log << std::endl;
 #endif
             b_max_fixed = b_max_in;
             b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
@@ -402,17 +412,6 @@ int main ( int argc, char* argv[] )
     eo::log << eo::progress << "Creating evaluators...";
     eo::log.flush();
 #endif
-
-    //    std::cout << "POPULATION" << std::endl;
-    //    for (size_t i = 0; i < popsize; ++i) {
-    //      std::cout << pop[i] << std::endl;
-    //    }
-
-
-
-    // worst fitness, TODO we should use the best individual from the previous evals at init
-    // used in an eval and in checkpointing
-    eoMinimizingDualFitness worst_fitness( std::make_pair<double,bool>( DBL_MAX, 0 ) );
 
     // nested evals:
     eoEvalFunc<daex::Decomposition> * p_eval;
