@@ -60,6 +60,8 @@ class eoEvalBestPlanFileDump : public eoEvalFunc<Decomposition>
             } // if invalid
         }
 
+        Decomposition::Fitness best_fitness() { return _best_fitness; }
+
     protected :
         eoEvalFunc<Decomposition>& _func;
         std::string _filename;
