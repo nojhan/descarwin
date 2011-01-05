@@ -314,24 +314,19 @@ void daeYahspEval::call( daex::Decomposition & decompo )
 
       } else {
       
-
-
 #ifndef NDEBUG
         eo::log << eo::xdebug << "malloc plans...";
         eo::log.flush();
 #endif
 
-
         cpt_malloc( plans, decompo.size()+1 ); // +1 for the subplan between the last goal and the final state
         plans_nb = 0;
         
-
 #ifndef NDEBUG
         eo::log << eo::xdebug << "ok" << std::endl;
         eo::log << eo::xdebug << "yahsp reset...";
         eo::log.flush();
 #endif
-
 
         // TODO autoriser les décompositions vides ?
         // TODO garder les plans intermédiaires non compressés pour éviter de les recalculer ?
@@ -341,11 +336,9 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         // initialise le current_state à initial_bitstate
         yahsp_reset();
 
-
 #ifndef NDEBUG
         eo::log << eo::xdebug << "ok" << std::endl;
 #endif
-
 
         // compteur de goals
         _k = 0;
@@ -359,11 +352,9 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         eo::log << eo::xdebug << "for each goal:" << std::endl;
 #endif
 
-
         // only use for xdebug messages
         unsigned int goal_count = 0;
            
-
         // return code of cpt_search
         unsigned int code;
 
@@ -371,16 +362,12 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         b_max( _b_max_in );
 
         // parcours les goals de la décomposition
-        for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); 
-             igoal != iend;
-             ++igoal ) {
-
+        for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
 
 #ifndef NDEBUG
             eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
             eo::log.flush();
 #endif
-
 
             // copie des goals daex dans leur equivant YAHSP
             // nouvelle allocation de tableau de goal
@@ -394,48 +381,35 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                 _intermediate_goal_state[i] =  (*iatom)->fluent_of<Fluent*>( "yahsp" );
 
 		//		eo::log << eo::logging << " Goal atom : " << fluent_name((*iatom)->fluent_of<Fluent*>( "yahsp" ))  << std::endl;
-
                 i++;
             }
-
             assert( i == _intermediate_goal_state_nb );
-
             // search a plan towards the current goal
             code = solve_next( decompo, _intermediate_goal_state, _intermediate_goal_state_nb  );
-	    decompo.fitness( std::make_pair( fitness_unfeasible_intermediate(), false ) );
-
             if( code != PLAN_FOUND ) {
-                break;
+	      decompo.fitness( std::make_pair( fitness_unfeasible_intermediate(), false ) );
+	      break;
             }
 
         } // for igoal in decompo
-
 
         // here we have reached the last goal of the decomposition
         // we are searching towards the ultimate goal
 
         if((code == PLAN_FOUND) || (decompo.size() == 0)) {
-
             // set the b_max specific to this step
             b_max( _b_max_last );
-
             unsigned int code = solve_next( decompo, goal_state, goal_state_nb  );
-            decompo.fitness( std::make_pair( fitness_unfeasible_final(), false ) );
-
-
             if( code == PLAN_FOUND ) {
-                
-                compress( decompo );
-                decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
-
-		//		eo::log << eo::logging << "FITNESS=" << ;
-
-
+	      compress( decompo );
+	      decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
 #ifndef NDEBUG
                 eo::log << eo::debug << "*";
                 eo::log.flush();
 #endif
-            } // if PLAN_FOUND
+	    } else {
+	      decompo.fitness( std::make_pair( fitness_unfeasible_final(), false ) );
+	    } // if PLAN_FOUND for last goal
         } // if PLAN_FOUND
       } // if size > _l_max
     } // if !decompo.invalid

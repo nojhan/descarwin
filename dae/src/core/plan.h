@@ -44,7 +44,11 @@ public:
     
     Plan() : _is_valid(false), _search_steps(0), _time_subsolver(0), _time_eval(0) {}
 
-
+      // SEG FAULT !!! FIXME
+      /*      ~Plan(){
+	plan_free( &_yahsp_plan );
+      }
+      */
     SolutionPlan yahsp_plan() const { return _yahsp_plan; }
     SolutionPlan* p_yahsp_plan() { return &_yahsp_plan; }
 

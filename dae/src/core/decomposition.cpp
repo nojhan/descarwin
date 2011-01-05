@@ -51,7 +51,6 @@ void Decomposition::printOn( std::ostream & out ) const
     out << ")";
 }
 
-
 Decomposition::iterator Decomposition::iter_at( unsigned int i )
 {
     if( i >= this->size() ) {
@@ -71,7 +70,6 @@ Decomposition::iterator Decomposition::iter_at( unsigned int i )
 
     return it;
 }
-
 
 void simplePrint( std::ostream & out, Decomposition & decompo )
 {

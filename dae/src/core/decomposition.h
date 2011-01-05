@@ -101,9 +101,6 @@ public:
 
     Decomposition::iterator iter_at( unsigned int i );
 
-    //virtual ~Decomposition() {}
-    
-
 protected:
 
     //! Plan global compressé
