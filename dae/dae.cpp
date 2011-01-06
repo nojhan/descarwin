@@ -226,7 +226,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxtry_mutex" << maxtry_mutex << std::endl;
     */
 
-    std::string plan_file = parser.createParam( (std::string)"plan.ipc", "plan-file", "Plan file backup", 'F', "Misc" ).value();
+    std::string plan_file = parser.createParam( (std::string)"plan.soln", "plan-file", "Plan file backup", 'F', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plan-file" << plan_file << std::endl;
 
     // Variation
