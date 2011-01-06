@@ -21,10 +21,12 @@ public:
     eoEvalBestPlanFileDump(
             eoEvalFunc<Decomposition>& func, 
             std::string afilename, 
-            Decomposition::Fitness worst_fitness, 
-            std::string sep = "." )
+            Decomposition::Fitness worst_fitness,
+            bool overwrite = false,
+            std::string sep = ".",
+            unsigned int file_count = 0)
         : _func(func), _filename(afilename),_best_fitness(worst_fitness), _sep(sep),
-          _file_count(0)
+          _overwrite(overwrite), _file_count(file_count)
     {
         // to test if the file can be opened, we use the "app" mode, 
         // thus the file is not erased (which is the case in the default "out" mode)
@@ -69,20 +71,26 @@ public:
 
 
     Decomposition::Fitness best_fitness() { return _best_fitness; }
+    unsigned int file_count() { return _file_count; }
 
 protected:
     const char * filename()
     {
-        std::ostringstream filename;
-        filename << _filename << _sep << _file_count;
+        if( _overwrite ) {
+            return _filename.c_str();
 
-        return filename.str().c_str();
+         } else {
+            std::ostringstream filename;
+            filename << _filename << _sep << _file_count;
+            return filename.str().c_str();
+         }
     }
 
     eoEvalFunc<Decomposition>& _func;
     std::string _filename;
     std::ofstream _of;
     Decomposition::Fitness _best_fitness;
+    bool _overwrite;
     unsigned int _file_count;
     std::string _sep;
 };

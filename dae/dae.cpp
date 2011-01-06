@@ -347,6 +347,10 @@ int main ( int argc, char* argv[] )
     // used to pass the eval count through the several eoEvalFuncCounter evaluators
     unsigned int eval_count = 0;
 #endif
+    
+    eoMinimizingDualFitness best_fitness = worst_fitness;
+    unsigned int dump_file_count = 0;
+    std::string dump_sep = ".";
 
     // Preventive direct call to YAHSP
     daex::Decomposition empty_decompo;
@@ -356,14 +360,13 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
         eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
 #endif
-        eoMinimizingDualFitness best_fitness = worst_fitness;
 
         while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
             goodguys = 0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
             daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty/*, is_sequential*/ );
-            daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file , best_fitness );
+            daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file, best_fitness, false, dump_sep, dump_file_count );
 #ifndef NDEBUG
             eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
             eval_counter.value( eval_count );
@@ -379,6 +382,7 @@ int main ( int argc, char* argv[] )
                 if (pop[i].fitness().is_feasible()) goodguys++;
                 else pop[i].invalidate();
             }
+
 
             if ((goodguys == 0) && (!found)) {
                 empty_decompo.invalidate();
@@ -398,17 +402,20 @@ int main ( int argc, char* argv[] )
             } // if ! goodguys && ! found
             
             best_fitness = eval_bestfile.best_fitness();
-
+            dump_file_count = eval_bestfile.file_count();
+            
 #ifndef NDEBUG
-            eval_count = eval_counter.value();
-
             eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize);
             eo::log << "\tbest_fitness " << best_fitness;
             if(found) {
                 eo::log << "\tfeasible empty decomposition";
             }
             eo::log << std::endl;
+            
+            eval_count = eval_counter.value();
 #endif
+
+
             b_max_fixed = b_max_in;
             b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
         } // while b_max_ratio
@@ -434,7 +441,7 @@ int main ( int argc, char* argv[] )
     eoEvalFunc<daex::Decomposition> * p_eval;
 
     // dump the best solution found so far in a file
-    daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file , worst_fitness );
+    daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file, best_fitness, false, dump_sep, dump_file_count );
 
 #ifndef NDEBUG
     // counter, for checkpointing
@@ -712,6 +719,7 @@ int main ( int argc, char* argv[] )
         checkpoint( pop );
 #endif
 
+        pop.push_back( empty_decompo );
         print_results( pop, time_start );
         return 0;
     }
@@ -721,6 +729,7 @@ int main ( int argc, char* argv[] )
 #endif
 
 
+    pop.push_back( empty_decompo );
     // push the best result, in case it was not in the last run
     pop.push_back( best );
     print_results( pop, time_start );
