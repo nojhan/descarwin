@@ -382,16 +382,19 @@ int main ( int argc, char* argv[] )
 
             if ((goodguys == 0) && (!found)) {
                 empty_decompo.invalidate();
+#ifndef NDEBUG
+                eval_counter(empty_decompo);
+#else
                 eval_bestfile(empty_decompo);
-                /*
+#endif
                 if (empty_decompo.fitness().is_feasible()){
                     found = true;
+                    /*
                     std::ofstream of(plan_file.c_str());
                     of << empty_decompo.plan();
-                    of.flush();
                     of.close();
+                    */
                 }
-                */
             } // if ! goodguys && ! found
             
             best_fitness = eval_bestfile.best_fitness();
