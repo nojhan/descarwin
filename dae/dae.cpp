@@ -86,15 +86,8 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
     std::cout << std::endl << pop.front().plan() << std::endl;
 }
 
-
 int main ( int argc, char* argv[] )
 {
-
-// #pragma omp parallel num_threads(4)
-//   {
-//     int x = 0;
-//     while(1) { x++; }
-//   }
 
     // WALLOCK TIME COUNTER
     time_t time_start = std::time(NULL);
