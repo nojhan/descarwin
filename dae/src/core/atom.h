@@ -13,12 +13,12 @@
 #include <stdexcept>
 
 #include <gmpxx.h>
-extern "C" {
+//extern "C" {
 #include <src/cpt.h>
 #include <src/branching.h>
 #include <src/structs.h>
 #include <src/problem.h>
-}
+//}
 
 #include "utils/pddl.h"
 

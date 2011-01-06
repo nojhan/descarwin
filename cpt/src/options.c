@@ -52,6 +52,7 @@ static CPTOption long_options[] = {
   {"facts", NULL, "<file>", 'f', "Problem file (typed/untyped PDDL)"},
 
   {NULL, "General"},
+  {"anytime", "any", NULL, 'N', "Anytime behavior."},
   {"plan-length", "pl", "<x>", 'l', "Maximum plan length (default 500). This value does not have to be set for canonical planning (see -c below)."},
   {"timer", NULL, "<x>", 't', "Maximum amount of user time in seconds for giving a solution."},
   {"output-file", "out", "<file>", 'H', "Output plan in file in IPC format."},
@@ -157,6 +158,7 @@ void cmd_line(int argc, const char **argv)
   memset(&options[j], 0, sizeof(struct option));
   arg_string[k] = 0;
 
+  opt.anytime = false;
   opt.bound = (char *) "0";
   opt.bad_supporters_pruning = true;
   opt.dae = false;
@@ -275,6 +277,7 @@ void cmd_line(int argc, const char **argv)
       trace(options, "temporal precision : %s,%s\n", opt.precision, opt.precision2); break; }
     case 'L': opt.local_mutex_sets = true; trace(options, "enable local mutex sets\n"); break;
     case 'M': opt.global_mutex_sets = true; opt.local_mutex_sets = true; trace(options, "enable global and local mutex sets\n"); break;
+    case 'N': opt.anytime = true; trace(options, "anytime behavior\n"); break;
     case 'O': opt.optimal = false; opt.complete_qualprec = true;
       opt.relevance = false; opt.bound = (char *) "10000"; opt.propagate_inactive_causals = true;
       opt.landmarks = true; opt.branching_strategy = SUPPORTS_FIRST; trace(options, "suboptimal search\n"); break;

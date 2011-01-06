@@ -7,9 +7,9 @@
 #include <iostream>
 #include <cstdlib>
 
-extern "C" {
+//extern "C" {
 #include <src/plan.h>
-}
+//}
 
 
 namespace daex

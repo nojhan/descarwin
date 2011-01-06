@@ -14,14 +14,14 @@
 #include "cpt-yahsp.h"
 
 
-extern "C" {
+//extern "C" {
 #include <src/globs.h>
 #include <src/plan.h>
 #include <src/yahsp.h>
 #include <src/cpt.h>
 #include <src/trace.h>
 #include <src/options.h>
-}
+//}
 
 
 

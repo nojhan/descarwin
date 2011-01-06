@@ -83,6 +83,7 @@ struct Statistics {
 
 extern void print_plan(FILE *file, SolutionPlan *plan, bool print_synchro);
 extern void print_plan_ipc(FILE *file, SolutionPlan *plan, double total_time);
+extern void print_plan_ipc_anytime(SolutionPlan *plan);
 extern SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time);
 extern void plan_free(SolutionPlan *plan);
 extern void compress_plans(bool causals, bool orderings);

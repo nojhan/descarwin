@@ -18,6 +18,7 @@ extern int global_argc;
 extern const char **global_argv;
 
 struct Option {
+  bool anytime;
   char *bound;
   bool bad_supporters_pruning;
   BranchingStrategy branching_strategy;

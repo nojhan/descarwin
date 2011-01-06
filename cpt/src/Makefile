@@ -5,7 +5,7 @@
 
 MAKEFLAGS += -j3
 
-CC     	= gcc
+CC     	= g++
 AR	= ar
 BISON   	= bison
 FLEX    	= flex

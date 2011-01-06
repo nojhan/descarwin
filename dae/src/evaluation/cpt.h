@@ -12,14 +12,14 @@
 #include "core/decomposition.h"
 #include "cpt-yahsp.h"
 
-extern "C" {
+//extern "C" {
 #include <src/globs.h>
 #include <src/plan.h>
 #include <src/yahsp.h>
 #include <src/cpt.h>
 #include <src/trace.h>
 #include <src/options.h>
-}
+//}
 
 //! Affectation de pointeurs depuis les atomes DAEx vers leur équivalent CPT
 void bindDaeCpt( daex::pddlLoad & pddl );

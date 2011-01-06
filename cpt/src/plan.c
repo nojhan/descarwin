@@ -75,6 +75,18 @@ void print_plan_ipc(FILE *out, SolutionPlan *plan, double total_time)
   print_plan(out, plan, false);
 }
 
+void print_plan_ipc_anytime(SolutionPlan *plan)
+{
+  if (opt.output_file != NULL) {
+    char filename[strlen(opt.output_file) + 10];
+    static int number = 1;
+    sprintf(filename, "%s.%d", opt.output_file, number++);
+    FILE *file = fopen(filename, "w");
+    print_plan_ipc(file, solution_plan, get_timer(stats.total));
+    fclose(file);
+  }
+}
+
 int precedes_in_plan(const void *s1, const void *s2)
 {
   Step *a = *((Step **) s1);

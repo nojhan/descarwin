@@ -22,14 +22,14 @@
 #include <gmpxx.h>
 
 /***** C headers *****/
-extern "C" {
+//extern "C" {
 #include <src/cpt.h>
 #include <src/options.h>
 #include <src/structs.h>
 #include <src/problem.h>
 #include <src/solve.h>
 #include <src/globs.h>
-} // extern "C"
+//} // extern "C"
 
 #include "core/atom.h"
 

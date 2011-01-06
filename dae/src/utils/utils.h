@@ -4,9 +4,9 @@
 
 #include "core/atom.h"
 
-extern "C" {
+//extern "C" {
 #include <src/structs.h>
-} // extern "C"
+//} // extern "C"
 
 
 namespace daex {

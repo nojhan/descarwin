@@ -10,10 +10,10 @@
 #include "utils/posix_timer.h"
 
 /***** En-tetes C *****/
-extern "C" {
+//extern "C" {
 #include <src/structs.h>
 #include <src/plan.h>
-}
+//}
 
 //! Convertit un TimeVal en string, en utilisant print_time de CPT/YAHSP
 std::string timeValToString( TimeVal x );

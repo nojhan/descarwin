@@ -89,7 +89,7 @@ static void synchronize_causal(Causal *c)
     if (c->consumer->used) make_precede(prod, c->consumer);
   } else {
     TimeVal min_cons_init = MAXTIME, min_prod_init = MAXTIME, max_prod_init = 0, max_cons_init = 0;
-    int nb = 0; Action *prod;
+    int nb = 0; Action *prod = NULL;
 
     FORPROD(a, c) {
       if (last_start(a) < first_start(c) || first_start(a) > last_start(c) || cannot_precede_aa(a, c->consumer) ||

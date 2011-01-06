@@ -127,13 +127,13 @@ extern WorldStack wstack;
 #define store(v, i) NEST( save(v); v = i; )
 #define vstore(t, i) NEST( save(t##_nb); t[t##_nb++] = i; )
 
-#define new_world(count) ({ jmp_buf _env; push_stack(wstack.env); wstack.env = &_env; push_stack(NULL); wstack.world++; \
+#define new_world(count) ({ jmp_buf _env; push_stack(wstack.env); wstack.env = &_env; push_stack(0); wstack.world++; \
       if (count) { wstack.nodes++; wstack.nodes_run++; trace_proc(new_world); } else wstack.initial_world = wstack.world; (setjmp(_env) == 0); })
 
-#define new_world2(count) ({ jmp_buf _env; push_stack(wstack.env); wstack.env = &_env; push_stack(NULL); wstack.world++; \
+#define new_world2(count) ({ jmp_buf _env; push_stack(wstack.env); wstack.env = &_env; push_stack(0); wstack.world++; \
       trace_proc(new_world); (setjmp(_env) == 0); })
 
-#define protected() ({ jmp_buf _env; push_stack(wstack.env); wstack.env = &_env; push_stack(NULL); (setjmp(_env) == 0); })
+#define protected() ({ jmp_buf _env; push_stack(wstack.env); wstack.env = &_env; push_stack(0); (setjmp(_env) == 0); })
 
 #define backtrack(ret)							\
   NEST(									\
