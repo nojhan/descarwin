@@ -167,50 +167,12 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     // pour chaque Atom
     for( unsigned int i=0; i < fluents_nb; ++i) {
 
-      /*
-      std::cout << i;
-      std::cout << "\t" << fluents[i]->atom->predicate->terms_nb;
-      std::cout << "\t" << fluents[i]->atom->predicate->name;
-      std::cout << std::endl;
-      */
-
-        daex::pddlPredicate * pred = new daex::pddlPredicate(
-                 fluents[i]->atom->predicate->name,
-                 fluents[i]->atom->predicate->terms_nb
-        );
-
-        // pour chaque Objet
-        std::vector< pddlObject * > objects;
-        for( unsigned int j=0; 
-             j < fluents[i]->atom->terms_nb; 
-             ++j ) {
-
-            // pour chaque Type
-            std::vector< pddlType > types;
-            for( unsigned int k=0; 
-                 k < fluents[i]->atom->terms[j]->types_nb; 
-                 ++k ) {
-
-                daex::pddlType type( fluents[i]->atom->terms[j]->types[k]->name );
-
-                types.push_back( type );
-            } // for k type
-
-            daex::pddlObject * obj = new daex::pddlObject( 
-                    types, 
-                    fluents[i]->atom->terms[j]->name );
-
-            objects.push_back( obj );
-
-        } // for j objet
-
         // prédicat, objet, date au plus tot, pointeur vers le fluent CPT
-        //Atom * atom = new Atom( pred, objects, fluents[i]->init, fluents[i] );
-        daex::Atom * atom = new daex::Atom( pred, objects, fluents[i]->init );
-
-        _atoms.push_back( atom );
+        daex::Atom * atom = new daex::Atom( fluents[i]->init, fluents[i] );
 
         //std::cout << *atom << std::endl;
+
+        _atoms.push_back( atom );
 
     } // for i atom
 }

@@ -9,17 +9,9 @@
 #include "yahsp.h"
 #include "utils/utils.h"
 
-//! Affectation de pointeurs depuis les atomes DAEx vers leur équivalent YAHSP
-void bindDaeYahsp( daex::pddlLoad & pddl )
-{
-    bindDaeYahspCpt( pddl, SOLVER_YAHSP );
-}
-
-
 std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 {
     //out << bitarray_get( bitarray, fluents[0] );
-
     for( unsigned int i = 1; i < fluents_nb; ++i ) {
         unsigned long bit = bitarray_get( bitarray, fluents[i] );
         //out << " " << bit;
@@ -30,15 +22,17 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 
     return out;
 }
+
+
 daeYahspEval::daeYahspEval( 
             unsigned int l_max_ /*= 20*/, 
             unsigned int b_max_in /*= 10*/, 
             unsigned int b_max_last /*=30*/, 
             double fitness_weight /*= 10*/,
-	    double fitness_penalty /*= 1e6*/,
-	    bool sequential /*= false*/
-        ) : 
-  daeCptYahspEval(l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty, sequential), _previous_state( NULL ), _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
+            double fitness_penalty /*= 1e6*/
+        ) :
+        daeCptYahspEval( l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty ),
+        _previous_state( NULL ), _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
 {
     // some init steps are not done here, but in pddl_load.cpp
     // notably the call to cpt_main
@@ -59,7 +53,6 @@ daeYahspEval::daeYahspEval(
 daeYahspEval::~daeYahspEval()
 {
     free( _previous_state );
-   
     free( _intermediate_goal_state );
 }
 
@@ -378,9 +371,8 @@ void daeYahspEval::call( daex::Decomposition & decompo )
             for( daex::Goal::iterator iatom = igoal->begin(); iatom != igoal->end(); ++iatom ) {
                 // le compilateur demande à expliciter le template pour fluents, 
                 // car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
-                _intermediate_goal_state[i] =  (*iatom)->fluent_of<Fluent*>( "yahsp" );
+                _intermediate_goal_state[i] =  (*iatom)->fluent();
 
-		//		eo::log << eo::logging << " Goal atom : " << fluent_name((*iatom)->fluent_of<Fluent*>( "yahsp" ))  << std::endl;
                 i++;
             }
             assert( i == _intermediate_goal_state_nb );
@@ -501,9 +493,11 @@ unsigned int daeYahspEvalInit::estimate_b_max( double quantile /* = 0.5 */ )
     //unsigned int nth = node_numbers.size() / 2; // division euclidienne, indicage à 0 => prend l'élément supérieur
     unsigned int nth = static_cast<unsigned int>( ceil( static_cast<double>( node_numbers.size() ) * quantile ) );
 
+#ifndef NDEBUG
     if( nth == 0 || nth == node_numbers.size()-1 ) {
         eo::log << eo::warnings << "WARNING: while estimating the b_max, the quantile at " << quantile << " returns the " << nth << "th element (size=" << node_numbers.size() << ")" << std::endl;
     }
+#endif
 
     // JACK use a simple computation of the median (rounding in case of an even size)
     

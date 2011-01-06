@@ -35,7 +35,6 @@ int main ( int argc, char* argv[] )
     solver_args.push_back("0");
 
     daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, /*is_sequential,*/ solver_args );
-    bindDaeYahsp( pddl );
    
     std::clog << "# Domain: " << domain << std::endl;
     std::clog << "# Instance: " << instance << std::endl;

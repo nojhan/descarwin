@@ -97,13 +97,12 @@ void Init::operator()( Decomposition & decompo )
             //<< std::left << std::setfill(' ') << std::setw(3) 
             << ")";
         nb_goals++;
-#endif
-#ifndef NDEBUG
+
         eo::log << eo::xdebug << std::endl << "Check atom's earliest start times consistency...";
         eo::log.flush();
         // assert that any atom in the goal have the same earliest start date (Fluent:init, in CPT)
         for( Goal::iterator iatom = goal.begin(), end = goal.end(); iatom != end; ++iatom ) {
-            assert( (*iatom)->fluent_of<Fluent*>("yahsp")->init == goal.earliest_start_time() );
+            assert( (*iatom)->fluent()->init == goal.earliest_start_time() );
         }
         eo::log << eo::xdebug << "OK" << std::endl;
 #endif

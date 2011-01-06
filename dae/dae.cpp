@@ -22,11 +22,17 @@
 #include "utils/eoEvalBestPlanFileDump.h"
 
 
-#define LOG_LOCATION(level) eo::log << level << "in " << __FILE__ << ":" << __LINE__ << " " << __PRETTY_FUNCTION__ << std::endl; 
-
 #define LOG_FILL ' '
 #define FORMAT_LEFT_FILL_WIDTH(width) "\t" << std::left << std::setfill(LOG_FILL) << std::setw(width) 
 #define FORMAT_LEFT_FILL_W_PARAM FORMAT_LEFT_FILL_WIDTH(20)
+
+inline void LOG_LOCATION( eo::Levels level )
+{
+#ifndef NDEBUG
+    eo::log << level << "in " << __FILE__ << ":" << __LINE__ << " " << __PRETTY_FUNCTION__ << std::endl; 
+#endif
+}
+
 
 void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
 {
@@ -56,15 +62,7 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
     eo::log << eo::warnings << FORMAT_LEFT_FILL_WIDTH(30) << "signals received"             << usage.ru_nsignals             << std::endl;
     eo::log << eo::warnings << FORMAT_LEFT_FILL_WIDTH(30) << "voluntary context switches"   << usage.ru_nvcsw                << std::endl;
     eo::log << eo::warnings << FORMAT_LEFT_FILL_WIDTH(30) << "involuntary context switches" << usage.ru_nivcsw               << std::endl;
-#endif
-
-    // the pop being unsorted, sorting it before getting the first is more efficient
-    // than using best_element (that uses std::max_element)
-    pop.sort();
-
-    std::cout << std::endl << pop.front() << std::endl;
-    std::cout << std::endl << pop.front().plan() << std::endl;
-
+    
     //double subsolver_time = 0;
     unsigned int subsolver_steps = 0;
     for( unsigned int i=0; i < pop.size(); i++ ) {
@@ -74,20 +72,24 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
         }
     }
 
-#ifndef NDEBUG
     eo::log << eo::progress << "; DAEx sub-solver steps " << subsolver_steps << std::endl;
     //eo::log << eo::progress << "; DAEx sub-solver time " << subsolver_time << " s (u-CPU)" << std::endl;
-
     eo::log << eo::progress << "; DAEx user time " << usage.ru_utime.tv_sec << "." << usage.ru_utime.tv_usec << " (seconds of user time in CPU)" << std::endl;
     eo::log << eo::progress << "; DAEx wallclock time " << std::difftime( std::time(NULL), time_start )  << " (seconds)" << std::endl;
 #endif
 
-}
+    // the pop being unsorted, sorting it before getting the first is more efficient
+    // than using best_element (that uses std::max_element)
+    pop.sort();
 
+    std::cout << std::endl << pop.front() << std::endl;
+    std::cout << std::endl << pop.front().plan() << std::endl;
+}
 
 
 int main ( int argc, char* argv[] )
 {
+
     // WALLOCK TIME COUNTER
     time_t time_start = std::time(NULL);
 
@@ -308,9 +310,6 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
 
-    // lie les structures de données DAEx à celles de YAHSP
-    bindDaeYahsp( pddl );
-
     /******************
      * INITIALIZATION *
      ******************/
@@ -343,6 +342,11 @@ int main ( int argc, char* argv[] )
      ************************************/
     
     unsigned int b_max_in=1, b_max_last, goodguys=0, popsize = pop.size();
+    
+#ifndef NDEBUG
+    // used to pass the eval count through the several eoEvalFuncCounter evaluators
+    unsigned int eval_count = 0;
+#endif
 
     // Preventive direct call to YAHSP
     daex::Decomposition empty_decompo;
@@ -360,12 +364,18 @@ int main ( int argc, char* argv[] )
 
             daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty/*, is_sequential*/ );
             daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file , best_fitness );
-
+#ifndef NDEBUG
+            eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
+            eval_counter.value( eval_count );
+            eoPopLoopEval<daex::Decomposition> eval_y( eval_counter );
+#else
             eoPopLoopEval<daex::Decomposition> eval_y( eval_bestfile );
+#endif
             eval_y( pop, pop );
 
             for (size_t i = 0; i < popsize; ++i) {
-                // unfeasible individuals are invalidated in order to be re-evaluated with a larger bmax at the next iteration but we keep the good guys.
+                // unfeasible individuals are invalidated in order to be re-evaluated 
+                // with a larger bmax at the next iteration but we keep the good guys.
                 if (pop[i].fitness().is_feasible()) goodguys++;
                 else pop[i].invalidate();
             }
@@ -387,6 +397,8 @@ int main ( int argc, char* argv[] )
             best_fitness = eval_bestfile.best_fitness();
 
 #ifndef NDEBUG
+            eval_count = eval_counter.value();
+
             eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize);
             eo::log << "\tbest_fitness " << best_fitness;
             if(found) {
@@ -424,6 +436,7 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
     // counter, for checkpointing
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
+    eval_counter.value( eval_count );
 #endif
 
     // if we do not want to add a time limit, do not add an EvalTime

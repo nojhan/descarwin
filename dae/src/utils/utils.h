@@ -9,30 +9,7 @@ extern "C" {
 } // extern "C"
 
 
-
-
 namespace daex {
-
-//! Return true if candidate is mutex with at least one of the atom in goal
-/*
-template<class T>
-bool has_one_mutex_in( Atom* const& candidate, T const& goal )
-{
-    for( typename T::const_iterator iatom = goal.begin(), iend = goal.end(); iatom != iend; ++iatom ) {
-        // il faut absolument passer par une variable intermédiaire, sans quoi le compilo
-        // merde complètement
-        Atom* a = (*iatom);
-
-	//        assert( candidate->fluent_of<Fluent*>("yahsp") != a->fluent_of<Fluent*>("yahsp") );
-
-        if( fmutex( candidate->fluent_of<Fluent*>("yahsp"),
-                            a->fluent_of<Fluent*>("yahsp") ) ) {
-            return true;
-        }
-    }
-    return false;
-}
-*/
 
 //! Return true if candidate is mutex with at least one of the atom in goal(first,last)
 template<class T>
@@ -47,8 +24,8 @@ template<class T>
         // Warning: fmutex does not test if an atom is mutex with itself, thus we have to do it manually
         if( candidate == a 
             || 
-            fmutex( candidate->fluent_of<Fluent*>("yahsp"),
-                            a->fluent_of<Fluent*>("yahsp") ) ) {
+            fmutex( candidate->fluent(),
+                            a->fluent() ) ) {
 
             return true;
         }
@@ -175,68 +152,6 @@ typename T1::const_iterator draw_until_nomutex( T1 const& applicants, T2 const g
 }
 
 
-
-
-//! Return the iterator to a randomly chosen atom in applicants which is not MUTEX with none of the atoms in goal. @see draw_until_mutex_if
-/*
-    template< class T1, class T2 >
-typename T1::const_iterator draw_until_nomutex( T1 const& applicants, T2 const& goal, unsigned int maxtry = 0 )
-{
-    if( maxtry == 0 ) { maxtry = applicants.size(); }
-
-    return draw_until_mutex_if( applicants, goal, maxtry, false );
-}
-*/
-
-
-//! Return the iterator to a randomly chosen atom in applicants that appear to be MUTEX with at least one of the atom in goal. @see draw_until_mutex_if
-/*
-    template< class T1, class T2 >
-typename T1::const_iterator draw_until_mutex( T2 const& applicants, T2 const& goal, unsigned int maxtry = 0 )
-{
-    if( maxtry == 0 ) { maxtry = applicants.size(); }
-
-    return draw_until_mutex_if( applicants, goal, maxtry, true );
-}
-*/
-
-
-//! Build the subset of atoms from a candidates list that are mutex with the applicant atom. Among mutexes, atoms are chosen randomly.
-/*
-template<class T>
-//std::list<Atom*> mutex( Atom* const& applicant, std::list<Atom*> const& candidates );
-T mutex( Atom* const& applicant, T const& candidates )
-{
-    assert( candidates.size() > 0 );
-
-    T mutexes;
-
-    for( typename T::const_iterator iatom = candidates.begin(), iend = candidates.end();
-            iatom != iend; iatom++ ) {
-       
-        Atom* a = *iatom;
-
-        //assert( a != applicant );
-//        
-//        if( a == applicant ) {
-//            continue;
-//        }
-//        assert( applicant->fluent_of<Fluent*>("yahsp") != a->fluent_of<Fluent*>("yahsp") );
-        
-
-        if( fmutex( applicant->fluent_of<Fluent*>("yahsp"),
-                            a->fluent_of<Fluent*>("yahsp") ) ) {
-
-            mutexes.push_back( a );
-
-        } // if mutex
-
-    } // for iatom in candidates
-
-    return mutexes;
-}
-*/
-
 //! Build a random subset of non-mutex atoms from a candidate list. 
 /*! Among mutex, atoms are chosen randomly, in an iterative manner.
  * Thus, the subset is the larg we can get with a random walk in the candidate list.
@@ -244,7 +159,6 @@ T mutex( Atom* const& applicant, T const& candidates )
 //std::vector<Atom*> nomutex( std::vector<Atom*> candidate_atoms );
 //std::list<Atom*> nomutex( std::vector<Atom*> candidate_atoms );
 //std::list<Atom*> nomutex( std::list<Atom*> candidate_atoms );
-
 template< class T >
 T nomutex( T const& candidates )
 {
@@ -282,12 +196,12 @@ T nomutex( T const& candidates )
                     Atom* a = *it;
 
                     assert( ca != a );
-                    assert( ca->fluent_of<Fluent*>("yahsp") != a->fluent_of<Fluent*>("yahsp") );
+                    assert( ca->fluent() != a->fluent() );
 
                     // si le candidat est mutex avec cet atome
                     if( fmutex(
-                                ca->fluent_of<Fluent*>("yahsp"), 
-                                a->fluent_of<Fluent*>("yahsp") 
+                                ca->fluent(), 
+                                a->fluent() 
                               )
                       ) {
 
@@ -318,8 +232,8 @@ T nomutex( T const& candidates )
     // Check that the resulting list effectively contains no atoms that are pairwise mutualy exlusives
     for(     typename T::iterator iatom  = nomutex_atoms.begin(), end  = nomutex_atoms.end(); iatom != end;  ++iatom  ) {
         for( typename T::iterator iatom2 = ++iatom,               end2 = nomutex_atoms.end(); iatom != end2; ++iatom2 ) {
-            //assert( ! fmutex( (*iatom )->fluent_of<Fluent*>("yahsp"), (*iatom2)->fluent_of<Fluent*>("yahsp") ) );
-            if( (*iatom )->fluent_of<Fluent*>("yahsp") == (*iatom2)->fluent_of<Fluent*>("yahsp") ) { exit(1); }
+            //assert( ! fmutex( (*iatom )->fluent(), (*iatom2)->fluent() ) );
+            if( (*iatom )->fluent() == (*iatom2)->fluent() ) { exit(1); }
         }
     }
 #endif
@@ -404,7 +318,7 @@ void assert_nomutex( T begin, T end )
         for( T iatom2 = begin2; iatom2 != end; ++iatom2 ) {
             Atom* a = *iatom;
             Atom* b = *iatom2;
-            assert( ! fmutex( a->fluent_of<Fluent*>("yahsp"), b->fluent_of<Fluent*>("yahsp") ) );
+            assert( ! fmutex( a->fluent(), b->fluent() ) );
         }
     }
 }
