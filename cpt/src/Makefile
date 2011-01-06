@@ -16,8 +16,10 @@ LIBINCDIR = ../include
 
 CFLAGS =  -O3 -Wall -g -fopenmp
 EXE     	= $(EXEDIR)/cpt
+MTEXE     	= $(EXEDIR)/cpt-mt
 RATP     	= $(EXEDIR)/cpt-ratp
 LIB      	= $(LIBDIR)/libcpt.a
+MTLIB      	= $(LIBDIR)/libcpt-mt.a
 LDLIBS   =  -lm -lgmp -fopenmp
 #-static
 
@@ -43,9 +45,14 @@ SOURCES =  \
 	branching.c \
 	trace_planner.c \
 	control.c \
-	yahsp.c \
 	solve.c
 
+YSOURCES = \
+	yahsp-seq.c
+
+MTYSOURCES = \
+	yahsp-mt.c
+  
 EXESOURCES = \
 	main.c
 
@@ -55,7 +62,7 @@ RATPSOURCES = \
 LIBSOURCES =  \
 	dae.c
 
-ALLSOURCES = $(BISON_SOURCES) $(FLEX_SOURCES) $(SOURCES) $(EXESOURCES) $(RATPSOURCES) $(LIBSOURCES)
+ALLSOURCES = $(BISON_SOURCES) $(FLEX_SOURCES) $(SOURCES) $(YSOURCES) $(MTYSOURCES) $(EXESOURCES) $(RATPSOURCES) $(LIBSOURCES)
 
 GDSL_DIR = gdsl
 
@@ -66,6 +73,8 @@ FLEX_GEN =  $(FLEX_SOURCES:.lex=.yy.c)
 
 OBJECTS = $(BISON_GEN:.c=.o)  $(FLEX_GEN:.c=.o) $(SOURCES:.c=.o) 
 EXEOBJECTS = $(EXESOURCES:.c=.o) 
+YOBJECTS = $(YSOURCES:.c=.o) 
+MTYOBJECTS = $(MTYSOURCES:.c=.o) 
 RATPOBJECTS = $(RATPSOURCES:.c=.o) 
 LIBOBJECTS = $(LIBSOURCES:.c=.o) 
 
@@ -78,6 +87,8 @@ STATIC_LIBS = $(GDSL_STATIC)
 all: lib exe
 
 exe: $(EXE) 
+
+mt:  $(MTLIB) $(MTEXE) 
 
 lib: $(LIB)
 
@@ -98,13 +109,21 @@ win: LDLIBS = -static -mno-cygwin
 win: STATIC_LIBS += /usr/lib/mingw/libgmp.a
 win: $(RATP)
 
-$(EXE): $(GDSL_STATIC) $(OBJECTS) $(EXEOBJECTS)  
-	$(CC) -o $@  $(OBJECTS) $(EXEOBJECTS) $(STATIC_LIBS) $(LDLIBS)
+$(EXE): $(GDSL_STATIC) $(OBJECTS) $(YOBJECTS) $(EXEOBJECTS)  
+	$(CC) -o $@  $(OBJECTS) $(YOBJECTS) $(EXEOBJECTS) $(STATIC_LIBS) $(LDLIBS)
+
+$(MTEXE): $(GDSL_STATIC) $(OBJECTS) $(MTYOBJECTS) $(EXEOBJECTS)  
+	$(CC) -o $@  $(OBJECTS) $(MTYOBJECTS) $(EXEOBJECTS) $(STATIC_LIBS) $(LDLIBS)
 
 $(RATP): $(GDSL_STATIC) $(OBJECTS) $(RATPOBJECTS)  
 	$(CC) -o $@  $(OBJECTS) $(RATPOBJECTS) $(STATIC_LIBS) $(LDLIBS)
 
-$(LIB): dae.h $(GDSL_STATIC) $(OBJECTS) $(LIBOBJECTS)
+$(LIB): dae.h $(GDSL_STATIC) $(OBJECTS) $(YOBJECTS) $(LIBOBJECTS)
+	cp dae.h $(LIBINCDIR)/dae.h
+	cp $(GDSL_STATIC) $@
+	$(AR) rcs $@ $(OBJECTS) $(LIBOBJECTS)
+
+$(MTLIB): dae.h $(GDSL_STATIC) $(OBJECTS) $(MTYOBJECTS) $(LIBOBJECTS)
 	cp dae.h $(LIBINCDIR)/dae.h
 	cp $(GDSL_STATIC) $@
 	$(AR) rcs $@ $(OBJECTS) $(LIBOBJECTS)
@@ -125,8 +144,9 @@ depr:
 	makedepend -- -DSCHED -- $(ALLSOURCES) 
 
 clean:
-	rm -f $(EXE) $(LIB) $(BISON_GEN) $(FLEX_GEN) $(OBJECTS) $(EXEOBJECTS)  $(RATPOBJECTS) $(LIBOBJECTS) parser.tab.h *~ core
+	rm -f $(EXE) $(LIB) $(BISON_GEN) $(FLEX_GEN) $(OBJECTS) $(YOBJECTS) $(MTYOBJECTS) $(EXEOBJECTS)  $(RATPOBJECTS) $(LIBOBJECTS) parser.tab.h *~ core
 
 distclean: clean
 	rm -f $(GDSL_STATIC) ; cd $(GDSL_DIR) ; make distclean
 
+ 
