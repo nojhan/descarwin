@@ -78,7 +78,7 @@ static long threads_count[] = { 4, 4, 8, 16, 32, 64 };
 static long nodes_limits[] = { 50, 400, 3000, 20000, 100000, LONG_MAX };
 static long nodes_limits_nb = 6;
 
-/* static long threads_count[] = { 1 }; */
+/* static long threads_count[] = { 64 }; */
 /* static long nodes_limits[] = { LONG_MAX }; */
 /* static long nodes_limits_nb = 1; */
 

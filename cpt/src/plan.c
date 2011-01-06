@@ -67,12 +67,16 @@ void print_plan_ipc(FILE *out, SolutionPlan *plan, double total_time)
 {
   fprintf(out, "; Time %.2f\n", total_time);
   fprintf(out, "; Length %ld\n", plan->steps_nb);
+  if (pddl_domain->action_costs) {
+    fprintf(out, "\n; TotalCost ");
+    print_time(out, plan->makespan);
+  } else {
   fprintf(out, "; Makespan ");
   print_time(out, plan->makespan);
-  fprintf(out, "\n; TotalCost ");
-  if (pddl_domain->action_costs) print_time(out, plan->makespan);
+  }
   fprintf(out, "\n");
   print_plan(out, plan, false);
+  fprintf(out, "; END OF PLAN");
 }
 
 void print_plan_ipc_anytime(SolutionPlan *plan)
