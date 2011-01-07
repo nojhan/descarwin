@@ -60,7 +60,7 @@ RATPSOURCES = \
 	ratp.c
 
 LIBSOURCES =  \
-	dae.c
+
 
 ALLSOURCES = $(BISON_SOURCES) $(FLEX_SOURCES) $(SOURCES) $(YSOURCES) $(MTYSOURCES) $(EXESOURCES) $(RATPSOURCES) $(LIBSOURCES)
 
@@ -84,7 +84,10 @@ STATIC_LIBS = $(GDSL_STATIC)
 
 .PHONY : all pp ratp dep clean distclean win
 
-all: lib exe mtlib mt
+all: CPPFLAGS += -DDAE
+all: nodae
+
+nodae: lib mtlib exe  mt
 
 exe: $(EXE) 
 
@@ -93,9 +96,6 @@ mt:  $(MTEXE)
 lib: $(LIB)
 
 mtlib: $(MTLIB)
-
-pp: CC = g++
-pp: exe
 
 ratp: CPPFLAGS += -DSCHED 
 ratp: LDLIBS += -lX11
@@ -120,13 +120,11 @@ $(MTEXE): $(GDSL_STATIC) $(OBJECTS) $(MTYOBJECTS) $(EXEOBJECTS)
 $(RATP): $(GDSL_STATIC) $(OBJECTS) $(RATPOBJECTS)  
 	$(CC) -o $@  $(OBJECTS) $(RATPOBJECTS) $(STATIC_LIBS) $(LDLIBS)
 
-$(LIB): dae.h $(GDSL_STATIC) $(OBJECTS) $(YOBJECTS) $(LIBOBJECTS)
-	cp dae.h $(LIBINCDIR)/dae.h
+$(LIB): $(GDSL_STATIC) $(OBJECTS) $(YOBJECTS) $(LIBOBJECTS)
 	cp $(GDSL_STATIC) $@
 	$(AR) rcs $@ $(OBJECTS) $(YOBJECTS) $(LIBOBJECTS)
 
-$(MTLIB): dae.h $(GDSL_STATIC) $(OBJECTS) $(MTYOBJECTS) $(LIBOBJECTS)
-	cp dae.h $(LIBINCDIR)/dae.h
+$(MTLIB): $(GDSL_STATIC) $(OBJECTS) $(MTYOBJECTS) $(LIBOBJECTS)
 	cp $(GDSL_STATIC) $@
 	$(AR) rcs $@ $(OBJECTS) $(MTYOBJECTS) $(LIBOBJECTS)
 

@@ -17,7 +17,6 @@
 #include "preprocess.h"
 #include "scheduling.h"
 #include "yahsp.h"
-#include "dae.h"
 #ifdef RATP
 #include "ratp.h"
 #endif
