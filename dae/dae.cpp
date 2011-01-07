@@ -662,7 +662,6 @@ int main ( int argc, char* argv[] )
     try { 
 
         while( 1 ) {
-
 #ifndef NDEBUG
             eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
 

@@ -68,7 +68,7 @@ void Init::operator()( Decomposition & decompo )
 
 
 
-    // créé et ajoute à la décomposition des goal aléatoirement construits avec des atoms non-mutex
+    // créé et ajoute à la décomposition des goals aléatoirement construits avec des atomes non-mutex
     for( std::vector<TimeVal>::iterator idate = t_candidates.begin(), iend = t_candidates.end(); 
             idate != iend; idate++ ) {
 
@@ -111,7 +111,6 @@ void Init::operator()( Decomposition & decompo )
         decompo.push_back( goal );
     } // for idate in t_candidates
     decompo.invalidate();
-
 } // Init::operator()
 
 } // namespace daex

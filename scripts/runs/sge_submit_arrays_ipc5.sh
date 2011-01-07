@@ -16,6 +16,8 @@ function sge_submit_array_ipc()
     # directory where to put everything
     res=$3
 
+    seq=$4
+
     # create directories if they do not exists
     mkdir -p $res
     mkdir -p $res/data
@@ -26,7 +28,7 @@ function sge_submit_array_ipc()
 
     # list the available domain files in the sub-tree of this directory
     # default: do not consider ADL, NUMERIC and CYBERSEC
-    domains=`find $base_rep -type f -name *-domain.pddl | sed 's#^.#/#' | sort  | grep -v adl | grep -v numeric | grep -v cybersec`
+    domains=`find $base_rep -type f -name domain_*.pddl | sed 's#^.#/#' | sort`
     #domains=`find $base_rep -type f -name *-domain.pddl | sed 's#^.#/#' | sort  | grep -v adl | grep -v numeric | grep -v cybersec | grep elevators-strips | grep p0`
     # + only problem within [01-09], add: | grep p0`
 
@@ -35,7 +37,7 @@ function sge_submit_array_ipc()
         cptr=0
       
         # in IPC6 (2008) instances files have the same names than the domains
-        instance=`echo $domain | sed s/-domain//g`
+        instance=`echo $domain | sed s/domain_//g`
 
         if test -r $instance && test -r $domain; then
 
@@ -46,15 +48,15 @@ function sge_submit_array_ipc()
             i=`basename $instance .pddl`
 
             # submit an array of *runs jobs
-            cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $res"
-            cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack_${d}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $res"
+            cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $res $seq"
+#            cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack_${d}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $res"
             
             echo $cmd1
-            echo $cmd2
+#            echo $cmd2
             #./run_wrapper.sh $domain $instance
             #./run_wrapper_jack.sh $domain $instance
             $cmd1
-            $cmd2
+#            $cmd2
 
             cptr=$((cptr+1))
         else
@@ -71,18 +73,32 @@ function sge_submit_array_ipc()
 #######################
 
 # nb of differents runs for each instance
-runs=11
+runs=1
 
-# IPC5 STRIPS
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/OPENSTACKS/STRIP" $runs "STRIPS"
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/PATHWAYS/STRIP" $runs "STRIPS"
+# IPC5
 
 # OPENSTACKS
-# domain=/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Time/Strips-Time/domain_p01.pddl to domain_p20.pddl
-# instance=/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Time/Strips-Time/p01.pddl to p20.pddl
-#sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Time/Strips-Time" $runs "tempo-sat"
+sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Time/Strips-Time" $runs "tempo-sat" 0
+sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Propositional/Strips" $runs "seq-sat" 1
+
+# PATHWAYS
+sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/pathways/Propositional/Strips" $runs "seq-sat" 1
+
+# PIPESWORLD
+sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/pipesworld/Propositional/Strips" $runs "seq-sat" 1
+
+# ROVERS
+sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/rovers/Propositional/Strips" $runs "seq-sat" 1
+
+# STORAGE
+# TPP
+
+# TRUCKS
+sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Propositional/Strips" $runs "seq-sat" 1
+sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Time/Strips-Time" "tempo-sat" 0
 
 
+# OPENSTACKS
 # domain=/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Propositional/Strips/domain_p01.pddl to domain_p30.pddl
 # instance=/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Propositional/Strips/p01.pddl to p30.pddl
 #sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/openstacks/Propositional/Strips" $runs "seq-sat"

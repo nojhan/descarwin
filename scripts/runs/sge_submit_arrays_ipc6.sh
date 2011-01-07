@@ -16,6 +16,8 @@ function sge_submit_array_ipc()
     # directory where to put everything
     res=$3
 
+    seq=$4
+
     # create directories if they do not exists
     mkdir -p $res
     mkdir -p $res/data
@@ -46,15 +48,15 @@ function sge_submit_array_ipc()
             i=`basename $instance .pddl`
 
             # submit an array of *runs jobs
-            cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $res"
-            cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack_${d}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $res"
+            cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $res $seq"
+#            cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack_${d}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $res"
             
             echo $cmd1
-            echo $cmd2
+#            echo $cmd2
             #./run_wrapper.sh $domain $instance
             #./run_wrapper_jack.sh $domain $instance
             $cmd1
-            $cmd2
+#            $cmd2
 
             cptr=$((cptr+1))
         else
@@ -71,9 +73,9 @@ function sge_submit_array_ipc()
 #######################
 
 # nb of differents runs for each instance
-runs=11
+runs=1
 
 # IPC6
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/tempo-sat/" $runs "tempo-sat"
-sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/" $runs "seq-sat"
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/tempo-sat/" $runs "tempo-sat" 0
+sge_submit_array_ipc "/tools/pddl/ipc/ipc2008/seq-sat/" $runs "seq-sat" 1
 

@@ -18,7 +18,7 @@ function sge_submit_array_ipc()
     # directory where to put everything
     res=$3
 
-    options=$4
+    seq=$4
 
     # create directories if they do not exists
     mkdir -p $res
@@ -35,7 +35,7 @@ function sge_submit_array_ipc()
     # domains=`find $base_rep -wholename "*/Strips/*.pddl" -print | grep -v adl ; find $base_rep -wholename "*/SimpleTime/*.pddl" -print | grep -v "SimpleTime.*[0-9]" | grep -v adl`
 
     domains=""
-    if [ $options == 0 ] ; then
+    if [ $options = 0 ] ; then
 	domains=`find $base_rep -wholename "*/SimpleTime/*.pddl" -print | grep -v "SimpleTime.*[0-9]" | grep -v adl`
     else
 	domains=`find $base_rep -wholename "*/Strips/*.pddl" -print | grep -v adl`
@@ -56,15 +56,15 @@ function sge_submit_array_ipc()
 		echo $i
             # submit an array of *runs jobs
             # additional arguments are in $options
-		cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $options $res"
-		cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack_${d}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $options $res"
+		cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.sh $domain $instance $res $seq"
+#		cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack_${d}_${i} -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $options $res"
 		
 		echo $cmd1
-		echo $cmd2
+#		echo $cmd2
             #./run_wrapper.sh $domain $instance $options
             #./run_wrapper_jack.sh $domain $instance $options
 		$cmd1
-		$cmd2
+#		$cmd2
 
 		cptr=$((cptr+1))
 	    else
@@ -82,7 +82,7 @@ function sge_submit_array_ipc()
 #######################
 
 # nb of differents runs for each instance
-runs=11
+runs=1
 
 # IPC3
 

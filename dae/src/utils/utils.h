@@ -238,11 +238,8 @@ T nomutex( T const& candidates )
     }
 #endif
 */
-
     return nomutex_atoms;
 }
-
-
 
 
 //! Build a goal from a random atoms subset of random size, chosen in a container of atoms
@@ -297,8 +294,6 @@ Goal random_subset( T candidate_atoms )
 	eo::log << eo::xdebug << "goal final date: " << goal.earliest_start_time();
     eo::log << eo::xdebug << std::endl;
 #endif
-
-
     return goal;
 }
 
