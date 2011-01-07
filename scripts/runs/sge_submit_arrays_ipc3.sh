@@ -35,7 +35,7 @@ function sge_submit_array_ipc()
     # domains=`find $base_rep -wholename "*/Strips/*.pddl" -print | grep -v adl ; find $base_rep -wholename "*/SimpleTime/*.pddl" -print | grep -v "SimpleTime.*[0-9]" | grep -v adl`
 
     domains=""
-    if [ $options = 0 ] ; then
+    if [ "$options" = 0 ] ; then
 	domains=`find $base_rep -wholename "*/SimpleTime/*.pddl" -print | grep -v "SimpleTime.*[0-9]" | grep -v adl`
     else
 	domains=`find $base_rep -wholename "*/Strips/*.pddl" -print | grep -v adl`
