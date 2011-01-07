@@ -84,13 +84,15 @@ STATIC_LIBS = $(GDSL_STATIC)
 
 .PHONY : all pp ratp dep clean distclean win
 
-all: lib exe
+all: lib exe mtlib mt
 
 exe: $(EXE) 
 
-mt:  $(MTLIB) $(MTEXE) 
+mt:  $(MTEXE) 
 
 lib: $(LIB)
+
+mtlib: $(MTLIB)
 
 pp: CC = g++
 pp: exe

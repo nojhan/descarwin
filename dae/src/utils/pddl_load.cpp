@@ -48,7 +48,7 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
         cpt_call.push_back( "-yahsp" );
 
 	// -yashp now has one argument (for multicore)
-        cpt_call.push_back( "1" ); 
+        cpt_call.push_back( "64" ); 
 
 	// précision pour la planif temporelle. Pour IPC, 0.0001 devrait aller,
 	// à vérifier.

@@ -38,6 +38,9 @@ SET(CMAKE_EXE_LINKER_FLAGS "-fopenmp")
 ADD_EXECUTABLE(dae dae.cpp) 
 ADD_DEPENDENCIES(dae daex)
 
+ADD_EXECUTABLE(dae-mt dae.cpp) 
+ADD_DEPENDENCIES(dae-mt daex)
+
 ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp) 
 ADD_DEPENDENCIES(test_chronopartition daex)
 
@@ -50,7 +53,7 @@ ADD_DEPENDENCIES(test_stats daex)
 # link librairies for the executable
 
 TARGET_LINK_LIBRARIES(dae eoutils daex cpt gmp eo gcov) 
-
+TARGET_LINK_LIBRARIES(dae-mt eoutils daex cpt-mt gmp eo gcov) 
 TARGET_LINK_LIBRARIES(test_chronopartition eoutils daex cpt gmp eo gcov) 
 TARGET_LINK_LIBRARIES(test_b_max eoutils daex cpt gmp eo gcov) 
 TARGET_LINK_LIBRARIES(test_stats eoutils daex cpt gmp eo gcov) 
