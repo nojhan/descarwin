@@ -12,8 +12,8 @@
 #include "problem.h"
 #include "max_atom.h"
 #include "plan.h"
+#include "comparison.h"
 #include "globs.h"
-/* #include "dae.h" */
 
 
 typedef struct Node Node;
@@ -30,7 +30,7 @@ struct Node {
   unsigned long key;
   BitArray state;
   bool state_registered;
-  long gvalue;
+  long length;
   long fvalue;
   TimeVal makespan;
   VECTOR(YStep, steps);
@@ -63,8 +63,6 @@ static BitArray initial_bitstate;
 
 static TimeVal best_makespan = MAXTIME;
 
-
-
 #define get_ainit(a) ainit[(a)->id]
 #define set_ainit(a, t) ainit[(a)->id] = t
 #define get_aused(a) aused[(a)->id]
@@ -73,21 +71,31 @@ static TimeVal best_makespan = MAXTIME;
 #define set_finit(f, t) finit[(f)->id] = t
 
 
-#define CMP(a, b) NEST( if ((a) != (b)) return (a) - (b); )
-
-
 #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
-//#define COST(a) ({ long cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
+//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
 
-#define ISBEST(prod, best) (prod->id > 1 && (best == NULL || get_ainit(prod) < get_ainit(best) || (get_ainit(prod) == get_ainit(best) && duration(prod) < duration(best))))
-//#define ISBEST(prod, best) (prod->id > 1 && (best == NULL || get_ainit(prod) < get_ainit(best) || (repl && get_ainit(prod) == get_ainit(best) && duration(prod) < duration(best))))
-//#define ISBEST(prod, best) (prod->id > 1 && (best == NULL || get_ainit(prod) < get_ainit(best)))
+#ifdef DAE
+#define INCCOST(cost, action) (cost += duration(action) + 1)
+#define NODE_GVALUE(node) node->length
+#define NODE_HVALUE(node) get_ainit(end_action)
+#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
+#else
+#define INCCOST(cost, action) (cost++)
+#define NODE_GVALUE(node) node->length
+#define NODE_HVALUE(node) get_ainit(end_action)
+//#define NODE_HVALUE(node) relaxed_plan_nb
+#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * 3)
+#endif
 
-#define INCCOST(cost, action) cost += duration(action) + 1
-//#define INCCOST(cost, action) cost ++
-
-
-static long heuristic_cmp(Heuristic *h1, Heuristic *h2);
+static Comparison is_best_action_rp(Action *prod, Action *best)
+{
+  PREFER(prod->id > 1, best->id <= 1);
+  LESS(get_ainit(prod), get_ainit(best));
+#ifdef DAE
+  LESS(duration(prod), duration(best));
+#endif
+  return Equal;
+}
 
 void node_free(Node *node) 
 { 
@@ -97,19 +105,22 @@ void node_free(Node *node)
   free(node);
 }
 
-static long open_list_cmp(Node *node1, Node *node2)
+static Comparison open_list_cmp(Node *node1, Node *node2)
 {
-  CMP(node1->fvalue, node2->fvalue);
-  CMP(node1->makespan, node2->makespan);
-  return node1->id - node2->id;
+  LESS(node1->fvalue, node2->fvalue);
+#ifdef DAE
+  LESS(node1->makespan, node2->makespan);
+#else
+  LESS(node1->length, node2->length);
+#endif
+  LESS(node1->id, node2->id);
+  return Equal;
 }
 
-static long closed_list_cmp(Node *node1, Node *node2)
+static Comparison closed_list_cmp(Node *node1, Node *node2)
 {
-  if (node1->key < node2->key) return -1;
-  if (node1->key > node2->key) return 1;
-  //CMP(node1->key, node2->key); // bug 64 bits
-  return bitarray_cmp(node1->state, node2->state, fluents_nb);
+  LESS(node1->key, node2->key);
+  return (Comparison) bitarray_cmp(node1->state, node2->state, fluents_nb);
 }
 
 static Node *open_list_insert(Node *node)
@@ -135,7 +146,6 @@ static void update_cost_h1(Fluent *f, TimeVal cost)
     FOR(a, f->consumers) { set_aused(a, true);} EFOR; } 
 }
 
-
 static void compute_h1_cost_yahsp(bool goal_pref)
 {
   bool loop = true;
@@ -157,16 +167,12 @@ static void compute_h1_cost_yahsp(bool goal_pref)
       }
     } EFOR; 
   }
-/*   applicable_nb = 0; */
-/*   FOR(a, actions) { if (get_ainit(a) == 0) applicable[applicable_nb++] = a; } EFOR; */
 }
 
-static long heuristic_cmp(Heuristic *h1, Heuristic *h2)
+static Comparison heuristic_cmp(Heuristic *h1, Heuristic *h2)
 {
-  if (h1->key < h2->key) return -1;
-  if (h1->key > h2->key) return 1;
-  //CMP(h1->key, h2->key); // bug 64 bits
-  return bitarray_cmp(h1->state, h2->state, fluents_nb);
+  LESS(h1->key, h2->key);
+  return (Comparison) bitarray_cmp(h1->state, h2->state, fluents_nb);
 }
 
 static void heuristic_insert(Node *node)
@@ -217,14 +223,14 @@ static void compute_h1(Node *node, bool goal_pref)
 }
 
 
-static int cmp_actions(const void *v1, const void *v2)
+static Comparison cmp_actions(const void *s1, const void *s2)
 {
-  Action *a1 = *((Action **) v1);
-  Action *a2 = *((Action **) v2);
-  CMP(get_ainit(a1), get_ainit(a2));
-  FOR(f, a1->prec) { if (deletes(a2, f)) return -1; } EFOR;
-  FOR(f, a2->prec) { if (deletes(a1, f)) return 1; } EFOR;
-  return 0;
+  Action *a1 = *((Action **) s1);
+  Action *a2 = *((Action **) s2);
+  LESS(get_ainit(a1), get_ainit(a2));
+  FOR(f, a1->prec) { if (deletes(a2, f)) return Better; } EFOR;
+  FOR(f, a2->prec) { if (deletes(a1, f)) return Worse; } EFOR;
+  return Equal;
 }
 
 static void compute_relaxed_plan(Node *node)
@@ -238,7 +244,8 @@ static void compute_relaxed_plan(Node *node)
       if (!get_finit(f)) {
 	set_finit(f, true);
 	Action *best = NULL;
-	FOR(prod, f->producers) { if (ISBEST(prod, best)) best = prod; } EFOR;
+        long ties = 1;
+        FOR(prod, f->producers) { if (!best || preferred(is_best_action_rp(prod, best), ties)) best = prod; } EFOR;
 	if (best != NULL && !get_aused(best)) {
  	  set_aused(best, true);
 	  relaxed_plan[relaxed_plan_nb++] = best;
@@ -246,7 +253,7 @@ static void compute_relaxed_plan(Node *node)
       }
     } EFOR;
   } EFOR;
-  qsort(relaxed_plan, relaxed_plan_nb, sizeof(Action *), cmp_actions);
+  qsort(relaxed_plan, relaxed_plan_nb, sizeof(Action *), (int (*)(const void*, const void*)) cmp_actions);
 }
 
 static bool can_be_applied(Node *node, Action *a)
@@ -257,34 +264,35 @@ static bool can_be_applied(Node *node, Action *a)
 
 static bool action_must_precede(Action *a1, Action *a2)
 {
-  //if (/* pddl_domain->action_costs ||  */amutex(a1, a2)) return true;
-  if (opt.sequential || amutex(a1, a2)) return true;
+  if (opt.sequential || (opt.fluent_mutexes && amutex(a1, a2))) return true;
+  FOR(f, a1->del) { if (consumes(a2, f) || produces(a2, f)) return true; } EFOR;
+  FOR(f, a2->del) { if (consumes(a1, f) || produces(a1, f)) return true; } EFOR;
   FOR(f, a2->prec) { if (produces(a1, f)) return true; } EFOR;
   return false;
 }
 
 static void node_apply_action(Node *node, Action *a) 
 {
-    FOR(f, a->del) { bitarray_unset(node->state, f); } EFOR;
-    FOR(f, a->add) { bitarray_set(node->state, f); } EFOR;
-    node->gvalue++;
-    TimeVal init = 0;
-    Node *tmp = node;
-    while (init < tmp->makespan) {
-      RFOR(s, tmp->steps) {
-	if (s.init + duration(s.action) <= init) continue;
-	if (action_must_precede(s.action, a)) {
-	  init = s.init + duration(s.action);
-	  if (init >= tmp->makespan) goto end;
-	}
-      } EFOR;
-      tmp = tmp->ancestor;
-    }
+  FOR(f, a->del) { bitarray_unset(node->state, f); } EFOR;
+  FOR(f, a->add) { bitarray_set(node->state, f); } EFOR;
+  node->length++;
+  TimeVal init = 0;
+  Node *tmp = node;
+  while (init < tmp->makespan) {
+    RFOR(s, tmp->steps) {
+      if (s.init + duration(s.action) <= init) continue;
+      if (action_must_precede(s.action, a)) {
+	init = s.init + duration(s.action);
+	if (init >= tmp->makespan) goto end;
+      }
+    } EFOR;
+    tmp = tmp->ancestor;
+  }
  end:
-    node->steps[node->steps_nb].action = a;
-    node->steps[node->steps_nb].init = init;
-    node->steps_nb++;
-    maximize(node->makespan, init + duration(a));
+  node->steps[node->steps_nb].action = a;
+  node->steps[node->steps_nb].init = init;
+  node->steps_nb++;
+  maximize(node->makespan, init + duration(a));
 }
 
 static Node *node_derive(Node *node)
@@ -292,12 +300,13 @@ static Node *node_derive(Node *node)
   Node *son = cpt_calloc(son, 1);
   son->id = stats.computed_nodes++;
   son->ancestor = node;
-  son->gvalue = node->gvalue;
-  son->state = bitarray_create(fluents_nb);
+  son->length = node->length;
   son->makespan = node->makespan;
+  son->state = bitarray_create(fluents_nb);
   bitarray_copy(son->state, node->state, fluents_nb);
   return son;
 }
+
 
 
 static Node *apply_relaxed_plan(Node *node)
@@ -319,20 +328,22 @@ static Node *apply_relaxed_plan(Node *node)
   FORi(a, i, relaxed_plan) {
     if (a != NULL && a != end_action) {
       FOR(b, relaxed_plan) {
-	if (b != NULL && a != b && b != end_action) {
-	  FOR(f, a->add) {
-	    if (!bitarray_get(node->state, f) && consumes(b, f)) {
-	      Action *best = NULL;
-	      FOR(prod, f->producers) { if (prod != a && prod != b && can_be_applied(son, prod) && ISBEST(prod, best)) best = prod; } EFOR;
-	      if (best != NULL) {
-		relaxed_plan[i] = NULL;
-		node_apply_action(son, best);
-		if (son->makespan > best_makespan) { node_free(son); return NULL; }
-		goto start;
-	      }
-	    }
-	  } EFOR;
-	}
+        if (b != NULL && a != b && b != end_action) {
+          FOR(f, a->add) {
+            if (!bitarray_get(node->state, f) && consumes(b, f)) {
+              Action *best = NULL;
+              long ties = 1;
+              FOR(prod, f->producers) {
+		if (prod != a && prod != b && can_be_applied(son, prod) && prod->id > 1
+		    && (!best || preferred(is_best_action_rp(prod, best), ties))) best = prod; 
+	      } EFOR;
+              if (best != NULL) {
+                relaxed_plan[i] = best;
+                goto start;
+              }
+            }
+          } EFOR;
+        }
       } EFOR;
     }
   } EFOR;
@@ -345,13 +356,13 @@ static void create_solution_plan(Node *node)
 {
   SolutionPlan *plan = cpt_calloc(plan, 1);
 
-  cpt_malloc(plan->steps, (plan->steps_nb = node->gvalue));
+  cpt_malloc(plan->steps, (plan->steps_nb = node->length));
   plan->makespan = node->makespan;
 
   while (node != NULL) {
     FORi(a, i, node->steps) {
       //printf("%s %d %d\n", action_name(a->action), a->init, a->end);
-      Step *s = cpt_calloc(plan->steps[node->gvalue - node->steps_nb + i], 1);
+      Step *s = cpt_calloc(plan->steps[node->length - node->steps_nb + i], 1);
       s->action = a.action;
       s->init = a.init;
     } EFOR;
@@ -369,8 +380,9 @@ static Node *compute_node(Node *node)
   if (node == NULL || closed_list_insert(node) == NULL || stats.evaluated_nodes >= opt.max_backtracks) return NULL;
   if (node->makespan >= best_makespan) return NULL;
   stats.evaluated_nodes++;
-  compute_h1(node, !opt.dae);
-  if (!opt.dae && get_ainit(end_action) == MAXTIME) compute_h1(node, false);
+  compute_h1(node, false);
+  /* compute_h1(node, !opt.dae); */
+  /* if (!opt.dae && get_ainit(end_action) == MAXTIME) compute_h1(node, false); */
   if (get_ainit(end_action) == MAXTIME) return NULL;
   if (get_ainit(end_action) == 0) {
     if (!opt.anytime) return node;
@@ -387,9 +399,7 @@ static Node *compute_node(Node *node)
   }
   vector_copy(node->applicable, applicable);
   compute_relaxed_plan(node);
-  //node->fvalue = node->gvalue + relaxed_plan_nb * 3;
-  node->fvalue = node->gvalue + get_ainit(end_action);
-  //node->fvalue = node->makespan + get_ainit(end_action);
+  node->fvalue = NODE_FVALUE(node);
   //open_list_insert(node); return NULL;
   return compute_node(apply_relaxed_plan(open_list_insert(node)));
 }
@@ -410,13 +420,6 @@ static Node *open_list_pop_best()
   return node;
 }
 
-void yahsp_reset()
-{
-  free(current_state);
-  current_state = bitarray_create(fluents_nb);
-  bitarray_copy(current_state, initial_bitstate, fluents_nb);
-}
-
 static Node *yahsp_plan()
 {
   Node *node = cpt_calloc(node, 1), *son;
@@ -434,6 +437,13 @@ static Node *yahsp_plan()
     cpt_free(node->applicable);
   }
   return NULL;
+}
+
+void yahsp_reset()
+{
+  free(current_state);
+  current_state = bitarray_create(fluents_nb);
+  bitarray_copy(current_state, initial_bitstate, fluents_nb);
 }
 
 void yahsp_init()

@@ -404,18 +404,20 @@ static void finalize_structures(void)
   }
 
   // problématique avec h2 !!!!
-  FORPAIR(f1, f2, fluents) {
-    if (opt.fluent_mutexes) unset_fmutex(f1, f2);
-    FOR(a1, f1->producers) {
-      if (!produces(a1, f1)) continue;
-      FOR(a2, f2->producers) {
-	if (!produces(a2, f2)) continue;
-	if (produces(a1, f2) || produces(a2, f1) || (a1 != start_action && !edeletes(a1, f2)) || (a2 != start_action && !edeletes(a2, f1))) goto suite2;
+  if (opt.fluent_mutexes)  {
+    FORPAIR(f1, f2, fluents) {
+      unset_fmutex(f1, f2);
+      FOR(a1, f1->producers) {
+	if (!produces(a1, f1)) continue;
+	FOR(a2, f2->producers) {
+	  if (!produces(a2, f2)) continue;
+	  if (produces(a1, f2) || produces(a2, f1) || (a1 != start_action && !edeletes(a1, f2)) || (a2 != start_action && !edeletes(a2, f1))) goto suite2;
+	} EFOR;
       } EFOR;
-    } EFOR;
-    if (opt.fluent_mutexes) set_fmutex(f1, f2);
-  suite2:;
-  } EFORPAIR;
+      set_fmutex(f1, f2);
+    suite2:;
+    } EFORPAIR;
+  }
 
 #ifdef RESOURCES
   FOR(r, resources) {
@@ -655,7 +657,7 @@ void create_problem(void)
     end_monitor();
   }
   
-  if (opt.fluent_mutexes ||  opt.initial_heuristic == 2) {
+  if (opt.fluent_mutexes || opt.initial_heuristic == 2) {
     begin_monitor("Finalizing e-deleters");
     create_edeletes();
     end_monitor();

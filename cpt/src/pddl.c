@@ -285,8 +285,9 @@ PDDLDomain *parse_domain(char *dom_name, char *prob_name)
     gdsl_rbtree_insert(domain->predicates_table, &predicate_total_time, &lost_int);
   } else if (opt.yahsp) {
     opt.sequential = true;
-    opt.fluent_mutexes = opt.dae;
   }
+  opt.fluent_mutexes = (!opt.yahsp || opt.dae);
+  
   parse_domain_types(domain);
   parse_domain_constants(domain, domain->token_constants, &domain->constants_domain, &domain->constants_domain_nb);
   parse_domain_predicates(domain, domain->token_predicates, &domain->predicates, &domain->predicates_nb);
