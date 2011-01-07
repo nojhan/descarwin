@@ -82,7 +82,9 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
     // than using best_element (that uses std::max_element)
     pop.sort();
 
-    std::cout << std::endl << pop.front() << std::endl;
+#ifndef NDEBUG
+    std::cout << std::endl << "; " << pop.front() << std::endl;
+#endif
     std::cout << std::endl << pop.front().plan() << std::endl;
 }
 
@@ -348,7 +350,7 @@ int main ( int argc, char* argv[] )
 #endif
     
     eoMinimizingDualFitness best_fitness = worst_fitness;
-    unsigned int dump_file_count = 0;
+    unsigned int dump_file_count = 1;
     std::string dump_sep = ".";
 
     // Preventive direct call to YAHSP

@@ -28,6 +28,7 @@ public:
         : _func(func), _filename(afilename),_best_fitness(worst_fitness), _sep(sep),
           _overwrite(overwrite), _file_count(file_count)
     {
+        /*
         // to test if the file can be opened, we use the "app" mode, 
         // thus the file is not erased (which is the case in the default "out" mode)
         _of.open( filename(), std::ios_base::out | std::ios_base::app );
@@ -39,7 +40,7 @@ public:
         } else {
             _of.close();
         }
-        
+        */
     }
 
 
@@ -49,23 +50,37 @@ public:
             // don't forget to call the embedded evaluator
             _func( eo );
 
-            if( eo.fitness() > _best_fitness ) {
-                _best_fitness = eo.fitness();
+            // FIXME use the real cost instead of the fitness?
+            if( eo.fitness().is_feasible() ) {
+              
+                if( eo.fitness() > _best_fitness ) {
 
-                // explicitely erase the file before writing in it
-                _of.open( filename(), std::ios_base::out | std::ios_base::trunc );
+                    _best_fitness = eo.fitness();
 
-                // here, we assume that the file could be opened, as it has been tested in the constructor
-                // thus, we avoid a supplementary test in this costly evaluator
-                _of << eo.plan() << std::endl;
+                    // explicitely erase the file before writing in it
+                    _of.open( filename(), std::ios_base::out | std::ios_base::trunc );
 
-                // TODO may we would want to write the decomposition in the output file also?
-                
-                _of.close();
+#ifndef NDEBUG
+                    if ( !_of.is_open() ) {
+                        std::string str = "Error, eoEvalBestFileDump could not open: " + _filename;
+                        throw std::runtime_error( str );
 
-                _file_count++;
+                    }
+                    _of << "; " << eo << std::endl;
+#endif
 
-            } // if better
+                    // here, we assume that the file could be opened, as it has been tested in the constructor
+                    // thus, we avoid a supplementary test in this costly evaluator
+                    _of << eo.plan() << std::endl;
+
+                    // TODO may we would want to write the decomposition in the output file also?
+                    
+                    _of.close();
+
+                    _file_count++;
+
+                } // if better
+            } // if feasible
         } // if invalid
     }
 
