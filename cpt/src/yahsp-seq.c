@@ -472,7 +472,8 @@ int yahsp_main()
     FOR(a, actions) { goal_preferred[a->id] = true; } EFOR;
     FOR(f, end_action->prec) {
       if (!produces(start_action, f)) 
-	FOR(a, actions) { if (deletes(a, f) || edeletes(a, f)) goal_preferred[a->id] = false; } EFOR;
+	//FOR(a, actions) { if (deletes(a, f) || edeletes(a, f)) goal_preferred[a->id] = false; } EFOR;
+	FOR(a, actions) { if (deletes(a, f)) goal_preferred[a->id] = false; } EFOR;
     } EFOR;
   }
 

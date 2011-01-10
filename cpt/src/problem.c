@@ -104,7 +104,7 @@ char *fluent_name(Fluent *f)
 void print_fluent(Fluent *f)
 {
   printf("FLUENT %ld : %s\n  INIT -> ", f->id, fluent_name(f));
-  print_time(stdout, f->init);
+  print_time(stderr, f->init);
   printf("\n  PRODUCERS -> ");
   FOR(a, f->producers) { printf(" %s", action_name(a)); } EFOR;
   printf("\n  CONSUMERS -> ");
@@ -135,12 +135,12 @@ void print_complete_action(Action *a)
 {
   printf("ACTION %ld : %s\n", a->id, action_name(a));
   printf("  INIT -> ");
-  print_time(stdout, a->init);
+  print_time(stderr, a->init);
   printf("\n  DURATION -> ");
-  print_time(stdout, duration(a));
+  print_time(stderr, duration(a));
   if (opt.pddl21 && a->ope->real_duration) {
     printf("\n  RDURATION -> ");
-    print_time(stdout, a->rdur.t);
+    print_time(stderr, a->rdur.t);
   }
   printf("\n  PREC ->");
   FOR(f, a->prec) { printf(" %s", fluent_name(f)); } EFOR;
@@ -160,16 +160,16 @@ void print_complete_action(Action *a)
     printf("\n  ACTIVITY ->\n");
     FOR(ac, a->ac_constraints) {
       printf("    %s -- min : ", fluent_name(ac->fluent));
-      print_time(stdout, ac->min.t);
+      print_time(stderr, ac->min.t);
       printf(" -- max : ");
-      print_time(stdout, ac->max.t);
+      print_time(stderr, ac->max.t);
       if (ac->time) {
 	printf("\n\t\t");
 	FOR2(t, ac->time, d, ac->dur) {
 	  printf("(");
-	  print_time(stdout, t.t);
+	  print_time(stderr, t.t);
 	  printf(",");
-	  print_time(stdout, d.t);
+	  print_time(stderr, d.t);
 	  printf(") ");
 	} EFOR;
       }
@@ -186,14 +186,14 @@ char *action_name(Action *a)
 void print_action(Action *a)
 {
   printf("%s%s%ld[", (a->used ? "*" : (a->excluded ? "!" : "")), action_name(a), a->id);
-  print_time(stdout, first_start(a));
+  print_time(stderr, first_start(a));
   printf(",");
-  print_time(stdout, last_start(a));
+  print_time(stderr, last_start(a));
   printf("](");
-  print_time(stdout, duration(a));
+  print_time(stderr, duration(a));
   printf(")");
 #ifdef RESOURCES
-  if (a->synchro) fprintf(stdout, "[%" TIMEP ",%" TIMEP "]", min_level(a), max_level(a));
+  if (a->synchro) fprintf(stderr, "[%" TIMEP ",%" TIMEP "]", min_level(a), max_level(a));
 #endif
 }
 
@@ -255,9 +255,9 @@ void print_resource(Resource *r)
 void print_causal(Causal *c)
 {
   printf("S(%s, [", fluent_name(c->fluent));
-  print_time(stdout, first_start(c));
+  print_time(stderr, first_start(c));
   printf(" ");
-  print_time(stdout, last_start(c));
+  print_time(stderr, last_start(c));
   printf("],");
   print_action(c->consumer);
   printf(")");
@@ -714,7 +714,7 @@ void create_problem(void)
   end_monitor();
 
   if (opt.print_actions) {
-    print_pddl_types(stdout, pddl_domain);
+    print_pddl_types(stderr, pddl_domain);
     FOR(a, actions) { print_complete_action(a); } EFOR;
     FOR(f, fluents) { print_fluent(f); } EFOR;
 #ifdef RESOURCES

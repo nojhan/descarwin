@@ -38,7 +38,7 @@ void trace_backtrack(void) {
 void trace_begin_bound(TimeVal bound)
 {
   printf("Bound : ");
-  print_time(stdout, bound - (opt.pddl21 ? pddl_domain->precision.t : 0));
+  print_time(stderr, bound - (opt.pddl21 ? pddl_domain->precision.t : 0));
   printf("  ---  ");
 
 }
@@ -51,7 +51,7 @@ void trace_end_bound(long nodes, long backtracks, double time)
 void trace_restart(long nodes, long backtracks, double time, TimeVal bound)
 {
   printf("%ld  ---  %ld  ---  %.2f\nBound : ", nodes, backtracks, time);
-  print_time(stdout, bound - (opt.pddl21 ? pddl_domain->precision.t : 0));
+  print_time(stderr, bound - (opt.pddl21 ? pddl_domain->precision.t : 0));
   printf("  ---  ");
 }
 
@@ -64,19 +64,19 @@ void trace_problem_stats(long actions_nb, long fluents_nb, long causals_nb)
 void trace_solution_plan(SolutionPlan *plan)
 {
   printf("\n");
-  print_plan(stdout, plan, true);
+  print_plan(stderr, plan, true);
 }
 
 void trace_plan_stats(SolutionPlan *plan)
 {
   if (opt.verbosity > 0) {
-    trace(normal, "\n");
-    trace(normal, "Makespan : ");
     if (pddl_domain->action_costs) {
-      print_time(stdout,  plan->steps_nb);
       trace(normal, "\nTotal cost : ");
-      print_time(stdout, plan->makespan);
-    } else print_time(stdout, plan->makespan);
+      print_time(stderr, plan->makespan);
+    } else if (!opt.sequential) {
+      trace(normal, "\nMakespan : ");
+      print_time(stderr, plan->makespan);
+    }
     trace(normal, "\nLength : %ld\n", plan->steps_nb);
   }
 }
@@ -115,7 +115,7 @@ void trace_yahsp_anytime_search_stats(TimeVal makespan, double search_time, doub
   if (pddl_domain->action_costs) trace(normal, "cost ");
   else if (opt.sequential) trace(normal, "length ");
   else trace(normal, "makespan ");
-  print_time(stdout, makespan);
+  print_time(stderr, makespan);
   trace(normal, " -- search time %.2f -- total time %.2f\n", search_time, total_time);
 }
 
@@ -245,21 +245,21 @@ void trace_producer_used(Causal *c)
 
 void trace_update_sup_a(Action *a, TimeVal i)
 {
-  if (last_start(a) > i) { printf("update sup "); print_action(a); printf(" : "); print_time(stdout, i); printf("\n"); }
+  if (last_start(a) > i) { printf("update sup "); print_action(a); printf(" : "); print_time(stderr, i); printf("\n"); }
 }
 
 void trace_update_sup_c(Causal *c, TimeVal i)
 {
-  if (last_start(c) > i) { printf("update sup "); print_causal(c); printf(" : "); print_time(stdout, i); printf("\n"); }
+  if (last_start(c) > i) { printf("update sup "); print_causal(c); printf(" : "); print_time(stderr, i); printf("\n"); }
 }
 
 void trace_update_inf_a(Action *a, TimeVal i)
 {
-  if (first_start(a) < i) { printf("update inf "); print_action(a); printf(" : "); print_time(stdout, i); printf("\n"); }
+  if (first_start(a) < i) { printf("update inf "); print_action(a); printf(" : "); print_time(stderr, i); printf("\n"); }
 }
 
 void trace_update_inf_c(Causal *c, TimeVal i)
 {
-  if (first_start(c) < i) { printf("update inf "); print_causal(c); printf(" : "); print_time(stdout, i); printf("\n"); }
+  if (first_start(c) < i) { printf("update inf "); print_causal(c); printf(" : "); print_time(stderr, i); printf("\n"); }
 }
 

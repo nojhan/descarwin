@@ -379,7 +379,7 @@ void evaluate_ac_forward(ActivityConstraint *ac, TimeVal fs, TimeVal ls, TimeVal
     }
     *acmin += ac->min.t;
     *acmax += ac->max.t;
-    //printf("ICI : min = %lld max = %lld -- fs = %lld ls = %lld\n", *acmin, *acmax, fs, ls); fflush(stdout);
+    //printf("ICI : min = %lld max = %lld -- fs = %lld ls = %lld\n", *acmin, *acmax, fs, ls); fflush(stderr);
   } else {
     *acmin = fs + ac->min.t;
     *acmax = ls + ac->max.t;
@@ -410,7 +410,7 @@ void evaluate_ac_backward(ActivityConstraint *ac, TimeVal fs, TimeVal ls, TimeVa
     }
     if (yb <= fs) *acmin = fs - dur;
     if (yb <= ls) *acmax = ls - dur;
-    //printf("ICI : min = %lld max = %lld -- fs = %lld ls = %lld\n\n", *acmin, *acmax, fs, ls); fflush(stdout);
+    //printf("ICI : min = %lld max = %lld -- fs = %lld ls = %lld\n\n", *acmin, *acmax, fs, ls); fflush(stderr);
   } else {
     *acmin = fs - ac->max.t;
     *acmax = ls - ac->min.t;

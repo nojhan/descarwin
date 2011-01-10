@@ -125,7 +125,7 @@ void compute_distance_boosting(void)
 	  } EFOR;
 	  if (newdist > distance(prod, cons)) {
 	    if (opt.verbose_preprocessing) {
-	      printf("distance increase : "); print_action(prod); printf("  "); print_causal(c); printf(" ==> "); print_time(stdout, newdist); printf("\n");
+	      printf("distance increase : "); print_action(prod); printf("  "); print_causal(c); printf(" ==> "); print_time(stderr, newdist); printf("\n");
 	    }
 	    set_distance(prod, cons, newdist);
 	  }
