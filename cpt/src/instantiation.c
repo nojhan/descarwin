@@ -11,6 +11,7 @@
 #include "trace.h"
 #include "structs.h"
 #include "problem.h"
+#include "globs.h"
 
 
 /*---------------------------------------------------------------------------*/

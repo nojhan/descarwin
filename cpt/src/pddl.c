@@ -10,6 +10,7 @@
 #include "cpt.h"
 #include "trace.h"
 #include "pddl.h"
+#include "globs.h"
 
 
 /*---------------------------------------------------------------------------*/
@@ -296,11 +297,11 @@ PDDLDomain *parse_domain(char *dom_name, char *prob_name)
   parse_domain_predicates(domain, domain->token_functions, &domain->functions, &domain->functions_nb);
   parse_domain_operators(domain);
   if (opt.precision) parse_number(domain->precision.q, opt.precision);
-  //print_pddl_domain(stderr, domain);
+  //print_pddl_domain(cptout, domain);
   if (domain->print_domain_only) { print_pddl_domain(fdopen(pipefd[1], "w"), domain); exit(0); }
   end_monitor();
 
-  if (opt.print_actions) print_pddl_domain(stderr, domain);
+  if (opt.print_actions) print_pddl_domain(cptout, domain);
 
   begin_monitor("Parsing problem");
   parser_read_pddl_file(domain, prob_name, 0);
@@ -311,7 +312,7 @@ PDDLDomain *parse_domain(char *dom_name, char *prob_name)
   parse_ac_constraints(domain, domain->token_ac_constraints, NULL, &domain->ac_constraints, &domain->ac_constraints_nb);
   end_monitor();
 
-  if (opt.print_actions) print_pddl_problem(stderr, domain); 
+  if (opt.print_actions) print_pddl_problem(cptout, domain); 
 
   cpt_malloc(domain->constants_all, domain->constants_domain_nb + domain->constants_problem_nb);
   domain->constants_all_nb = 0;

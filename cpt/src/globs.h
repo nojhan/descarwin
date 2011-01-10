@@ -39,5 +39,6 @@ extern Statistics stats;
 extern Causal *last_conflict_candidate;
 EVECTOR(Causal *, last_conflicts);
 
+extern FILE *cptout;
 
 #endif /* GLOBS_H */

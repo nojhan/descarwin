@@ -11,6 +11,7 @@
 #include "cpt.h"
 #include "trace.h"
 #include "options.h"
+#include "globs.h"
 
 
 /*---------------------------------------------------------------------------*/

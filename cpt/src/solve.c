@@ -59,6 +59,12 @@ Statistics stats;
 Causal *last_conflict_candidate;
 VECTOR(Causal *, last_conflicts);
 
+#ifdef DAE
+FILE *cptout = stderr;
+#else
+FILE *cptout = stdout;
+#endif
+
 
 /*---------------------------------------------------------------------------*/
 /* Local Macros                                                              */
@@ -118,7 +124,7 @@ static void partial_statistics_request(int n)
   int v = opt.verbosity;
   opt.verbosity = 1;
   trace(normal, "\n----- Partial statistics at bound ");
-  print_time(stderr, last_start(end_action));
+  print_time(cptout, last_start(end_action));
   trace(normal, " -----\n");
   trace_proc(search_stats, get_timer(stats.search), get_timer(stats.total));
   opt.verbosity = v;
@@ -337,7 +343,7 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
 /*       FOR(c, causals) { c->weight = 0; } EFOR; */
 /*       FOR(a, actions) { a->weight = 0; } EFOR; */
       solve2();
-      /* print_time(stderr, first_start(end_action)); printf("\n"); */
+      /* print_time(cptout, first_start(end_action)); printf("\n"); */
       if (solution_plan) plan_free(solution_plan);
       solution_plan = plan_save(active_actions, active_actions_nb, get_timer(stats.search));
       solution_plan->backtracks = nb_backtracks();

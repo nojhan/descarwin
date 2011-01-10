@@ -10,6 +10,7 @@
 #include "cpt.h"
 #include "trace.h"
 #include "var.h"
+#include "globs.h"
 
 
 /*---------------------------------------------------------------------------*/

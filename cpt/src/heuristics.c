@@ -205,7 +205,7 @@ Comparison is_best_mutex_optimal(Action *a, Action *b, Action *a0, Action *b0)
 
 /*   GREATER(max(ch2(a, b), ch2(b, a)), max(ch2(a0, b0), ch2(b0, a0))); */
 /*   GREATER(max(ch6(a, b), ch6(b, a)), max(ch6(a0, b0), ch6(b0, a0))); */
-  //printf("X");fflush(stderr);
+  //printf("X");fflush(cptout);
   //LESS(max(ch4(a, b), ch4(b, a)), max(ch4(a0, b0), ch4(b0, a0)));
   //LESS(max(ch5(a, b), ch5(b, a)), max(ch5(a0, b0), ch5(b0, a0)));
   //GREATER(ch2(a, b)+ch2(b, a), ch2(a0, b0) + ch2(b0, a0));

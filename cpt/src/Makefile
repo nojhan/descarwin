@@ -44,7 +44,6 @@ SOURCES =  \
 	heuristics.c \
 	branching.c \
 	trace_planner.c \
-	control.c \
 	solve.c
 
 YSOURCES = \

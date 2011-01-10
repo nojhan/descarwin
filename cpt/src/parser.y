@@ -10,6 +10,7 @@
 #include "cpt.h"
 #include "trace.h"
 #include "pddl.h"
+#include "globs.h"
 
 extern int pddl_lex(PDDLDomain *domain);
 extern char *pddl_text;

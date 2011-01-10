@@ -14,7 +14,7 @@
 #include "trace.h"
 
 
-#define DECLARE(name, args...)  extern void trace_##name(args); extern void control_##name(args)
+#define DECLARE(name, args...)  extern void trace_##name(args)
 
 DECLARE(new_world, void);
 DECLARE(backtrack, void);
