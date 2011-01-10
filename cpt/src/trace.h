@@ -62,11 +62,11 @@
 
 #define begin_monitor _begin_monitor
 #define end_monitor _end_monitor
-#define trace(v, args...) NEST( if (TR_##v & opt.verbosity) { printf(args); fflush(stdout); } )
+#define trace(v, args...) NEST( if (TR_##v & opt.verbosity) { fprintf(stderr,args); fflush(stderr); } )
 #ifdef CONTROL
-#define trace_proc(v, args...) NEST( if (TR_##v & opt.verbosity) { trace_##v(args); fflush(stdout); } control_##v(args); )
+#define trace_proc(v, args...) NEST( if (TR_##v & opt.verbosity) { trace_##v(args); fflush(stderr); } control_##v(args); )
 #else
-#define trace_proc(v, args...) NEST( if (TR_##v & opt.verbosity) { trace_##v(args); fflush(stdout); } )
+#define trace_proc(v, args...) NEST( if (TR_##v & opt.verbosity) { trace_##v(args); fflush(stderr); } )
 #endif
 
 #endif
