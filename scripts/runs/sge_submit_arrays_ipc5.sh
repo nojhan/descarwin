@@ -95,7 +95,7 @@ sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/rovers/Propositional/Strips" 
 
 # TRUCKS
 sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Propositional/Strips" $runs "seq-sat" 1
-sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Time/Strips-Time" "tempo-sat" 0
+sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Time/Strips-Time" $runs "tempo-sat" 0
 
 
 # OPENSTACKS
