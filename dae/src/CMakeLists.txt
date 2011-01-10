@@ -12,13 +12,12 @@ SET(LIBRARY_OUTPUT_PATH ${DAEX_LIB_OUTPUT_PATH})
 
 SET (DAEX_SOURCES
         utils/posix_timer.cpp
-        #utils/utils.cpp
         utils/pddl_load.cpp 
+        utils/evalBestPlanDump.cpp
         core/decomposition.cpp
         core/goal.cpp
         initialization/init.cpp
         evaluation/cpt-yahsp.cpp
-        #        evaluation/cpt.cpp
         evaluation/yahsp.cpp
         variation/addgoal.cpp
         variation/delgoal.cpp

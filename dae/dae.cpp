@@ -19,7 +19,7 @@
 
 #include "daex.h"
 #include "evaluation/yahsp.h"
-#include "utils/eoEvalBestPlanFileDump.h"
+#include "utils/evalBestPlanDump.h"
 
 
 #define LOG_FILL ' '
@@ -34,7 +34,7 @@ inline void LOG_LOCATION( eo::Levels level )
 }
 
 
-void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
+void print_results( eoPop<daex::Decomposition> pop, time_t time_start )
 {
 #ifndef NDEBUG
     struct rusage usage;
@@ -72,10 +72,10 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
         }
     }
 
-    eo::log << eo::progress << "; DAEx sub-solver steps " << subsolver_steps << std::endl;
+    eo::log << eo::progress << "DAEx sub-solver steps " << subsolver_steps << std::endl;
     //eo::log << eo::progress << "; DAEx sub-solver time " << subsolver_time << " s (u-CPU)" << std::endl;
-    eo::log << eo::progress << "; DAEx user time " << usage.ru_utime.tv_sec << "." << usage.ru_utime.tv_usec << " (seconds of user time in CPU)" << std::endl;
-    eo::log << eo::progress << "; DAEx wallclock time " << std::difftime( std::time(NULL), time_start )  << " (seconds)" << std::endl;
+    eo::log << eo::progress << "DAEx user time " << usage.ru_utime.tv_sec << "." << usage.ru_utime.tv_usec << " (seconds of user time in CPU)" << std::endl;
+    eo::log << eo::progress << "DAEx wallclock time " << std::difftime( std::time(NULL), time_start )  << " (seconds)" << std::endl;
 #endif
 
     // the pop being unsorted, sorting it before getting the first is more efficient
@@ -83,10 +83,11 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start)
     pop.sort();
 
 #ifndef NDEBUG
-    std::cout << std::endl << "; " << pop.front() << std::endl;
+    std::cout << IPC_PLAN_COMMENT << pop.front() << std::endl;
 #endif
-    std::cout << std::endl << pop.front().plan() << std::endl;
+    std::cout << pop.front().plan() << std::endl;
 }
+
 
 int main ( int argc, char* argv[] )
 {
@@ -334,9 +335,6 @@ int main ( int argc, char* argv[] )
     // randomly generate the population with the init operator
     eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
 
-    // worst fitness, TODO we should use the best individual from the previous evals at init
-    // used in an eval and in checkpointing
-    eoMinimizingDualFitness worst_fitness( std::make_pair<double,bool>( DBL_MAX, 0 ) );
 
     /************************************
      * Incremental strategy to fix bmax 
@@ -349,9 +347,10 @@ int main ( int argc, char* argv[] )
     unsigned int eval_count = 0;
 #endif
     
-    eoMinimizingDualFitness best_fitness = worst_fitness;
-    unsigned int dump_file_count = 1;
+    TimeVal best_makespan = INT_MAX; // FIXME UINT_MAX returns -1, why?
     std::string dump_sep = ".";
+    unsigned int dump_file_count = 1;
+    std::string metadata = "domain " + domain + "\n" + IPC_PLAN_COMMENT + "instance " + instance;
 
     // Preventive direct call to YAHSP
     daex::Decomposition empty_decompo;
@@ -367,7 +366,7 @@ int main ( int argc, char* argv[] )
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
             daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty/*, is_sequential*/ );
-            daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file, best_fitness, false, dump_sep, dump_file_count );
+            daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 #ifndef NDEBUG
             eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
             eval_counter.value( eval_count );
@@ -402,12 +401,12 @@ int main ( int argc, char* argv[] )
                 }
             } // if ! goodguys && ! found
             
-            best_fitness = eval_bestfile.best_fitness();
+            best_makespan = eval_bestfile.best();
             dump_file_count = eval_bestfile.file_count();
             
 #ifndef NDEBUG
             eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize);
-            eo::log << "\tbest_fitness " << best_fitness;
+            eo::log << "\tbest_makespan " << best_makespan;
             if(found) {
                 eo::log << "\tfeasible empty decomposition";
             }
@@ -442,7 +441,7 @@ int main ( int argc, char* argv[] )
     eoEvalFunc<daex::Decomposition> * p_eval;
 
     // dump the best solution found so far in a file
-    daex::eoEvalBestPlanFileDump eval_bestfile( eval_yahsp, plan_file, best_fitness, false, dump_sep, dump_file_count );
+    daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 
 #ifndef NDEBUG
     // counter, for checkpointing
@@ -525,13 +524,13 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
     // get the best plan only if it improve the fitness
     // note: fitness is different from the makespan!
-    eoBestPlanImprovedStat<daex::Decomposition> best_plan( worst_fitness, "Best improved plan");
+    //eoBestPlanImprovedStat<daex::Decomposition> best_plan( worst_fitness, "Best improved plan");
     // at each generation
-    checkpoint.add( best_plan );
+    //checkpoint.add( best_plan );
     
     // display the stats on std::cout
     // ostream & out, bool _verbose=true, std::string _delim = "\t", unsigned int _width=20, char _fill=' ' 
-    eoOStreamMonitor cout_monitor( std::cout, "\t", 10, ' '); 
+    eoOStreamMonitor clog_monitor( std::clog, "\t", 10, ' '); 
 
 
     // get best fitness
@@ -566,17 +565,17 @@ int main ( int argc, char* argv[] )
         //checkpoint.add( iqr_stat );
         checkpoint.add( dual_iqr );
     
-        cout_monitor.add( eval_counter );
-        cout_monitor.add( best_stat );
-        cout_monitor.add( asize_stat );
-        cout_monitor.add( feasible_stat );
-        cout_monitor.add( median_stat );
-        //cout_monitor.add( dual_median );
-        //cout_monitor.add( iqr_stat );
-        cout_monitor.add( dual_iqr );
+        clog_monitor.add( eval_counter );
+        clog_monitor.add( best_stat );
+        clog_monitor.add( asize_stat );
+        clog_monitor.add( feasible_stat );
+        clog_monitor.add( median_stat );
+        //clog_monitor.add( dual_median );
+        //clog_monitor.add( iqr_stat );
+        clog_monitor.add( dual_iqr );
         
         // the checkpoint should call the monitor at every generation
-        checkpoint.add( cout_monitor );
+        checkpoint.add( clog_monitor );
     }
 
     // Note: commented here because superseeded by the eoEvalBestPlanFileDump
