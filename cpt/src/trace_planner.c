@@ -109,6 +109,17 @@ void trace_search_stats(double search_time, double total_time)
   }
 }
 
+void trace_yahsp_anytime_search_stats(TimeVal makespan, double search_time, double total_time)
+{
+  trace(normal, "plan found : ");
+  if (pddl_domain->action_costs) trace(normal, "cost ");
+  else if (opt.sequential) trace(normal, "length ");
+  else trace(normal, "makespan ");
+  print_time(stdout, makespan);
+  trace(normal, " -- search time %.2f -- total time %.2f\n", search_time, total_time);
+}
+
+
 void trace_conflict_choice(Causal *c, Action *a, bool direction, bool first)
 {
   if (first) {

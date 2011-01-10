@@ -283,8 +283,10 @@ PDDLDomain *parse_domain(char *dom_name, char *prob_name)
     predicate_total_time.name = symbol_insert(domain, "total-time"); 
     predicate_total_time.terms_nb = 0; 
     gdsl_rbtree_insert(domain->predicates_table, &predicate_total_time, &lost_int);
-  } else if (opt.yahsp) {
-    opt.sequential = true;
+  } else {
+    if (opt.yahsp) opt.sequential = true;
+    if (opt.precision) cpt_free(opt.precision); 
+    if (opt.precision2) cpt_free(opt.precision2); 
   }
   opt.fluent_mutexes = (!opt.yahsp || opt.dae);
   

@@ -22,6 +22,7 @@
 #define TR_solution_plan 1
 #define TR_plan_stats 1
 #define TR_search_stats 1
+#define TR_yahsp_anytime_search_stats 1
 #define TR_new_world 2
 #define TR_backtrack 2
 #define TR_conflict_choice 4

@@ -25,6 +25,7 @@ DECLARE(problem_stats, long actions_nb, long fluents_nb, long causals_nb);
 DECLARE(solution_plan, SolutionPlan *plan);
 DECLARE(plan_stats, SolutionPlan *plan);
 DECLARE(search_stats, double search_time, double total_time);
+DECLARE(yahsp_anytime_search_stats, TimeVal makespan, double search_time, double total_time);
 DECLARE(conflict_choice, Causal *c, Action *a, bool direction, bool first);
 DECLARE(support_choice, Causal *c, Action *a, bool direction, bool first);
 DECLARE(mutex_choice, Action *a1, Action *a2, bool direction, bool first);

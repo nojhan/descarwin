@@ -14,6 +14,7 @@
 #include "plan.h"
 #include "comparison.h"
 #include "globs.h"
+#include "trace_planner.h"
 
 
 typedef struct Node Node;
@@ -98,7 +99,7 @@ static long nodes_limits_nb = 6;
 //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
 
 #ifdef DAE
-#define INCCOST(cost, action) (cost += duration(action) + 1)
+#define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
 #define NODE_GVALUE(node) node->length
 #define NODE_HVALUE(node) get_ainit(end_action)
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
@@ -438,9 +439,8 @@ static Node *compute_node(Node *node)
       {
 	if (node->makespan < best_makespan) {
 	  best_makespan = node->makespan;
-	  trace(normal, "plan found : %.2f - ", omp_get_wtime() - stats.wcsearch);
-	  print_time(stdout, node->makespan);
-	  trace(normal, "\n");
+	  trace_proc(yahsp_anytime_search_stats, 
+		     node->makespan, omp_get_wtime() - stats.wcsearch, omp_get_wtime() - stats.wctime);
 	  create_solution_plan(node);
 	  print_plan_ipc_anytime(solution_plan);
 	  plan_free(solution_plan);
