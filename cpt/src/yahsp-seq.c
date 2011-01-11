@@ -72,20 +72,26 @@ static TimeVal best_makespan = MAXTIME;
 #define set_finit(f, t) finit[(f)->id] = t
 
 
+#ifdef DAE
+
 #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
 //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
-
-#ifdef DAE
 #define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
 #define NODE_GVALUE(node) node->length
 #define NODE_HVALUE(node) get_ainit(end_action)
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
+
 #else
+
+//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
+#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
+//#define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
 #define INCCOST(cost, action) (cost++)
 #define NODE_GVALUE(node) node->length
-#define NODE_HVALUE(node) get_ainit(end_action)
-//#define NODE_HVALUE(node) relaxed_plan_nb
+//#define NODE_HVALUE(node) get_ainit(end_action)
+#define NODE_HVALUE(node) relaxed_plan_nb
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * 3)
+
 #endif
 
 static Comparison is_best_action_rp(Action *prod, Action *best)
@@ -100,10 +106,10 @@ static Comparison is_best_action_rp(Action *prod, Action *best)
 
 void node_free(Node *node) 
 { 
-  if (!node->state_registered) free(node->state);
-  free(node->steps); 
-  free(node->applicable);
-  free(node);
+  if (!node->state_registered) cpt_free(node->state);
+  cpt_free(node->steps); 
+  cpt_free(node->applicable);
+  cpt_free(node);
 }
 
 static Comparison open_list_cmp(Node *node1, Node *node2)
@@ -246,7 +252,9 @@ static void compute_relaxed_plan(Node *node)
 	set_finit(f, true);
 	Action *best = NULL;
         long ties = 1;
-        FOR(prod, f->producers) { if (!best || preferred(is_best_action_rp(prod, best), ties)) best = prod; } EFOR;
+        FOR(prod, f->producers) { 
+	  if (!best || preferred(is_best_action_rp(prod, best), ties)) best = prod; 
+	} EFOR;
 	if (best != NULL && !get_aused(best)) {
  	  set_aused(best, true);
 	  relaxed_plan[relaxed_plan_nb++] = best;
@@ -326,28 +334,57 @@ static Node *apply_relaxed_plan(Node *node)
       goto start;
     }
   } EFOR;
+  /* FORi(a, i, relaxed_plan) { */
+  /*   if (a != NULL && a != end_action) { */
+  /*     Fluent *unsat = NULL; */
+  /*     FOR(f, a->prec) { */
+  /* 	if (!bitarray_get(son->state, f)) { */
+  /* 	  if (unsat != NULL) goto next_action; */
+  /* 	  unsat = f; */
+  /* 	} */
+  /*     } EFOR; */
+  /*     if (!unsat) exit(55); */
+  /*     Action *best = NULL; */
+  /*     long ties = 1; */
+  /*     FOR(prod, unsat->producers) { */
+  /* 	if (prod != a && can_be_applied(son, prod) && prod->id > 1 */
+  /* 	    && (!best || preferred(is_best_action_rp(prod, best), ties))) { */
+  /* 	  FOR(f, a->prec) { if (deletes(prod, f)) goto next_prod; } EFOR; */
+  /* 	  best = prod; */
+  /* 	} */
+  /*     next_prod:; */
+  /*     } EFOR; */
+  /*     if (best != NULL) { */
+  /* 	if (son->steps_nb > relaxed_plan_nb*2) exit(55); */
+  /* 	//trace(normal, "%s\n", action_name(best)); */
+  /*     	node_apply_action(son, best); */
+  /*     	if (son->makespan > best_makespan) { node_free(son); return NULL; } */
+  /*     	goto start; */
+  /*     } */
+  /*   } */
+  /*   next_action:; */
+  /* } EFOR; */
   FORi(a, i, relaxed_plan) {
-    if (a != NULL && a != end_action) {
-      FOR(b, relaxed_plan) {
-        if (b != NULL && a != b && b != end_action) {
-          FOR(f, a->add) {
-            if (!bitarray_get(node->state, f) && consumes(b, f)) {
-              Action *best = NULL;
-              long ties = 1;
-              FOR(prod, f->producers) {
-		if (prod != a && prod != b && can_be_applied(son, prod) && prod->id > 1
-		    && (!best || preferred(is_best_action_rp(prod, best), ties))) best = prod; 
-	      } EFOR;
-              if (best != NULL) {
-                relaxed_plan[i] = best;
-                goto start;
-              }
-            }
-          } EFOR;
-        }
+    if (a == NULL || a == end_action) continue;
+    FOR(b, relaxed_plan) {
+      if (b == NULL || b == a || b == end_action) continue;
+      FOR(f, a->add) {
+	if (!bitarray_get(son->state, f) && consumes(b, f)) {
+	  Action *best = NULL;
+	  long ties = 1;
+	  FOR(prod, f->producers) {
+	    if (prod != a && prod != b && can_be_applied(son, prod) && prod->id > 1
+		&& (!best || preferred(is_best_action_rp(prod, best), ties))) best = prod; 
+	  } EFOR;
+	  if (best != NULL) {
+	    relaxed_plan[i] = best;
+	    goto start;
+	  }
+	}
       } EFOR;
-    }
+    } EFOR;
   } EFOR;
+
   //if (son->steps_nb == 0) error(no_plan, "Erreur plan relaxé inapplicable");
   if (son->steps_nb > 0) cpt_realloc(son->steps, son->steps_nb);
   return son;
@@ -440,7 +477,7 @@ static Node *yahsp_plan()
 
 void yahsp_reset()
 {
-  free(current_state);
+  cpt_free(current_state);
   current_state = bitarray_create(fluents_nb);
   bitarray_copy(current_state, initial_bitstate, fluents_nb);
 }

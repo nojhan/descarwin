@@ -123,10 +123,10 @@ static Comparison is_best_action_rp(Action *prod, Action *best)
 
 void node_free(Node *node) 
 { 
-  if (!node->state_registered) free(node->state);
-  free(node->steps); 
-  free(node->applicable);
-  free(node);
+  if (!node->state_registered) cpt_free(node->state);
+  cpt_free(node->steps); 
+  cpt_free(node->applicable);
+  cpt_free(node);
 }
 
 static Comparison open_list_cmp(Node *node1, Node *node2)
@@ -289,7 +289,9 @@ static void compute_relaxed_plan(Node *node)
         set_finit(f, true);
         Action *best = NULL;
         long ties = 1;
-        FOR(prod, f->producers) { if (!best || preferred(is_best_action_rp(prod, best), ties)) best = prod; } EFOR;
+        FOR(prod, f->producers) { 
+	  if (!best || preferred(is_best_action_rp(prod, best), ties)) best = prod; 
+	} EFOR;
         if (best != NULL && !get_aused(best)) {
           set_aused(best, true);
           relaxed_plan[relaxed_plan_nb++] = best;
@@ -370,26 +372,24 @@ static Node *apply_relaxed_plan(Node *node)
     }
   } EFOR;
   FORi(a, i, relaxed_plan) {
-    if (a != NULL && a != end_action) {
-      FOR(b, relaxed_plan) {
-        if (b != NULL && a != b && b != end_action) {
-          FOR(f, a->add) {
-            if (!bitarray_get(node->state, f) && consumes(b, f)) {
-              Action *best = NULL;
-              long ties = 1;
-              FOR(prod, f->producers) { 
-		if (prod != a && prod != b && can_be_applied(son, prod) && prod->id > 1
-		    && (!best || preferred(is_best_action_rp(prod, best), ties))) best = prod; 
-	      } EFOR;
-              if (best != NULL) {
-                relaxed_plan[i] = best;
-                goto start;
-              }
-            }
-          } EFOR;
-        }
+    if (a == NULL || a == end_action) continue;
+    FOR(b, relaxed_plan) {
+      if (b == NULL || b == a || b == end_action) continue;
+      FOR(f, a->add) {
+	if (!bitarray_get(son->state, f) && consumes(b, f)) {
+	  Action *best = NULL;
+	  long ties = 1;
+	  FOR(prod, f->producers) {
+	    if (prod != a && prod != b && can_be_applied(son, prod) && prod->id > 1
+		&& (!best || preferred(is_best_action_rp(prod, best), ties))) best = prod; 
+	  } EFOR;
+	  if (best != NULL) {
+	    relaxed_plan[i] = best;
+	    goto start;
+	  }
+	}
       } EFOR;
-    }
+    } EFOR;
   } EFOR;
   //if (son->steps_nb == 0) error(no_plan, "Erreur plan relaxé inapplicable");
   if (son->steps_nb > 0) cpt_realloc(son->steps, son->steps_nb);
@@ -523,7 +523,7 @@ static Node *yahsp_plan()
 
 void yahsp_reset()
 {
-  free(current_state);
+  cpt_free(current_state);
   current_state = bitarray_create(fluents_nb);
   bitarray_copy(current_state, initial_bitstate, fluents_nb);
 }
