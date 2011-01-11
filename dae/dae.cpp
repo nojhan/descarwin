@@ -361,7 +361,7 @@ int main ( int argc, char* argv[] )
         eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
 #endif
 
-        while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
+        while( (((double)goodguys/(double)popsize) < b_max_ratio) && (!found) && (b_max_in < b_max_init) ) {
             goodguys = 0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
@@ -376,14 +376,21 @@ int main ( int argc, char* argv[] )
 #endif
             eval_y( pop, pop );
 
+
+#ifndef NDEBUG
+	    eoBestFitnessStat<daex::Decomposition> best_statTEST("Best");
+	    best_statTEST(pop);
+	    eo::log << eo::logging << "\tbest_fitness " << best_statTEST.value();
+#endif
+
             for (size_t i = 0; i < popsize; ++i) {
                 // unfeasible individuals are invalidated in order to be re-evaluated 
                 // with a larger bmax at the next iteration but we keep the good guys.
                 if (pop[i].fitness().is_feasible()) goodguys++;
                 else pop[i].invalidate();
             }
-
-
+	    
+	    // If no individual haven't yet been found, then try a direct call to YAHSP (i.e. the empty decomposition evaluation)
             if ((goodguys == 0) && (!found)) {
                 empty_decompo.invalidate();
 #ifndef NDEBUG

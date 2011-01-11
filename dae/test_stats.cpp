@@ -81,7 +81,7 @@ int main ( int argc, char* argv[] )
     std::cout << FORMAT_LEFT_FILL_WIDTH(30) << "page reclaims * page size"   << usage.ru_minflt * getpagesize() << std::endl;
     
     
-    std::clog << "Statistics on the populaion after an init: " << std::endl;
+    std::clog << "Statistics on the population after an init: " << std::endl;
 
     eoBestFitnessStat<daex::Decomposition> best_stat;
     eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
