@@ -82,7 +82,7 @@ function sge_submit_array_ipc()
 #######################
 
 # nb of differents runs for each instance
-runs=1
+runs=11
 
 # IPC3
 

@@ -85,7 +85,7 @@ function sge_submit_array_ipc_single_domain()
 # CURRENT EXPERIMENTS #
 #######################
 
-runs=1 # nb of differents runs for each instance
+runs=11 # nb of differents runs for each instance
 
 # IPC4 
 

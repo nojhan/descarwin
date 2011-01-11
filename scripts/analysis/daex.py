@@ -385,7 +385,7 @@ Example:
 
     (opts, filenames) = parser.parse_args()
 
-    key="MakeSpan"
+    key="Makespan"
     if opts.seq:
         key="TotalCost"
  

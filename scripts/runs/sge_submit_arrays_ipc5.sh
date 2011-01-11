@@ -9,13 +9,11 @@ function sge_submit_array_ipc()
 
     # directory where to search PDDL domains and instance files 
     base_rep=$1
-
     # nb of differents runs for each instance
     runs=$2
-
     # directory where to put everything
     res=$3
-
+    # sequential flag 1=sequential
     seq=$4
 
     # create directories if they do not exists
@@ -67,13 +65,55 @@ function sge_submit_array_ipc()
     echo "$((cptr*runs)) runs submitted"
 }
 
+function sge_submit_array_ipc_single_domain()
+{
+    base_rep=$1 # directory where to search PDDL domains and instance files 
+    runs=$2 # nb of differents runs for each instance
+    res=$3 # directory where to put everything
+    seq=$4 # sequential flag 1=sequential
+
+    # create directories if they do not exists
+    mkdir -p $res
+    mkdir -p $res/data
+    mkdir -p $res/logs
+    mkdir -p $res/status
+    mkdir -p $res/plans
+    mkdir -p $res/gens
+
+    domain=$base_rep/domain.pddl
+    instances=`ls $base_rep/p*.pddl`
+    for instance in $instances; do
+        cptr=0
+	if test -r $instance && test -r $domain; then
+            # parent directory
+            d=`echo $domain | cut -d '/' -f 7`
+
+            # filename without the extension
+            i=`basename $instance .pddl`
+
+            # submit an array of *runs jobs
+            cmd1="qsub -l h_rt=00:35:00 -q all.q@@ls -b y -N dae_${d}_${i}      -cwd -o $res/data/ -e $res/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.ipc4.sh $domain $instance $res $seq"
+#	    cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack -cwd -o $respath/data/ -e $respath/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.sh $domain $instance $respath"
+	    echo $cmd1
+#	    echo $cmd2
+#            ./run_wrapper.sh $domain $instance $respath
+#            ./run_wrapper_jack.sh $domain $instance $respath
+	    $cmd1
+#	    $cmd2
+	    cptr=$((cptr+1))
+	else
+	    echo "ERROR, instance or domain files cannot be open: $instance"
+	fi
+    done # domain
+    echo "$((cptr*runs)) runs submitted"
+}
 
 #######################
 # CURRENT EXPERIMENTS #
 #######################
 
 # nb of differents runs for each instance
-runs=1
+runs=11
 
 # IPC5
 
@@ -91,7 +131,10 @@ sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/pipesworld/Propositional/Stri
 sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/rovers/Propositional/Strips" $runs "seq-sat" 1
 
 # STORAGE
+sge_submit_array_ipc_single_domain "/tools/pddl/ipc/IPC5/DOMAINS/storage/Propositional" $runs "seq-sat" 1
+sge_submit_array_ipc_single_domain "/tools/pddl/ipc/IPC5/DOMAINS/storage/Time" $runs "tempo-sat" 0
 # TPP
+sge_submit_array_ipc_single_domain "/tools/pddl/ipc/IPC5/DOMAINS/TPP/Propositional" $runs "seq-sat" 1
 
 # TRUCKS
 sge_submit_array_ipc "/tools/pddl/ipc/IPC5/DOMAINS/trucks/Propositional/Strips" $runs "seq-sat" 1
