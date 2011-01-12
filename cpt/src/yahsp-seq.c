@@ -30,7 +30,6 @@ struct Node {
   Node *ancestor;
   unsigned long key;
   BitArray state;
-  bool state_registered;
   long length;
   long fvalue;
   TimeVal makespan;
@@ -109,7 +108,7 @@ static Comparison is_best_action_rp(Action *prod, Action *best)
 
 static void node_free(Node *node) 
 { 
-  if (!node->state_registered) cpt_free(node->state);
+  cpt_free(node->state);
   cpt_free(node->steps); 
   cpt_free(node->applicable);
   cpt_free(node);
@@ -196,9 +195,9 @@ static void heuristic_insert(Node *node)
 {
   Heuristic *h = cpt_malloc(h, 1);
   int gdsl_return;
-  h->state = node->state;
   h->key = node->key;
-  node->state_registered = true;
+  h->state = bitarray_create(fluents_nb);
+  bitarray_copy(h->state, node->state, fluents_nb);
   cpt_malloc(h->inits, fluents_nb);
   memcpy(h->inits, finit, fluents_nb * sizeof(TimeVal));
   gdsl_rbtree_insert(heuristics, h, &gdsl_return);
@@ -207,8 +206,8 @@ static void heuristic_insert(Node *node)
 static bool heuristic_search(Node *node)
 {
   Heuristic test;
-  test.state = node->state;
   test.key = node->key;
+  test.state = node->state;
   Heuristic *h = (Heuristic *) gdsl_rbtree_search(heuristics, (gdsl_compare_func_t) heuristic_cmp, &test);
   if (h == NULL) return false;
   memcpy(finit, h->inits, fluents_nb * sizeof(TimeVal));
@@ -537,8 +536,10 @@ int yahsp_main()
     return NO_PLAN;
   }
   
-  current_state = bitarray_create(fluents_nb);
-  bitarray_copy(current_state, node->state, fluents_nb);
+  /* current_state = bitarray_create(fluents_nb); */
+  /* bitarray_copy(current_state, node->state, fluents_nb); */
+  current_state = node->state;
+  node->state = NULL;
 
   create_solution_plan(node);
 

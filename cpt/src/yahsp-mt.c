@@ -30,7 +30,6 @@ struct Node {
   Node *ancestor;
   unsigned long key;
   BitArray state;
-  bool state_registered;
   long fvalue;
   long length;
   TimeVal makespan;
@@ -94,6 +93,9 @@ static long nodes_limits_nb = 6;
 #undef preferred
 #define preferred(comp, ties) ({ Comparison test = comp; test == Worse ? false : (!opt.random || omp_get_thread_num() == 2 || omp_get_thread_num() == 3) ? test == Better : test == Better ? (ties = 1) : rand() % ++ties == 0; })
 
+#undef check_allocation
+#define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res) && opt.dae && ({ gdsl_rbtree_flush(heuristics); !(ptr = (typeof(ptr)) res); })) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
+
 
 #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
 //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
@@ -123,7 +125,7 @@ static Comparison is_best_action_rp(Action *prod, Action *best)
 
 void node_free(Node *node) 
 { 
-  if (!node->state_registered) cpt_free(node->state);
+  cpt_free(node->state);
   cpt_free(node->steps); 
   cpt_free(node->applicable);
   cpt_free(node);
@@ -206,6 +208,13 @@ static void compute_h1_cost_yahsp(bool goal_pref)
   }
 }
 
+static void heuristic_free(Heuristic *h)
+{
+  cpt_free(h->state);
+  cpt_free(h->inits);
+  cpt_free(h);
+}
+
 static Comparison heuristic_cmp(Heuristic *h1, Heuristic *h2)
 {
   LESS(h1->key, h2->key);
@@ -216,9 +225,9 @@ static void heuristic_insert(Node *node)
 {
   Heuristic *h = cpt_malloc(h, 1);
   int gdsl_return;
-  h->state = node->state;
   h->key = node->key;
-  node->state_registered = true;
+  h->state = bitarray_create(fluents_nb);
+  bitarray_copy(h->state, node->state, fluents_nb);
   cpt_malloc(h->inits, fluents_nb);
   memcpy(h->inits, finit, fluents_nb * sizeof(TimeVal));
   omp_set_lock(&heuristics_lock);
@@ -229,11 +238,10 @@ static void heuristic_insert(Node *node)
 static bool heuristic_search(Node *node)
 {
   Heuristic test;
-  test.state = node->state;
   test.key = node->key;
-  Heuristic *h;
+  test.state = node->state;
   omp_set_lock(&heuristics_lock);
-  h = (Heuristic *) gdsl_rbtree_search(heuristics, (gdsl_compare_func_t) heuristic_cmp, &test);
+  Heuristic *h = (Heuristic *) gdsl_rbtree_search(heuristics, (gdsl_compare_func_t) heuristic_cmp, &test);
   omp_unset_lock(&heuristics_lock);
   if (h == NULL) return false;
   memcpy(finit, h->inits, fluents_nb * sizeof(TimeVal));
@@ -544,7 +552,7 @@ void yahsp_init()
     omp_init_lock(&closed_locks[i]);
   }
   omp_init_lock(&heuristics_lock);
-  if (heur || opt.dae) heuristics = gdsl_rbtree_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) heuristic_cmp);
+  if (heur || opt.dae) heuristics = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) heuristic_free, (gdsl_compare_func_t) heuristic_cmp);
   initial_bitstate = bitarray_create(fluents_nb);
   FOR(f, init_state) { bitarray_set(initial_bitstate, f); } EFOR;
   yahsp_reset();
@@ -576,7 +584,7 @@ int yahsp_main()
     num_threads = mini(opt.yahsp_threads, threads_count[i]);
     //num_threads = threads_count[i];
     nodes_bound = num_threads == opt.yahsp_threads ? LONG_MAX : nodes_limit;
-    trace(normal, "#threads : %ld -- already evaluated nodes : %ld\n", num_threads, stats.evaluated_nodes);
+    //trace(normal, "#threads : %ld -- already evaluated nodes : %ld\n", num_threads, stats.evaluated_nodes);
 #pragma omp parallel num_threads(num_threads * opt.yahsp_teams)
     {
       cpt_malloc(aused, actions_nb);
