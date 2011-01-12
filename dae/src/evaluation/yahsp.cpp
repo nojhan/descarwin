@@ -176,15 +176,17 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
         // qui sera utilisée par yahsp lors de la compression
         // Note : yahsp_main écrase le prochain pointeur solution_plan avec 
         // une nouvelle allocation.
-        plans[plans_nb] = solution_plan;
-        plans_nb++;
+	plans[plans_nb] = solution_plan;
+	plans_nb++;
         
 
         // convertit et stocke les plans intermédiaires dans des structures propres à DAEx
-        decompo.plans_sub_add( daex::Plan( *solution_plan ) );
+	//12.1        decompo.plans_sub_add( daex::Plan( *solution_plan ) );
+	decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mains on garde la structure notamment pour last_reached.
+
 
         // timer à jour pour le dernier plan inséré
-        decompo.last_subplan().search_steps( _B );
+	decompo.last_subplan().search_steps( _B );
 
         
 #ifndef NDEBUG
@@ -225,9 +227,7 @@ void daeYahspEval::compress( daex::Decomposition & decompo )
         eo::log.flush();
 #endif
 
-
         //solution_plan = NULL;
-
         // compression, utilise la globale "plans" construire plus haut
         // et créé un plan compressé dans solution_plan
         yahsp_compress_plans();
@@ -235,11 +235,9 @@ void daeYahspEval::compress( daex::Decomposition & decompo )
         assert(solution_plan != NULL);
 
         // TODO pendant les tests, le plan ne peut pas etre vide, mais en compétition, cela peut arriver, auquel cas il faudra virer l'assert (penser à compiler en NDEBUG)
-
-	//	std::cout << "MAKESPAAAAN =" << solution_plan->makespan;
+	//		std::cout << "MAKESPAAAAN =" << solution_plan->makespan;
 
         assert(solution_plan->makespan > 0);
-
 
 #ifndef NDEBUG
         eo::log << eo::xdebug << "ok" << std::endl;
@@ -247,11 +245,10 @@ void daeYahspEval::compress( daex::Decomposition & decompo )
         eo::log.flush();
 #endif
 
-        
         // sauvegarde le plan compressé global pour DAEx
-        decompo.plan_global( daex::Plan( *solution_plan ) );
+	decompo.plan_global( daex::Plan( *solution_plan ) );
 
-        decompo.last_subplan().search_steps( _B );
+	decompo.last_subplan().search_steps( _B );
 
         // change la fitness
         //decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
@@ -312,8 +309,8 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         eo::log.flush();
 #endif
 
-        cpt_malloc( plans, decompo.size()+1 ); // +1 for the subplan between the last goal and the final state
-        plans_nb = 0;
+	cpt_malloc( plans, decompo.size()+1 ); // +1 for the subplan between the last goal and the final state
+	plans_nb = 0;
         
 #ifndef NDEBUG
         eo::log << eo::xdebug << "ok" << std::endl;
@@ -345,25 +342,18 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         eo::log << eo::xdebug << "for each goal:" << std::endl;
 #endif
 
-        // only use for xdebug messages
-        unsigned int goal_count = 0;
-           
-        // return code of cpt_search
-        unsigned int code;
-
-        // set the generic b_max 
-        b_max( _b_max_in );
+        unsigned int goal_count = 0; // only use for xdebug messages
+        unsigned int code; // return code of cpt_search
+        b_max( _b_max_in ); // set the generic b_max 
 
         // parcours les goals de la décomposition
         for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
-
 #ifndef NDEBUG
             eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
             eo::log.flush();
 #endif
-
             // copie des goals daex dans leur equivant YAHSP
-            // nouvelle allocation de tableau de goal
+           // nouvelle allocation de tableau de goal
             assert( igoal->size() > 0 );
             _intermediate_goal_state_nb = igoal->size();
 
@@ -372,7 +362,6 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                 // le compilateur demande à expliciter le template pour fluents, 
                 // car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
                 _intermediate_goal_state[i] =  (*iatom)->fluent();
-
                 i++;
             }
             assert( i == _intermediate_goal_state_nb );
@@ -420,11 +409,10 @@ void daeYahspEval::free_yahsp_structures()
     eo::log << eo::xdebug << "\t\tfree plans...";
     eo::log.flush();
 #endif
-    // On ne libère plus les sous-plans vu qu'on pointe dessus dans la solution
     // libère la variable globale "plans", utilisée par yahsp lors de la compression
-    //    for( unsigned int p=0; p < plans_nb; ++p ) {
-    //        plan_free( plans[p] );
-    //    }
+    for( unsigned int p=0; p < plans_nb; ++p ) {
+      plan_free( plans[p] );
+    }
     
     plans_nb = 0;
     

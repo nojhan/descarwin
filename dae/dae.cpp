@@ -20,7 +20,7 @@
 #include "daex.h"
 #include "evaluation/yahsp.h"
 #include "utils/evalBestPlanDump.h"
-
+#include "evaluation/cpt-yahsp.h"
 
 #define LOG_FILL ' '
 #define FORMAT_LEFT_FILL_WIDTH(width) "\t" << std::left << std::setfill(LOG_FILL) << std::setw(width) 
@@ -380,6 +380,7 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
 	    eoBestFitnessStat<daex::Decomposition> best_statTEST("Best");
 	    best_statTEST(pop);
+	    //	    eo::log << eo::logging << "\tbest_fitness " << timeValToString(best_statTEST.value());
 	    eo::log << eo::logging << "\tbest_fitness " << best_statTEST.value();
 #endif
 
