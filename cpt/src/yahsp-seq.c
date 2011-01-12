@@ -71,6 +71,9 @@ static TimeVal best_makespan = MAXTIME;
 #define get_finit(f) finit[(f)->id]
 #define set_finit(f, t) finit[(f)->id] = t
 
+#undef check_allocation
+#define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res) && opt.dae && ({ gdsl_rbtree_flush(heuristics); !(ptr = (typeof(ptr)) res); })) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
+
 
 #ifdef DAE
 
@@ -104,7 +107,7 @@ static Comparison is_best_action_rp(Action *prod, Action *best)
   return Equal;
 }
 
-void node_free(Node *node) 
+static void node_free(Node *node) 
 { 
   if (!node->state_registered) cpt_free(node->state);
   cpt_free(node->steps); 
@@ -174,6 +177,13 @@ static void compute_h1_cost_yahsp(bool goal_pref)
       }
     } EFOR; 
   }
+}
+
+static void heuristic_free(Heuristic *h)
+{
+  cpt_free(h->state);
+  cpt_free(h->inits);
+  cpt_free(h);
 }
 
 static Comparison heuristic_cmp(Heuristic *h1, Heuristic *h2)
@@ -494,7 +504,7 @@ void yahsp_init()
 
   open_list = gdsl_rbtree_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) open_list_cmp);
   closed_list = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) node_free, (gdsl_compare_func_t) closed_list_cmp);
-  if (opt.dae) heuristics = gdsl_rbtree_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) heuristic_cmp);
+  if (opt.dae) heuristics = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) heuristic_free, (gdsl_compare_func_t) heuristic_cmp);
 
   initial_bitstate = bitarray_create(fluents_nb);
   FOR(f, init_state) { bitarray_set(initial_bitstate, f); } EFOR;
