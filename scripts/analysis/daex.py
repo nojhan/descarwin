@@ -433,6 +433,9 @@ def print_filenames( filenames ):
 
 def process_commands( opts, filepatterns ):
 
+    # the result to return, if necessary
+    tab = []
+
     key="Makespan"
     if opts.seq:
         key="TotalCost"
@@ -447,9 +450,9 @@ def process_commands( opts, filepatterns ):
 
     if opts.basestats:
         #stats = [len,min,median,mean,std,skew,kurtosis]
-        stats = available_functions
+        stats = [f for k,f in available_functions.items() ]
         tab = parse_func( filepatterns, stats, key, labels=has_labels )
-        printa(tab,transpose=False)
+        #printa(tab,transpose=False)
 
     if opts.compare:
         compare_median(filepatterns,key)
@@ -460,7 +463,7 @@ def process_commands( opts, filepatterns ):
     if opts.function:
         f = available_functions[opts.function]
         tab = parse_func( filepatterns, [f], key, labels=has_labels )
-        printa(tab,transpose=False)
+        #printa(tab,transpose=False)
 
     if opts.plot:
         f = available_functions[opts.function]
@@ -472,6 +475,8 @@ def process_commands( opts, filepatterns ):
                 ylabel=f.__name__, 
                 xlabel="instances"
             )
+
+    return tab
 
 
 if __name__=="__main__":
@@ -520,18 +525,29 @@ Example:
 
     (opts, filepatterns) = parser.parse_args()
 
+    results = []
+
     # re-split data by instances
     # let this switch be the first, the commands using the "filepatterns"
     if opts.byinstance:
         if len( filepatterns ) == 1:
             patterns = split_by_instance( filepatterns )
-            process_commands( opts, patterns )
+            results = process_commands( opts, patterns )
+            printa(results,transpose=False)
         else:
             for filepattern in filepatterns:
-                print "======================================================================================="
-                print filepattern
+                #print "======================================================================================="
+                #print filepattern
                 patterns = split_by_instance( [filepattern] )
-                process_commands( opts, patterns )
+                result = []
+                res = process_commands( opts, patterns )
+                for r in res:
+                    result.append( r[0] )
+
+                results.append( result )
+            
+            printa( results, transpose=True )
     else:
-        process_commands( opts, filepatterns )
+        results = process_commands( opts, filepatterns )
+        printa(results,transpose=False)
 
