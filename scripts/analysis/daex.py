@@ -256,8 +256,9 @@ def plot_line( tab, title="", labels=[], ylabel="", xlabel=""):
 
     fig = p.figure()
     ax = fig.add_subplot(111)
-
-    ax.plot( tab, '*-', label=labels )
+    
+    for i in xrange(len(tab)):
+        ax.plot( tab[i], '*-', label=labels[i] )
 
     ax.legend()
     ax.set_title(title)
@@ -488,8 +489,25 @@ if __name__=="__main__":
     parser = optparse.OptionParser("""daex.py [options] file_patterns
 Parse the set of file patterns given in entry and apply various functions to it.
 The file patterns must be given in double quotes.
-Example:
-    daex.py --seq --basestats "plan_1_r*.soln" "plan_2_r*.soln" """)
+
+Examples:
+Getting basic statistics on sequential problems for two algoritms:
+    daex.py --seq --basestats "algo1_domain_p01_r*.soln" "algo2_domain_p01_r*.soln"
+
+Print the table comparing the kurtosis of the results for 2 algorithms, by instance, show the file patterns used as labels:
+    daex.py "algo1*elevators*.soln" "algo2*elevators*.soln" --byinstance --function=kurtosis --labels
+
+Show the histogram of the absolute makespan/cost for 2 algorithms:
+    daex.py "algo1*elevators*.soln" "algo2*elevators*.soln" --plotdistrib
+
+Compare the absolute makespan/cost distributions of 3 algorithms and tell which one is significantly different from all the others:
+    daex.py "algo1*elevators*.soln" "algo2*elevators*.soln" "algo3*elevators*.soln" --compare
+
+Comparing the median of several runs for 3 algorithms, all instances behind shown on a single screen:
+    daex.py "algo1*elevators*.soln" "algo2*elevators*.soln" "algo3*elevators*.soln" --byinstance --function=median
+
+Comparing the minima of several runs for 3 algorithms, by instance and plot a graphic:
+    daex.py "algo1*elevators*.soln" "algo2*elevators*.soln" "algo3*elevators*.soln" --byinstance --function=min --plotbyinstance """)
 
     parser.add_option("-s", "--seq", dest="seq", action="store_true",
             help="sequential problem (default to temporal)" )
@@ -510,7 +528,10 @@ Example:
             help="plot as histograms" )
 
     parser.add_option("-p", "--plot", dest="plot", action="store_true",
-            help="plot as lines" )
+            help="plot data that can be plotted as a single line" )
+
+    parser.add_option("-o", "--plotbyinstance", dest="plotbyinstance", action="store_true",
+            help="plot several lines on the same graphics, when parsing by instance" )
 
     parser.add_option("-c", "--compare", dest="compare", action="store_true",
             help="compare distributions" )
@@ -535,6 +556,8 @@ Example:
             results = process_commands( opts, patterns )
             printa(results,transpose=False)
         else:
+            print opts.function
+            plabels = []
             for filepattern in filepatterns:
                 #print "======================================================================================="
                 #print filepattern
@@ -545,8 +568,22 @@ Example:
                     result.append( r[0] )
 
                 results.append( result )
-            
-            printa( results, transpose=True )
+                plabels.append( filepattern )
+              
+            arr = scipy.array( results )#.transpose()
+            print ' '.join( plabels )
+            printa( arr, transpose=True )
+           
+            if opts.plotbyinstance:
+                plot_line(
+                        arr,
+                        title= common_characters( filepatterns ), 
+                        labels = plabels,
+                        ylabel = opts.function,
+                        xlabel="instances"
+                    )
+
+
     else:
         results = process_commands( opts, filepatterns )
         printa(results,transpose=False)
