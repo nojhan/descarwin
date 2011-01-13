@@ -42,7 +42,6 @@ def unstr( func ):
 @unstr
 def expand( filepatterns ):
     """Yelds file names matching each 'filepatterns'"""
-#    filepatterns = degen( filepatterns )
     for base_dir,filepattern in dir_file(filepatterns):
         for dirname, dirs, files in os.walk( base_dir ):
             for filename in fnmatch.filter(files, filepattern):
@@ -50,7 +49,7 @@ def expand( filepatterns ):
 
 @unstr
 def fopen( filenames):
-    """Yields every files corresponding tothe given filenames"""
+    """Yields every files corresponding to the given filenames"""
     for filename in filenames:
         yield open(filename)
 
@@ -140,7 +139,13 @@ def parse( pattern, keyword = "MakeSpan" ):
     strs = cut( greped, -1 ) # -1 = the last item
 
     # NOTE scipy 0.6 does not handle generators, thus we must expand it in a list
-    return [ float(i) for i in strs ]
+    res = [ float(i) for i in strs ]
+
+    if len(res) == 0:
+        print "ERROR cannot find the \"",keyword,"\" keyword in files"
+        sys.exit(1)
+    else:
+        return res
 
 
 def parse_func( filenames, functions, keyword = "MakeSpan", labels=False ):
@@ -221,7 +226,6 @@ def printa( tab, transpose=False ):
 
 
 def plot_histo( tab, title="Distribution", labels=[]):
-    import numpy as np
     import pylab as p
 
     fig = p.figure()
@@ -237,16 +241,25 @@ def plot_histo( tab, title="Distribution", labels=[]):
     p.show()
 
 
+def plot_line( tab, title="", labels=[], ylabel="", xlabel=""):
+    import pylab as p
+
+    fig = p.figure()
+    ax = fig.add_subplot(111)
+
+    ax.plot( tab, '*-', label=labels )
+
+    ax.legend()
+    ax.set_title(title)
+    ax.set_ylabel(ylabel)
+    ax.set_xlabel(xlabel)
+
+    p.show()
+
+
 ######################################
 # COMMANDS
 ######################################
-
-def basestats( filenames, key ):
-    # base statistics
-    stats = [len,min,median,mean,std,skew,kurtosis]
-    tab = parse_func( filenames, stats, key, labels=True ) 
-    printa(tab,transpose=False)
-    
 
 def plotdistrib( filenames, key ):
     # plot the distributions
@@ -361,6 +374,7 @@ if __name__=="__main__":
 
     import optparse
     import os
+    import re
 
     parser = optparse.OptionParser("""daex.py [options] file_patterns
 Parse the set of file patterns given in entry and apply various functions to it.
@@ -371,6 +385,12 @@ Example:
     parser.add_option("-s", "--seq", dest="seq", action="store_true",
             help="sequential problem (default to temporal)" )
 
+    parser.add_option("-l", "--labels", dest="labels", action="store_true",
+            help="display labels related to the data" )
+
+    parser.add_option("-i", "--byinstance", dest="byinstance", action="store_true",
+            help="data parsed by instances" )
+
     parser.add_option("-f", "--files", dest="files", action="store_true",
             help="list the files that match the given patterns" )
 
@@ -380,15 +400,70 @@ Example:
     parser.add_option("-d", "--plotdistrib", dest="plotdistrib", action="store_true",
             help="plot as histograms" )
 
+    parser.add_option("-p", "--plot", dest="plot", action="store_true",
+            help="plot as lines" )
+
     parser.add_option("-c", "--compare", dest="compare", action="store_true",
             help="compare distributions" )
+
+    av_funcs = [len,min,max,mean,median,std,skew,kurtosis]
+    available_functions = {}
+    for f in av_funcs:
+        available_functions[f.__name__] = f
+
+    parser.add_option("-u", "--function", dest="function", metavar="FUNC", 
+            help="display result of the call of a function on the data, among %s" % available_functions.keys())
 
     (opts, filenames) = parser.parse_args()
 
     key="Makespan"
     if opts.seq:
         key="TotalCost"
- 
+
+    has_labels = False
+    if opts.labels:
+        has_labels = True
+
+    # re-split data by instances
+    # let this switch be the first, the commands using the "filenames"
+    if opts.byinstance:
+        fnames = []
+        for pattern in filenames:
+            for f in expand( pattern ):
+                fnames.append( f )
+
+        if len(fnames) == 0:
+            print "ERROR files not found"
+            sys.exit(1)
+
+        fnames.sort()
+        finalnames = []
+        
+        ins_mark = "p[0-9]{2}"
+        prev_ins = re.findall( ins_mark, fnames[0] )
+        ins_files = [ fnames[0] ]
+        for fname in fnames[1:]:
+            if not prev_ins:
+                print "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname )
+            cur_ins = re.findall( ins_mark, fname )
+
+            # new instance
+            if cur_ins == prev_ins:
+                ins_files.append( fname )
+            else:
+                finalnames.append( ins_files )
+                ins_files = [fname]
+             
+            prev_ins = cur_ins
+        
+        finalnames.append( ins_files )
+
+        filenames = []
+        for i in xrange(len(finalnames)):
+            filenames.append( common_characters( finalnames[i] ).strip("*") )
+
+
+    # display targeted files, for debug purpose
     if opts.files:
         efiles = []
         for pattern in filenames:
@@ -402,11 +477,30 @@ Example:
         print common_characters(efiles)
 
     if opts.basestats:
-        basestats(filenames,key)
+        #stats = [len,min,median,mean,std,skew,kurtosis]
+        stats = available_functions
+        tab = parse_func( filenames, stats, key, labels=has_labels )
+        printa(tab,transpose=False)
 
     if opts.compare:
         compare_median(filenames,key)
 
     if opts.plotdistrib:
         plotdistrib(filenames,key)
+
+    if opts.function:
+        f = available_functions[opts.function]
+        tab = parse_func( filenames, [f], key, labels=has_labels )
+        printa(tab,transpose=False)
+
+    if opts.plot:
+        f = available_functions[opts.function]
+        tab = parse_func( filenames, [f], key, labels=False )
+        plot_line(
+                tab, 
+                title= common_characters( filenames ), 
+                labels = f.__name__, 
+                ylabel=f.__name__, 
+                xlabel="instances"
+            )
 
