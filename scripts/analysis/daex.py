@@ -159,12 +159,22 @@ def parse_func( filenames, functions, keyword = "MakeSpan", labels=False ):
             trow.append( f.__name__ )
         tab.append(trow)
 
-    for pattern in filenames:
-        makespans = parse( pattern, keyword )
+    fnames = []
+    for p in filenames:
+        fnames.append( p )
+
+    for i in xrange(len(fnames)):
+        fn = copy.deepcopy( fnames )
+        p_i = fn.pop( i )
+        # FIXME BUG
+        #name = different_characters( p_i, fn )
+        name = p_i
+
+        makespans = parse( fnames[i], keyword )
 
         trow = []
         if labels:
-            trow.append(pattern)
+            trow.append(name)
 
         for f in functions:
             trow.append( f( makespans ) )
@@ -367,7 +377,101 @@ def compare( filenames, key, p_thresh = 0.95 ):
                
                 #print kruskal(ms[0], ms[1]) # FIXME error from scipy
     
+   
+def split_by_instance( filenames):
+
+        fnames = []
+        for pattern in filenames:
+            for f in expand( pattern ):
+                fnames.append( f )
+
+        if len(fnames) == 0:
+            print "ERROR files not found"
+            sys.exit(1)
+
+        fnames.sort()
+        finalnames = []
+        
+        ins_mark = "p[0-9]{2}"
+        prev_ins = re.findall( ins_mark, fnames[0] )
+        ins_files = [ fnames[0] ]
+        for fname in fnames[1:]:
+            if not prev_ins:
+                print "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname )
+            cur_ins = re.findall( ins_mark, fname )
+
+            # new instance
+            if cur_ins == prev_ins:
+                ins_files.append( fname )
+            else:
+                finalnames.append( ins_files )
+                ins_files = [fname]
+             
+            prev_ins = cur_ins
+        
+        finalnames.append( ins_files )
+
+        filenames = []
+        for i in xrange(len(finalnames)):
+            filenames.append( common_characters( finalnames[i] ).strip("*") )
+
+        return filenames
+
+
+def print_filenames( filenames ):
+    efiles = []
+    for pattern in filenames:
+        dir,file = dir_file( pattern ).next()
+        print dir,":",file
     
+        for f in expand( pattern ):
+            print "\t",os.path.basename(f)
+            efiles.append( f )
+
+    print common_characters(efiles)
+
+
+def process_commands( opts, filepatterns ):
+
+    key="Makespan"
+    if opts.seq:
+        key="TotalCost"
+
+    has_labels = False
+    if opts.labels:
+        has_labels = True
+
+    # display targeted files, for debug purpose
+    if opts.files:
+        print_filenames( filepatterns )
+
+    if opts.basestats:
+        #stats = [len,min,median,mean,std,skew,kurtosis]
+        stats = available_functions
+        tab = parse_func( filepatterns, stats, key, labels=has_labels )
+        printa(tab,transpose=False)
+
+    if opts.compare:
+        compare_median(filepatterns,key)
+
+    if opts.plotdistrib:
+        plotdistrib(filepatterns,key)
+
+    if opts.function:
+        f = available_functions[opts.function]
+        tab = parse_func( filepatterns, [f], key, labels=has_labels )
+        printa(tab,transpose=False)
+
+    if opts.plot:
+        f = available_functions[opts.function]
+        tab = parse_func( filepatterns, [f], key, labels=False )
+        plot_line(
+                tab, 
+                title= common_characters( filepatterns ), 
+                labels = f.__name__, 
+                ylabel=f.__name__, 
+                xlabel="instances"
+            )
 
 
 if __name__=="__main__":
@@ -414,93 +518,20 @@ Example:
     parser.add_option("-u", "--function", dest="function", metavar="FUNC", 
             help="display result of the call of a function on the data, among %s" % available_functions.keys())
 
-    (opts, filenames) = parser.parse_args()
-
-    key="Makespan"
-    if opts.seq:
-        key="TotalCost"
-
-    has_labels = False
-    if opts.labels:
-        has_labels = True
+    (opts, filepatterns) = parser.parse_args()
 
     # re-split data by instances
-    # let this switch be the first, the commands using the "filenames"
+    # let this switch be the first, the commands using the "filepatterns"
     if opts.byinstance:
-        fnames = []
-        for pattern in filenames:
-            for f in expand( pattern ):
-                fnames.append( f )
-
-        if len(fnames) == 0:
-            print "ERROR files not found"
-            sys.exit(1)
-
-        fnames.sort()
-        finalnames = []
-        
-        ins_mark = "p[0-9]{2}"
-        prev_ins = re.findall( ins_mark, fnames[0] )
-        ins_files = [ fnames[0] ]
-        for fname in fnames[1:]:
-            if not prev_ins:
-                print "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname )
-            cur_ins = re.findall( ins_mark, fname )
-
-            # new instance
-            if cur_ins == prev_ins:
-                ins_files.append( fname )
-            else:
-                finalnames.append( ins_files )
-                ins_files = [fname]
-             
-            prev_ins = cur_ins
-        
-        finalnames.append( ins_files )
-
-        filenames = []
-        for i in xrange(len(finalnames)):
-            filenames.append( common_characters( finalnames[i] ).strip("*") )
-
-
-    # display targeted files, for debug purpose
-    if opts.files:
-        efiles = []
-        for pattern in filenames:
-            dir,file = dir_file( pattern ).next()
-            print dir,":",file
-        
-            for f in expand( pattern ):
-                print "\t",os.path.basename(f)
-                efiles.append( f )
-
-        print common_characters(efiles)
-
-    if opts.basestats:
-        #stats = [len,min,median,mean,std,skew,kurtosis]
-        stats = available_functions
-        tab = parse_func( filenames, stats, key, labels=has_labels )
-        printa(tab,transpose=False)
-
-    if opts.compare:
-        compare_median(filenames,key)
-
-    if opts.plotdistrib:
-        plotdistrib(filenames,key)
-
-    if opts.function:
-        f = available_functions[opts.function]
-        tab = parse_func( filenames, [f], key, labels=has_labels )
-        printa(tab,transpose=False)
-
-    if opts.plot:
-        f = available_functions[opts.function]
-        tab = parse_func( filenames, [f], key, labels=False )
-        plot_line(
-                tab, 
-                title= common_characters( filenames ), 
-                labels = f.__name__, 
-                ylabel=f.__name__, 
-                xlabel="instances"
-            )
+        if len( filepatterns ) == 1:
+            patterns = split_by_instance( filepatterns )
+            process_commands( opts, patterns )
+        else:
+            for filepattern in filepatterns:
+                print "======================================================================================="
+                print filepattern
+                patterns = split_by_instance( [filepattern] )
+                process_commands( opts, patterns )
+    else:
+        process_commands( opts, filepatterns )
 
