@@ -89,5 +89,7 @@ extern void plan_free(SolutionPlan *plan);
 extern void compress_plans(bool causals, bool orderings);
 extern int precedes_in_plan(const void *s1, const void *s2);
 
+extern void plan_free_static(SolutionPlan *plan);
+extern SolutionPlan plan_copy_static(SolutionPlan plan);
 
 #endif /* PLAN_H */

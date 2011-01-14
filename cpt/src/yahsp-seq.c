@@ -49,7 +49,6 @@ struct Heuristic {
 static TimeVal *ainit;
 static TimeVal *aused;
 static TimeVal *finit;
-static bool *goal_preferred;
 
 SVECTOR(Action *, relaxed_plan);
 SVECTOR(Action *, applicable);
@@ -61,7 +60,7 @@ static gdsl_rbtree_t heuristics;
 static BitArray current_state;
 static BitArray initial_bitstate;
 
-static TimeVal best_makespan = MAXTIME;
+static TimeVal best_makespan;
 
 #define get_ainit(a) ainit[(a)->id]
 #define set_ainit(a, t) ainit[(a)->id] = t
@@ -74,16 +73,15 @@ static TimeVal best_makespan = MAXTIME;
 #define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res) && opt.dae && ({ gdsl_rbtree_flush(heuristics); !(ptr = (typeof(ptr)) res); })) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
 
 
-#ifdef DAE
-
-#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
-//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
-#define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
-#define NODE_GVALUE(node) node->length
-#define NODE_HVALUE(node) get_ainit(end_action)
-#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
-
-#else
+/* #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; }) */
+/* //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; }) */
+/* #define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0)) */
+/* //#define INCCOST(cost, action) (cost += duration(action) + 1) */
+/* #define NODE_GVALUE(node) node->length */
+/* #define NODE_HVALUE(node) get_ainit(end_action) */
+/* //#define NODE_HVALUE(node) relaxed_plan_nb */
+/* #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node)) */
+/* //#define NODE_FVALUE(node) (NODE_HVALUE(node)) */
 
 //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
 #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
@@ -93,8 +91,6 @@ static TimeVal best_makespan = MAXTIME;
 //#define NODE_HVALUE(node) get_ainit(end_action)
 #define NODE_HVALUE(node) relaxed_plan_nb
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * 3)
-
-#endif
 
 static Comparison is_best_action_rp(Action *prod, Action *best)
 {
@@ -142,7 +138,8 @@ static Node *closed_list_insert(Node *node)
 {
   int gdsl_return;
   ulong i;
-  for (i = 0; i < (ulong) (fluents_nb -1) / __WORDSIZE + 1; i++) node->key ^= node->state[i] * (i + 1);
+  for (i = 0; i < (ulong) (fluents_nb -1) / __WORDSIZE + 1; i++) 
+    node->key ^= node->state[i] * (i + 1);
   gdsl_rbtree_insert(closed_list, node, &gdsl_return);
    return gdsl_return == GDSL_INSERTED ? node : ({ node_free(node); (Node *) NULL; });
 }
@@ -155,7 +152,7 @@ static void update_cost_h1(Fluent *f, TimeVal cost)
     FOR(a, f->consumers) { set_aused(a, true);} EFOR; } 
 }
 
-static void compute_h1_cost_yahsp(bool goal_pref)
+static void compute_h1_cost_yahsp()
 {
   bool loop = true;
   TimeVal cost;
@@ -163,7 +160,7 @@ static void compute_h1_cost_yahsp(bool goal_pref)
   while (loop) {
     loop = false;
     FORMIN(a, actions, 2) {
-      if (get_aused(a) && (!goal_pref || goal_preferred[a->id])) {
+      if (get_aused(a)) {
 	set_aused(a, false);
 	cost = COST(a);
 	if (cost < get_ainit(a)) {
@@ -221,7 +218,7 @@ static bool heuristic_search(Node *node)
   return true;
 }
 
-static void compute_h1(Node *node, bool goal_pref)
+static void compute_h1(Node *node)
 {
   applicable_nb = 0;
   if (opt.dae && heuristic_search(node)) return;
@@ -233,7 +230,7 @@ static void compute_h1(Node *node, bool goal_pref)
     set_finit(f, MAXTIME);
     if (bitarray_get(node->state, f)) update_cost_h1(f, 0);
   } EFOR;
-  compute_h1_cost_yahsp(goal_pref);
+  compute_h1_cost_yahsp();
   set_ainit(end_action, COST(end_action));
   if (opt.dae) heuristic_insert(node);
 }
@@ -373,6 +370,7 @@ static Node *apply_relaxed_plan(Node *node)
   /*   } */
   /*   next_action:; */
   /* } EFOR; */
+
   FORi(a, i, relaxed_plan) {
     if (a == NULL || a == end_action) continue;
     FOR(b, relaxed_plan) {
@@ -393,8 +391,6 @@ static Node *apply_relaxed_plan(Node *node)
       } EFOR;
     } EFOR;
   } EFOR;
-
-  //if (son->steps_nb == 0) error(no_plan, "Erreur plan relaxé inapplicable");
   if (son->steps_nb > 0) cpt_realloc(son->steps, son->steps_nb);
   return son;
 }
@@ -408,7 +404,6 @@ static void create_solution_plan(Node *node)
 
   while (node != NULL) {
     FORi(a, i, node->steps) {
-      //printf("%s %d %d\n", action_name(a->action), a->init, a->end);
       Step *s = cpt_calloc(plan->steps[node->length - node->steps_nb + i], 1);
       s->action = a.action;
       s->init = a.init;
@@ -427,9 +422,7 @@ static Node *compute_node(Node *node)
   if (node == NULL || closed_list_insert(node) == NULL || stats.evaluated_nodes >= opt.max_backtracks) return NULL;
   if (node->makespan >= best_makespan) return NULL;
   stats.evaluated_nodes++;
-  compute_h1(node, false);
-  /* compute_h1(node, !opt.dae); */
-  /* if (!opt.dae && get_ainit(end_action) == MAXTIME) compute_h1(node, false); */
+  compute_h1(node);
   if (get_ainit(end_action) == MAXTIME) return NULL;
   if (get_ainit(end_action) == 0) {
     if (!opt.anytime) return node;
@@ -445,7 +438,6 @@ static Node *compute_node(Node *node)
   vector_copy(node->applicable, applicable);
   compute_relaxed_plan(node);
   node->fvalue = NODE_FVALUE(node);
-  //open_list_insert(node); return NULL;
   return compute_node(apply_relaxed_plan(open_list_insert(node)));
 }
 
@@ -468,6 +460,7 @@ static Node *open_list_pop_best()
 static Node *yahsp_plan()
 {
   Node *node = cpt_calloc(node, 1), *son;
+  best_makespan = MAXTIME;
   node->state = current_state;
   if ((son = compute_node(node))) return son;
   while ((node = open_list_pop_best())) {
@@ -498,7 +491,6 @@ void yahsp_init()
   cpt_malloc(aused, actions_nb);
   cpt_malloc(finit, fluents_nb);
   cpt_malloc(relaxed_plan, actions_nb);
-  cpt_malloc(goal_preferred, actions_nb);
   cpt_malloc(applicable, actions_nb);
 
   open_list = gdsl_rbtree_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) open_list_cmp);
@@ -514,15 +506,6 @@ void yahsp_init()
 
 int yahsp_main() 
 {
-  if (!opt.dae) {
-    FOR(a, actions) { goal_preferred[a->id] = true; } EFOR;
-    FOR(f, end_action->prec) {
-      if (!produces(start_action, f)) 
-	//FOR(a, actions) { if (deletes(a, f) || edeletes(a, f)) goal_preferred[a->id] = false; } EFOR;
-	FOR(a, actions) { if (deletes(a, f)) goal_preferred[a->id] = false; } EFOR;
-    } EFOR;
-  }
-
   stats.computed_nodes = 0;
   stats.evaluated_nodes = 0;
   stats.expanded_nodes = 0;

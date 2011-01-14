@@ -154,6 +154,26 @@ SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
 }
 
 
+SolutionPlan plan_copy_static(SolutionPlan plan)
+{
+  SolutionPlan copy = plan;
+  cpt_malloc(copy.steps, copy.steps_nb);
+  FORi(s, i, plan.steps) {
+    cpt_malloc(copy.steps[i], 1);
+    copy.steps[i] = s;
+  } EFOR;
+  return copy;
+}
+
+void plan_free_static(SolutionPlan *plan)
+{
+  FOR(s, plan->steps) {
+    cpt_free(s->causals);
+    cpt_free(s->before);
+    cpt_free(s);
+  } EFOR;
+  cpt_free(plan->steps);
+}
 
 void plan_free(SolutionPlan *plan)
 {

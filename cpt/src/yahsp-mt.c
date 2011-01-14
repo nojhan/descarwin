@@ -49,7 +49,6 @@ struct Heuristic {
 static TimeVal *ainit;
 static TimeVal *aused;
 static TimeVal *finit;
-static bool *goal_preferred;
 
 SVECTOR(Action *, relaxed_plan);
 SVECTOR(Action *, applicable);
@@ -97,20 +96,42 @@ static long nodes_limits_nb = 6;
 #define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res) && opt.dae && ({ gdsl_rbtree_flush(heuristics); !(ptr = (typeof(ptr)) res); })) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
 
 
+#ifdef DAE
+
+/*
 #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
 //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
-
-#ifdef DAE
 #define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
+//#define INCCOST(cost, action) (cost += duration(action) + 1)
 #define NODE_GVALUE(node) node->length
 #define NODE_HVALUE(node) get_ainit(end_action)
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
-#else
-#define INCCOST(cost, action) (cost++)
+*/
+
+#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
+//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
+#define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0))
+//#define INCCOST(cost, action) (cost += (duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm)*10000+1 + (pddl_domain->action_costs ? 1 : 0))
+//#define INCCOST(cost, action) (cost += duration(action) + 1)
+//#define INCCOST(cost, action) (cost++)
+
 #define NODE_GVALUE(node) node->length
 #define NODE_HVALUE(node) get_ainit(end_action)
 //#define NODE_HVALUE(node) relaxed_plan_nb
+#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
+//#define NODE_FVALUE(node) (NODE_HVALUE(node))
+
+#else
+
+//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
+#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
+//#define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
+#define INCCOST(cost, action) (cost++)
+#define NODE_GVALUE(node) node->length
+//#define NODE_HVALUE(node) get_ainit(end_action)
+#define NODE_HVALUE(node) relaxed_plan_nb
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * 3)
+
 #endif
 
 static Comparison is_best_action_rp(Action *prod, Action *best)
@@ -171,7 +192,8 @@ static Node *closed_list_insert(Node *node)
 {
   int gdsl_return;
   ulong i;
-  for (i = 0; i < (ulong) (fluents_nb -1) / __WORDSIZE + 1; i++) node->key ^= node->state[i] * (i + 1);
+  for (i = 0; i < (ulong) (fluents_nb -1) / __WORDSIZE + 1; i++) 
+    node->key ^= node->state[i] * (i + 1);
   omp_set_lock(closed_lock);
   gdsl_rbtree_insert(closed_list, node, &gdsl_return);
   omp_unset_lock(closed_lock);
@@ -185,7 +207,7 @@ static void update_cost_h1(Fluent *f, TimeVal cost)
     FOR(a, f->consumers) { set_aused(a, true);} EFOR; } 
 }
 
-static void compute_h1_cost_yahsp(bool goal_pref)
+static void compute_h1_cost_yahsp()
 {
   bool loop = true;
   TimeVal cost;
@@ -193,7 +215,7 @@ static void compute_h1_cost_yahsp(bool goal_pref)
   while (loop) {
     loop = false;
     FORMIN(a, actions, 2) {
-      if (get_aused(a) && (!goal_pref || goal_preferred[a->id])) {
+      if (get_aused(a)) {
         set_aused(a, false);
         cost = COST(a);
         if (cost < get_ainit(a)) {
@@ -255,12 +277,10 @@ static bool heuristic_search(Node *node)
   return true;
 }
 
-bool heur = false;
-
-static void compute_h1(Node *node, bool goal_pref)
+static void compute_h1(Node *node)
 {
   applicable_nb = 0;
-  if ((heur || opt.dae) && heuristic_search(node)) return;
+  if (opt.dae && heuristic_search(node)) return;
   FOR(a, actions) {
     set_ainit(a, MAXTIME);
     set_aused(a, a->prec_nb == 0);
@@ -269,9 +289,9 @@ static void compute_h1(Node *node, bool goal_pref)
     set_finit(f, MAXTIME);
     if (bitarray_get(node->state, f)) update_cost_h1(f, 0);
   } EFOR;
-  compute_h1_cost_yahsp(goal_pref);
+  compute_h1_cost_yahsp();
   set_ainit(end_action, COST(end_action));
-  if (heur || opt.dae) heuristic_insert(node);
+  if (opt.dae) heuristic_insert(node);
 }
 
 
@@ -353,7 +373,7 @@ static Node *node_derive(Node *node)
 {
   Node *son = cpt_calloc(son, 1);
 #pragma omp critical
-    son->id = stats.computed_nodes++;
+  son->id = stats.computed_nodes++;
   son->ancestor = node;
   son->length = node->length;
   son->makespan = node->makespan;
@@ -399,7 +419,6 @@ static Node *apply_relaxed_plan(Node *node)
       } EFOR;
     } EFOR;
   } EFOR;
-  //if (son->steps_nb == 0) error(no_plan, "Erreur plan relaxé inapplicable");
   if (son->steps_nb > 0) cpt_realloc(son->steps, son->steps_nb);
   return son;
 }
@@ -413,7 +432,6 @@ static void create_solution_plan(Node *node)
 
   while (node != NULL) {
     FORi(a, i, node->steps) {
-      //printf("%s %d %d\n", action_name(a->action), a->init, a->end);
       Step *s = cpt_calloc(plan->steps[node->length - node->steps_nb + i], 1);
       s->action = a.action;
       s->init = a.init;
@@ -436,9 +454,7 @@ static Node *compute_node(Node *node)
   if (node->makespan >= best_makespan) return NULL;
 #pragma omp atomic
   stats.evaluated_nodes++;
-  compute_h1(node, false);
-  /* compute_h1(node, !opt.dae); */
-  /* if (!opt.dae && get_ainit(end_action) == MAXTIME) compute_h1(node, false); */
+  compute_h1(node);
   if (get_ainit(end_action) == MAXTIME) return NULL;
   if (get_ainit(end_action) == 0) {
     if (!opt.anytime) return node;
@@ -521,11 +537,10 @@ static Node *yahsp_plan()
       cpt_free(node->applicable);
 #pragma omp atomic
       working_threads--;
-    } //else trace(normal, "%ld ", stats.expanded_nodes);
+    }
 #pragma omp critical
     if (working_threads == 0 && gdsl_rbtree_is_empty(open_list)) open_empty = true;
   }
-  //if (!plan_found) trace(normal, "%d waiting\n", omp_get_thread_num());
   return NULL;
 }
 
@@ -540,7 +555,6 @@ void yahsp_init()
 {
   long i;
   compute_init_rh1_cost();
-  cpt_malloc(goal_preferred, actions_nb);
   cpt_malloc(open_lists, opt.yahsp_teams);
   cpt_malloc(open_locks, opt.yahsp_teams);
   cpt_malloc(closed_lists, opt.yahsp_teams);
@@ -552,7 +566,7 @@ void yahsp_init()
     omp_init_lock(&closed_locks[i]);
   }
   omp_init_lock(&heuristics_lock);
-  if (heur || opt.dae) heuristics = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) heuristic_free, (gdsl_compare_func_t) heuristic_cmp);
+  if (opt.dae) heuristics = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) heuristic_free, (gdsl_compare_func_t) heuristic_cmp);
   initial_bitstate = bitarray_create(fluents_nb);
   FOR(f, init_state) { bitarray_set(initial_bitstate, f); } EFOR;
   yahsp_reset();
@@ -561,24 +575,12 @@ void yahsp_init()
 
 int yahsp_main() 
 {
-  if (!opt.dae) {
-    FOR(a, actions) { goal_preferred[a->id] = true; } EFOR;
-    FOR(f, end_action->prec) {
-      if (!produces(start_action, f)) 
-        FOR(a, actions) { if (deletes(a, f) || edeletes(a, f)) goal_preferred[a->id] = false; } EFOR;
-    } EFOR;
-  }
-
-  /* FOR(f, fluents) { if (bitarray_get(current_state, f)) trace(normal, "%s ", fluent_name(f)); } EFOR; */
-  /* trace(normal, "\n\n"); */
+  Node *node = NULL;
+  long num_threads;
 
   stats.computed_nodes = 0;
   stats.evaluated_nodes = 0;
   stats.expanded_nodes = 0;
-
-  Node *node = NULL;
-
-  long num_threads;
 
   FORi(nodes_limit, i, nodes_limits) {
     num_threads = mini(opt.yahsp_threads, threads_count[i]);
@@ -612,11 +614,11 @@ int yahsp_main()
       }
     }
     if (plan_found || stats.evaluated_nodes >= opt.max_backtracks) break;
-    long i;
-    for(i = 0; i < opt.yahsp_teams; i++) {
-      gdsl_rbtree_flush(open_lists[i]);
-      gdsl_rbtree_flush(closed_lists[i]);
-    }
+    /* long i; */
+    /* for(i = 0; i < opt.yahsp_teams; i++) { */
+    /*   gdsl_rbtree_flush(open_lists[i]); */
+    /*   gdsl_rbtree_flush(closed_lists[i]); */
+    /* } */
   } EFOR;
 
   if (node == NULL) {
