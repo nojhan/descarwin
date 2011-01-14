@@ -26,7 +26,7 @@ $cmd
 
 filename="$res/plans/dae_plan_${d}_${i}_r$r"
 lastfile=`ls -1 -v $filename* | tail -n 1`
-cp $lastfile $filename
+cp $lastfile ${filename}.soln
 
 if [ "$seq" = 0 ] ; then 
     cmd="./validate -t 0.00001 $domain $instance $filename"

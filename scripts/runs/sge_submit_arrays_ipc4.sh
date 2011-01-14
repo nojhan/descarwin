@@ -64,7 +64,7 @@ function sge_submit_array_ipc_single_domain()
 	    mkdir -p $respath/plans
 	    mkdir -p $respath/gens
             # submit an array of *runs jobs
-	    cmd1="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N dae      -cwd -o $respath/data/ -e $respath/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.ipc4.sh $domain $instance $respath $seq"
+	    cmd1="qsub -l h_rt=00:35:00 -q all.q@@ls -b y -N dae      -cwd -o $respath/data/ -e $respath/logs/ -t 1-$runs -S /bin/bash ./run_wrapper.ipc4.sh $domain $instance $respath $seq"
 #	    cmd2="qsub -l h_rt=00:30:00 -q all.q@@ls -b y -N jack -cwd -o $respath/data/ -e $respath/logs/ -t 1-$runs -S /bin/bash ./run_wrapper_jack.ipc4.sh $domain $instance $respath"
 	    echo $cmd1
 #	    echo $cmd2
