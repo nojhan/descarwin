@@ -360,8 +360,9 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
         eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
 #endif
-	//12.1          while( (goodguys == 0) && (!found) && (b_max_in < b_max_init) ) {
-	while( (((double)goodguys/(double)popsize) < b_max_ratio) && (!found) && (b_max_in < b_max_init) ) {
+	//	while( (((double)goodguys/(double)popsize) < b_max_ratio) && (!found) && (b_max_in < b_max_init) ) {
+	//12.1 while( (goodguys == 0) && (!found) && (b_max_in < b_max_init) ) {
+	while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
 	    goodguys=0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
@@ -421,10 +422,10 @@ int main ( int argc, char* argv[] )
 #endif
             b_max_fixed = b_max_in;
             b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
-        } // while b_max_ratio
-	//12.1	if (((double)goodguys/(double)popsize) < b_max_ratio) {
-	//12.1	  b_max_fixed= b_max_fixed * 2;
-	//12.1	}
+        } // while
+//12.1	if (((double)goodguys/(double)popsize) < b_max_ratio) {
+//12.1	b_max_fixed= b_max_fixed * 2;
+//12.1	}
     } // if b_max_fixed == 0 
 
     b_max_in = b_max_fixed;
