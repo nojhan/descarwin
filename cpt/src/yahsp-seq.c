@@ -96,9 +96,9 @@ static Comparison is_best_action_rp(Action *prod, Action *best)
 {
   PREFER(prod->id > 1, best->id <= 1);
   LESS(get_ainit(prod), get_ainit(best));
-#ifdef DAE
-  LESS(duration(prod), duration(best));
-#endif
+/* #ifdef DAE */
+/*   LESS(duration(prod), duration(best)); */
+/* #endif */
   return Equal;
 }
 
@@ -113,11 +113,11 @@ static void node_free(Node *node)
 static Comparison open_list_cmp(Node *node1, Node *node2)
 {
   LESS(node1->fvalue, node2->fvalue);
-#ifdef DAE
-  LESS(node1->makespan, node2->makespan);
-#else
+/* #ifdef DAE */
+/*   LESS(node1->makespan, node2->makespan); */
+/* #else */
   LESS(node1->length, node2->length);
-#endif
+/* #endif */
   LESS(node1->id, node2->id);
   return Equal;
 }
