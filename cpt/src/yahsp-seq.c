@@ -75,21 +75,21 @@ static TimeVal best_makespan;
 
 /* #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; }) */
 /* //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; }) */
-/* #define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0)) */
-/* //#define INCCOST(cost, action) (cost += duration(action) + 1) */
+/* //#define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0)) */
+/* #define INCCOST(cost, action) (cost += duration(action) + 1) */
 /* #define NODE_GVALUE(node) node->length */
 /* #define NODE_HVALUE(node) get_ainit(end_action) */
 /* //#define NODE_HVALUE(node) relaxed_plan_nb */
 /* #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node)) */
 /* //#define NODE_FVALUE(node) (NODE_HVALUE(node)) */
 
-//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
-#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
+#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
+//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
 //#define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
 #define INCCOST(cost, action) (cost++)
 #define NODE_GVALUE(node) node->length
-//#define NODE_HVALUE(node) get_ainit(end_action)
-#define NODE_HVALUE(node) relaxed_plan_nb
+#define NODE_HVALUE(node) get_ainit(end_action)
+//#define NODE_HVALUE(node) relaxed_plan_nb
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * 3)
 
 static Comparison is_best_action_rp(Action *prod, Action *best)
