@@ -26,6 +26,13 @@
 #define FORMAT_LEFT_FILL_WIDTH(width) "\t" << std::left << std::setfill(LOG_FILL) << std::setw(width) 
 #define FORMAT_LEFT_FILL_W_PARAM FORMAT_LEFT_FILL_WIDTH(20)
 
+// MODIFS MS START
+// at the moment, in utils/make_help.cpp
+// this should become some eoUtils.cpp with corresponding eoUtils.h
+bool testDirRes(std::string _dirName, bool _erase);
+// MODIFS MS END
+
+
 inline void LOG_LOCATION( eo::Levels level )
 {
 #ifndef NDEBUG
@@ -99,8 +106,6 @@ int main ( int argc, char* argv[] )
     // EO
     eoParserLogger parser(argc, argv);
     make_verbose(parser);
-
-    //eoState state;
 
     // SYSTEM
 #ifndef NDEBUG
@@ -288,6 +293,29 @@ int main ( int argc, char* argv[] )
     unsigned int maxruns = parser.createParam( (unsigned int)1, "runs-max", 
             "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
+
+    // MODIFS MS START
+#ifndef NDEBUG
+    eoValueParam<std::string>& dirNameParam =  parser.createParam(std::string("Res"), "resDir", "Directory to store DISK outputs", '\0', "Output - Disk");
+
+    // shoudl we empty it if exists
+    eoValueParam<bool>& eraseParam = parser.createParam(true, "eraseDir", "erase files in dirName if any", '\0', "Output - Disk");
+
+    eoValueParam<unsigned>& saveFrequencyParam = parser.createParam(unsigned(0), "saveFrequency", "Save every F generation (0 = only final state, absent = never)", '\0', "Persistence" );
+#endif
+
+    std::string plusOrComma =  parser.createParam(std::string("Comma"), "plusOrComma", "Plus (parents+offspring) or Comma (only offspring) for replacement", '\0', "Evolution Engine").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plusOrComma" << plusOrComma << std::endl;
+
+    unsigned replaceTourSize = parser.createParam(unsigned(1), "replaceTourSize", "Size of Replacement Tournament (1->deterministic (hum, pas logique ;-(", '\0', "Evolution Engine" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "replaceTourSize" << replaceTourSize << std::endl;
+
+    bool removeDuplicates = parser.createParam(false, "removeDuplicates", "Does not allow duplicates in replacement (if possible)", '\0', "Evolution Engine").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "removeDuplicates" << removeDuplicates << std::endl;
+
+    bool weakElitism = parser.createParam(true, "weakElitism", "Weak Elitism in replacement", '\0', "Evolution Engine").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "weakElitism" << weakElitism << std::endl;
+    // MODIFS MS END
 
     make_help( parser );
 
@@ -593,6 +621,30 @@ int main ( int argc, char* argv[] )
     file_monitor.add( best_plan );
     checkpoint.add( file_monitor );
     */
+
+    // MODIFS MS START 
+    // pour plus d'output (recopiés de do/make_checkpoint)
+    // un state, pour sauver l'état courant
+    eoState state;
+    state.registerObject(parser);
+    state.registerObject(pop);
+    state.registerObject(eo::rng);
+
+    bool dirOK = false;
+    
+    if (parser.isItThere(saveFrequencyParam)) {
+      if (! dirOK ) {
+	dirOK = testDirRes(dirNameParam.value(), eraseParam.value());
+    eo::log << eo::progress << "TESTRESDIR" << std::endl;
+      }
+    }
+
+    unsigned freq = (saveFrequencyParam.value()>0 ? saveFrequencyParam.value() : UINT_MAX );
+    std::string stmp = dirNameParam.value() + "/generations";
+    eoCountedStateSaver stateSaver1 (freq, state, stmp);
+    checkpoint.add(stateSaver1);
+    // MODIFS MS END
+    
 #endif // NDEBUG
 
     // SELECTION
@@ -600,13 +652,16 @@ int main ( int argc, char* argv[] )
     
     // JACK the article indicate that tere is no selection, but the article use a deterministic tournament
 
+    eoSelectOne<daex::Decomposition> * p_selectone;
+    if ( toursize == 1 ) {
     // L'article indique qu'il n'y a pas de sélection, on aurait alors ça :
-    //eoSequentialSelect<daex::Decomposition> selectone( true );
-
+      p_selectone = (eoSelectOne<daex::Decomposition> *) ( new eoSequentialSelect<daex::Decomposition> ( true ) );
+    }
+    else {
     /// MAIS le code utilise un tournoi déterministe, on a donc ça :
-    eoDetTournamentSelect<daex::Decomposition> selectone( toursize );
-
-
+      p_selectone = (eoSelectOne<daex::Decomposition> *) ( new eoDetTournamentSelect<daex::Decomposition> ( toursize ) );
+    }
+    
     // VARIATION
 
     // mutations
@@ -636,7 +691,7 @@ int main ( int argc, char* argv[] )
     eoSGAGenOp<daex::Decomposition> variator( crossover, proba_cross, mutator, proba_mut);
 
     // selector, variator, rate (for selection), interpret_as_rate
-    eoGeneralBreeder<daex::Decomposition> breed( selectone, variator, offsprings, false ); 
+    eoGeneralBreeder<daex::Decomposition> breed( *p_selectone, variator, offsprings, false ); 
     // FIXME tester si on veut 700% ou 700
 
 
@@ -645,13 +700,40 @@ int main ( int argc, char* argv[] )
     // JACK : L'article indique qu'on fait un remplacement en tournoi déterministe et qu'il n'y a pas d'élistisme, on aurait alors ça :
     //eoSSGADetTournamentReplacement<daex::Decomposition> replace(5);
     
-    // MAIS le code utilise un remplacement intégral des parents par le meilleur des parents+enfants, avec élitisme faible, on a donc :
-    eoCommaReplacement<daex::Decomposition> commareplace;
-    eoWeakElitistReplacement<daex::Decomposition> replace( commareplace );
-
+    // MODIFS MS START
+    // plus de paramétrage du remplacement
+    eoReplacement<daex::Decomposition> * pt_replace;
+    // MAIS le code utilise un remplacement intégral des parents par le meilleur des parents+enfants, avec élitisme faible, on a donc 
+    // Note MS: le commentaire était incohérent entre Plus et Comma ???
+    
+    // Use the eoMergeReduce construct
+    
+    // Merge: either merge (Plus strategy, parents + offspring) or only keep offspring (Comma)
+    eoMerge<daex::Decomposition> * pt_merge;
+    if (plusOrComma == "Comma") {
+      pt_merge = (eoMerge<daex::Decomposition> *) (new eoNoElitism<daex::Decomposition>);
+    } else { // Plus
+      pt_merge = (eoMerge<daex::Decomposition> *) (new eoPlus<daex::Decomposition>);
+    }
+    // Reduce: either truncate (deterministic) or tournament
+    eoReduce<daex::Decomposition> * pt_reduce;
+    if (replaceTourSize == 1) {
+      pt_reduce = (eoReduce<daex::Decomposition> *) (new eoTruncate<daex::Decomposition>);
+    } else {
+      pt_reduce = (eoReduce<daex::Decomposition> *) (new eoDetTournamentTruncate<daex::Decomposition> ( replaceTourSize ));
+    }
+    // the full MergeReduce object
+    eoMergeReduce<daex::Decomposition> mergeReduce (*pt_merge, *pt_reduce);
+    
+    // Now the weak elitism
+    if (weakElitism) {
+	pt_replace = (eoReplacement<daex::Decomposition> *) (new eoWeakElitistReplacement<daex::Decomposition> ( mergeReduce ) );
+      } else {
+	pt_replace = &mergeReduce;
+      }
 
     // ALGORITHM
-    eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, replace );
+    eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, (*pt_replace) );
 
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
