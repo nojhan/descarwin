@@ -26,6 +26,9 @@
 #include <gmp.h>
 #include <omp.h>
 
+#ifndef __WORDSIZE
+#define __WORDSIZE 32
+#endif
 
 #define VALUE_SHORT
 #define TIME_LONG
@@ -58,7 +61,11 @@ typedef short int TimeVal;
 #ifdef TIME_LONG
 typedef long int TimeVal;
 #define TIMEP "ld"
+#if (__WORDSIZE == 32)
 #define MAXTIME 1000000000
+#else
+#define MAXTIME 1000000000000000000LL
+#endif
 #define MAXCOST MAXTIME
 #define time_round __builtin_lrintl
 #endif
@@ -113,10 +120,6 @@ struct TimeStruct {
 /* Bit arrays */
 
 typedef unsigned long *BitArray;
-
-#ifndef __WORDSIZE
-#define __WORDSIZE 32
-#endif
 
 #define bitarray_create(n) ((unsigned long *) calloc(((n) - 1) / __WORDSIZE + 1, sizeof(unsigned long)))
 #define bitarray_copy(dest, source, n) memcpy(dest, source, (((n) - 1) / __WORDSIZE + 1) * sizeof(unsigned long))
