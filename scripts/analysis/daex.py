@@ -45,6 +45,10 @@ def unstr( func ):
 @unstr
 def expand( filepatterns ):
     """Yelds file names matching each 'filepatterns'"""
+    if len(filepatterns) == 0:
+        print "EMPTY PATTERN"
+        yield (i for i in [] )
+
     for base_dir,filepattern in dir_file(filepatterns):
         for dirname, dirs, files in os.walk( base_dir ):
             for filename in fnmatch.filter(files, filepattern):
@@ -131,12 +135,21 @@ def common_characters( strings ):
 
 def lines( pattern ):
     """Open all files matching the given pattern and yields their descriptors"""
+#    print "PATTERN",pattern
+#    if pattern == "":
+#        print "WARNING empty pattern"
+#        return ( i for i in [] ) # empty generator
+
     files = expand( pattern )
     fds = fopen(files)
     return cat( fds )
 
 def parse( pattern, keyword = "MakeSpan" ):
     """Open files matchin pattern, filter the lines matching the keyword and returns the list of the last item of each line, converted in float"""
+    if pattern == "":
+#        print "WARNING empty pattern"
+        return []
+
     rawlines = lines(pattern)
     greped = grep( rawlines, keyword )
     strs = cut( greped, -1 ) # -1 = the last item
@@ -180,7 +193,10 @@ def parse_func( filenames, functions, keyword = "MakeSpan", labels=False ):
             trow.append(name)
 
         for f in functions:
-            trow.append( f( makespans ) )
+            if len(makespans) != 0:
+                trow.append( f( makespans ) )
+            else:
+                trow.append( None )
         tab.append(trow)
 
     return tab
@@ -188,7 +204,7 @@ def parse_func( filenames, functions, keyword = "MakeSpan", labels=False ):
 
 def printas( tab, transpose=False):
     """Print a table using scipy formating"""
-    a = scipy.array(tab)
+    a = toarray(tab)
     if transpose:
         a = a.transpose()
 
@@ -225,12 +241,72 @@ def toarray( tab ):
         jsize = max( len(row), jsize )
 
     a = scipy.zeros( (isize, jsize) )
-
     for i in xrange(len(tab)):
         for j in xrange(len(tab[i])):
             a[i,j] = tab[i][j]
 
     return a
+
+
+def tomat( tab ):
+    """Convert a list of list into a square list of list with padding "None", filling with zero when values are missing"""
+    isize = len(tab)
+
+    jsize = 0
+    for row in tab:
+        jsize = max( len(row), jsize )
+
+    a = []
+    for i in xrange(len(tab)):
+        row = []
+        for j in xrange(len(tab[i])):
+            row.append( tab[i][j] )
+        for j in xrange(len(tab[i]), jsize):
+            row.append( None )
+
+        a.append(row)
+
+    return a
+
+
+
+def transposemat( mat ):
+    nrows= len(mat)
+    ncols = len(mat[0]) # must be equals
+
+    tmat = []
+    for j in xrange(ncols):
+        row = []
+        for i in xrange(nrows):
+            row.append( mat[i][j] )
+        tmat.append(row)
+
+    return tmat
+
+
+
+def printa2( tab, transpose=False ):
+    """Pretty print a 2D table"""
+
+    a = tomat(tab)
+
+    if transpose:
+        a = transposemat(a)
+
+    nrows = len(a)
+    ncols = len(a[0]) # all rows have the same size, thanks to totab
+
+    for i in xrange(nrows):
+        for j in xrange(ncols):
+            isize = len_max_col(a,j)
+            fmt_s = "%"+str(isize)+"s "
+            fmt_f = "%"+str(isize)+".2f "
+            
+            try:
+                print fmt_f % float(a[i][j]),
+            except:
+                print fmt_s % a[i][j],
+        print
 
 
 
@@ -402,7 +478,7 @@ def compare( filenames, key, p_thresh = 0.95 ):
                 #print kruskal(ms[0], ms[1]) # FIXME error from scipy
     
    
-def split_by_instance( filenames):
+def split_by_instance( filenames ):
 
         fnames = []
         for pattern in filenames:
@@ -414,30 +490,47 @@ def split_by_instance( filenames):
             sys.exit(1)
 
         fnames.sort()
-        finalnames = []
+        finalnames = [[]] * 31 # FIXME hardcoded nb of instances
         
         ins_mark = "p[0-9]{2}"
-        prev_ins = re.findall( ins_mark, fnames[0] )
+        prev_ins = re.findall( ins_mark, fnames[0] )[0]
+        
         ins_files = [ fnames[0] ]
+
         for fname in fnames[1:]:
             if not prev_ins:
                 print "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname )
-            cur_ins = re.findall( ins_mark, fname )
 
-            # new instance
+            ins_counter = int( prev_ins.strip("p") )
+            cur_ins = re.findall( ins_mark, fname )[0]
+        
+            # if the same instance
             if cur_ins == prev_ins:
+                # adding this file to the current list
                 ins_files.append( fname )
-            else:
-                finalnames.append( ins_files )
+
+            else: # if we change of instance
+                # store the list of files for the previous instance
+                finalnames[ins_counter] = ins_files
                 ins_files = [fname]
-             
+                 
             prev_ins = cur_ins
         
-        finalnames.append( ins_files )
+        finalnames[ins_counter] = ins_files
+
+#        for f in finalnames:
+#            print len(f),
+#            if len(f) > 0:
+#                print f[0],"..."
+#            else:
+#                print []
+#            sys.stdout.flush()
+#        print
 
         filenames = []
         for i in xrange(len(finalnames)):
-            filenames.append( common_characters( finalnames[i] ).strip("*") )
+            f = common_characters( finalnames[i] )
+            filenames.append( f.strip("*") )
 
         return filenames
 
@@ -594,7 +687,7 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
                 plabels.append( filepattern )
               
             print ' '.join( plabels )
-            printa( results, transpose=True )
+            printa2( results, transpose=True )
            
             if opts.plotbyinstance:
                 plot_line(
