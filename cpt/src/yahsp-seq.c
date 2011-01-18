@@ -73,15 +73,19 @@ static TimeVal best_makespan;
 #define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res) && opt.dae && ({ gdsl_rbtree_flush(heuristics); !(ptr = (typeof(ptr)) res); })) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
 
 
-/* #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; }) */
-/* //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; }) */
-/* //#define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0)) */
-/* #define INCCOST(cost, action) (cost += duration(action) + 1) */
-/* #define NODE_GVALUE(node) node->length */
-/* #define NODE_HVALUE(node) get_ainit(end_action) */
-/* //#define NODE_HVALUE(node) relaxed_plan_nb */
-/* #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node)) */
-/* //#define NODE_FVALUE(node) (NODE_HVALUE(node)) */
+#ifdef DAE
+
+#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
+//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
+//#define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0))
+#define INCCOST(cost, action) (cost += duration(action) + 1)
+#define NODE_GVALUE(node) node->length
+#define NODE_HVALUE(node) get_ainit(end_action)
+//#define NODE_HVALUE(node) relaxed_plan_nb
+#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
+//#define NODE_FVALUE(node) (NODE_HVALUE(node))
+
+#else
 
 #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
 //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
@@ -92,13 +96,15 @@ static TimeVal best_makespan;
 //#define NODE_HVALUE(node) relaxed_plan_nb
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * 3)
 
+#endif
+
 static Comparison is_best_action_rp(Action *prod, Action *best)
 {
   PREFER(prod->id > 1, best->id <= 1);
   LESS(get_ainit(prod), get_ainit(best));
-/* #ifdef DAE */
-/*   LESS(duration(prod), duration(best)); */
-/* #endif */
+#ifdef DAE
+  LESS(duration(prod), duration(best));
+#endif
   return Equal;
 }
 
@@ -113,11 +119,11 @@ static void node_free(Node *node)
 static Comparison open_list_cmp(Node *node1, Node *node2)
 {
   LESS(node1->fvalue, node2->fvalue);
-/* #ifdef DAE */
-/*   LESS(node1->makespan, node2->makespan); */
-/* #else */
+#ifdef DAE
+  LESS(node1->makespan, node2->makespan);
+#else
   LESS(node1->length, node2->length);
-/* #endif */
+#endif
   LESS(node1->id, node2->id);
   return Equal;
 }
@@ -376,7 +382,11 @@ static Node *apply_relaxed_plan(Node *node)
     FOR(b, relaxed_plan) {
       if (b == NULL || b == a || b == end_action) continue;
       FOR(f, a->add) {
+#ifdef DAE
+	if (!bitarray_get(node->state, f) && consumes(b, f)) {
+#else
 	if (!bitarray_get(son->state, f) && consumes(b, f)) {
+#endif
 	  Action *best = NULL;
 	  long ties = 1;
 	  FOR(prod, f->producers) {
