@@ -587,22 +587,19 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
                 results.append( result )
                 plabels.append( filepattern )
               
-            #arr = scipy.array( results )#.transpose()
             print ' '.join( plabels )
-#            printa( arr, transpose=True )
             printa( results, transpose=True )
            
             if opts.plotbyinstance:
                 plot_line(
-                        arr,
+                        results,
                         title= common_characters( filepatterns ), 
                         labels = plabels,
                         ylabel = opts.function,
                         xlabel="instances"
                     )
 
-
-    else:
+    else: # if not by instance
         results = process_commands( opts, filepatterns )
         printa(results,transpose=False)
 
