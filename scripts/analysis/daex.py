@@ -1,6 +1,9 @@
 #!/bin/env python
 #encoding=utf-8
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 import os
 import sys
 import difflib
@@ -556,7 +559,7 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
     parser.add_option("-c", "--compare", dest="compare", action="store_true",
             help="compare distributions" )
 
-    av_funcs = [len,min,max,mean,median,std,skew,kurtosis]
+    av_funcs = [len,min,max,mean,median,std,skew,kurtosis,copy.copy]
     available_functions = {}
     for f in av_funcs:
         available_functions[f.__name__] = f
