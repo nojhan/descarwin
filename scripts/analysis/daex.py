@@ -216,12 +216,15 @@ def len_max_col( tab, j ):
 def toarray( tab ):
     """Convert a list of list into a scipy array, filling with zero when values are missing"""
     isize = len(tab)
-    jsize = len_max(tab)
+
+    jsize = 0
+    for row in tab:
+        jsize = max( len(row), jsize )
 
     a = scipy.zeros( (isize, jsize) )
 
     for i in xrange(len(tab)):
-        for j in range(len(tab[i])):
+        for j in xrange(len(tab[i])):
             a[i,j] = tab[i][j]
 
     return a
