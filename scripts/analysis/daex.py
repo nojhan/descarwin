@@ -213,9 +213,26 @@ def len_max_col( tab, j ):
     return max
 
 
+def toarray( tab ):
+    """Convert a list of list into a scipy array, filling with zero when values are missing"""
+    isize = len(tab)
+    jsize = len_max(tab)
+
+    a = scipy.zeros( (isize, jsize) )
+
+    for i in xrange(len(tab)):
+        for j in range(len(tab[i])):
+            a[i,j] = tab[i][j]
+
+    return a
+
+
+
 def printa( tab, transpose=False ):
     """Pretty print a 2D table"""
-    a = scipy.array(tab)
+
+    a = toarray(tab)
+
     if transpose:
         a = a.transpose()
 
@@ -559,7 +576,7 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
             print opts.function
             plabels = []
             for filepattern in filepatterns:
-                #print "======================================================================================="
+                #print "====================================================================="
                 #print filepattern
                 patterns = split_by_instance( [filepattern] )
                 result = []
@@ -570,9 +587,10 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
                 results.append( result )
                 plabels.append( filepattern )
               
-            arr = scipy.array( results )#.transpose()
+            #arr = scipy.array( results )#.transpose()
             print ' '.join( plabels )
-            printa( arr, transpose=True )
+#            printa( arr, transpose=True )
+            printa( results, transpose=True )
            
             if opts.plotbyinstance:
                 plot_line(
