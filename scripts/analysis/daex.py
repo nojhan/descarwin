@@ -529,7 +529,6 @@ def split_by_instance( filenames, nb_instances = 31, ins_mark = "p[0-9]{2}" ):
 
             ins_counter = int( re.sub("[^0-9]", '', prev_ins ) )
 
-
             marks = re.findall( ins_mark, fname ) 
             if len(marks) == 0:
                 raise "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname )
@@ -714,7 +713,7 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
         if len( filepatterns ) == 1:
             patterns = split_by_instance( filepatterns, opts.nbinstances, opts.instancemarker )
             results = process_commands( opts, patterns )
-            printa(results,transpose=False)
+            printa2(results,transpose=False)
         else:
             print opts.function
             plabels = []
