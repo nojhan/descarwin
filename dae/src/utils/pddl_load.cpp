@@ -50,10 +50,10 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
 	// -yashp now has one argument (for multicore)
         cpt_call.push_back( "64" ); 
 
-	// précision pour la planif temporelle. Pour IPC, 0.0001 devrait aller,
+	// précision pour la planif temporelle. Pour IPC : 0.01 (cf. mail Carlos)
 	// à vérifier.
 	cpt_call.push_back( "-K" ); 
-	cpt_call.push_back( "0.0001,0.0001" ); 
+	cpt_call.push_back( "0.01,0.01" ); 
 	
         // Enables h2-based fluent mutexes in yahsp (fluent-mutexes / fm / F)
 	cpt_call.push_back( "-fluent-mutexes" );
