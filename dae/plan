@@ -1,0 +1,2 @@
+./dae --domain=$1 --instance=$2 --plan-file=$3
+cp `ls -1 -v $3* | tail -n 1` $3
