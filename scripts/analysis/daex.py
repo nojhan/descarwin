@@ -357,12 +357,37 @@ def plot_line( tab, title="", labels=[], ylabel="", xlabel=""):
     ax = fig.add_subplot(111)
     
     for i in xrange(len(tab)):
-        ax.plot( tab[i], '*-', label=labels[i] )
+        ax.plot( tab[i], 'o-', label=labels[i] )
 
     ax.legend()
     ax.set_title(title)
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
+
+    p.show()
+
+
+def plot_box( tab, title="", labels=[], ylabel="", xlabel=""):
+    import pylab as p
+    import numpy as np
+
+    fig = p.figure()
+    ax = fig.add_subplot(111)
+
+    for i in xrange(len(tab)):
+        for j in xrange(len(tab[i])):
+            if tab[i][j] == None:
+                tab[i][j] = []
+    
+    ax.boxplot( [x for l in zip(*tab) for x in l] )
+
+    ax.legend()
+    ax.set_title(title)
+    ax.set_ylabel(ylabel)
+    ax.set_xlabel(xlabel)
+
+#    xtickNames = p.setp(ax, xticklabels = labels * len(tab[0]) )
+#    p.setp(xtickNames, rotation=225, fontsize=8)
 
     p.show()
 
@@ -478,7 +503,7 @@ def compare( filenames, key, p_thresh = 0.95 ):
                 #print kruskal(ms[0], ms[1]) # FIXME error from scipy
     
    
-def split_by_instance( filenames ):
+def split_by_instance( filenames, nb_instances = 31, ins_mark = "p[0-9]{2}" ):
 
         fnames = []
         for pattern in filenames:
@@ -490,19 +515,25 @@ def split_by_instance( filenames ):
             sys.exit(1)
 
         fnames.sort()
-        finalnames = [[]] * 31 # FIXME hardcoded nb of instances
-        
-        ins_mark = "p[0-9]{2}"
-        prev_ins = re.findall( ins_mark, fnames[0] )[0]
+        finalnames = [[]] * nb_instances
+      
+        marks = re.findall( ins_mark, fnames[0] )
+        if len(marks) == 0:
+            raise "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname[0] )
+
+        prev_ins = marks[0]
         
         ins_files = [ fnames[0] ]
 
         for fname in fnames[1:]:
-            if not prev_ins:
-                print "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname )
 
             ins_counter = int( prev_ins.strip("p") )
-            cur_ins = re.findall( ins_mark, fname )[0]
+
+            marks = re.findall( ins_mark, fname ) 
+            if len(marks) == 0:
+                raise "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname )
+
+            cur_ins = marks[0]
         
             # if the same instance
             if cur_ins == prev_ins:
@@ -649,8 +680,20 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
     parser.add_option("-o", "--plotbyinstance", dest="plotbyinstance", action="store_true",
             help="plot several lines on the same graphics, when parsing by instance" )
 
+    parser.add_option("-B", "--boxplotbyinstance", dest="boxplotbyinstance", action="store_true",
+            help="plot several box plots on the same graphics, when parsing by instance" )
+
     parser.add_option("-c", "--compare", dest="compare", action="store_true",
             help="compare distributions" )
+
+    parser.add_option("-n", "--nbinstances", dest="nbinstances", 
+            action="store", type="int", default=31, metavar="NB",
+            help="number of instances to seek when splitting by instances" )
+
+    parser.add_option("-m", "--instancemarker", dest="instancemarker", 
+            action="store", type="str", default="p[0-9]{2}", metavar="REGEXP",
+            help="regexp marking the instance number in the files names" )
+
 
     av_funcs = [len,min,max,mean,median,std,skew,kurtosis,copy.copy]
     available_functions = {}
@@ -663,12 +706,12 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
     (opts, filepatterns) = parser.parse_args()
 
     results = []
-
+    
     # re-split data by instances
     # let this switch be the first, the commands using the "filepatterns"
     if opts.byinstance:
         if len( filepatterns ) == 1:
-            patterns = split_by_instance( filepatterns )
+            patterns = split_by_instance( filepatterns, opts.nbinstances, opts.instancemarker )
             results = process_commands( opts, patterns )
             printa(results,transpose=False)
         else:
@@ -677,7 +720,7 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
             for filepattern in filepatterns:
                 #print "====================================================================="
                 #print filepattern
-                patterns = split_by_instance( [filepattern] )
+                patterns = split_by_instance( [filepattern], opts.nbinstances, opts.instancemarker )
                 result = []
                 res = process_commands( opts, patterns )
                 for r in res:
@@ -690,13 +733,22 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
             printa2( results, transpose=True )
            
             if opts.plotbyinstance:
-                plot_line(
+                plot_line (
                         results,
                         title= common_characters( filepatterns ), 
                         labels = plabels,
                         ylabel = opts.function,
                         xlabel="instances"
                     )
+            elif opts.boxplotbyinstance:
+                plot_box (
+                        results,
+                        title= common_characters( filepatterns ), 
+                        labels = plabels,
+                        ylabel = opts.function,
+                        xlabel="instances"
+                    )
+
 
     else: # if not by instance
         results = process_commands( opts, filepatterns )
