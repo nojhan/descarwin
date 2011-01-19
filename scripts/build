@@ -1,0 +1,19 @@
+#!/bin/sh
+
+here=`pwd`
+
+cd $here/dae_yahsp/cpt/src/gdsl/
+./configure && make
+
+cd $here/dae_yahsp/cpt/src/
+make
+
+cd $here/dae_yahsp/dae
+cat install-dist.cmake | sed "s,<<PATH_TO_EO>>,$here/eo," > install.tmp
+cat install.tmp | sed "s,<<PATH_TO_CPT>>,$here/dae_yahsp/cpt," > install.cmake
+./make_ipc.sh
+
+cp ./ipc/dae $here
+
+cd $here
+
