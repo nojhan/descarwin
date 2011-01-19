@@ -11,7 +11,7 @@ SET(CPT_DIR "<<PATH_TO_CPT>>" CACHE PATH "CPT directory" FORCE)
 # automagically set parameters, do not edit
 
 SET(EO_SRC_DIR "${EO_DIR}/src" CACHE PATH "EO source directory" FORCE)
-SET(EO_BIN_DIR "${EO_DIR}/build" CACHE PATH "EO binary directory" FORCE)
+SET(EO_BIN_DIR "${EO_DIR}/release" CACHE PATH "EO binary directory" FORCE)
 
 
 SET(CPT_SRC_DIR "${CPT_DIR}" CACHE PATH "CPT source directory" FORCE)
