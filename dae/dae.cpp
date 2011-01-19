@@ -274,7 +274,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_mut" << proba_mut << std::endl;
 
     // Stopping criterions
-    unsigned int max_seconds = parser.createParam( (unsigned int)1800, "max-seconds", 
+    unsigned int max_seconds = parser.createParam( (unsigned int)0, "max-seconds", 
             "Maximum number of user seconds in CPU for the whole search, set it to 0 to deactivate (1800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 1800 seconds = 30 minutes
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
 
@@ -290,7 +290,7 @@ int main ( int argc, char* argv[] )
             "Maximum number of iterations", 'x', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxgens" << maxgens << std::endl;
 
-    unsigned int maxruns = parser.createParam( (unsigned int)1, "runs-max", 
+    unsigned int maxruns = parser.createParam( (unsigned int)0, "runs-max", 
             "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
