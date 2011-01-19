@@ -521,20 +521,21 @@ def split_by_instance( filenames, nb_instances = 31, ins_mark = "p[0-9]{2}" ):
         if len(marks) == 0:
             raise "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname[0] )
 
-        prev_ins = marks[0]
+        prev_ins = re.sub("[^0-9]", '', marks[0] )
         
         ins_files = [ fnames[0] ]
 
         for fname in fnames[1:]:
 
-            ins_counter = int( prev_ins.strip("p") )
+            ins_counter = int( re.sub("[^0-9]", '', prev_ins ) )
+
 
             marks = re.findall( ins_mark, fname ) 
             if len(marks) == 0:
                 raise "ERROR the following file name does not contains the instance marker (%s):\n%s" % ( ins_mark, fname )
 
             cur_ins = marks[0]
-        
+                    
             # if the same instance
             if cur_ins == prev_ins:
                 # adding this file to the current list
