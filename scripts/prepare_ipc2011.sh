@@ -7,8 +7,8 @@ today=`date --iso-8601`
 mkdir $today
 cd $today
 
-mkdir seq-sat-DAE_YAHSP
-cd seq-sat-DAE_YAHSP 
+mkdir seq-sat-dae_yahsp
+cd seq-sat-dae_yahsp 
 
 here=`pwd`
 
@@ -23,14 +23,15 @@ cd $here
 echo "archive current version of DAE/YAHSP"
 svn export $descarwin_trunk $here/dae_yahsp
 
-echo "copy the IPC build file"
+echo "copy the IPC build and plan file"
 cp $descarwin_trunk/scripts/build $here
+cp $descarwin_trunk/scripts/plan $here
 
 cd ..
 
 echo "duplicate seq to tempo"
-cp -r seq-sat-DAE_YAHSP tempo-sat-DAE_YAHSP
+cp -r seq-sat-dae_yahsp tempo-sat-dae_yahsp
 
 echo "archive everything"
-tar cjf dae_yahsp.tar.bz2 seq-sat-DAE_YAHSP tempo-sat-DAE_YAHSP
+tar cjf dae_yahsp.tar.bz2 seq-sat-dae_yahsp tempo-sat-dae_yahsp
 
