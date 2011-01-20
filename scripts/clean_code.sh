@@ -17,9 +17,14 @@ clean=clean.sh
 echo "" > $clean
 
 for ext in {h,cpp}; do
-    find . -name "*.ascii" -exec echo "sed -nf /home/nojhan/code/descarwin/trunk/scripts/remove_comments.sed {} > {}.nocom ; sed '/^\s*$/d' {}.nocom > {}.ok" \; >> $clean
+    find . -name "*.ascii" -exec echo "sed -nf ./remove_comments.sed {} > {}.nocom ; sed '/^\s*$/d' {}.nocom > {}.nocom.ok" \; >> $clean
 done
 
 bash ./clean.sh
+
+
+for f in `find . -name "*.ok" -exec echo {} \; | sed "s/.ascii.nocom.ok//g"` ; do
+    cp ${f}.ascii.nocom.ok ${f}
+done
 
 
