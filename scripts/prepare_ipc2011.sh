@@ -21,13 +21,18 @@ unzip -qq eo_${today}.zip
 cd $here
 
 echo "archive current version of DAE/YAHSP"
-svn export $descarwin_trunk $here/dae_yahsp
+svn export $descarwin_trunk $here/daeyahsp
+
+echo "clean DAE code comments"
+cd ..
+cp $descarwin_trunk/remove_comments.sed .
+$descarwin_trunk/scripts/clean_code.sh $here/daeyahsp/dae
 
 echo "copy the IPC build and plan file"
 cp $descarwin_trunk/scripts/build $here
 cp $descarwin_trunk/scripts/plan $here
 
-cd ..
+cd $here/..
 
 echo "duplicate seq to tempo"
 cp -r seq-sat-dae_yahsp tempo-sat-dae_yahsp

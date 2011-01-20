@@ -27,4 +27,5 @@ for f in `find . -name "*.ok" -exec echo {} \; | sed "s/.ascii.nocom.ok//g"` ; d
     cp ${f}.ascii.nocom.ok ${f}
 done
 
+find . -name "*.ascii*" -exec rm -f {} \;
 

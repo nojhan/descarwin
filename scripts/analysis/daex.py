@@ -657,7 +657,7 @@ Comparing the minima of several runs for 3 algorithms, by instance and plot a gr
     daex.py "algo1*elevators*.soln" "algo2*elevators*.soln" "algo3*elevators*.soln" --byinstance --function=min --plotbyinstance 
 
 Comparing the distributions of several runs for 3 algorithms, by instance and show a box plot (WARNING: boxes are not differenciated, read them by groups):
-    daex.py "algo1*elevators*.soln" "algo2*elevators*.soln" --byinstance --function=copy --boxplotbyinstance    
+    daex.py "algo1*elevators*.soln" "algo2*elevators*.soln" --byinstance --function=copy --boxplotbyinstance
 """)
 
     parser.add_option("-s", "--seq", dest="seq", action="store_true",
