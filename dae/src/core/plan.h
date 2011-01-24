@@ -77,6 +77,8 @@ public:
 
         out << buffer;
 
+        free( buffer );
+
         return out.str();
     }
 
