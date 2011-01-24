@@ -218,6 +218,12 @@ pddlLoad::pddlLoad(
     compute_chrono_partition();
 }
 
+pddlLoad::~pddlLoad()
+{
+    for( unsigned int i=0; i<_atoms.size(); ++i) {
+        delete _atoms[i];
+    }
+}
 
 } // namespace daex
 

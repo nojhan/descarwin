@@ -77,6 +77,9 @@ public:
     //! Parse the PDDL file, instanciate corresponding atoms in a vector and compute the corresponding chronological partition
     pddlLoad( std::string domain, std::string problem, std::string solver = SOLVER_YAHSP, unsigned int heuristic_start_times = HEURISTIC_H1, /*bool is_sequential = false,*/ std::vector<std::string> solver_args = std::vector<std::string>());
 
+
+    ~pddlLoad();
+
     //! Use CPT to parse the PDDL file passed to the constructor, and convert the fluents list to Atom instances in a vector member
     void load_pddl( std::string solver = SOLVER_YAHSP, unsigned int heuristic_start_times = HEURISTIC_H1, /*bool is_sequential = false,*/ std::vector<std::string> solver_args = std::vector<std::string>() );
 
