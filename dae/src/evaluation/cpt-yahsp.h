@@ -80,12 +80,10 @@ protected:
 
     /*virtual*/ void pre_call( daex::Decomposition & decompo ) 
     {
-        _timer_eval.restart();
     }
 
     /*virtual*/ void post_call( daex::Decomposition & decompo )
     {
-        decompo.plan().time_eval( _timer_eval.get() );
         decompo.plan().search_steps( _B );
     }
 
@@ -143,9 +141,6 @@ protected:
     unsigned int _B;
 
 protected:
-
-    PosixTimer _timer_eval;
-    PosixTimer _timer_subsolver;
 
     bool _sequential;
 

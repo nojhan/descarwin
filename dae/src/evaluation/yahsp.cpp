@@ -223,7 +223,7 @@ void daeYahspEval::compress( daex::Decomposition & decompo )
 #endif
 
         // sauvegarde le plan compressé global pour DAEx
-	decompo.plan_global( daex::Plan( *solution_plan ) );
+	decompo.plan_global( daex::Plan( solution_plan ) );
 
 	decompo.last_subplan().search_steps( _B );
 

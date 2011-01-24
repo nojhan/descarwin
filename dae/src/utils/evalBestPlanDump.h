@@ -140,15 +140,6 @@ public:
 
 protected:
     virtual void call( Decomposition & eo );
-    /*{
-        std::cout << "*************** " << _metadata << std::endl;
-        printf("********************");
-
-        if( eo.plan().yahsp_plan().makespan < _best ) {
-            _best = eo.plan().yahsp_plan().makespan;
-            dump( eo );
-        } // if better
-    }*/
 };
 
 
@@ -175,14 +166,7 @@ public:
     }
 
 protected:
-    virtual void call( Decomposition & eo )
-    {
-        // Note: in EO, maximizing by default, later overloaded for minimizing
-        if( eo.fitness() > _best ) {
-            _best = eo.fitness();
-            dump( eo );
-        } // if better
-    }
+    virtual void call( Decomposition & eo );
 };
 
 } // namespace daex

@@ -4,7 +4,7 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
+#include <sstream>
 #include <cstdlib>
 
 //extern "C" {
@@ -19,13 +19,11 @@ class Plan
 {
 protected:
 
-    SolutionPlan _yahsp_plan;
+    //! The makespan/cost of the plan, as extracted from the YAHSP SolutionPlan * pointer in the constructor
+    TimeVal _makespan;
 
-    //! Temps CPU pris pour la dernière évaluation
-    double _time_eval;
-
-    //! Temps CPU pris par le sous-solveur lui-meme
-    double _time_subsolver;
+    //! The string representation of the plan
+    std::string _plan_rep;
 
     //! Nombre d'étapes de recherche
     /* Nombre de backtracks si solveur type CPT,
@@ -37,63 +35,57 @@ protected:
     bool _is_valid;
    
 public:
-//    Plan( SolutionPlan* plan, unsigned int search_steps, unsigned int search_time, unsigned int total_time ) : 
-    //Plan( SolutionPlan plan ) : _yahsp_plan(plan), _search_steps(0), _time_subsolver(0), _time_eval(0) {}
 
-    Plan( SolutionPlan plan ) : _yahsp_plan(plan), _is_valid(true), _search_steps(0), _time_subsolver(0), _time_eval(0) {}
+    //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
+    Plan( SolutionPlan * p_plan ) : _plan_rep("Plan representation not extracted"), _makespan(p_plan->makespan), _is_valid(true), _search_steps(0) 
+    {
+        // get the plan representation
+        _plan_rep = plan_to_str( p_plan );
+    }
     
-    Plan() : _is_valid(false), _search_steps(0), _time_subsolver(0), _time_eval(0) {}
-
-      // SEG FAULT !!! FIXME
-      /*      ~Plan(){
-	plan_free( &_yahsp_plan );
-      }
-      */
-    SolutionPlan yahsp_plan() const { return _yahsp_plan; }
-    SolutionPlan* p_yahsp_plan() { return &_yahsp_plan; }
-
-    void time_eval( double time ) { _time_eval = time; }
-    double time_eval() const { return _time_eval; }
-
-    void time_subsolver( double time ) { _time_subsolver = time; }
-    double time_subsolver() const { return _time_subsolver; }
+    //! Construct a invalid plan from scratch
+    /*! @TODO INT_MAX may not be the best choice here, FIXME
+     */
+    Plan() : _plan_rep("No plan"), _makespan( INT_MAX ), _is_valid(false), _search_steps(0) {}
 
     void search_steps( unsigned int steps ) { _search_steps = steps; }
     unsigned int search_steps() const { return _search_steps; }
 
+    TimeVal makespan() const { return _makespan; }
 
+    //! Print a SolutionPlan in a string using YAHSP's print_plan_ipc function
+    std::string plan_to_str( SolutionPlan * p_plan )
+    {        
+        std::ostringstream out;
+
+        char* buffer;
+        size_t buffer_size;
+
+        FILE* stream = open_memstream( & buffer, & buffer_size );
+
+        if( stream == NULL ) {
+            std::ostringstream msg;
+            msg << "Cannot open memstream for printing Plan (" << p_plan << ")";
+            throw std::runtime_error( msg.str() );
+        }
+
+        // CPT function @ plan.c:66
+        // see also print_plan @ plan.c:32
+        print_plan_ipc( stream, p_plan, 0.0 ); // last arg is the time taken FIXME ?
+
+        fclose( stream );
+
+        out << buffer;
+
+        return out.str();
+    }
+
+
+    //! Print the string rep on a ostream
     friend std::ostream& operator<<( std::ostream& out, Plan & plan )
     {
-        
-        if( ! plan._is_valid )
-        {
-            out << "No plan found (decomposition is unfeasible)";
-
-        } else { // if plan._is_valid
-        
-            char* buffer;
-            size_t buffer_size;
-
-            FILE* stream = open_memstream( & buffer, & buffer_size );
-
-            if( stream == NULL ) {
-                std::ostringstream msg;
-                msg << "Cannot open memstream for printing Plan (" << plan << ")";
-                throw std::runtime_error( msg.str() );
-            }
-
-            // CPT function @ plan.c:66
-            // see also print_plan @ plan.c:32
-            print_plan_ipc( stream, plan.p_yahsp_plan(), plan.time_eval() );
-
-            fclose( stream );
-
-            out << buffer;
-
-        } // if !plan._is_valid
-
-        return out;
-    };
+        out << plan._plan_rep;
+    }
 };
 
 } // namespace daex

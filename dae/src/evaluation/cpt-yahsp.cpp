@@ -36,7 +36,7 @@ double daeCptYahspEval::fitness_feasible( daex::Decomposition & decompo )
 {
     // Pour travailler sur les valeurs affichables, on va partout ramener à la bonne valeur
     //unsigned int Q = solution_plan->makespan;
-  double Q = (double) solution_plan->makespan * pddl_domain->time_gcd / pddl_domain->time_lcm;
+  double Q = (double) decompo.plan().makespan() * pddl_domain->time_gcd / pddl_domain->time_lcm;
     assert( Q > 0 );
 
     //    std::cout << "SEQUENTIAL=" << this->_sequential;
