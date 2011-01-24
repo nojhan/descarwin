@@ -130,11 +130,16 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
 #endif
     if( return_code == NO_PLAN || return_code == GOALS_MUTEX ) {
 
-      //decompo.fitness( std::make_pair( fitness_unfeasible( decompo, _previous_state ), false ) );
-      //      std::cout << "stats.evaluated_nodes = " << stats.evaluated_nodes << std::endl;
-      //      eo::log << eo::logging << " FAIL: " << decompo << std::endl;
+        //decompo.fitness( std::make_pair( fitness_unfeasible( decompo, _previous_state ), false ) );
+        //      std::cout << "stats.evaluated_nodes = " << stats.evaluated_nodes << std::endl;
+        //      eo::log << eo::logging << " FAIL: " << decompo << std::endl;
 
-      step_recorder_fail();
+        step_recorder_fail();
+
+        // search has failed, free the invalid plan
+        if( solution_plan != NULL ) {
+            plan_free( solution_plan );
+        }
 
 #ifndef NDEBUG
         eo::log << eo::debug << "x";
@@ -163,15 +168,15 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
         // qui sera utilisée par yahsp lors de la compression
         // Note : yahsp_main écrase le prochain pointeur solution_plan avec 
         // une nouvelle allocation.
-	plans[plans_nb] = solution_plan;
-	plans_nb++;
+        plans[plans_nb] = solution_plan;
+        plans_nb++;
 
         // convertit et stocke les plans intermédiaires dans des structures propres à DAEx
-	//12.1        decompo.plans_sub_add( daex::Plan( *solution_plan ) );
-	decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mains on garde la structure notamment pour last_reached.
+        //12.1        decompo.plans_sub_add( daex::Plan( *solution_plan ) );
+        decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mains on garde la structure notamment pour last_reached.
 
         // timer à jour pour le dernier plan inséré
-	decompo.last_subplan().search_steps( _B );
+        decompo.last_subplan().search_steps( _B );
 
 #ifndef NDEBUG
         eo::log << eo::xdebug << "ok" << std::endl;
@@ -184,6 +189,9 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
         // dans la classe daeEvalYahsp, la fonction est vide
         step_recorder();
 
+        // the corresponding pointer is stored in plans, thus we do not free it
+        solution_plan = NULL;
+
 #ifndef NDEBUG
         eo::log << eo::xdebug << "ok" << std::endl;
 #endif
@@ -191,7 +199,7 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
     } else { // return_code != NO_PLAN && != GOALS_MUTEX && != PLAN_FOUND
         throw std::runtime_error( "Unkonwn error code from cpt_search" );
     }
-    solution_plan = NULL;
+
     return return_code;
 }
 
@@ -223,13 +231,11 @@ void daeYahspEval::compress( daex::Decomposition & decompo )
 #endif
 
         // sauvegarde le plan compressé global pour DAEx
-	decompo.plan_global( daex::Plan( solution_plan ) );
+        decompo.plan_global( daex::Plan( solution_plan ) );
 
-	decompo.last_subplan().search_steps( _B );
+        // NOTE: solution_plan is freed in free_yahsp_structures
 
-        // change la fitness
-        //decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
-
+        decompo.last_subplan().search_steps( _B );
 
 #ifndef NDEBUG
         eo::log << eo::xdebug << "ok" << std::endl;
@@ -273,20 +279,20 @@ void daeYahspEval::call( daex::Decomposition & decompo )
 
 
 #ifndef PAPERVERSION
-      // JACK the code does not even try to evaluate decompositions that are too long 
-      // FIXME what is the effect on variation operators that relies on last_reached?
-      if( decompo.size() > _l_max ) {
-	decompo.fitness( std::make_pair( fitness_unfeasible_too_long(), false ) );
-      } else 
+        // JACK the code does not even try to evaluate decompositions that are too long 
+        // FIXME what is the effect on variation operators that relies on last_reached?
+        if( decompo.size() > _l_max ) {
+            decompo.fitness( std::make_pair( fitness_unfeasible_too_long(), false ) );
+        } else 
 #endif
-	{
+	           {
 
 #ifndef NDEBUG
         eo::log << eo::xdebug << "malloc plans...";
         eo::log.flush();
 #endif
-	cpt_malloc( plans, decompo.size()+1 ); // +1 for the subplan between the last goal and the final state
-	plans_nb = 0;
+        cpt_malloc( plans, decompo.size()+1 ); // +1 for the subplan between the last goal and the final state
+        plans_nb = 0;
 
 #ifndef NDEBUG
         eo::log << eo::xdebug << "ok" << std::endl;
@@ -334,15 +340,17 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                 i++;
             }
             assert( i == _intermediate_goal_state_nb );
-                             // search a plan towards the current goal
+            
+            // search a plan towards the current goal
             code = solve_next( decompo, _intermediate_goal_state, _intermediate_goal_state_nb  );
+
             if( code != PLAN_FOUND ) {
 #ifdef PAPERVERSION
-	      decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
+              decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
 #else
-	      decompo.fitness( std::make_pair( fitness_unfeasible_intermediate(), false ) );
+              decompo.fitness( std::make_pair( fitness_unfeasible_intermediate(), false ) );
 #endif 
-	      break;
+              break;
             }
         } // for igoal in decompo
         // here we have reached the last goal of the decomposition, it remains searching towards the ultimate goal
@@ -351,19 +359,19 @@ void daeYahspEval::call( daex::Decomposition & decompo )
             b_max( _b_max_last );
             unsigned int code = solve_next( decompo, goal_state, goal_state_nb  );
             if( code == PLAN_FOUND ) {
-	      compress( decompo );
-	      decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
+                compress( decompo );
+                decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
 #ifndef NDEBUG
                 eo::log << eo::debug << "*";
                 eo::log.flush();
 #endif
-	    } else {
+            } else {
 #ifdef PAPERVERSION
-	      decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
+                decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
 #else
-	      decompo.fitness( std::make_pair( fitness_unfeasible_final(), false ) );
+                decompo.fitness( std::make_pair( fitness_unfeasible_final(), false ) );
 #endif 
-	    } // if PLAN_FOUND for last goal
+            } // if PLAN_FOUND for last goal
         } // if PLAN_FOUND
       } // if size > _l_max
     } // if !decompo.invalid
@@ -375,7 +383,6 @@ void daeYahspEval::call( daex::Decomposition & decompo )
  **************************************************************************************************************/
 void daeYahspEval::free_yahsp_structures()
 {
-
 #ifndef NDEBUG
     eo::log << eo::xdebug << "\t\tfree plans...";
     eo::log.flush();
@@ -389,14 +396,13 @@ void daeYahspEval::free_yahsp_structures()
     
     cpt_free( plans );
 
+    if( solution_plan != NULL ) {
+        plan_free( solution_plan );
+    }
+
 #ifndef NDEBUG
     eo::log << eo::xdebug << "ok" << std::endl;
 #endif
-
-    // in cpt_search, yahsp free solution_plan if it is allocated. 
-    // Thus, we set it to NULL, so has to avoid a free 
-    // and keep the pointer within the Decompostion>Plan class
-    solution_plan = NULL;
 }
 
 /**************************************************************************************************************
