@@ -19,7 +19,7 @@ public:
             double proba_change, /*double proba_add, */
             unsigned int maxtry_search_candidate = 0, unsigned int maxtry_search_mutex = 0
         ) 
-      : _times(times), _proba_change(proba_change), /*_proba_add(proba_add), */ _maxtry_search_candidate(maxtry_search_candidate), _maxtry_search_mutex(maxtry_search_mutex)
+      :_proba_change(proba_change), /*_proba_add(proba_add), */ _times(times), _maxtry_search_candidate(maxtry_search_candidate), _maxtry_search_mutex(maxtry_search_mutex)
     {}
 
     bool operator()( Decomposition & decompo )
@@ -121,7 +121,7 @@ public:
  private:
     double _proba_change;
     
-    double _proba_add;
+    //    double _proba_add;
 
     const ChronoPartition & _times;
 

@@ -316,9 +316,9 @@ void daeYahspEval::call( daex::Decomposition & decompo )
 
 #ifndef NDEBUG
         eo::log << eo::xdebug << "for each goal:" << std::endl;
-#endif
         unsigned int goal_count = 0; // only use for xdebug messages
-        unsigned int code; // return code of cpt_search
+#endif
+        unsigned int code = 0; // return code of cpt_search
         b_max( _b_max_in ); // set the generic b_max 
 
         // parcours les goals de la décomposition
@@ -415,13 +415,13 @@ void daeYahspEvalInit::call( daex::Decomposition & decompo )
 #ifndef NDEBUG
     eo::log << eo::logging << std::endl << "init decompo nodes nb: ";
     eo::log.flush();
+    int prev = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
 #endif
 
-    int prev = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
     daeYahspEval::call( decompo );
-    int next = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
 
 #ifndef NDEBUG
+    int next = std::accumulate( node_numbers.begin(), node_numbers.end(), 0 );
     eo::log << eo::logging << "     (" << next - prev << ")";
 #endif
 }

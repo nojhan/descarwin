@@ -43,7 +43,6 @@ bool operator!=( const PDDLTerm & term, const daex::pddlObject & object );
 class daeCptYahspEval : public eoEvalFunc<daex::Decomposition>
 {
 public:
-     
   daeCptYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e60, bool sequential = false ) : _l_max( l_max_ ), _b_max_in(b_max_in),_b_max_last( b_max_last),_unknown_parameter(fitness_weight),_fitness_penalty( fitness_penalty ),_sequential( sequential )
     {
         // hors ligne, car l'accesseur en profite pour modifier opt.max_backtracks
@@ -63,7 +62,6 @@ public:
         opt.max_backtracks = b;
     }
 
-
 public:
     //! Proxy EO avec appels aux timers
     /*virtual*/ void operator() ( daex::Decomposition & decompo ) 
@@ -78,9 +76,8 @@ public:
 
 protected:
 
-    /*virtual*/ void pre_call( daex::Decomposition & decompo ) 
-    {
-    }
+    /*virtual*/ void pre_call( daex::Decomposition & /*decompo*/ ) 
+    {}
 
     /*virtual*/ void post_call( daex::Decomposition & decompo )
     {
@@ -96,11 +93,9 @@ protected:
      */
     unsigned int distance_to_goal_Hamming( BitArray state );
 
-
     //! Fitness des décompositions dont on arrive à construire le plan
     //! Note: the call to decomposition.fitness(...) automatically validate the fitness
     double fitness_feasible( daex::Decomposition & decompo );
-
 
     //! Fitness des décompositions dont on arrive pas à construire le plan
     //! Note: the call to decomposition.fitness(...) automatically validate the fitness
@@ -111,11 +106,6 @@ protected:
     double fitness_unfeasible_final( );
 
 protected:
-    //! Paramètre pondérant le compteur k lors du calcul de fitness quand le plan n'est pas trouvé
-    // TODO qualité de la pondération ? pourquoi ce paramètre et pourquoi fixé à 10 ?
-    double _unknown_parameter;
-
-    double _fitness_penalty;
 
     //! Taille maximum d'une décomposition
     unsigned int _l_max;
@@ -129,6 +119,16 @@ protected:
     //! b_max for the very last search towards the end goal
     unsigned int _b_max_last;
 
+    //! Paramètre pondérant le compteur k lors du calcul de fitness quand le plan n'est pas trouvé
+    // TODO qualité de la pondération ? pourquoi ce paramètre et pourquoi fixé à 10 ?
+    double _unknown_parameter;
+
+    double _fitness_penalty;
+
+protected:
+
+    bool _sequential;
+
 protected:
 
     //! compteur de goals
@@ -140,13 +140,7 @@ protected:
     //! compteur des tentatives de recherche
     unsigned int _B;
 
-protected:
-
-    bool _sequential;
-
-
 }; // class daeCptYahspEval
-
 
 #endif // __DAE_BIND_YAHSP_CPT_H__
 

@@ -32,17 +32,18 @@
 bool testDirRes(std::string _dirName, bool _erase);
 // MODIFS MS END
 
-
+/*
+#ifndef NDEBUG
 inline void LOG_LOCATION( eo::Levels level )
 {
-#ifndef NDEBUG
     eo::log << level << "in " << __FILE__ << ":" << __LINE__ << " " << __PRETTY_FUNCTION__ << std::endl; 
-#endif
 }
-
+#endif
+*/
 
 void print_results( eoPop<daex::Decomposition> pop, time_t time_start )
 {
+    (void) time_start;
 #ifndef NDEBUG
     struct rusage usage;
     getrusage(RUSAGE_SELF,&usage);
@@ -749,7 +750,7 @@ int main ( int argc, char* argv[] )
 
     try { 
 
-        while( 1 ) {
+        while( true ) {
 #ifndef NDEBUG
             eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
 

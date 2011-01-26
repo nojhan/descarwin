@@ -29,9 +29,8 @@ class Atom
 {
 public:
     //! Constructeur prédicats + objets + date au plus tot + pointeur vers structure interne YAHSP
-    Atom( TimeVal start_time, Fluent* fluent ) :
-        _earliest_start_time(start_time), _fluent(fluent)
-    { }
+    Atom( TimeVal start_time, Fluent* fluent ) : _fluent(fluent), _earliest_start_time(start_time)
+    {}
  
     //! Accesseurs
     TimeVal                     earliest_start_time() const { return _earliest_start_time; }

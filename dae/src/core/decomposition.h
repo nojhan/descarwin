@@ -70,7 +70,7 @@ public:
     }
 
     //! If one has reached no goal or the first one, return 0, else return the index of the goal, if the end state has been reached, return the index of the last goal in the decomposition
-    unsigned int last_reached_safe() const
+    /*    unsigned int last_reached_safe() const
     {
         int last_reached = static_cast<int>( subplans_size() ) - 1;
 
@@ -82,6 +82,14 @@ public:
         }
 
         return static_cast<unsigned int>( last_reached );
+    }
+    */
+
+    unsigned int last_reached_safe() const
+    {
+      if ( subplans_size() == 0 ) return 0;
+      if ( subplans_size() > this->size()) return this->size() - 1;
+      return subplans_size() - 1 ;
     }
 
     /*

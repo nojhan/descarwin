@@ -22,9 +22,6 @@ protected:
     //! The makespan/cost of the plan, as extracted from the YAHSP SolutionPlan * pointer in the constructor
     TimeVal _makespan;
 
-    //! The string representation of the plan
-    std::string _plan_rep;
-
     //! Nombre d'étapes de recherche
     /* Nombre de backtracks si solveur type CPT,
      * nombre d'itérations si solveur type YAHSP.
@@ -33,20 +30,23 @@ protected:
 
     //! True if the plan is correctly initialized and contains a SolutionPlan
     bool _is_valid;
-   
+
+    //! The string representation of the plan
+    std::string _plan_rep;
+
 public:
 
     //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
-    Plan( SolutionPlan * p_plan ) : _plan_rep("Plan representation not extracted"), _makespan(p_plan->makespan), _is_valid(true), _search_steps(0) 
-    {
-        // get the plan representation
+    Plan( SolutionPlan * p_plan ) : _makespan(p_plan->makespan), _search_steps(0), _is_valid(true) 
+      {   // get the plan representation
         _plan_rep = plan_to_str( p_plan );
-    }
+      }
     
     //! Construct a invalid plan from scratch
     /*! @TODO INT_MAX may not be the best choice here, FIXME
      */
-    Plan() : _plan_rep("No plan"), _makespan( INT_MAX ), _is_valid(false), _search_steps(0) {}
+      Plan() : _makespan( INT_MAX ), _search_steps(0), _is_valid(false),_plan_rep("No plan")
+	{}
 
     void search_steps( unsigned int steps ) { _search_steps = steps; }
     unsigned int search_steps() const { return _search_steps; }
@@ -87,6 +87,7 @@ public:
     friend std::ostream& operator<<( std::ostream& out, Plan & plan )
     {
         out << plan._plan_rep;
+	return out;
     }
 };
 

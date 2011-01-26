@@ -61,15 +61,13 @@ protected:
     // that have been used during call
     void free_yahsp_structures();
 
+    //! État à chaque itération
+    BitArray _previous_state;
 
     // init_state et goal_state sont des variables globales définies dans globs.h
     // pointeur sur un tableau de Fluent CPT
     Fluent * * _intermediate_goal_state;
     unsigned int _intermediate_goal_state_nb;
-			
-
-    //! État à chaque itération
-    BitArray _previous_state;
 };
 
 

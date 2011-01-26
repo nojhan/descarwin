@@ -32,11 +32,8 @@ public:
             unsigned int file_count = 0,
             std::string metadata = ""
     )
-        : _func(func), _filename(afilename),_best(worst), _sep(sep),
-          _single_file(single_file), _file_count(file_count), _metadata(metadata)
-    {
-    }
-
+        : _func(func), _filename(afilename), _single_file(single_file), _file_count(file_count), _sep(sep), _metadata(metadata), _best(worst)
+    {}
 
     void dump( Decomposition & eo )
     {
@@ -48,7 +45,8 @@ public:
          } else {
             std::ostringstream afilename;
             afilename << _filename << _sep << _file_count;
-            _of.open( afilename.str().c_str(), std::ios_base::out | std::ios_base::trunc );
+	    //            _of.open( afilename.str().c_str(), std::ios_base::out | std::ios_base::trunc ); //  valeurs par défaut.
+            _of.open( afilename.str().c_str());
          }
 
         // BUG 
@@ -65,7 +63,8 @@ public:
 
         // here, in release mode, we assume that the file could be opened
         // thus, we avoid a supplementary test in this costly evaluator
-        _of << eo.plan() << std::endl;
+	_of << eo.plan() << std::endl;
+	
         _of.close();
 
         _file_count++;
@@ -106,13 +105,13 @@ protected:
 
     eoEvalFunc<Decomposition>& _func;
     std::string _filename;
-    std::ofstream _of;
     bool _single_file;
     unsigned int _file_count;
     std::string _sep;
     std::string _metadata;
-    
     T _best;
+    std::ofstream _of;
+
 }; // class evalBestPlanDump
 
 

@@ -26,6 +26,7 @@ public:
     friend std::ostream& operator<<( std::ostream& out, const pddlType & type )
     {
         out << type._name;
+	return out;
     }
 };
 
@@ -58,6 +59,7 @@ public:
     friend std::ostream& operator<<( std::ostream& out, const pddlObject & obj )
     {
         out << obj._value;
+	return out;
     }
 };
 
@@ -83,6 +85,7 @@ public:
     {
         // _predicate
         out << pred._name;
+	return out;
     }
 };
 
