@@ -24,14 +24,13 @@ public:
     void l_max( unsigned int l ) { _l_max = l; }
     unsigned int l_max() const { return _l_max; }
 
-
 protected:
-    // TODO faire des tests pour vérifier si doit etre à 0 ou à 1 par défaut
+    const ChronoPartition & _times;
+
+   // TODO faire des tests pour vérifier si doit etre à 0 ou à 1 par défaut
     const unsigned int _min_nb;
 
     const unsigned int _l_max_init_coef;
-
-    const ChronoPartition & _times;
 
     //! Taille maximale d'une décomposition
     unsigned int _l_max;
