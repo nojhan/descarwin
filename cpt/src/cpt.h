@@ -3,7 +3,7 @@
  *
  * File : cpt.h
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 
@@ -92,8 +92,6 @@ struct TimeStruct {
 
 #define maxi(a, b) ({ typeof(a) _x = (a); typeof(b) _y = (b); (_x > _y ? _x : _y); })
 #define mini(a, b) ({ typeof(a) _x = (a); typeof(b) _y = (b); (_x < _y ? _x : _y); })
-/* #define maximize(a, b) NEST( typeof(b) _y = (b); if ((a) < _y) (a) = _y; ) */
-/* #define minimize(a, b) NEST( typeof(b) _y = (b); if ((a) > _y) (a) = _y; ) */
 #define maximize(a, b) NEST( typeof(&a) _x = (&a); typeof(b) _y = (b); if (*_x < _y) *_x = _y; )
 #define minimize(a, b) NEST( typeof(&a) _x = (&a); typeof(b) _y = (b); if (*_x > _y) *_x = _y; )
 
@@ -160,9 +158,7 @@ typedef unsigned long *BitArray;
 #define EFORCOUPLE EFOR; EFOR
 
 
-#define mpz_get_timeval(n) ({ char *s = mpz_get_str(NULL, 10, n); \
-      if (strlen(s) > 19) exit(66);				  \
-      TimeVal res = atoll(s); free(s); res; })
+#define mpz_get_timeval(n) ({ char *s = mpz_get_str(NULL, 10, n); TimeVal res = atoll(s); free(s); res; })
 
 #endif /* CPT_H */
 

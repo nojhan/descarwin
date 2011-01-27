@@ -3,7 +3,7 @@
  *
  * File : plan.c
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 
@@ -13,6 +13,7 @@
 #include "globs.h"
 #include "propagations.h"
 #include "plan.h"
+#include "comparison.h"
 #include "trace_planner.h"
 #ifdef RESOURCES
 #include "resources.h"
@@ -95,8 +96,10 @@ int precedes_in_plan(const void *s1, const void *s2)
 {
   Step *a = *((Step **) s1);
   Step *b = *((Step **) s2);
-  TimeVal diff = a->init - b->init;
-  return diff == 0 ? 0 : diff < 0 ? -1 : 1;
+  LESS(a->init, b->init);
+  LESS(duration(a->action), duration(b->action));
+  LESS(a->action->id, b->action->id);
+  return Equal;
 }
 
 SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
@@ -121,6 +124,7 @@ SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
       maximize(plan->makespan,  first_start(a) + (opt.pddl21 ? a->rdur.t : duration(a)));
     }
   } EFOR;
+  if (opt.sequential && pddl_domain->action_costs) plan->makespan = total_plan_cost;
   //plan->makespan = first_start(end_action) - (opt.pddl21 ? pddl_domain->precision.t : 0);
   qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);
 

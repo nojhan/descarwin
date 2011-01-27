@@ -3,7 +3,7 @@
  *
  * File : parser.lex
  *
- * Copyright (C) 2005, 2006  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005, 2006  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 %option prefix="pddl_" outfile="parser.yy.c" case-insensitive never-interactive noyywrap nounput

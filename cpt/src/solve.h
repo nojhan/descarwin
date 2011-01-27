@@ -3,7 +3,7 @@
  *
  * File : solve.h
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 

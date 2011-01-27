@@ -1,9 +1,9 @@
 /*
  * CPT - a Constraint Programming Temporal planner
  *
- * File : yahsp.c
+ * File : yahsp-mt.c
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 #include "cpt.h"
@@ -89,32 +89,16 @@ static long nodes_limits_nb = 6;
 #define get_finit(f) finit[(f)->id]
 #define set_finit(f, t) finit[(f)->id] = t
 
-#undef preferred
-#define preferred(comp, ties) ({ Comparison test = comp; test == Worse ? false : (!opt.random || omp_get_thread_num() == 2 || omp_get_thread_num() == 3) ? test == Better : test == Better ? (ties = 1) : rand() % ++ties == 0; })
-
 #undef check_allocation
 #define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res) && opt.dae && ({ gdsl_rbtree_flush(heuristics); !(ptr = (typeof(ptr)) res); })) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
 
 
 #ifdef DAE
 
-/*
 #define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
 //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
-#define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
-//#define INCCOST(cost, action) (cost += duration(action) + 1)
-#define NODE_GVALUE(node) node->length
-#define NODE_HVALUE(node) get_ainit(end_action)
-#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
-*/
-
-#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
-//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
-#define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0))
-//#define INCCOST(cost, action) (cost += (duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm)*10000+1 + (pddl_domain->action_costs ? 1 : 0))
-//#define INCCOST(cost, action) (cost += duration(action) + 1)
-//#define INCCOST(cost, action) (cost++)
-
+//#define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0))
+#define INCCOST(cost, action) (cost += duration(action) + 1)
 #define NODE_GVALUE(node) node->length
 #define NODE_HVALUE(node) get_ainit(end_action)
 //#define NODE_HVALUE(node) relaxed_plan_nb
@@ -123,13 +107,13 @@ static long nodes_limits_nb = 6;
 
 #else
 
-//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
-#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
+#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
+//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
 //#define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
 #define INCCOST(cost, action) (cost++)
 #define NODE_GVALUE(node) node->length
-//#define NODE_HVALUE(node) get_ainit(end_action)
-#define NODE_HVALUE(node) relaxed_plan_nb
+#define NODE_HVALUE(node) get_ainit(end_action)
+//#define NODE_HVALUE(node) relaxed_plan_nb
 #define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * 3)
 
 #endif
@@ -189,7 +173,7 @@ static Node *open_list_insert(Node *node)
 }
 
 static Node *closed_list_insert(Node *node)
-{
+{ 
   int gdsl_return;
   ulong i;
   for (i = 0; i < (ulong) (fluents_nb -1) / __WORDSIZE + 1; i++) 

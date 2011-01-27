@@ -3,7 +3,7 @@
  *
  * File : globs.h
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 
@@ -24,6 +24,7 @@ EVECTOR(Causal *, active_causals);
 EVECTOR(Resource *, resources);
 #endif
 extern long total_actions_nb;
+extern TimeVal total_plan_cost;
 
 extern Action *start_action;
 extern Action *end_action;

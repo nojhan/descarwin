@@ -1,9 +1,9 @@
 /*
  * CPT - a Constraint Programming Temporal planner
  *
- * File : yahsp.c
+ * File : yahsp-seq.c
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 #include "cpt.h"
@@ -383,6 +383,7 @@ static Node *apply_relaxed_plan(Node *node)
       if (b == NULL || b == a || b == end_action) continue;
       FOR(f, a->add) {
 #ifdef DAE
+	// voluuntary bug!!
 	if (!bitarray_get(node->state, f) && consumes(b, f)) {
 #else
 	if (!bitarray_get(son->state, f) && consumes(b, f)) {

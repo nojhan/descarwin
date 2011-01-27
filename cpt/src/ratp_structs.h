@@ -3,7 +3,7 @@
  *
  * File : ratp_struct.h
  *
- * Copyright (C) 2005-2009, 2007  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011, 2007  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 

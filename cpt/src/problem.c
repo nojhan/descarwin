@@ -3,7 +3,7 @@
  *
  * File : problem.c
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 
@@ -353,7 +353,7 @@ static void create_structures(void)
 	FOR(a2, f->consumers) { set_amutex(a, a2); } EFOR;
 	FOR(a2, f->producers) { set_amutex(a, a2); } EFOR;
       } EFOR;
-      if (0&&opt.pddl21) {
+      if (opt.pddl21) {
 	FORPAIR(a1, a2, f->producers) { if (a1 != a2) set_amutex(a1, a2); } EFORPAIR;
 	FORPAIR(a1, a2, f->deleters) { if (a1 != a2) set_amutex(a1, a2); } EFORPAIR;
       }

@@ -3,7 +3,7 @@
  *
  * File : heuristics.c
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 
@@ -22,7 +22,7 @@
 
 double ch2(Action *a, Action *b);
 
-#define wdeg(x) ((0+x->origin->weight) / (double) (1 + last_start(x) - first_start(x)))
+#define wdeg(x) ((x->origin->weight) / (double) (1 + last_start(x) - first_start(x)))
 
 //#define wdeg2(c) ((0+c->origin->weight) / (double) (1 + get_nbprods(c)))
 #define wdeg2(c) wdeg(c)

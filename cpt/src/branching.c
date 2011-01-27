@@ -3,7 +3,7 @@
  *
  * File : branching.c
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 
@@ -213,17 +213,6 @@ static void propagate_conflict_choice(Choice *choice, bool first)
   else order_before_ca(c, a);
 }
 
-
-/* static void propagate_support_choice(Choice *choice, bool first) */
-/* { */
-/*   Causal *c = choice_causal(choice); */
-/*   Action *a = choice_action(choice); */
-
-/*   trace_proc(support_choice, c, a, choice->direction, first); */
-/*   if (first == choice->direction) set_producer(c, a); */
-/*   else rem_producer(c, a); */
-/* } */
-
 static void propagate_support_choice(Choice *choice, bool first)
 {
   Causal *c = choice_causal(choice);
@@ -288,9 +277,10 @@ static bool supports_first(Choice *c)
 
 static bool mutex_first(Choice *c)
 {
-  //return (choose_mutex(c) || /* choose_conflict(c) ||  */choose_support(c));
   return (choose_mutex(c) || choose_conflict(c) || choose_support(c));
 }
+
+TimeVal best_total_plan_cost = MAXTIME;
 
 void search(void)
 {
@@ -306,5 +296,5 @@ void search(void)
   if (make_choice(&c)) {
     c.propagate(&c, new_world(true));
     search();
-  }
+  } 
 }

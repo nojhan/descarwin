@@ -3,7 +3,7 @@
  *
  * File : parser.y
  *
- * Copyright (C) 2005, 2006  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005, 2006  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 %{

@@ -3,7 +3,7 @@
  *
  * File : propagations.c
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 
@@ -191,7 +191,14 @@ void use_action(Action *a)
 	else if (precedes(a, a1)) protect(a, a1);
       } EFOR;
     }
-    if (opt.sequential && active_actions_nb - 2 > last_start(end_action)) { contradiction(); }
+    if (opt.sequential) { 
+      store(total_plan_cost, total_plan_cost + duration(a));
+      update_inf_a(end_action, total_plan_cost);
+      FOR(a, actions) {
+	if (!a->used && total_plan_cost + duration(a) > last_start(end_action))
+	  exclude_action(a);
+      } EFOR;
+    }
     //protect_against(a); // ici ou en dessous ?
     activate_action(a);
   }
@@ -210,10 +217,18 @@ static void exclude_action2(Action *a, Causal *c)
     if (opt.wdeg) {
       if (c != NULL) {
 	increment_weight(c);
-	FOR(b, active_actions) { if (a != b && edeletes(b, c->fluent)) b->origin->weight++; } EFOR;
+	FOR(b, active_actions) { 
+	  if (a != b && edeletes(b, c->fluent)) 
+	    b->origin->weight++;
+	} EFOR;
       } else {
-	FORCOUPLE(f, a->add, c, f->active_causals) { if (get_producer(c) == a) increment_weight(c); } EFORCOUPLE;
-	FOR(b, active_actions) { if (b != a && amutex(a,b) && (precedes(a, b) || precedes(b, a))) b->origin->weight++; } EFOR;
+	FORCOUPLE(f, a->add, c, f->active_causals) { 
+	  if (get_producer(c) == a) increment_weight(c); 
+	} EFORCOUPLE;
+	FOR(b, active_actions) { 
+	  if (b != a && amutex(a,b) && (precedes(a, b) || precedes(b, a))) 
+	    b->origin->weight++; 
+	} EFOR;
 	a->origin->weight++;
       }
     }

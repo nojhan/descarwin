@@ -3,7 +3,7 @@
  *
  * File : solve.c
  *
- * Copyright (C) 2005-2009  Vincent Vidal <vidal@cril.univ-artois.fr>
+ * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
 
@@ -44,6 +44,7 @@ VECTOR(Causal *, active_causals);
 VECTOR(Resource *, resources);
 #endif
 long total_actions_nb;
+TimeVal total_plan_cost;
 
 Action *start_action;
 Action *end_action;
@@ -322,9 +323,11 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
   set_backtrack_limit(opt.max_backtracks);
   reset_backtracks();
 
+  // not useful due to global mutex sets ?
   if (opt.sequential) {
     propagate();
-    maximize(bound, active_actions_nb - 2);
+    //maximize(bound, active_actions_nb - 2);
+    maximize(bound, total_plan_cost);
     dic_lower = dic_upper = bound;
   }
 

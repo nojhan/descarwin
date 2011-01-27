@@ -143,7 +143,7 @@ depr:
 	makedepend -- -DSCHED -- $(ALLSOURCES) 
 
 clean:
-	rm -f $(EXE) $(LIB) $(BISON_GEN) $(FLEX_GEN) $(OBJECTS) $(YOBJECTS) $(MTYOBJECTS) $(EXEOBJECTS)  $(RATPOBJECTS) $(LIBOBJECTS) parser.tab.h *~ core
+	rm -f $(EXE) $(MTEXE) $(LIB) $(MTLIB) $(BISON_GEN) $(FLEX_GEN) $(OBJECTS) $(YOBJECTS) $(MTYOBJECTS) $(EXEOBJECTS)  $(RATPOBJECTS) $(LIBOBJECTS) parser.tab.h *~ core
 
 distclean: clean
 	rm -f $(GDSL_STATIC) ; cd $(GDSL_DIR) ; make distclean
