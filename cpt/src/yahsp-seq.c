@@ -62,6 +62,10 @@ static BitArray initial_bitstate;
 
 static TimeVal best_makespan;
 
+#ifdef DAE
+#pragma omp threadprivate(ainit, aused, finit, relaxed_plan, relaxed_plan_nb, applicable, applicable_nb, open_list, closed_list, heuristics, current_state, initial_bitstate, best_makespan)
+#endif
+
 #define get_ainit(a) ainit[(a)->id]
 #define set_ainit(a, t) ainit[(a)->id] = t
 #define get_aused(a) aused[(a)->id]
