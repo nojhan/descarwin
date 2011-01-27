@@ -1,7 +1,7 @@
 
-eo_dir=~/code/eodev/eodev/eo
+eo_dir=/tools/eo/eo/
 eo_git=0
-descarwin_trunk=~/code/descarwin/trunk/
+descarwin_trunk=~/TGV/DESCARWIN/dae/descarwin/trunk/
 
 today=`date --iso-8601`
 # make a directory of the current date
@@ -30,7 +30,7 @@ svn export $descarwin_trunk $here/daeyahsp
 
 echo "clean DAE code comments"
 cd ..
-cp $descarwin_trunk/remove_comments.sed .
+cp $descarwin_trunk/scripts/remove_comments.sed .
 $descarwin_trunk/scripts/clean_code.sh $here/daeyahsp/dae
 
 echo "copy the IPC build and plan file"
