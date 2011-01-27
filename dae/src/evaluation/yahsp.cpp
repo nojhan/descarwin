@@ -11,15 +11,12 @@
 
 std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 {
-    //out << bitarray_get( bitarray, fluents[0] );
     for( unsigned int i = 1; i < fluents_nb; ++i ) {
         unsigned long bit = bitarray_get( bitarray, fluents[i] );
-        //out << " " << bit;
         if( bit != 0 ) {
             out << " " << fluent_name(fluents[i]);
         }
     }
-
     return out;
 }
 
@@ -38,7 +35,7 @@ daeYahspEval::daeYahspEval(
     // because it can only be called once
         
     _previous_state = bitarray_create( fluents_nb );
-    
+
     _intermediate_goal_state = (Fluent**) malloc( fluents_nb * sizeof( Fluent* ) );
 
     if( _intermediate_goal_state == NULL ) {
@@ -59,147 +56,56 @@ daeYahspEval::~daeYahspEval()
  **************************************************************************************************************/
 unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb )
 {
-    // copy the current_state of yahsp in _previous_state, 
-    // in order to compute the distance between those two states
-    // during the bad fitness computation
-    //_previous_state = bitarray_create( fluents_nb );
     bitarray_copy( _previous_state, *get_current_state(), fluents_nb );
-   
-#ifndef NDEBUG
-    eo::log << eo::xdebug << "ok" << std::endl;
-    eo::log << eo::xdebug << "\t\tcall the solver...";
-    eo::log.flush();
-#endif
-
-    /* 
-     * Appel au solveur:
-           int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb, 
-                          bool compress, bool compress_causals, bool compress_orderings) 
-     *
-     * return codes utilisés par yahsp (définis dans plan.h, utilisés dans yahsp.c):
-            PLAN_FOUND 0
-            NO_PLAN 5
-     * return code utilisé par cpt_search (solve.c)
-            GOALS_MUTEX 1
-     *
-     * solution trouvée est dans la variable globale : 
-            SolutionPlan* solution_plan
-     *
-     * avec :
-            struct SolutionPlan {
-              VECTOR(Step *, steps);
-              TimeVal makespan;
-              double search_time;
-              double total_time;
-              double backtracks;
-            };
-     * 
-     * Note : _init_state n'est utilisé qu'au tout début de l'appel, 
-     * si un premier yahsp_reset a été fait. yahsp_main maintient
-     * un initial_bitstate et un current_state au fur et à mesure de la recherche.
-     * Il n'y a donc pas besoin de mettre à jour l'état courant passé en premier
-     * argument à cpt_search.
-     */
-    /*
-    BitArray my_initial_bitstate = bitarray_create(fluents_nb);
-    FOR(f, init_state) { bitarray_set(my_initial_bitstate, f); } EFOR;
-
-    eo::log << eo::logging << "init_state=";
-    for( unsigned int i = 0; i < init_state_nb; ++i ) {
-      eo::log << eo::logging << fluent_name(init_state[i]);
-    }
-
-    eo::log << eo::logging << "my_initial_bitstate=";
-    for( unsigned int i = 0; i < (fluents_nb - 1) / __WORDSIZE + 1; ++i ) {
-      eo::log << eo::logging << my_initial_bitstate[i] << " ";
-    }
-
-    eo::log << eo::logging << "next_state=";
-    for( unsigned int i = 0; i < next_state_nb; ++i ) {
-      eo::log << eo::logging << fluent_name(next_state[i]);
-    }
-    */
+                                 #ifndef NDEBUG
+                                     eo::log << eo::xdebug << "ok" << std::endl;
+                                     eo::log << eo::xdebug << "\t\tcall the solver...";
+                                     eo::log.flush();
+                                 #endif
     unsigned int return_code = cpt_search( init_state, init_state_nb, next_state, next_state_nb, false, false, false );
-
-    //    eo::log << eo::logging << "\t\treturn code: " << return_code << std::endl;
-
-#ifndef NDEBUG
-    eo::log << eo::xdebug << "ok" << std::endl;
-    eo::log << eo::xdebug << "\t\treturn code: " << return_code << " ";
-    eo::log.flush();
-#endif
+                                 #ifndef NDEBUG
+                                     eo::log << eo::xdebug << "ok" << std::endl;
+                                     eo::log << eo::xdebug << "\t\treturn code: " << return_code << " ";
+                                     eo::log.flush();
+                                 #endif
     if( return_code == NO_PLAN || return_code == GOALS_MUTEX ) {
-
-        //decompo.fitness( std::make_pair( fitness_unfeasible( decompo, _previous_state ), false ) );
-        //      std::cout << "stats.evaluated_nodes = " << stats.evaluated_nodes << std::endl;
-        //      eo::log << eo::logging << " FAIL: " << decompo << std::endl;
-
         step_recorder_fail();
-
-        // search has failed, free the invalid plan
-        if( solution_plan != NULL ) {
-            plan_free( solution_plan );
-        }
-
-#ifndef NDEBUG
-        eo::log << eo::debug << "x";
-        eo::log.flush();
-        eo::log << eo::xdebug << std::endl;
-#endif
-    } else if( return_code == PLAN_FOUND ) {
-        //assert( return_code == PLAN_FOUND );
-        assert( solution_plan != NULL );
+                                 #ifndef NDEBUG
+                                         eo::log << eo::debug << "x";
+                                         eo::log.flush();
+                                         eo::log << eo::xdebug << std::endl;
+                                 #endif
+    } else if( return_code == PLAN_FOUND ) { assert( solution_plan != NULL );
 
         if( solution_plan->steps_nb > 0 )  {
-                          // in ipc6/seq-sat/elevators-strips, there is actions with a null cost
-                          // thus, the only way to be sure that the plan is usefull is te steps_nb
-                          //assert(solution_plan->makespan > 0);
             _u++; // un goal utile supplémentaire
-            // un certains nombre de NOEUDS supplémentaires
-            // (stocké dans le champs "backtracks" par yahsp, à cause de cpt)
             _B += static_cast<unsigned int>( solution_plan->backtracks );
         }
         _k++; // incrémente le compteur de plan
 
-        // Note : ici, l'exécution du plan est inutile avec yahsp, 
-        // car il a déjà construit le prochain état initial
-
-        // stocke le plan intermédiaire dans la variable globale "plans"
-        // qui sera utilisée par yahsp lors de la compression
-        // Note : yahsp_main écrase le prochain pointeur solution_plan avec 
-        // une nouvelle allocation.
         plans[plans_nb] = solution_plan;
         plans_nb++;
 
-        // convertit et stocke les plans intermédiaires dans des structures propres à DAEx
-        //12.1        decompo.plans_sub_add( daex::Plan( *solution_plan ) );
-        decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mains on garde la structure notamment pour last_reached.
-
-        // timer à jour pour le dernier plan inséré
+        decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mais on garde la structure notamment pour last_reached.
         decompo.last_subplan().search_steps( _B );
 
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "ok" << std::endl;
-        eo::log << eo::xdebug << "\t\trecord steps...";
-        eo::log.flush();
-#endif
-        // Récupère le nombre de noeuds utilisés par une résolution avec yahsp
-        // utilisé uniquement par la classe daeEvalYahspInit 
-        // pour le calcul de la médiane des noeuds pour l'initialisation du b_max
-        // dans la classe daeEvalYahsp, la fonction est vide
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "ok" << std::endl;
+                                         eo::log << eo::xdebug << "\t\trecord steps...";
+                                         eo::log.flush();
+                                 #endif
         step_recorder();
+        
+        solution_plan = NULL; // the corresponding pointer is stored in plans, thus we do not free it
 
-        // the corresponding pointer is stored in plans, thus we do not free it
-        solution_plan = NULL;
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "ok" << std::endl;
+                                 #endif
 
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "ok" << std::endl;
-#endif
-
-    } else { // return_code != NO_PLAN && != GOALS_MUTEX && != PLAN_FOUND
-        throw std::runtime_error( "Unkonwn error code from cpt_search" );
     }
-
+                        /*else { // return_code != NO_PLAN && != GOALS_MUTEX && != PLAN_FOUND
+                                   throw std::runtime_error( "Unknown error code from cpt_search" );
+	                  }*/
     return return_code;
 }
 
@@ -208,130 +114,96 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
  **************************************************************************************************************/
 void daeYahspEval::compress( daex::Decomposition & decompo )
 {
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "\t\tcompression...";
-        eo::log.flush();
-#endif
-        //solution_plan = NULL;
-        // compression, utilise la globale "plans" construire plus haut
-        // et créé un plan compressé dans solution_plan
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "\t\tcompression...";
+                                         eo::log.flush();
+                                 #endif
+        // compression, utilise la globale "plans" construire plus haut et créé un plan compressé dans solution_plan
         yahsp_compress_plans();
-
-        assert(solution_plan != NULL);
-
+                                         assert(solution_plan != NULL);
         // TODO pendant les tests, le plan ne peut pas etre vide, mais en compétition, cela peut arriver, auquel cas il faudra virer l'assert (penser à compiler en NDEBUG)
 	//		std::cout << "MAKESPAAAAN =" << solution_plan->makespan;
 
-        assert(solution_plan->makespan > 0);
+                                         assert(solution_plan->makespan > 0);
 
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "ok" << std::endl;
-        eo::log << eo::xdebug << "\t\tsave compressed plan and fitness...";
-        eo::log.flush();
-#endif
-
-        // sauvegarde le plan compressé global pour DAEx
-        decompo.plan_global( daex::Plan( solution_plan ) );
-
-        // NOTE: solution_plan is freed in free_yahsp_structures
-
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "ok" << std::endl;
+                                         eo::log << eo::xdebug << "\t\tsave compressed plan and fitness...";
+                                         eo::log.flush();
+                                 #endif
+        decompo.plan_global( daex::Plan( solution_plan ) ); // sauvegarde le plan compressé global pour DAEx
+                                       // NOTE: solution_plan is freed in free_yahsp_structures
         decompo.last_subplan().search_steps( _B );
-
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "ok" << std::endl;
-#endif
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "ok" << std::endl;
+                                 #endif
 }
-
 
 /**************************************************************************************************************
  * CALL
  **************************************************************************************************************/
 void daeYahspEval::call( daex::Decomposition & decompo ) 
 {
+                                 #ifndef NDEBUG
+                                     eo::log << eo::xdebug << "decompo.size=" << decompo.size() << std::endl;
+                                 #endif
+                                 #ifndef NDEBUG
 
-#ifndef NDEBUG
-    eo::log << eo::xdebug << "decompo.size=" << decompo.size() << std::endl;
-#endif
-
-#ifndef NDEBUG
-//    eo::log << eo::xdebug << "CHECK ASSERT" << std::endl;
-//    daex::Decomposition tmp;
-//    std::copy( decompo.begin(), decompo.end(), std::back_inserter( tmp ) );
-//    tmp.front().push_back( tmp.front().front() );
-//    for( daex::Decomposition::iterator igoal = tmp.begin(), goal_end = tmp.end(); igoal != goal_end; ++igoal ) {
-//        assert_nomutex_noduplicate( igoal->begin(), igoal->end() );
-//    }
-
-    eo::log << eo::xdebug << "Check goal consistency" << std::endl;
-    for( daex::Decomposition::iterator igoal = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
-        assert_noduplicate( igoal->begin(), igoal->end() );
-        assert_nomutex(     igoal->begin(), igoal->end() );
-    }
-#endif
-
-    if( ! decompo.invalid() ) {
-#ifndef NDEBUG
-        eo::log << eo::debug << "-";
-        eo::log.flush();
-#endif
-        // do nothing
+                                     eo::log << eo::xdebug << "Check goal consistency" << std::endl;
+                                     for( daex::Decomposition::iterator igoal = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
+                                         assert_noduplicate( igoal->begin(), igoal->end() );
+                                         assert_nomutex(     igoal->begin(), igoal->end() );
+                                     }
+                                 #endif
+    if( ! decompo.invalid() ) { // do nothing
+                                 #ifndef NDEBUG
+                                         eo::log << eo::debug << "-";
+                                         eo::log.flush();
+                                 #endif
     } else { // if decompo.invalid
 
-
 #ifndef PAPERVERSION
-        // JACK the code does not even try to evaluate decompositions that are too long 
-        // FIXME what is the effect on variation operators that relies on last_reached?
+               // JACK the code does not even try to evaluate decompositions that are too long 
+                                         // FIXME what is the effect on variation operators that relies on last_reached?
         if( decompo.size() > _l_max ) {
-            decompo.fitness( std::make_pair( fitness_unfeasible_too_long(), false ) );
+           decompo.fitness( std::make_pair( fitness_unfeasible_too_long(), false ) );
         } else 
-#endif
-	           {
-
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "malloc plans...";
-        eo::log.flush();
-#endif
+                                 #endif
+	  {
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "malloc plans...";
+                                         eo::log.flush();
+                                 #endif
         cpt_malloc( plans, decompo.size()+1 ); // +1 for the subplan between the last goal and the final state
         plans_nb = 0;
-
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "ok" << std::endl;
-        eo::log << eo::xdebug << "yahsp reset...";
-        eo::log.flush();
-#endif
-        // TODO autoriser les décompositions vides ?
-        // TODO garder les plans intermédiaires non compressés pour éviter de les recalculer ?
-
-        // nécéssaire pour indiquer à yahsp que la prochaine recherche doit se faire à partir
-        // de l'état initial (variable globale init_state)
-        // initialise le current_state à initial_bitstate
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "ok" << std::endl;
+                                         eo::log << eo::xdebug << "yahsp reset...";
+                                         eo::log.flush();
+                                 #endif
         yahsp_reset();
-
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "ok" << std::endl;
-#endif
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "ok" << std::endl;
+                                 #endif
         _k = 0; // compteur de goals
         _u = 0; // compteur de goals utiles
         _B = 0; // compteur des tentatives de recherche
 
-#ifndef NDEBUG
-        eo::log << eo::xdebug << "for each goal:" << std::endl;
-        unsigned int goal_count = 0; // only use for xdebug messages
-#endif
+                                 #ifndef NDEBUG
+                                         eo::log << eo::xdebug << "for each goal:" << std::endl;
+                                 #endif
         unsigned int code = 0; // return code of cpt_search
         b_max( _b_max_in ); // set the generic b_max 
 
-        // parcours les goals de la décomposition
+        // parcourt les goals de la décomposition
         for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
-#ifndef NDEBUG
-            eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
-            eo::log.flush();
-#endif
+                                 #ifndef NDEBUG
+                                             eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
+                                             eo::log.flush();
+                                 #endif
             // copie des goals daex dans leur equivant YAHSP
            // nouvelle allocation de tableau de goal
-            assert( igoal->size() > 0 );
-            _intermediate_goal_state_nb = igoal->size();
-
+                                             assert( igoal->size() > 0 );
             unsigned int i = 0;
             for( daex::Goal::iterator iatom = igoal->begin(); iatom != igoal->end(); ++iatom ) {
                               // le compilateur demande à expliciter le template pour fluents, 
@@ -339,10 +211,9 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                 _intermediate_goal_state[i] =  (*iatom)->fluent();
                 i++;
             }
-            assert( i == _intermediate_goal_state_nb );
-            
+                                             assert( i ==  igoal->size());
             // search a plan towards the current goal
-            code = solve_next( decompo, _intermediate_goal_state, _intermediate_goal_state_nb  );
+            code = solve_next( decompo, _intermediate_goal_state, igoal->size() );
 
             if( code != PLAN_FOUND ) {
 #ifdef PAPERVERSION
@@ -361,10 +232,10 @@ void daeYahspEval::call( daex::Decomposition & decompo )
             if( code == PLAN_FOUND ) {
                 compress( decompo );
                 decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
-#ifndef NDEBUG
-                eo::log << eo::debug << "*";
-                eo::log.flush();
-#endif
+                                 #ifndef NDEBUG
+                                                 eo::log << eo::debug << "*";
+                                                 eo::log.flush();
+                                 #endif
             } else {
 #ifdef PAPERVERSION
                 decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
@@ -383,32 +254,30 @@ void daeYahspEval::call( daex::Decomposition & decompo )
  **************************************************************************************************************/
 void daeYahspEval::free_yahsp_structures()
 {
-#ifndef NDEBUG
-    eo::log << eo::xdebug << "\t\tfree plans...";
-    eo::log.flush();
-#endif
+                                 #ifndef NDEBUG
+                                     eo::log << eo::xdebug << "\t\tfree plans...";
+                                     eo::log.flush();
+                                 #endif
     // libère la variable globale "plans", utilisée par yahsp lors de la compression
     for( unsigned int p=0; p < plans_nb; ++p ) {
       plan_free( plans[p] );
     }
-    
     plans_nb = 0;
     
     cpt_free( plans );
 
     if( solution_plan != NULL ) {
         plan_free( solution_plan );
+	solution_plan = NULL;
     }
-
-#ifndef NDEBUG
-    eo::log << eo::xdebug << "ok" << std::endl;
-#endif
+                                 #ifndef NDEBUG
+                                     eo::log << eo::xdebug << "ok" << std::endl;
+                                 #endif
 }
 
 /**************************************************************************************************************
  * YAHSP EVAL INIT
  **************************************************************************************************************/
-
 
 void daeYahspEvalInit::call( daex::Decomposition & decompo ) 
 {
