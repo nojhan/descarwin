@@ -1,5 +1,6 @@
 
 eo_dir=~/code/eodev/eodev/eo
+eo_git=0
 descarwin_trunk=~/code/descarwin/trunk/
 
 today=`date --iso-8601`
@@ -13,12 +14,16 @@ cd seq-sat-dae_yahsp
 here=`pwd`
 
 echo "archive current version of EO"
-cd $eo_dir
-mkdir -p $here/eo
-git archive --format zip master > $here/eo/eo_${today}.zip
-cd $here/eo
-unzip -qq eo_${today}.zip
-cd $here
+if [ eo_git == 1 ] ; then
+    cd $eo_dir
+    mkdir -p $here/eo
+    git archive --format zip master > $here/eo/eo_${today}.zip
+    cd $here/eo
+    unzip -qq eo_${today}.zip
+    cd $here
+else
+    cp -r $eo_dir $here/eo
+fi
 
 echo "archive current version of DAE/YAHSP"
 svn export $descarwin_trunk $here/daeyahsp
