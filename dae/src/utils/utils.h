@@ -117,9 +117,9 @@ typename T1::const_iterator draw_until_mutex_if( T1 const& applicants, T2 const 
         // si on cherche les mutex ET qu'il y en a au moins un dans le goal
         // OU
         // si on cherche les nomutex ET qu'il n'y en a pas dans le goal
-        if(   search_mutex &&  has_one_mutex_in( **itapp, goal_first, goal_last )
+        if(   ( search_mutex &&  has_one_mutex_in( **itapp, goal_first, goal_last ) )
            ||
-             !search_mutex && !has_one_mutex_in( **itapp, goal_first, goal_last ) ) {
+	      ( !search_mutex && !has_one_mutex_in( **itapp, goal_first, goal_last ) ) ) {
 
 #ifndef NDEBUG
             if( !search_mutex ) {

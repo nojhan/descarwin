@@ -107,6 +107,7 @@ int main ( int argc, char* argv[] )
     // EO
     eoParserLogger parser(argc, argv);
     make_verbose(parser);
+    make_parallel(parser);
 
     // SYSTEM
 #ifndef NDEBUG

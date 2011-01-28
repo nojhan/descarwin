@@ -8,9 +8,18 @@ endif(COMMAND cmake_policy)
 # include the install configuration file where are defined the main variables
 INCLUDE(${CMAKE_SOURCE_DIR}/install.cmake)
 
+ENABLE_LANGUAGE(C)
+ENABLE_LANGUAGE(CXX)
 
 # define project name
 PROJECT(DAEX CXX)
+
+FIND_PACKAGE(OpenMP REQUIRED)
+
+IF(OPENMP_FOUND)
+  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+ENDIF()
 
 # include the sources
 
@@ -28,14 +37,14 @@ LINK_DIRECTORIES(${CPT_LIB_DIR})
 #ADD_DEFINITIONS(-W -Wall -pedantic)
 ADD_DEFINITIONS(-W -Wall)
 
-SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DPAPERVERSION -fopenmp" )
-SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG -fopenmp" )
+# SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DPAPERVERSION -fopenmp" )
+# SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG -fopenmp" )
 
 # make a static exe
 # FIXME this is a ugly ha as it assume that the linker is gcc-compatible
 # there must be a more elegant way to do that with CMake, maybe with:
 # LINK_SEARCH_END_STATIC ?
-SET(CMAKE_EXE_LINKER_FLAGS "-fopenmp")
+#SET(CMAKE_EXE_LINKER_FLAGS "-fopenmp")
 
 # target
 
