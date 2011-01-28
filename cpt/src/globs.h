@@ -42,9 +42,7 @@ EVECTOR(Causal *, last_conflicts);
 
 extern FILE *cptout;
 
-#ifdef DAE
 #pragma omp threadprivate(solution_plan, plans, plans_nb)
-#endif
 
 
 #endif /* GLOBS_H */
