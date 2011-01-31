@@ -27,28 +27,28 @@ daeYahspEval::daeYahspEval(
             double fitness_weight /*= 10*/,
             double fitness_penalty /*= 1e6*/
         ) :
-        daeCptYahspEval( l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty ),
-        _previous_state( NULL ), _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
+  daeCptYahspEval( l_max_,b_max_in, b_max_last, fitness_weight, fitness_penalty )//,
+        //_previous_state( NULL ) //, _intermediate_goal_state(NULL), _intermediate_goal_state_nb(0)
 {
     // some init steps are not done here, but in pddl_load.cpp
     // notably the call to cpt_main
     // because it can only be called once
         
-    _previous_state = bitarray_create( fluents_nb );
+    //_previous_state = bitarray_create( fluents_nb );
 
-    _intermediate_goal_state = (Fluent**) malloc( fluents_nb * sizeof( Fluent* ) );
+    // _intermediate_goal_state = (Fluent**) malloc( fluents_nb * sizeof( Fluent* ) );
 
-    if( _intermediate_goal_state == NULL ) {
-        std::ostringstream msg;
-        msg << "Error: cannot allocate an intermediate goal state of size " << fluents_nb << std::endl;
-        throw std::runtime_error( msg.str().c_str() );
-    }
+    // if( _intermediate_goal_state == NULL ) {
+    //     std::ostringstream msg;
+    //     msg << "Error: cannot allocate an intermediate goal state of size " << fluents_nb << std::endl;
+    //     throw std::runtime_error( msg.str().c_str() );
+    // }
 }
 
 daeYahspEval::~daeYahspEval()
 {
-    free( _previous_state );
-    free( _intermediate_goal_state );
+  //free( _previous_state );
+    //free( _intermediate_goal_state );
 }
 
 /**************************************************************************************************************
@@ -56,7 +56,6 @@ daeYahspEval::~daeYahspEval()
  **************************************************************************************************************/
 unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb )
 {
-    bitarray_copy( _previous_state, *get_current_state(), fluents_nb );
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "ok" << std::endl;
                                      eo::log << eo::xdebug << "\t\tcall the solver...";
@@ -173,6 +172,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         } else 
                                  #endif
 	  {
+	BitArray previous_state = bitarray_create( fluents_nb );  
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "malloc plans...";
                                          eo::log.flush();
@@ -207,20 +207,22 @@ void daeYahspEval::call( daex::Decomposition & decompo )
             // copie des goals daex dans leur equivant YAHSP
            // nouvelle allocation de tableau de goal
                                              assert( igoal->size() > 0 );
+            Fluent **intermediate_goal_state = (Fluent **) malloc(igoal->size() * sizeof(Fluent *));
             unsigned int i = 0;
             for( daex::Goal::iterator iatom = igoal->begin(); iatom != igoal->end(); ++iatom ) {
                               // le compilateur demande à expliciter le template pour fluents, 
                               // car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
-                _intermediate_goal_state[i] =  (*iatom)->fluent();
+                intermediate_goal_state[i] =  (*iatom)->fluent();
                 i++;
             }
                                              assert( i ==  igoal->size());
             // search a plan towards the current goal
-            code = solve_next( decompo, _intermediate_goal_state, igoal->size() );
+	    bitarray_copy( previous_state, *get_current_state(), fluents_nb );
+            code = solve_next( decompo, intermediate_goal_state, igoal->size() );
 
             if( code != PLAN_FOUND ) {
 #ifdef PAPERVERSION
-              decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
+              decompo.fitness( std::make_pair( fitness_unfeasible(decompo, previous_state), false ) );
 #else
               decompo.fitness( std::make_pair( fitness_unfeasible_intermediate(decompo), false ) );
 #endif 
@@ -231,6 +233,8 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         if((decompo.size() == 0) || (code == PLAN_FOUND)) {
             // set the b_max specific to this step
             b_max( _b_max_last );
+
+	    bitarray_copy( previous_state, *get_current_state(), fluents_nb );
             unsigned int code = solve_next( decompo, goal_state, goal_state_nb  );
             if( code == PLAN_FOUND ) {
                 compress( decompo );
@@ -243,12 +247,13 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                                  #endif
             } else {
 #ifdef PAPERVERSION
-                decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
+                decompo.fitness( std::make_pair( fitness_unfeasible(decompo, previous_state), false ) );
 #else
                 decompo.fitness( std::make_pair( fitness_unfeasible_final(decompo), false ) );
 #endif 
             } // if PLAN_FOUND for last goal
         } // if PLAN_FOUND
+	cpt_free(previous_state);
       } // if size > _l_max
     } // if !decompo.invalid
     free_yahsp_structures();

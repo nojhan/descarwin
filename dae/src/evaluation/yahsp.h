@@ -61,13 +61,16 @@ protected:
     // that have been used during call
     void free_yahsp_structures();
 
+    // VV : moved to Decomposition
     //! État à chaque itération
-    BitArray _previous_state;
+    //BitArray _previous_state;
 
+
+    // VV : removed this ! shared between all threads... build it in method 'call'
     // init_state et goal_state sont des variables globales définies dans globs.h
     // pointeur sur un tableau de Fluent CPT
-    Fluent * * _intermediate_goal_state;
-    unsigned int _intermediate_goal_state_nb;
+    /* Fluent * * _intermediate_goal_state; */
+    /* unsigned int _intermediate_goal_state_nb; */
 };
 
 

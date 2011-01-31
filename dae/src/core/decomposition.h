@@ -13,6 +13,8 @@
 #include "decomposition.h"
 #include "goal.h"
 #include "plan.h"
+#include "src/globs.h"
+#include "src/yahsp.h"
 
 namespace daex
 {
@@ -31,7 +33,6 @@ public:
      * Note: and is not feasible, @see eoDualFitness
      */
     //Decomposition() : _plan_global(NULL) {}
-
 
     Plan plan_copy() const
     {
@@ -139,8 +140,8 @@ protected:
 
     //! compteur des tentatives de recherche
     unsigned int _B;
-}; // class Decomposition
 
+}; // class Decomposition
 
 //! Print a decomposition in a simple format
 /** On a single line, print the date and the number of atoms of each goal, i.e.:
