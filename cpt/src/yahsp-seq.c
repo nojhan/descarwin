@@ -16,6 +16,8 @@
 #include "globs.h"
 #include "trace_planner.h"
 
+// DIRTY
+#define end_action (&yend_action)
 
 typedef struct Node Node;
 typedef struct YStep YStep;
@@ -57,7 +59,7 @@ static gdsl_rbtree_t open_list;
 static gdsl_rbtree_t closed_list;
 static gdsl_rbtree_t heuristics;
 
-static BitArray current_state;
+static BitArray current_state=NULL;
 static BitArray initial_bitstate;
 
 static TimeVal best_makespan;
@@ -79,7 +81,7 @@ static TimeVal best_makespan;
 
 #ifdef DAE
 
-#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
+#define COST(a) ({ TimeVal cost = 0; FOR(f, (a)->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
 //#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
 //#define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0))
 #define INCCOST(cost, action) (cost += duration(action) + 1)
@@ -210,6 +212,8 @@ static void heuristic_insert(Node *node)
   gdsl_rbtree_insert(heuristics, h, &gdsl_return);
 }
 
+#define COST2(a) ({ TimeVal cost = 0; FOR(f, yend_action.prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
+
 static bool heuristic_search(Node *node)
 {
   Heuristic test;
@@ -218,7 +222,19 @@ static bool heuristic_search(Node *node)
   Heuristic *h = (Heuristic *) gdsl_rbtree_search(heuristics, (gdsl_compare_func_t) heuristic_cmp, &test);
   if (h == NULL) return false;
   memcpy(finit, h->inits, fluents_nb * sizeof(TimeVal));
-  set_ainit(end_action, COST(end_action));
+  //set_ainit(end_action, COST(end_action));
+  //set_ainit((&yend_action), COST((&yend_action)));
+
+
+  TimeVal cost = 0; 
+  FOR(f, yend_action.prec) { 
+    if (get_finit(f) == MAXTIME) { 
+      cost = MAXTIME; break; 
+    } else cost += get_finit(f); 
+  } EFOR;
+
+  ainit[yend_action.id] = cost;
+
   if (get_ainit(end_action) != MAXTIME) {
     FORMIN(a, actions, 2) {
       set_ainit(a, COST(a));
@@ -236,6 +252,10 @@ static void compute_h1(Node *node)
     set_ainit(a, MAXTIME);
     set_aused(a, a->prec_nb == 0);
   } EFOR;
+  // DIRTY
+  set_ainit(end_action, MAXTIME);
+  set_aused(end_action, end_action->prec_nb == 0);
+  //
   FOR(f, fluents) { 
     set_finit(f, MAXTIME);
     if (bitarray_get(node->state, f)) update_cost_h1(f, 0);
@@ -261,6 +281,9 @@ static void compute_relaxed_plan(Node *node)
   relaxed_plan[0] = end_action;
   relaxed_plan_nb = 1;
   FOR(a, actions) { set_aused(a, false); } EFOR;
+  // DIRTY
+  set_aused(end_action, false);
+  //
   FOR(f, fluents) { set_finit(f, bitarray_get(node->state, f)); } EFOR;
   FOR(a, relaxed_plan) {
     FOR(f, a->prec) {

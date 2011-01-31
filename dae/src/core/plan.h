@@ -39,6 +39,8 @@ public:
     //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
     Plan( SolutionPlan * p_plan ) : _makespan(p_plan->makespan), _search_steps(0), _is_valid(true) 
       {   // get the plan representation
+// OMP DIRTY
+#pragma omp critical
         _plan_rep = plan_to_str( p_plan );
       }
     

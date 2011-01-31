@@ -48,6 +48,8 @@ TimeVal total_plan_cost;
 
 Action *start_action;
 Action *end_action;
+// DIRTY
+Action yend_action;
 
 VECTOR(Fluent *, init_state);
 VECTOR(Fluent *, goal_state);
@@ -143,6 +145,7 @@ static void timer_interruption(int n)
 
 #endif
 
+Action test;
 
 int cpt_main(int argc, const char **argv)
 {
@@ -169,7 +172,13 @@ int cpt_main(int argc, const char **argv)
   stats.wcsearch = omp_get_wtime();
   
   if (opt.yahsp) {
-    yahsp_init();
+    // DIRTY
+    test = *end_action;
+#pragma omp parallel num_threads(2) 
+    {
+      yend_action = *end_action;
+      yahsp_init();
+    }
     start_timer(stats.search);
   }
 
@@ -236,11 +245,15 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
 {
   FORPAIR(f1, f2, goals) { if (fmutex(f1, f2)) return GOALS_MUTEX; } EFORPAIR;
 
+  if (init_nb == -1) exit(88);
+
   if (init_nb != -1) {
     start_action->add = init;
     start_action->add_nb = init_nb;
-    end_action->prec = goals;
-    end_action->prec_nb = goals_nb;
+    /* end_action->prec = goals; */
+    /* end_action->prec_nb = goals_nb; */
+    yend_action.prec = goals;
+    yend_action.prec_nb = goals_nb;
   }
 
   solution_plan = NULL;

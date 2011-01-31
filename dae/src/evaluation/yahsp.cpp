@@ -86,6 +86,9 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
         plans[plans_nb] = solution_plan;
         plans_nb++;
 
+	// if k != plans_nb => the same decomposition is evaluated simultaneously by several threads !!!
+	assert (_k == plans_nb);
+	
         decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mais on garde la structure notamment pour last_reached.
         decompo.last_subplan().search_steps( _B );
 
@@ -231,6 +234,8 @@ void daeYahspEval::call( daex::Decomposition & decompo )
             unsigned int code = solve_next( decompo, goal_state, goal_state_nb  );
             if( code == PLAN_FOUND ) {
                 compress( decompo );
+		if (solution_plan->makespan < 6)
+		  std::cout << decompo.size() << " " << plans_nb << std::endl;
                 decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
                                  #ifndef NDEBUG
                                                  eo::log << eo::debug << "*";

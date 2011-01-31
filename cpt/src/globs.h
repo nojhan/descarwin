@@ -28,6 +28,9 @@ extern TimeVal total_plan_cost;
 
 extern Action *start_action;
 extern Action *end_action;
+// DIRTY
+extern Action yend_action;
+
 
 EVECTOR(Fluent *, init_state);
 EVECTOR(Fluent *, goal_state);
@@ -42,7 +45,8 @@ EVECTOR(Causal *, last_conflicts);
 
 extern FILE *cptout;
 
-#pragma omp threadprivate(solution_plan, plans, plans_nb)
+
+#pragma omp threadprivate(stats, yend_action, solution_plan, plans, plans_nb)
 
 
 #endif /* GLOBS_H */
