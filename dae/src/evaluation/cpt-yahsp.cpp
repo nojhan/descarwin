@@ -49,7 +49,7 @@ double daeCptYahspEval::fitness_feasible( daex::Decomposition & decompo )
     // soit ne jamais l'être. Pour avoir des valeurs plus sympas, j'ai modifié Q au départ.
     //if (this->_sequential == true) return (double)Q + ( (double)decompo.size() - (double)_u + 1.0 ) / (double)Q + (double)_B / (double)_l_max * (double)_b_max ;
     //else return (double)Q * pddl_domain->time_gcd / pddl_domain->time_lcm + ( (double)decompo.size() - (double)_u + 1.0 ) / (double)Q + (double)_B / (double)_l_max * (double)_b_max ;
-    return Q + ( (double)decompo.size() - (double)_u + 1.0 ) / Q + (double)_B / ( (double)_l_max * (double)_b_max );
+    return Q + ( (double)decompo.size() - (double)decompo.get_number_useful_goals() + 1.0 ) / Q + (double)decompo.get_number_evaluated_nodes() / ( (double)_l_max * (double)_b_max );
 }
 
 //! Fitness des décompositions dont on arrive pas à construire le plan
@@ -68,7 +68,7 @@ double daeCptYahspEval::fitness_unfeasible( daex::Decomposition & decompo, BitAr
      */
     // NOTE in the current code, the compression is not supposed to fail, thus there is an assert that check it, thus we haven't implemented the last fitness
     // unkonw_parameter = 10 (in the code and in the paper)
-    return /*1e99 +*/ (double)_unknown_parameter * /*_k * */ (double)distance_to_goal_Hamming( state ) + (double)decompo.size() - (double)_u; 
+    return /*1e99 +*/ (double)_unknown_parameter * /*_k * */ (double)distance_to_goal_Hamming( state ) + (double)decompo.size() - (double)decompo.get_number_useful_goals(); 
 }
 
 //! Fitness des décompositions dont la taille dépasse l_max
@@ -79,15 +79,15 @@ double daeCptYahspEval::fitness_unfeasible_too_long( )
 }
 
 //! Fitness des décompositions qui ont échoué avant le dernier goal de la décomposition
-double daeCptYahspEval::fitness_unfeasible_intermediate( )
+double daeCptYahspEval::fitness_unfeasible_intermediate( daex::Decomposition & decompo )
 {
-  return _fitness_penalty * ((double)_l_max - (double)_u + 1.0) * (double)_l_max * (double)_unknown_parameter;
+  return _fitness_penalty * ((double)_l_max - (double)decompo.get_number_useful_goals() + 1.0) * (double)_l_max * (double)_unknown_parameter;
 }
 
 //! Fitness des décompositions qui ont échoué à atteindre le goal final du problème
-double daeCptYahspEval::fitness_unfeasible_final( )
+double daeCptYahspEval::fitness_unfeasible_final( daex::Decomposition & decompo )
 {
-  return _fitness_penalty * ((double)_l_max - (double)_u + 1.0);
+  return _fitness_penalty * ((double)_l_max - (double)decompo.get_number_useful_goals() + 1.0);
 }
 
 //! Renvoie le nombre d'atomes communs entre le goal final et un goal donné

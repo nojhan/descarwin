@@ -145,8 +145,6 @@ static void timer_interruption(int n)
 
 #endif
 
-Action test;
-
 int cpt_main(int argc, const char **argv)
 {
   cmd_line(argc, argv);
@@ -173,8 +171,7 @@ int cpt_main(int argc, const char **argv)
   
   if (opt.yahsp) {
     // DIRTY
-    test = *end_action;
-#pragma omp parallel num_threads(2) 
+#pragma omp parallel num_threads(opt.dae_threads)
     {
       yend_action = *end_action;
       yahsp_init();

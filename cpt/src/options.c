@@ -114,7 +114,7 @@ static CPTOption long_options[] = {
   {"ratp-incr", NULL, "<x>", 'I', "Increment wait_max for the RATP bus scheduling problem."},
   {"ratp-limit", NULL, "<x>", 'N', "Goal type for RATP bus scheduling."},
 #endif
-  {"dae", NULL, NULL, 'E', "Divide-and-Evolve approach."},
+  {"dae", NULL, "<x>", 'E', "Divide-and-Evolve approach with <x> threads."},
   {"read-actions", NULL, "<f>", 'z', "Limit to actions in file."},
   {"yahsp", "yahsp", "<x>", 'y', "Suboptimal Yahsp search, with <x> threads."}
 };
@@ -163,6 +163,7 @@ void cmd_line(int argc, const char **argv)
   opt.bound = (char *) "0";
   opt.bad_supporters_pruning = true;
   opt.dae = false;
+  opt.dae_threads = 1;
   opt.dichotomy = 2;
   opt.distance_boosting = true;
   opt.distances = 1;
@@ -256,8 +257,8 @@ void cmd_line(int argc, const char **argv)
     case 'B': opt.bad_supporters_pruning = false; trace(options, "disable bad supporters pruning\n"); break;
     case 'C': opt.last_conflicts = atol(optarg); trace(options, "number of last conflicts : %ld\n", opt.last_conflicts); break;
     case 'D': opt.distance_boosting = false; trace(options, "disable distance increase\n"); break;
-    case 'E': opt.dae = true; opt.limit_initial_propagation = true; opt.max_propagations = 10000; opt.pb_restrict = opt.yahsp; 
-      trace(options, "divide-and-evolve approach\n"); break;
+    case 'E': opt.dae = true; opt.dae_threads = atol(optarg); opt.limit_initial_propagation = true; opt.max_propagations = 10000; opt.pb_restrict = opt.yahsp; 
+      trace(options, "divide-and-evolve approach with %ld threads\n", opt.dae_threads); break;
     case 'F': opt.fluent_mutexes = true; trace(options, "enables h2 based fluent mutexes in yahsp\n"); break;
     case 'G': opt.global_mutex_sets = true; trace(options, "enable global mutex sets\n"); break;
     case'H': opt.output_file = (char *) optarg; trace(options, "output file : %s\n", opt.output_file); break;

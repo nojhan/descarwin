@@ -65,7 +65,7 @@ static BitArray initial_bitstate;
 static TimeVal best_makespan;
 
 #ifdef DAE
-#pragma omp threadprivate(ainit, aused, finit, relaxed_plan, relaxed_plan_nb, applicable, applicable_nb, open_list, closed_list, heuristics, current_state, initial_bitstate, best_makespan)
+#pragma omp threadprivate(ainit, aused, finit, relaxed_plan, relaxed_plan_nb, applicable, applicable_nb, open_list, closed_list, current_state, initial_bitstate, best_makespan)
 #endif
 
 #define get_ainit(a) ainit[(a)->id]
@@ -209,6 +209,7 @@ static void heuristic_insert(Node *node)
   bitarray_copy(h->state, node->state, fluents_nb);
   cpt_malloc(h->inits, fluents_nb);
   memcpy(h->inits, finit, fluents_nb * sizeof(TimeVal));
+#pragma omp critical
   gdsl_rbtree_insert(heuristics, h, &gdsl_return);
 }
 
@@ -219,22 +220,12 @@ static bool heuristic_search(Node *node)
   Heuristic test;
   test.key = node->key;
   test.state = node->state;
-  Heuristic *h = (Heuristic *) gdsl_rbtree_search(heuristics, (gdsl_compare_func_t) heuristic_cmp, &test);
+  Heuristic *h;
+#pragma omp critical
+  h = (Heuristic *) gdsl_rbtree_search(heuristics, (gdsl_compare_func_t) heuristic_cmp, &test);
   if (h == NULL) return false;
   memcpy(finit, h->inits, fluents_nb * sizeof(TimeVal));
-  //set_ainit(end_action, COST(end_action));
-  //set_ainit((&yend_action), COST((&yend_action)));
-
-
-  TimeVal cost = 0; 
-  FOR(f, yend_action.prec) { 
-    if (get_finit(f) == MAXTIME) { 
-      cost = MAXTIME; break; 
-    } else cost += get_finit(f); 
-  } EFOR;
-
-  ainit[yend_action.id] = cost;
-
+  set_ainit(end_action, COST(end_action));
   if (get_ainit(end_action) != MAXTIME) {
     FORMIN(a, actions, 2) {
       set_ainit(a, COST(a));
@@ -533,6 +524,7 @@ void yahsp_init()
 
   open_list = gdsl_rbtree_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) open_list_cmp);
   closed_list = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) node_free, (gdsl_compare_func_t) closed_list_cmp);
+#pragma omp master
   if (opt.dae) heuristics = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) heuristic_free, (gdsl_compare_func_t) heuristic_cmp);
 
   initial_bitstate = bitarray_create(fluents_nb);

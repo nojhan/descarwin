@@ -2,6 +2,7 @@
 
 #include "utils/pddl_load.h"
 #include <utils/eoLogger.h>
+#include <utils/eoParallel.h>
 
  
 namespace daex
@@ -25,6 +26,12 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
 
     // Divide-and-Evolve approach ( dae / NULL / E )
     cpt_call.push_back( "-dae" );
+
+    // number of threads
+    std::stringstream nthreads;
+    //nthreads << eo::parallel.nthreads(); // does not work............ FIXME
+    nthreads << 2;
+    cpt_call.push_back( nthreads.str().c_str() );
 
     // Searches a sequential plan ( sequential / seq / P )
     // TODO ne mettre l'option -seq que pour les PDDL strips et cost, et pas pour temporal (extraire l'info lors du parsing ?) avec pddl_domain->action_costs ?

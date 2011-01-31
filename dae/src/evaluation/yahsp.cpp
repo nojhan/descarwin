@@ -78,19 +78,19 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
     } else if( return_code == PLAN_FOUND ) { assert( solution_plan != NULL );
 
         if( solution_plan->steps_nb > 0 )  {
-            _u++; // un goal utile supplémentaire
-            _B += static_cast<unsigned int>( solution_plan->backtracks );
+	    decompo.incr_number_useful_goals(1); // un goal utile supplémentaire
+	    decompo.incr_number_evaluated_nodes(static_cast<unsigned int>( solution_plan->backtracks ));
         }
-        _k++; // incrémente le compteur de plan
+        decompo.incr_number_evaluated_goals(1); // incrémente le compteur de plan
 
         plans[plans_nb] = solution_plan;
         plans_nb++;
 
 	// if k != plans_nb => the same decomposition is evaluated simultaneously by several threads !!!
-	assert (_k == plans_nb);
+	assert (decompo.get_number_evaluated_goals() == plans_nb);
 	
         decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mais on garde la structure notamment pour last_reached.
-        decompo.last_subplan().search_steps( _B );
+        decompo.last_subplan().search_steps( decompo.get_number_evaluated_nodes() );
 
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "ok" << std::endl;
@@ -136,7 +136,7 @@ void daeYahspEval::compress( daex::Decomposition & decompo )
                                  #endif
         decompo.plan_global( daex::Plan( solution_plan ) ); // sauvegarde le plan compressé global pour DAEx
                                        // NOTE: solution_plan is freed in free_yahsp_structures
-        decompo.last_subplan().search_steps( _B );
+        decompo.last_subplan().search_steps( decompo.get_number_evaluated_nodes() );
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "ok" << std::endl;
                                  #endif
@@ -188,9 +188,9 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "ok" << std::endl;
                                  #endif
-        _k = 0; // compteur de goals
-        _u = 0; // compteur de goals utiles
-        _B = 0; // compteur des tentatives de recherche
+        decompo.reset_number_evaluated_goals(); // compteur de goals
+        decompo.reset_number_useful_goals(); // compteur de goals utiles
+        decompo.reset_number_evaluated_nodes(); // compteur des tentatives de recherche
 
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "for each goal:" << std::endl;
@@ -222,7 +222,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
 #ifdef PAPERVERSION
               decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
 #else
-              decompo.fitness( std::make_pair( fitness_unfeasible_intermediate(), false ) );
+              decompo.fitness( std::make_pair( fitness_unfeasible_intermediate(decompo), false ) );
 #endif 
               break;
             }
@@ -245,7 +245,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
 #ifdef PAPERVERSION
                 decompo.fitness( std::make_pair( fitness_unfeasible(decompo, _previous_state), false ) );
 #else
-                decompo.fitness( std::make_pair( fitness_unfeasible_final(), false ) );
+                decompo.fitness( std::make_pair( fitness_unfeasible_final(decompo), false ) );
 #endif 
             } // if PLAN_FOUND for last goal
         } // if PLAN_FOUND

@@ -109,6 +109,19 @@ public:
 
     Decomposition::iterator iter_at( unsigned int i );
 
+    // VV : getters/setters for 3 fields taken from daeCptYahspEval
+    unsigned int get_number_evaluated_goals() { return _k; }
+    void reset_number_evaluated_goals() { _k = 0; }
+    void incr_number_evaluated_goals(unsigned int k) { _k += k; }
+
+    unsigned int get_number_useful_goals() { return _u; }
+    void reset_number_useful_goals() { _u = 0; }
+    void incr_number_useful_goals(unsigned int u) { _u += u; }
+
+    unsigned int get_number_evaluated_nodes() { return _B; }
+    void reset_number_evaluated_nodes() { _B = 0; }
+    void incr_number_evaluated_nodes(unsigned int B) { _B += B; }
+
 protected:
 
     //! Plan global compressé
@@ -117,6 +130,15 @@ protected:
     //! Vecteur des sous-plans
     std::vector< Plan > _plans_sub;
 
+    // VV : 3 fields made local to decomposition
+    //! compteur de goals
+    unsigned int _k;
+
+    //! compteur de goals utiles
+    unsigned int _u;
+
+    //! compteur des tentatives de recherche
+    unsigned int _B;
 }; // class Decomposition
 
 

@@ -24,6 +24,7 @@ struct Option {
   BranchingStrategy branching_strategy;
   bool complete_qualprec;
   bool dae;
+  long dae_threads;
   long dichotomy;
   bool distance_boosting;
   long distances;

@@ -81,7 +81,7 @@ protected:
 
     /*virtual*/ void post_call( daex::Decomposition & decompo )
     {
-        decompo.plan().search_steps( _B );
+        decompo.plan().search_steps( decompo.get_number_evaluated_nodes() );
     }
 
 protected:
@@ -102,8 +102,8 @@ protected:
     double fitness_unfeasible( daex::Decomposition & decompo, BitArray state );
 
     double fitness_unfeasible_too_long( );
-    double fitness_unfeasible_intermediate( );
-    double fitness_unfeasible_final( );
+    double fitness_unfeasible_intermediate( daex::Decomposition & decompo );
+    double fitness_unfeasible_final( daex::Decomposition & decompo );
 
 protected:
 
@@ -129,6 +129,8 @@ protected:
 
     bool _sequential;
 
+    // fields moved to Decomposition
+    /*
 protected:
 
     //! compteur de goals
@@ -139,6 +141,7 @@ protected:
 
     //! compteur des tentatives de recherche
     unsigned int _B;
+    */
 
 }; // class daeCptYahspEval
 
