@@ -219,6 +219,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
             // search a plan towards the current goal
 	    bitarray_copy( previous_state, *get_current_state(), fluents_nb );
             code = solve_next( decompo, intermediate_goal_state, igoal->size() );
+	    free(intermediate_goal_state);
 
             if( code != PLAN_FOUND ) {
 #ifdef PAPERVERSION
