@@ -283,9 +283,11 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_mut" << proba_mut << std::endl;
 
     // Stopping criterions
+#ifndef OPENMP
     unsigned int max_seconds = parser.createParam( (unsigned int)0, "max-seconds", 
             "Maximum number of user seconds in CPU for the whole search, set it to 0 to deactivate (1800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 1800 seconds = 30 minutes
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
+#endif
 
     unsigned int mingen = parser.createParam( (unsigned int)10, "gen-min", 
             "Minimum number of iterations", 'n', "Stopping criterions" ).value();
@@ -385,9 +387,12 @@ int main ( int argc, char* argv[] )
 #endif
     
     TimeVal best_makespan = INT_MAX; // FIXME UINT_MAX returns -1, why?
+
+#ifndef OPENMP
     std::string dump_sep = ".";
     unsigned int dump_file_count = 1;
     std::string metadata = "domain " + domain + "\n" + IPC_PLAN_COMMENT + "instance " + instance;
+#endif
 
     // Preventive direct call to YAHSP
     daex::Decomposition empty_decompo;
@@ -403,14 +408,26 @@ int main ( int argc, char* argv[] )
 	    goodguys=0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-            daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty/*, is_sequential*/ );
-            daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
+            daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+
+// in non multi-threaded version, use the plan dumper
+#ifndef OPENMP
+                daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
+
+// if we do not want MT, but we want debug, add more eval wrappers
 #ifndef NDEBUG
-            eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
-            eval_counter.value( eval_count );
-            eoPopLoopEval<daex::Decomposition> eval_y( eval_counter );
-#else
-            eoPopLoopEval<daex::Decomposition> eval_y( eval_bestfile );
+                    eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
+                    eval_counter.value( eval_count );
+                    eoPopLoopEval<daex::Decomposition> eval_y( eval_counter );
+
+// else, only the plan dumper
+#else // ifdef NDEBUG
+                    eoPopLoopEval<daex::Decomposition> eval_y( eval_bestfile );
+#endif
+
+// if we want to compile a multi-threaded version with OpenMP, we only want the basic evaluator, not the other wrappers, even the one that dump plans
+#else // ifdef OPENMP
+                eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
 #endif
             eval_y( pop, pop );
 
@@ -430,10 +447,14 @@ int main ( int argc, char* argv[] )
 	    // If no individual haven't yet been found, then try a direct call to YAHSP (i.e. the empty decomposition evaluation)
             if ((goodguys == 0) && (!found)) {
                 empty_decompo.invalidate();
+#ifdef OPENMP
+                eval_yahsp( empty_decompo );
+#else
 #ifndef NDEBUG
                 eval_counter(empty_decompo);
 #else
                 eval_bestfile(empty_decompo);
+#endif
 #endif
                 if (empty_decompo.fitness().is_feasible()){
                     found = true;
@@ -444,9 +465,13 @@ int main ( int argc, char* argv[] )
                     */
                 }
             } // if ! goodguys && ! found
-            
+
+#ifdef OPENMP
+            best_makespan = pop.best_element().fitness().makespan();
+#else
             best_makespan = eval_bestfile.best();
             dump_file_count = eval_bestfile.file_count();
+#endif
             
 #ifndef NDEBUG
             eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize);
@@ -484,6 +509,7 @@ int main ( int argc, char* argv[] )
     // nested evals:
     eoEvalFunc<daex::Decomposition> * p_eval;
 
+#ifndef OPENMP
     // dump the best solution found so far in a file
     daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 
@@ -492,9 +518,13 @@ int main ( int argc, char* argv[] )
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
     eval_counter.value( eval_count );
 #endif
+#endif
 
     // if we do not want to add a time limit, do not add an EvalTime
-    if( max_seconds == 0 ) {
+#ifdef OPENMP
+        p_eval = & eval_yahsp;
+#else // ifndef OPENMP
+        if( max_seconds == 0 ) {
 #ifndef NDEBUG
         p_eval = & eval_counter;
 #else
@@ -512,6 +542,7 @@ int main ( int argc, char* argv[] )
 #endif
         p_eval = p_eval_maxtime;
     }
+#endif // OPENMP
 
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
@@ -608,8 +639,9 @@ int main ( int argc, char* argv[] )
         //checkpoint.add( dual_median );
         //checkpoint.add( iqr_stat );
         checkpoint.add( dual_iqr );
-    
+#ifndef OPENMP
         clog_monitor.add( eval_counter );
+#endif
         clog_monitor.add( best_stat );
         clog_monitor.add( asize_stat );
         clog_monitor.add( feasible_stat );
