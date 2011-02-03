@@ -1,0 +1,169 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citeauthoryear{Bibai \bgroup et al.\egroup
+  }{2008}]{deterministic:IPC6}
+Bibai, J.; Sav{\'e}ant, P.; Schoenauer, M.; and Vidal, V.
+\newblock 2008.
+\newblock {DAE : Planning as Artificial Evolution (Deterministic part)}.
+\newblock At International Planning Competition (IPC)
+  {\texttt{http://ipc.icaps-conference.org/}}.
+
+\bibitem[\protect\citeauthoryear{Bibai \bgroup et al.\egroup
+  }{2010}]{BibGECCO:2010}
+Bibai, J.; Sav{\'e}ant, P.; Schoenauer, M.; and Vidal, V.
+\newblock 2010.
+\newblock On the generality of parameter tuning in evolutionary planning.
+\newblock In {et al.}, J.~B., ed., {\em Genetic and Evolutionary Computation
+  Conference (GECCO)},  241--248.
+\newblock ACM Press.
+
+\bibitem[\protect\citeauthoryear{Bibai, Sav{\'e}ant, and
+  Schoenauer}{2009}]{BibEvoCop2009}
+Bibai, J.; Sav{\'e}ant, P.; and Schoenauer, M.
+\newblock 2009.
+\newblock {Divide-And-Evolve Facing State-of-the-Art Temporal Planners during
+  the $6^{th}$ International Planning Competition}.
+\newblock In Cotta, C., and Cowling, P., eds., {\em Ninth European Conference
+  on Evolutionary Computation in Combinatorial Optimization (EvoCOP 2009)},
+  number 5482 in Lecture Notes in Computer Science,  133--144.
+\newblock Springer-Verlag.
+
+\bibitem[\protect\citeauthoryear{Bri{\'e} and Morignot}{2005}]{Morignot-2005}
+Bri{\'e}, A.~H., and Morignot, P.
+\newblock 2005.
+\newblock Genetic {P}lanning {U}sing {V}ariable {L}ength {C}hromosomes.
+\newblock In {\em Proc. ICAPS}.
+
+\bibitem[\protect\citeauthoryear{Fox and Long}{2003}]{Fox-JAIR-2003}
+Fox, M., and Long, D.
+\newblock 2003.
+\newblock {PDDL2.1}: {A}n {E}xtension to {PDDL} for {E}xpressing {T}emporal
+  {P}lanning {D}omains.
+\newblock {\em JAIR} 20:61--124.
+
+\bibitem[\protect\citeauthoryear{Grefenstette}{1986}]{Grefenstette86}
+Grefenstette, J.~J.
+\newblock 1986.
+\newblock Optimization of control parameters for genetic algorithms.
+\newblock {\em IEEE Trans. on Systems, Man and Cybernetics} SMC-16.
+
+\bibitem[\protect\citeauthoryear{Hart, Krasnogor, and
+  Smith}{2005}]{MemeticBook:2005}
+Hart, W.; Krasnogor, N.; and Smith, J., eds.
+\newblock 2005.
+\newblock {\em Recent Advances in Memetic Algorithms}.
+\newblock Studies in Fuzziness and Soft Computing, Vol. 166. Springer Verlag.
+
+\bibitem[\protect\citeauthoryear{Haslum and
+  Geffner}{2000}]{HaslumGeffner-AIPS-2000}
+Haslum, P., and Geffner, H.
+\newblock 2000.
+\newblock Admissible {H}euristics for {O}ptimal {P}lanning.
+\newblock In {\em Proc. AIPS-2000},  70--82.
+
+\bibitem[\protect\citeauthoryear{Hutter \bgroup et al.\egroup
+  }{2006}]{Hutter06}
+Hutter, F.; Hamadi, Y.; Hoos, H.~H.; and Leyton-Brown, K.
+\newblock 2006.
+\newblock Performance prediction and automated tuning of randomized and
+  parametric algorithms.
+\newblock In {\em CP 2006}, number 4204 in lncs,  213--228.
+\newblock Springer Verlag.
+
+\bibitem[\protect\citeauthoryear{Hutter \bgroup et al.\egroup
+  }{2009}]{ParamILS-JAIR}
+Hutter, F.; Hoos, H.~H.; Leyton-Brown, K.; and St{\"u}tzle, T.
+\newblock 2009.
+\newblock {ParamILS:} an automatic algorithm configuration framework.
+\newblock {\em Journal of Artificial Intelligence Research} 36:267--306.
+
+\bibitem[\protect\citeauthoryear{{J}acques {B}ibai \bgroup et al.\egroup
+  }{2010a}]{Bibai:ICAPS2010}
+{J}acques {B}ibai; {P}ierre {S}av{\'e}ant; {M}arc {S}choenauer; and {V}incent
+  {V}idal.
+\newblock 2010a.
+\newblock An evolutionary metaheuristic based on state decomposition for
+  domain-independent satisficing planning.
+\newblock In {\em {I}{C}{A}{P}S 2010},  18--25.
+\newblock AAAI press.
+
+\bibitem[\protect\citeauthoryear{{J}acques {B}ibai \bgroup et al.\egroup
+  }{2010b}]{BibEvoCop:2010}
+{J}acques {B}ibai; {P}ierre {S}av{\'e}ant; {M}arc {S}choenauer; and {V}incent
+  {V}idal.
+\newblock 2010b.
+\newblock On the benefit of sub-optimality within the divide-and-evolve scheme.
+\newblock In Cowling, P., and Merz, P., eds., {\em EvoCOP 2010}, number 6022 in
+  Lecture Notes in Computer Science,  23--34.
+\newblock Springer-Verlag.
+
+\bibitem[\protect\citeauthoryear{Lobo, Lima, and
+  Michalewicz}{2007}]{ParameterSettingBook07}
+Lobo, F.; Lima, C.; and Michalewicz, Z., eds.
+\newblock 2007.
+\newblock {\em Parameter Setting in Evolutionary Algorithms}.
+\newblock Berlin: Springer.
+
+\bibitem[\protect\citeauthoryear{Muslea}{1997}]{muslea97}
+Muslea, I.
+\newblock 1997.
+\newblock {SINERGY: A Linear Planner Based on Genetic Programming}.
+\newblock In {\em Proc. ECP '97},  312--324.
+\newblock Springer-Verlag.
+
+\bibitem[\protect\citeauthoryear{Schoenauer, Sav{\'e}ant, and
+  Vidal}{2006}]{DAE:EvoCOP06}
+Schoenauer, M.; Sav{\'e}ant, P.; and Vidal, V.
+\newblock 2006.
+\newblock {Divide-and-Evolve: a New Memetic Scheme for Domain-Independent
+  Temporal Planning}.
+\newblock In Gottlieb, J., and Raidl, G., eds., {\em Proc. EvoCOP'06}.
+\newblock Springer Verlag.
+
+\bibitem[\protect\citeauthoryear{Schoenauer, Sav{\'e}ant, and
+  Vidal}{2007}]{DAE:book-2007}
+Schoenauer, M.; Sav{\'e}ant, P.; and Vidal, V.
+\newblock 2007.
+\newblock {Divide-and-Evolve: a Sequential Hybridization Strategy using
+  Evolutionary Algorithms}.
+\newblock In Michalewicz, Z., and Siarry, P., eds., {\em {Advances in
+  Metaheuristics for Hard Optimization}},  179--198.
+\newblock Springer.
+
+\bibitem[\protect\citeauthoryear{Spector}{1994}]{Spector-AAAI-94}
+Spector, L.
+\newblock 1994.
+\newblock Genetic {P}rogramming and {AI} {P}lanning {S}ystems.
+\newblock In {\em Proc. AAAI 94},  1329--1334.
+\newblock AAAI/MIT Press.
+
+\bibitem[\protect\citeauthoryear{Vidal}{2004}]{V:icaps04}
+Vidal, V.
+\newblock 2004.
+\newblock A lookahead strategy for heuristic search planning.
+\newblock In {\em Proceedings of the 14th International Conference on Automated
+  Planning and Scheduling (ICAPS'04)},  150--159.
+\newblock Whistler, BC, Canada: AAAI Press.
+
+\bibitem[\protect\citeauthoryear{Westerberg and Levine}{2000}]{westerberg:2000}
+Westerberg, C.~H., and Levine, J.
+\newblock 2000.
+\newblock {``GenPlan'': Combining Genetic Programming and Planning}.
+\newblock In Garagnani, M., ed., {\em 19th PLANSIG Workshop}.
+
+\bibitem[\protect\citeauthoryear{Westerberg and Levine}{2001}]{westerberg:2001}
+Westerberg, C.~H., and Levine, J.
+\newblock 2001.
+\newblock {Investigations of Different Seeding Strategies in a Genetic
+  Planner}.
+\newblock In {E.J.W. Boers et al.}, ed., {\em Applications of Evolutionary
+  Computing},  505--514.
+\newblock LNCS 2037, Springer-Verlag.
+
+\bibitem[\protect\citeauthoryear{Yu \bgroup et al.\egroup }{2008}]{practice08}
+Yu, T.; Davis, L.; Baydar, C.; and Roy, R., eds.
+\newblock 2008.
+\newblock {\em Evolutionary Computation in Practice}.
+\newblock Studies in Computational Intelligence 88, Springer Verlag.
+
+\end{thebibliography}
