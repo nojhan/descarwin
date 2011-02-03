@@ -38,7 +38,7 @@ LINK_DIRECTORIES(${CPT_LIB_DIR})
 ADD_DEFINITIONS(-W -Wall)
 
 # SET( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DPAPERVERSION -fopenmp" )
-# SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG -fopenmp" )
+SET( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -DNDEBUG -fopenmp" )
 
 # make a static exe
 # FIXME this is a ugly ha as it assume that the linker is gcc-compatible
