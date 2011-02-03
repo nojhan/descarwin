@@ -10,8 +10,8 @@ namespace daex
 
 void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/, 
                           unsigned int heuristic_start_times /*= HEURISTIC_H1*/,
-                          /*bool is_sequential,*/ /* = false */
-                          std::vector<std::string> solver_args /* = std::vector<std::string>()*/  
+                          unsigned int nthreads /* = 1 */,
+                          std::vector<std::string> solver_args /* = std::vector<std::string>()*/
         )
 {
     assert( solver == SOLVER_YAHSP || solver == SOLVER_CPT );
@@ -28,16 +28,9 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     cpt_call.push_back( "-dae" );
 
     // number of threads
-    std::stringstream nthreads;
-    //nthreads << eo::parallel.nthreads(); // does not work............ FIXME
-    nthreads << 2;
-    cpt_call.push_back( nthreads.str().c_str() );
-
-    // Searches a sequential plan ( sequential / seq / P )
-    // TODO ne mettre l'option -seq que pour les PDDL strips et cost, et pas pour temporal (extraire l'info lors du parsing ?) avec pddl_domain->action_costs ?
-    //if( is_sequential ) {
-    //    cpt_call.push_back( "-sequential" );
-    //}
+    std::stringstream nbthreads;
+    nbthreads << nthreads;
+    cpt_call.push_back( nbthreads.str().c_str() );
 
     // Domain file (typed/untyped PDDL) ( ops / NULL / o )
     cpt_call.push_back( "-ops" );
@@ -54,16 +47,16 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
         // use suboptimal yahsp search (yahsp / yahsp / y)
         cpt_call.push_back( "-yahsp" );
 
-	// -yashp now has one argument (for multicore)
-        cpt_call.push_back( "64" ); 
+        // -yashp now has one argument (for multicore)
+        cpt_call.push_back( "64" );
 
-	// précision pour la planif temporelle. Pour IPC : 0.01 (cf. mail Carlos)
-	// à vérifier.
-	cpt_call.push_back( "-K" ); 
-	cpt_call.push_back( "0.01,0.01" ); 
+        // précision pour la planif temporelle. Pour IPC : 0.01 (cf. mail Carlos)
+        // à vérifier.
+        cpt_call.push_back( "-K" ); 
+        cpt_call.push_back( "0.01,0.01" ); 
 	
         // Enables h2-based fluent mutexes in yahsp (fluent-mutexes / fm / F)
-	cpt_call.push_back( "-fluent-mutexes" );
+        cpt_call.push_back( "-fluent-mutexes" );
 
         // Maximum number of backtracks <x> allowed.
         // TODO vérifier que yahsp ne différencie pas -maxbb et -maxb
@@ -158,16 +151,6 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     // TODO restreindre les prédicats à ceux qui sont utilisés
 
 
-    /*
-    std::cout << "Nombre de fluents = " << fluents_nb << std::endl;
-    for( unsigned int i=0; i < fluents_nb; ++i ) {
-        std::cout << "fluent " << i << " init: " << fluents[i]->init << std::endl;
-    }
-    std::cout << std::endl;
-    */
-
-    //std::cout << "i\tterms_nb\tname" << std::endl;
-
     // fluents et fluents_nb sont des variables globales initialisées par CPT à partir de pddl_domain, 
     // puis modifiées pour ne garder que les fluents atteignables
 
@@ -217,11 +200,11 @@ pddlLoad::pddlLoad(
           std::string problem, 
           std::string solver /*= SOLVER_YAHSP*/, 
           unsigned int heuristic_start_times /*= HEURISTIC_H1*/,
-          /*bool is_sequential,*/ /*= false */
+          unsigned int nthreads /*= 1*/,
           std::vector<std::string> solver_args /* = std::vector<std::string>()*/
         ) : _domain(domain), _problem(problem)
 {
-    load_pddl( solver, heuristic_start_times, /*is_sequential,*/ solver_args );
+    load_pddl( solver, heuristic_start_times, nthreads, solver_args);
     compute_chrono_partition();
 }
 

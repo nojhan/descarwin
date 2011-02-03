@@ -24,7 +24,7 @@
 
 #define LOG_FILL ' '
 #define FORMAT_LEFT_FILL_WIDTH(width) "\t" << std::left << std::setfill(LOG_FILL) << std::setw(width) 
-#define FORMAT_LEFT_FILL_W_PARAM FORMAT_LEFT_FILL_WIDTH(20)
+#define FORMAT_LEFT_FILL_W_PARAM FORMAT_LEFT_FILL_WIDTH(22)
 
 // MODIFS MS START
 // at the moment, in utils/make_help.cpp
@@ -103,12 +103,7 @@ int main ( int argc, char* argv[] )
     // WALLOCK TIME COUNTER
     time_t time_start = std::time(NULL);
 
-
-    // EO
-    eoParserLogger parser(argc, argv);
-    make_verbose(parser);
-    make_parallel(parser);
-
+    
     // SYSTEM
 #ifndef NDEBUG
     struct rlimit limit;
@@ -131,9 +126,21 @@ int main ( int argc, char* argv[] )
 #endif
 
 
+    // EO
+    eoParserLogger parser(argc, argv);
+    make_verbose(parser);
+    make_parallel(parser);
+    
     // PARAMETERS
-
     eo::log << eo::logging << "Parameters:" << std::endl;
+
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "verbose" << eo::log.getLevelSelected() << std::endl;
+
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-loop" << eo::parallel.isEnabled() << std::endl;
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-dynamic" << eo::parallel.isDynamic() << std::endl;
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-prefix" << eo::parallel.prefix() << std::endl;
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-nthreads" << eo::parallel.nthreads() << std::endl;
+
 
     // createParam (ValueType _defaultValue, std::string _longName, std::string _description, char _shortHand=0, std::string _section="", bool _required=false)
     std::string domain = parser.createParam( (std::string)"domain-zeno-time.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
@@ -334,8 +341,8 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
     
-    daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1/*, is_sequential*/ );
-    
+    daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, eo::parallel.nthreads(), std::vector<std::string>());
+   
 #ifndef NDEBUG
     eo::log << eo::progress << "Load the instance...OK" << std::endl;
     eo::log << eo::progress << "Initialization...";
