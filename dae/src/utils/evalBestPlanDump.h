@@ -77,6 +77,7 @@ public:
             _func( eo );
 
             if( eo.fitness().is_feasible() ) {
+#pragma omp critical
                 call( eo );
             } // if feasible
         } // if invalid
