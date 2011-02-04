@@ -87,7 +87,7 @@ extern void print_plan_ipc_anytime(SolutionPlan *plan);
 extern SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time);
 extern void plan_free(SolutionPlan *plan);
 extern void compress_plans(bool causals, bool orderings);
-extern int precedes_in_plan(const void *s1, const void *s2);
+extern Comparison precedes_in_plan(Step **s1, Step **s2);
 
 extern void plan_free_static(SolutionPlan *plan);
 extern SolutionPlan plan_copy_static(SolutionPlan plan);

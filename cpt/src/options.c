@@ -11,6 +11,8 @@
 #include "cpt.h"
 #include "trace.h"
 #include "options.h"
+#include "structs.h"
+#include "plan.h"
 #include "globs.h"
 
 

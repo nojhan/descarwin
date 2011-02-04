@@ -10,6 +10,7 @@
 #include "cpt.h"
 #include "structs.h"
 #include "problem.h"
+#include "plan.h"
 #include "globs.h"
 #include "propagations.h"
 #include "trace_planner.h"

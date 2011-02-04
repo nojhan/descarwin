@@ -12,9 +12,8 @@
 #include "problem.h"
 #include "max_atom.h"
 #include "plan.h"
-#include "comparison.h"
-#include "globs.h"
 #include "trace_planner.h"
+#include "globs.h"
 
 // DIRTY
 #define end_action (&yend_action)
@@ -29,7 +28,7 @@ struct YStep {
 
 struct Node {
   long id;
-  Node *ancestor;
+  Node *parent;
   unsigned long key;
   BitArray state;
   long length;
@@ -46,7 +45,6 @@ struct Heuristic {
   BitArray state;
   TimeVal *inits;
 };
-
 
 static TimeVal *ainit;
 static TimeVal *aused;
@@ -66,6 +64,11 @@ static TimeVal best_makespan;
 
 #ifdef DAE
 #pragma omp threadprivate(ainit, aused, finit, relaxed_plan, relaxed_plan_nb, applicable, applicable_nb, open_list, closed_list, current_state, initial_bitstate, best_makespan)
+
+#ifndef SHARED_MEMOIZATION
+#pragma omp threadprivate(heuristics)
+#endif
+
 #endif
 
 #define get_ainit(a) ainit[(a)->id]
@@ -107,6 +110,7 @@ static TimeVal best_makespan;
 static Comparison is_best_action_rp(Action *prod, Action *best)
 {
   PREFER(prod->id > 1, best->id <= 1);
+  // PREFER(get_aused(prod), !get_aused(best)); // à évaluer !!
   LESS(get_ainit(prod), get_ainit(best));
 #ifdef DAE
   LESS(duration(prod), duration(best));
@@ -205,24 +209,25 @@ static void heuristic_insert(Node *node)
   Heuristic *h = cpt_malloc(h, 1);
   int gdsl_return;
   h->key = node->key;
-  h->state = bitarray_create(fluents_nb);
-  bitarray_copy(h->state, node->state, fluents_nb);
+  bitarray_clone(h->state, node->state, fluents_nb);
   cpt_malloc(h->inits, fluents_nb);
   memcpy(h->inits, finit, fluents_nb * sizeof(TimeVal));
+#ifdef SHARED_MEMOIZATION
 #pragma omp critical
+#endif
   gdsl_rbtree_insert(heuristics, h, &gdsl_return);
 }
 
-#define COST2(a) ({ TimeVal cost = 0; FOR(f, yend_action.prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
-
 static bool heuristic_search(Node *node)
 {
-  Heuristic test;
-  test.key = node->key;
-  test.state = node->state;
+  Heuristic tmp;
+  tmp.key = node->key;
+  tmp.state = node->state;
   Heuristic *h;
+#ifdef SHARED_MEMOIZATION
 #pragma omp critical
-  h = (Heuristic *) gdsl_rbtree_search(heuristics, (gdsl_compare_func_t) heuristic_cmp, &test);
+#endif
+  h = (Heuristic *) gdsl_rbtree_search(heuristics, (gdsl_compare_func_t) heuristic_cmp, &tmp);
   if (h == NULL) return false;
   memcpy(finit, h->inits, fluents_nb * sizeof(TimeVal));
   set_ainit(end_action, COST(end_action));
@@ -243,10 +248,6 @@ static void compute_h1(Node *node)
     set_ainit(a, MAXTIME);
     set_aused(a, a->prec_nb == 0);
   } EFOR;
-  // DIRTY
-  set_ainit(end_action, MAXTIME);
-  set_aused(end_action, end_action->prec_nb == 0);
-  //
   FOR(f, fluents) { 
     set_finit(f, MAXTIME);
     if (bitarray_get(node->state, f)) update_cost_h1(f, 0);
@@ -257,10 +258,10 @@ static void compute_h1(Node *node)
 }
 
 
-static Comparison cmp_actions(const void *s1, const void *s2)
+static Comparison cmp_actions(Action **s1, Action **s2)
 {
-  Action *a1 = *((Action **) s1);
-  Action *a2 = *((Action **) s2);
+  Action *a1 = *s1;
+  Action *a2 = *s2;
   LESS(get_ainit(a1), get_ainit(a2));
   FOR(f, a1->prec) { if (deletes(a2, f)) return Better; } EFOR;
   FOR(f, a2->prec) { if (deletes(a1, f)) return Worse; } EFOR;
@@ -272,9 +273,6 @@ static void compute_relaxed_plan(Node *node)
   relaxed_plan[0] = end_action;
   relaxed_plan_nb = 1;
   FOR(a, actions) { set_aused(a, false); } EFOR;
-  // DIRTY
-  set_aused(end_action, false);
-  //
   FOR(f, fluents) { set_finit(f, bitarray_get(node->state, f)); } EFOR;
   FOR(a, relaxed_plan) {
     FOR(f, a->prec) {
@@ -292,7 +290,7 @@ static void compute_relaxed_plan(Node *node)
       }
     } EFOR;
   } EFOR;
-  qsort(relaxed_plan, relaxed_plan_nb, sizeof(Action *), (int (*)(const void*, const void*)) cmp_actions);
+  vector_sort(relaxed_plan, cmp_actions);
 }
 
 static bool can_be_applied(Node *node, Action *a)
@@ -325,7 +323,7 @@ static void node_apply_action(Node *node, Action *a)
 	if (init >= tmp->makespan) goto end;
       }
     } EFOR;
-    tmp = tmp->ancestor;
+    tmp = tmp->parent;
   }
  end:
   node->steps[node->steps_nb].action = a;
@@ -338,15 +336,12 @@ static Node *node_derive(Node *node)
 {
   Node *son = cpt_calloc(son, 1);
   son->id = stats.computed_nodes++;
-  son->ancestor = node;
+  son->parent = node;
   son->length = node->length;
   son->makespan = node->makespan;
-  son->state = bitarray_create(fluents_nb);
-  bitarray_copy(son->state, node->state, fluents_nb);
+  bitarray_clone(son->state, node->state, fluents_nb);
   return son;
 }
-
-
 
 static Node *apply_relaxed_plan(Node *node)
 {
@@ -420,29 +415,26 @@ static Node *apply_relaxed_plan(Node *node)
       } EFOR;
     } EFOR;
   } EFOR;
-  if (son->steps_nb > 0) cpt_realloc(son->steps, son->steps_nb);
+  cpt_realloc(son->steps, son->steps_nb);
   return son;
 }
 
 static void create_solution_plan(Node *node)
 {
   SolutionPlan *plan = cpt_calloc(plan, 1);
-
-  cpt_malloc(plan->steps, (plan->steps_nb = node->length));
+  long length = node->length;
+  cpt_malloc(plan->steps, (plan->steps_nb = length));
   plan->makespan = node->makespan;
-
+  plan->backtracks = stats.evaluated_nodes;
   while (node != NULL) {
-    FORi(a, i, node->steps) {
-      Step *s = cpt_calloc(plan->steps[node->length - node->steps_nb + i], 1);
+    RFOR(a, node->steps) {
+      Step *s = cpt_calloc(plan->steps[--length], 1);
       s->action = a.action;
       s->init = a.init;
     } EFOR;
-    node = node->ancestor;
+    node = node->parent;
   }
-
-  qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);
-  plan->backtracks = stats.evaluated_nodes;
-
+  vector_sort(plan->steps, precedes_in_plan);
   solution_plan = plan;
 }
 
@@ -472,9 +464,9 @@ static Node *compute_node(Node *node)
 
 
 
-static int open_list_map(Node *node, gdsl_location_t loc, void *data) 
+static int open_list_map(Node *node, gdsl_location_t loc, Node **data) 
 {
-  if (*((Node **) data) == NULL) *((Node **) data) = node;
+  if (*data == NULL) *data = node;
   return GDSL_MAP_STOP;
 }
 
@@ -490,7 +482,7 @@ static Node *yahsp_plan()
 {
   Node *node = cpt_calloc(node, 1), *son;
   best_makespan = MAXTIME;
-  node->state = current_state;
+  bitarray_clone(node->state, current_state, fluents_nb);
   if ((son = compute_node(node))) return son;
   while ((node = open_list_pop_best())) {
     stats.expanded_nodes++;
@@ -508,14 +500,11 @@ static Node *yahsp_plan()
 
 void yahsp_reset()
 {
-  cpt_free(current_state);
-  current_state = bitarray_create(fluents_nb);
   bitarray_copy(current_state, initial_bitstate, fluents_nb);
 }
 
 void yahsp_init()
 {
-  compute_init_rh1_cost();
   cpt_malloc(ainit, actions_nb);
   cpt_malloc(aused, actions_nb);
   cpt_malloc(finit, fluents_nb);
@@ -524,10 +513,13 @@ void yahsp_init()
 
   open_list = gdsl_rbtree_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) open_list_cmp);
   closed_list = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) node_free, (gdsl_compare_func_t) closed_list_cmp);
+#ifdef SHARED_MEMOIZATION
 #pragma omp master
+#endif
   if (opt.dae) heuristics = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) heuristic_free, (gdsl_compare_func_t) heuristic_cmp);
 
   initial_bitstate = bitarray_create(fluents_nb);
+  current_state = bitarray_create(fluents_nb);
   FOR(f, init_state) { bitarray_set(initial_bitstate, f); } EFOR;
   yahsp_reset();
   srand(opt.seed);
@@ -542,24 +534,17 @@ int yahsp_main()
 
   Node *node = yahsp_plan();
 
+  int return_code;
   if (node == NULL) {
-    current_state = NULL;
-    gdsl_rbtree_flush(open_list);
-    gdsl_rbtree_flush(closed_list);
-    return NO_PLAN;
+    return_code = NO_PLAN;
+  } else {
+    bitarray_copy(current_state, node->state, fluents_nb);
+    create_solution_plan(node);
+    return_code = PLAN_FOUND;
   }
-  
-  /* current_state = bitarray_create(fluents_nb); */
-  /* bitarray_copy(current_state, node->state, fluents_nb); */
-  current_state = node->state;
-  node->state = NULL;
-
-  create_solution_plan(node);
-
   gdsl_rbtree_flush(open_list);
   gdsl_rbtree_flush(closed_list);
-
-  return PLAN_FOUND;
+  return return_code;
 }
 
 int yahsp_compress_plans()
@@ -571,8 +556,8 @@ int yahsp_compress_plans()
   plan->steps_nb = 0;
   FOR(p, plans) {
     FOR(s, p->steps) {
-      *cpt_calloc(plan->steps[plan->steps_nb++], 1) = *s;
-      s = plan->steps[plan->steps_nb - 1];
+      *cpt_calloc(plan->steps[plan->steps_nb], 1) = *s;
+      s = plan->steps[plan->steps_nb++];
       s->init = 0;
       RFOR(s2, plan->steps) {
 	if (action_must_precede(s2->action, s->action)) {
@@ -584,7 +569,7 @@ int yahsp_compress_plans()
       maximize(plan->makespan, s->end);
     } EFOR;
   } EFOR;
-  qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);
+  vector_sort(plan->steps, precedes_in_plan);
   solution_plan = plan;
   return PLAN_FOUND;
 }

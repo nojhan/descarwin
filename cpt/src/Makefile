@@ -86,6 +86,9 @@ STATIC_LIBS = $(GDSL_STATIC)
 all: CPPFLAGS += -DDAE
 all: nodae
 
+shared: CPPFLAGS += -DSHARED_MEMOIZATION
+shared: all
+
 nodae: lib mtlib exe  mt
 
 exe: $(EXE) 

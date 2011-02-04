@@ -84,7 +84,6 @@ struct TimeStruct {
 
 #define STRING_MAX 10000
 
-
 #include "options.h"
 
 
@@ -114,6 +113,7 @@ struct TimeStruct {
 #define SVECTOR(args...) _mkvector(args, static)
 #define _mkvector(type, name, kw...) kw type *name; kw long name##_nb
 #define vector_copy(dest, source) NEST( cpt_malloc(dest, (dest##_nb = source##_nb)); memcpy(dest, source, dest##_nb * sizeof(typeof(*dest))); )
+#define vector_sort(name, cmp_func) qsort(name, name##_nb, sizeof(typeof(*name)), (int (*) (const void *, const void *)) cmp_func)
 
 /* Bit arrays */
 
@@ -121,6 +121,7 @@ typedef unsigned long *BitArray;
 
 #define bitarray_create(n) ((unsigned long *) calloc(((n) - 1) / __WORDSIZE + 1, sizeof(unsigned long)))
 #define bitarray_copy(dest, source, n) memcpy(dest, source, (((n) - 1) / __WORDSIZE + 1) * sizeof(unsigned long))
+#define bitarray_clone(dest, source, n) NEST( dest = bitarray_create(n); bitarray_copy(dest, source, n); )
 #define bitarray_cmp(dest, source, n) memcmp(dest, source, (((n) - 1) / __WORDSIZE + 1) * sizeof(unsigned long))
 #define bitarray_set_index(x) NEST( (x)->bit_index = (x)->id / __WORDSIZE; (x)->bit_mask = 1L << ((x)->id % __WORDSIZE); )
 #define bitarray_set(tab, x) NEST( tab[(x)->bit_index] |= (x)->bit_mask; )
@@ -156,6 +157,17 @@ typedef unsigned long *BitArray;
 #define FORCOUPLE(x1, t1, x2, t2) FOR(x1, t1) FOR(x2, t2) 
 #define EFORPAIR EFOR; EFOR
 #define EFORCOUPLE EFOR; EFOR
+
+
+/* Comparisons */
+
+typedef enum {Better = -1, Equal = 0, Worse = 1} Comparison;
+
+#define LESS(x, y) NEST( typeof(x) _a = x; typeof(y) _b = y; if (_a < _b) return Better; if (_a > _b) return Worse; )
+#define GREATER(x, y) NEST( typeof(x) _a = x; typeof(y) _b = y; if (_a > _b) return Better; if (_a < _b) return Worse; )
+#define PREFER(exp1, exp2) NEST( bool _e1 = exp1, _e2 = exp2; if (_e1 && _e2) return Better; if (!_e1 && !_e2) return Worse; )
+
+#define preferred(comp, ties) ({ Comparison test = comp; test == Worse ? false : !opt.random ? test == Better : test == Better ? (ties = 1) : rand() % ++ties == 0; })
 
 
 #define mpz_get_timeval(n) ({ char *s = mpz_get_str(NULL, 10, n); TimeVal res = atoll(s); free(s); res; })

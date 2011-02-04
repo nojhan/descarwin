@@ -10,6 +10,8 @@
 #include "cpt.h"
 #include "trace.h"
 #include "var.h"
+#include "structs.h"
+#include "plan.h"
 #include "globs.h"
 
 

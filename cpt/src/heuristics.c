@@ -9,10 +9,10 @@
 
 #include "cpt.h"
 #include "structs.h"
-#include "globs.h"
-#include "comparison.h"
+#include "plan.h"
 #include "heuristics.h"
 #include "trace.h"
+#include "globs.h"
 
 
 /*****************************************************************************/

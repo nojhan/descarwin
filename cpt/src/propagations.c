@@ -15,10 +15,10 @@
 #include "scheduling.h"
 #include "plan.h"
 #include "trace_planner.h"
-#include "globs.h"
 #ifdef RESOURCES
 #include "resources.h"
 #endif
+#include "globs.h"
 
 
 /*---------------------------------------------------------------------------*/

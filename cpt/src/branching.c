@@ -14,10 +14,9 @@
 #include "scheduling.h"
 #include "plan.h"
 #include "trace_planner.h"
-#include "globs.h"
-#include "comparison.h"
 #include "heuristics.h"
 #include "branching.h"
+#include "globs.h"
 
 
 /*---------------------------------------------------------------------------*/

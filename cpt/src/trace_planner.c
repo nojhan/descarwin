@@ -11,8 +11,8 @@
 #include "structs.h"
 #include "problem.h"
 #include "branching.h"
-#include "globs.h"
 #include "plan.h"
+#include "globs.h"
 #include "trace_planner.h"
 
 

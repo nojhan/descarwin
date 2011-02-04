@@ -10,21 +10,17 @@
 #include "cpt.h"
 #include "structs.h"
 #include "problem.h"
-#include "globs.h"
 #include "propagations.h"
 #include "plan.h"
-#include "comparison.h"
 #include "trace_planner.h"
 #ifdef RESOURCES
 #include "resources.h"
 #endif
+#include "globs.h"
 
 /*---------------------------------------------------------------------------*/
 /* Static Functions                                                          */
 /*---------------------------------------------------------------------------*/
-
-
-//static int precedes_in_plan(const void *s1, const void *s2);
 
 
 /*****************************************************************************/
@@ -92,10 +88,10 @@ void print_plan_ipc_anytime(SolutionPlan *plan)
   }
 }
 
-int precedes_in_plan(const void *s1, const void *s2)
+Comparison precedes_in_plan(Step **s1, Step **s2)
 {
-  Step *a = *((Step **) s1);
-  Step *b = *((Step **) s2);
+  Step *a = *s1;
+  Step *b = *s2;
   LESS(a->init, b->init);
   LESS(duration(a->action), duration(b->action));
   LESS(a->action->id, b->action->id);
@@ -126,7 +122,7 @@ SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
   } EFOR;
   if (opt.sequential && pddl_domain->action_costs) plan->makespan = total_plan_cost;
   //plan->makespan = first_start(end_action) - (opt.pddl21 ? pddl_domain->precision.t : 0);
-  qsort(plan->steps, plan->steps_nb, sizeof(Step *), precedes_in_plan);
+  vector_sort(plan->steps, precedes_in_plan);
 
   FOR(s, plan->steps) { 
     s->causals_nb = s->action->causals_nb;

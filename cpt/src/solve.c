@@ -242,8 +242,6 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
 {
   FORPAIR(f1, f2, goals) { if (fmutex(f1, f2)) return GOALS_MUTEX; } EFORPAIR;
 
-  if (init_nb == -1) exit(88);
-
   if (init_nb != -1) {
     start_action->add = init;
     start_action->add_nb = init_nb;

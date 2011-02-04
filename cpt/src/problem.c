@@ -18,10 +18,10 @@
 #include "preprocess.h"
 #include "scheduling.h"
 #include "yahsp.h"
-#include "globs.h"
 #ifdef RESOURCES
 #include "resources.h"
 #endif
+#include "globs.h"
 
 
 /*---------------------------------------------------------------------------*/
