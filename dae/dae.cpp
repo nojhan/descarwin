@@ -283,7 +283,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_mut" << proba_mut << std::endl;
 
     // Stopping criterions
-#ifndef OPENMP
+#ifndef SINGLE_EVAL_ITER_DUMP
     unsigned int max_seconds = parser.createParam( (unsigned int)0, "max-seconds", 
             "Maximum number of user seconds in CPU for the whole search, set it to 0 to deactivate (1800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 1800 seconds = 30 minutes
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
@@ -388,7 +388,7 @@ int main ( int argc, char* argv[] )
     
     TimeVal best_makespan = INT_MAX; // FIXME UINT_MAX returns -1, why?
 
-#ifndef OPENMP
+#ifndef SINGLE_EVAL_ITER_DUMP
     std::string dump_sep = ".";
     unsigned int dump_file_count = 1;
     std::string metadata = "domain " + domain + "\n" + IPC_PLAN_COMMENT + "instance " + instance;
@@ -411,7 +411,7 @@ int main ( int argc, char* argv[] )
             daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
 
 // in non multi-threaded version, use the plan dumper
-#ifndef OPENMP
+//#ifndef SINGLE_EVAL_ITER_DUMP
                 daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 
 // if we do not want MT, but we want debug, add more eval wrappers
@@ -426,9 +426,9 @@ int main ( int argc, char* argv[] )
 #endif
 
 // if we want to compile a multi-threaded version with OpenMP, we only want the basic evaluator, not the other wrappers, even the one that dump plans
-#else // ifdef OPENMP
-                eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
-#endif
+//#else // ifdef SINGLE_EVAL_ITER_DUMP
+//                eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+//#endif
             eval_y( pop, pop );
 
 #ifndef NDEBUG
@@ -447,15 +447,15 @@ int main ( int argc, char* argv[] )
 	    // If no individual haven't yet been found, then try a direct call to YAHSP (i.e. the empty decomposition evaluation)
             if ((goodguys == 0) && (!found)) {
                 empty_decompo.invalidate();
-#ifdef OPENMP
-                eval_yahsp( empty_decompo );
-#else
+//#ifdef SINGLE_EVAL_ITER_DUMP
+//                eval_yahsp( empty_decompo );
+//#else
 #ifndef NDEBUG
                 eval_counter(empty_decompo);
 #else
                 eval_bestfile(empty_decompo);
 #endif
-#endif
+//#endif
                 if (empty_decompo.fitness().is_feasible()){
                     found = true;
                     /*
@@ -466,12 +466,12 @@ int main ( int argc, char* argv[] )
                 }
             } // if ! goodguys && ! found
 
-#ifdef OPENMP
-            best_makespan = pop.best_element().fitness().makespan();
-#else
+//#ifdef SINGLE_EVAL_ITER_DUMP
+//            best_makespan = pop.best_element().plan_copy().makespan();
+//#else
             best_makespan = eval_bestfile.best();
             dump_file_count = eval_bestfile.file_count();
-#endif
+//#endif
             
 #ifndef NDEBUG
             eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize);
@@ -493,7 +493,7 @@ int main ( int argc, char* argv[] )
     b_max_in = b_max_fixed;
     b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty/*, is_sequential*/ );
+    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
     eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
     eval_y( pop, pop );
 
@@ -509,7 +509,7 @@ int main ( int argc, char* argv[] )
     // nested evals:
     eoEvalFunc<daex::Decomposition> * p_eval;
 
-#ifndef OPENMP
+//#ifndef SINGLE_EVAL_ITER_DUMP
     // dump the best solution found so far in a file
     daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 
@@ -518,12 +518,12 @@ int main ( int argc, char* argv[] )
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
     eval_counter.value( eval_count );
 #endif
-#endif
+//#endif
 
     // if we do not want to add a time limit, do not add an EvalTime
-#ifdef OPENMP
-        p_eval = & eval_yahsp;
-#else // ifndef OPENMP
+//#ifdef SINGLE_EVAL_ITER_DUMP
+//        p_eval = & eval_yahsp;
+//#else // ifndef SINGLE_EVAL_ITER_DUMP
         if( max_seconds == 0 ) {
 #ifndef NDEBUG
         p_eval = & eval_counter;
@@ -542,7 +542,7 @@ int main ( int argc, char* argv[] )
 #endif
         p_eval = p_eval_maxtime;
     }
-#endif // OPENMP
+//#endif // SINGLE_EVAL_ITER_DUMP
 
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
@@ -596,6 +596,11 @@ int main ( int argc, char* argv[] )
     // the checkpoint is here to get some stat during the search
     eoCheckPoint<daex::Decomposition> checkpoint( continuator );
 
+#ifdef SINGLE_EVAL_ITER_DUMP
+    daex::BestMakespanStat stat_makespan("BestMakespan");
+    daex::BestPlanStat stat_plan("BestPlan");
+#endif
+
 #ifndef NDEBUG
     // get the best plan only if it improve the fitness
     // note: fitness is different from the makespan!
@@ -639,7 +644,12 @@ int main ( int argc, char* argv[] )
         //checkpoint.add( dual_median );
         //checkpoint.add( iqr_stat );
         checkpoint.add( dual_iqr );
-#ifndef OPENMP
+#ifdef SINGLE_EVAL_ITER_DUMP
+        checkpoint.add( stat_makespan );
+        checkpoint.add( stat_plan );
+        clog_monitor.add( stat_makespan );
+        clog_monitor.add( stat_plan );
+#else
         clog_monitor.add( eval_counter );
 #endif
         clog_monitor.add( best_stat );
@@ -654,14 +664,15 @@ int main ( int argc, char* argv[] )
         checkpoint.add( clog_monitor );
     }
 
+#ifdef SINGLE_EVAL_ITER_DUMP
     // Note: commented here because superseeded by the eoEvalBestPlanFileDump
     // append the plans in a file
     // std::string _filename, std::string _delim = " ", bool _keep = false, bool _header=false, bool _overwrite = false
-    /*
     eoFileMonitor file_monitor( plan_file, "\n", false, false, true);
-    file_monitor.add( best_plan );
+    file_monitor.add( stat_plan );
     checkpoint.add( file_monitor );
-    */
+#endif
+    
 
     // MODIFS MS START 
     // pour plus d'output (recopiés de do/make_checkpoint)
