@@ -1,0 +1,204 @@
+% This is "sig-alternate.tex" V1.9 April 2009
+% This file should be compiled with V2.4 of "sig-alternate.cls" April 2009
+%
+% This example file demonstrates the use of the 'sig-alternate.cls'
+% V2.4 LaTeX2e document class file. It is for those submitting
+% articles to ACM Conference Proceedings WHO DO NOT WISH TO
+% STRICTLY ADHERE TO THE SIGS (PUBS-BOARD-ENDORSED) STYLE.
+% The 'sig-alternate.cls' file will produce a similar-looking,
+% albeit, 'tighter' paper resulting in, invariably, fewer pages.
+%
+% ----------------------------------------------------------------------------------------------------------------
+% This .tex file (and associated .cls V2.4) produces:
+%       1) The Permission Statement
+%       2) The Conference (location) Info information
+%       3) The Copyright Line with ACM data
+%       4) NO page numbers
+%
+% as against the acm_proc_article-sp.cls file which
+% DOES NOT produce 1) thru' 3) above.
+%
+% Using 'sig-alternate.cls' you have control, however, from within
+% the source .tex file, over both the CopyrightYear
+% (defaulted to 200X) and the ACM Copyright Data
+% (defaulted to X-XXXXX-XX-X/XX/XX).
+% e.g.
+% \CopyrightYear{2007} will cause 2007 to appear in the copyright line.
+% \crdata{0-12345-67-8/90/12} will cause 0-12345-67-8/90/12 to appear in the copyright line.
+%
+% ---------------------------------------------------------------------------------------------------------------
+% This .tex source is an example which *does* use
+% the .bib file (from which the .bbl file % is produced).
+% REMEMBER HOWEVER: After having produced the .bbl file,
+% and prior to final submission, you *NEED* to 'insert'
+% your .bbl file into your source .tex file so as to provide
+% ONE 'self-contained' source file.
+%
+% ================= IF YOU HAVE QUESTIONS =======================
+% Questions regarding the SIGS styles, SIGS policies and
+% procedures, Conferences etc. should be sent to
+% Adrienne Griscti (griscti@acm.org)
+%
+% Technical questions _only_ to
+% Gerald Murray (murray@hq.acm.org)
+% ===============================================================
+%
+% For tracking purposes - this is V1.9 - April 2009
+
+\documentclass{sig-alternate}
+
+\newcommand{\dae}{{\em Divide-and-Evolve}}
+\newcommand{\DAEX}{{\sc DaE$_{\text{X}}$}}
+\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
+\newcommand{\YAHSP}{{\sc YAHSP}}
+
+\def\UU{{\mathbb{U}}}
+
+
+\begin{document}
+
+%\title{A Multicore Implementation of the Divide-and-Evolve Algorithm}
+%\title{Speeding Up the Individual Evaluation of the Divide-and-Evolve Algorithm}
+%\title{Multithreading the Divide-and-Evolve Algorithm for a Multicore Machine}
+\title{A Multithreaded Release of the Divide-and-Evolve Planning System for a Multicore Machine}
+
+%
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+\numberofauthors{4}
+
+\author{
+\alignauthor Caner Candan\\
+\affaddr{\mbox{Thales Research \& Technology}}\\
+\affaddr{Palaiseau, France}\\
+\email{\normalsize caner.candan@thalesgroup.com}
+\alignauthor Johann Dr{\'e}o\\
+\affaddr{\mbox{Thales Research \& Technology}}\\
+\affaddr{Palaiseau, France}\\
+\email{\normalsize johann.dreo@thalesgroup.com}
+\and
+\alignauthor Pierre Sav{\'e}ant\\
+\affaddr{\mbox{Thales Research \& Technology}}\\
+\affaddr{Palaiseau, France}\\
+\email{\normalsize pierre.saveant@thalesgroup.com}
+\alignauthor Vincent Vidal\\
+\affaddr{ONERA -- DCSD}\\
+\affaddr{Toulouse, France}\\
+\email{\normalsize vincent.vidal@onera.fr}
+}
+
+%\numberofauthors{2}
+%\author{
+%\alignauthor
+%Caner Candan\\
+%Johann Dr{\'e}o\\
+%Pierre Sav{\'e}ant\\
+%\affaddr{Thales Research \& Technology}\\
+%\affaddr{Palaiseau, France}\\
+%\email{first.last@thalesgroup.com}
+%\alignauthor
+%Vincent Vidal\\
+%\affaddr{ONERA -- DCSD}\\
+%\affaddr{Toulouse, France}\\
+%\email{Vincent.Vidal@onera.fr}
+%}
+
+%\numberofauthors{2}
+%\author{
+%\alignauthor
+%Caner Candan$^{1}$ ~~~~~~~~ Johann Dr{\'e}o$^{1}$\\
+%\affaddr{$^{1}$Thales Research \& Technology}\\
+%\affaddr{Palaiseau, France}\\
+%\email{first.last@thalesgroup.com}
+%\alignauthor
+%Pierre Sav{\'e}ant$^{1}$ ~~~~~~~~ Vincent Vidal$^{2}$\\
+%\affaddr{$^{2}$ONERA -- DCSD}\\
+%\affaddr{Toulouse, France}\\
+%\email{Vincent.Vidal@onera.fr}
+%}
+
+%\numberofauthors{4}
+%\author{
+%\alignauthor
+%Caner Candan\\
+%\affaddr{Thales Research \& Technology}\\
+%\affaddr{Palaiseau, France}\\
+%\email{first.last@thalesgroup.com}
+%\alignauthor
+%Johann Dr{\'e}o\\
+%\alignauthor
+%Pierre Sav{\'e}ant\\
+%\alignauthor
+%Vincent Vidal\\
+%\affaddr{ONERA -- DCSD}\\
+%\affaddr{Toulouse, France}\\
+%\email{Vincent.Vidal@onera.fr}
+%}
+
+\maketitle
+\begin{abstract}
+This paper provides 
+\end{abstract}
+
+\section{Introduction}
+
+$\UU$ denotes a uniform random draw from the set given as argument.
+
+\cite{paradiseo:JHeuristics2004}
+\cite{paradiseo:ParallelComputing2004}
+\cite{alba:IEEE2002}
+\cite{alba:COR2008}
+\cite{alba:IPL2002}
+\cite{burns:JAIR2010}
+\cite{burns:icaps2009}
+\cite{burns:ijcai2009}
+\cite{vidal:socs2010}
+\cite{dae:icaps2010}
+\cite{dae:evocop2006}
+
+\section{Discussion and Conclusion}
+
+%ACKNOWLEDGMENTS are optional
+%\section{Acknowledgments}
+
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{abbrv}
+\bibliography{dae_mt}  % sigproc.bib is the name of the Bibliography in this case
+% You must have a proper ".bib" file
+%  and remember to run:
+% latex bibtex latex latex
+% to resolve all references
+%
+% ACM needs 'a single self-contained file'!
+%
+%Generated by bibtex from your ~.bib file.  Run latex,
+%then bibtex, then latex twice (to resolve references)
+%to create the ~.bbl file.  Insert that ~.bbl file into
+%the .tex source file and comment out
+%the command \texttt{{\char'134}thebibliography}.
+\end{document}
