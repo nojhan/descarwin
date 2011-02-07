@@ -12,11 +12,8 @@
 \title{An Optimizing and Learning Algorithm Framework used for Parameter Tuning of the Divide-and-Evolve Method}
 
 
-\author{M{\'a}ty{\'a}s Brendel$^{1}$ \\ \\ $^{1}$Projet TAO \\ INRIA Saclay \& LRI\\ Universit{\'e} Paris Sud \\ Orsay, France\\ matthias.brendel@lri.fr \\ marc.schoenauer@inria.fr
-\And  Johann Dr{\'e}o $^{2}$ 
-\And Pierre Sav{\'e}ant$^{2}$ \\ \\ $^{2}$Thales Research \& Technology\\ Palaiseau, France\\firstname.lastname@thalesgroup.com
-\And Marc Schoenauer$^{1}$ 
-\And Vincent Vidal$^{3}$ \\ \\ $^{3}$ONERA -- DCSD \\ Toulouse, France \\ vincent.vidal@onera.fr}
+\author{M{\'a}ty{\'a}s Brendel \\ \\ Projet TAO \\ INRIA Saclay \& LRI\\ Universit{\'e} Paris Sud \\ Orsay, France\\ matthias.brendel@lri.fr   
+\And Marc Schoenauer \\ \\ Projet TAO \\ INRIA Saclay \& LRI\\ Universit{\'e} Paris Sud \\ Orsay, France\\ marc.schoenauer@inria.fr}
 
 
 
@@ -37,7 +34,7 @@ The one exception we are aware of is the work \cite{Hutter06} in the SAT domain,
 
 An AI planning task written in PDDL (more details in Section \ref{section:planning}) is specified by a domain, that defines the predicates and the actions, and an instance, that instantiates the objects, and specifies the initial state and a list of goals to reach. A solution is a plan, or a sequence of actions, such that when applied to the initial state it leads the system into a state where all goal atoms are true. Hence, for a given domain, there can exist several instances sharing the same predicates and actions, but differing either by the number of objects, or the initial and goal states. 
 
-Unfortunately, there does not exist any set of features for the AI Planning problem that are sufficient to describe the characteristics of a planning task, like mentioned above for the SAT domain \cite{Hutter06}. In this paper however, we make a big step on the framework for parameter tuning applied generally for each domain in AI with a preliminary set of features. Our Learn and Optimize (LaO) framework consists of the combination of optimizing (i.e. parameter tuning) and of learning the mapping between features and best parameters. We benefit from learning already in the optimization phase using the learned model as in other model based optimization techniques. Or LaO framework has the capability in theory to solve intra-domain and inter-domain generalization.
+Unfortunately, there does not exist any set of features for the AI Planning problem that are sufficient to describe the characteristics of a planning task, like mentioned above for the SAT domain \cite{Hutter06}. In this paper however, we make a big step on the framework for parameter tuning applied generally for each domain in AI with a preliminary set of features. Our Learn and Optimize (LaO) framework consists of the combination of optimizing (i.e. parameter tuning) and of learning the mapping between features and best parameters. We benefit from learning already in the optimization phase using the learned model as in other surrogate model based optimization techniques (see for example \cite{Bardenet} for a Gaussian-process-based approach). Or LaO framework has the capability in theory to solve intra-domain and inter-domain generalization.
 
 LaO can of course be applied to any other algorithm, but in this paper we are considering our special, an Evolution Strategy (ES) algorithm, called Divide and Evolve (DaE), which is an EA applied to solve AI problems. We take the DaE as a black-box algorithm and did not modify it in this paper. The realization described in \cite{BibEvoCop:2010} is used. 
 
@@ -140,7 +137,9 @@ There is one additional technical problem with CMA-ES, this is that each paramet
 
 Our realization of our LaO algorithm uses the Shark library (\cite{shark08}) for CMA-ES and the FANN library for ANN (\cite{nissen}). To evaluate each parameter-setting with each instance, we use a computer-cluster of LRI with 60 computers, most of them have 4 cores, but some have 8. The cluster is used by many researchers, so our algorithm contains a scheduler to use the free capacity on this cluster.
 
-Since the parallel architecture used in our algorithm is somewhat heterogeneous, we can not rely on a fixed running time. Therefore, for each evaluation the number of evaluations is fixed for DaE. Moreover, since DaE is not deterministic, we carried out 11 runs and took the median cost as the result for that instance and that parameter-settings.
+Since the parallel architecture used in our algorithm is somewhat heterogeneous, we can not rely on a fixed running time. Therefore, for each evaluation the number of evaluations is fixed for DaE. Note that the number of evaluations is approximately proportional with running time, so that the execution time for a particular computer is also determined independently of the parameter-settings. For example, even if the size of the population is increased, with fixed number of evaluation the number of generations will be limited respectively resulting approximatively in the same running time for each parameter-settings. 
+
+Moreover, since DaE is not deterministic, we carried out 11 runs and took the median cost as the result for that instance and that parameter-settings.
 
 \section*{Acknowledgements}
 
