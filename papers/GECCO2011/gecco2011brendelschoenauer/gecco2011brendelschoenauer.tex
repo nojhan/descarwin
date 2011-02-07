@@ -49,7 +49,7 @@ Unfortunately, there does not exist any set of features for the AI Planning prob
 
 LaO can of course be applied to any other algorithm, but in this paper we are considering our special, an Evolution Strategy (ES) algorithm, called Divide and Evolve (DaE), which is an EA applied to solve AI problems. We take the DaE as a black-box algorithm and did not modify it in this paper. The realization described in \cite{BibEvoCop:2010} is used. 
 
-The paper is organized as follows: AI Planning Problems and the basic YASHP Solver is briefly introduced in Section \ref{section:planning}. Section \ref{section:dae} describes our intermediate, Divide and Evolve Method. Section \ref{section:LaO} describes our new, top level method: Learn and Optimize, used for parameter tuning. 
+The paper is organized as follows: AI Planning Problems and the basic YASHP Solver is briefly introduced in section \ref{section:planning}. Section \ref{section:dae} describes our intermediate, Divide and Evolve Method. Section \ref{section:LaO} describes our new, top level method: Learn and Optimize, used for parameter tuning. Our resuts are presented in section \ref{section:results} and conlcusions are drawn in section \ref{section:conclusions}. We end the paper with future work foreseeable in section \ref{section:futurework}.
 
 \section{AI Planning Problems}
 \label{section:planning}
@@ -151,6 +151,91 @@ Our realization of our LaO algorithm uses the Shark library (\cite{shark08}) for
 Since the parallel architecture used in our algorithm is somewhat heterogeneous, we can not rely on a fixed running time. Therefore, for each evaluation the number of evaluations is fixed for DaE. Note that the number of evaluations is approximately proportional with running time, so that the execution time for a particular computer is also determined independently of the parameter-settings. For example, even if the size of the population is increased, with fixed number of evaluation the number of generations will be limited respectively resulting approximatively in the same running time for each parameter-settings. 
 
 Moreover, since DaE is not deterministic, we carried out 11 runs and took the median cost as the result for that instance and that parameter-settings.
+
+
+\section{Results}
+\label{section:results}
+
+In the Planning and Learning Part of IPC2011 (IPC), there were 5 sample domains pre-published, with a corresponding problem-generator for each domain. The 5 domains are Ferry, Freecell, Grid, Mprime, and Sokoban. We generated approximately 100 instances for each domain, since this seemed to be appropriate for a running time of 2-3 weeks. The description of the track fixes running time as 15 minutes. Since we use number of evaluations as a terminating criterion, we carried out a run for each instancfeatues on our own server to measure the median of number of evaluations for each instance with our default parameters. The median of 11 runs were taken and used as a termination criterion for each instance in the train set. For many instances we did not have any result in 15 minutes, those we had to drop. The remaining instances were used for training. 
+
+ \begin{table*}[ht]
+\centering
+\begin{tabular}{l c c c c c c c}
+\hline\hline
+Name & \# of iterations & \# of training instances & \# of test instances &  ANN-error & quality-ratio LAO & quality-ratio ANN on train & quality-ratio of ANN test \\ 
+\hline
+Freecell& 16 & 108 & 230 & 0.1 & 1.09 & 1.05 & 1.04  \\
+Grid & 10 & 55 & 124 & 0.09 & 1.09 & 1.05 & 1.03  \\
+Mprime & 8 & 64 & 152 & 0.08 & 1.11 & 1.05 & 1.04   \\
+Sokoban & 8 & 32 & 52 & 0.11 & 	 &  &   \\
+\hline
+\end{tabular}
+\label{table:domains}
+\caption{Domains: note that only the actually usable training instances are shown. ANN-error is given as MSE, returned by FANN}
+\end{table*} 
+
+ \begin{table*}[ht]
+\centering
+\begin{tabular}{l c c c c c c}
+\hline\hline
+Name & \ default parameters & \ CMA-ES &  Genetrasnferer & ANN \\ 
+\hline
+Freecell & 0/0.09& 0.64/0.66  & 0.18/0.08  & 0.18/0.17     \\
+Grid & 0.02/0.24 & 0.66/0.6  & 0.16/0.11 & 0.17/0.05  &    \\
+Mprime &  0.02/0.45& 0.59/0.36 & 0.2/0.11  & 0.18/0.08  &    \\
+Sokoban & 0.01/0.03 & 0.69/0.61   & 0.2/0.32  & 0.1/0.03  &    \\
+
+\hline
+\end{tabular}
+\label{table:domains}
+\caption{Best results according to source of hint}
+\end{table*} 
+
+
+
+\begin{table*}[ht]
+\centering
+\begin{tabular}{l c c c}
+\hline\hline
+Name & Minimum & Maximum & Default value \\ 
+\hline
+Probability of crossover & 0.0 & 1 & 0.8 \\
+Probability of mutation & 0.0& 1& 0.2 \\
+Rate of mutation add station& 0& 10& 1 \\
+Rate of mutation delete station& 0& 10& 3 \\
+Rate of mutation add atom& 0& 10& 1 \\
+Rate of mutation delete atom& 0& 10& 1 \\
+Mean average for mutations& 0.0& 1& 0.8 \\
+Time interval radius& 0& 10& 2 \\
+Maximum number of stations& 5& 50& 20 \\
+Maximum number of nodes& 100& 100000& 10000 \\
+Population size& 10& 300& 100 \\
+Number of offsprings& 100& 2000& 700 \\
+\hline
+\end{tabular}
+\label{table:parameters}
+\caption{Controlled Parameters}
+\end{table*} 
+
+Table \ref{table:domains} shows the data for each domain, as you can see from the approximately 100 instances from each domain we could only use all instances in the domain Freecell. In the other domains we got much less usable instances. The Mean Square Error (MSE) is shown for each domain. Note that since there can be multiple optimal parameters for the same instance (fitness-function is discrete), there might be an unavoidable error of the ANN.
+
+5 iterations of CMA-ES were carried out, followed by one ANN and one gene-transfer, and this cycle were iterated in the algorithm. This means that for example CMA-ES was running for 50 iterations for the Grid domain.
+
+The ANN had 3 fully connected layers, and the hidden layer had the same number of neurons as the input. Learning was done by the conventional back-propagation algorithm, which is the default in FANN. The ANN was only trained for 50 iterations in one iterations of LaO, so that we avoid over-training. Over the 10 iterations of LaO this means that 500 iterations of the ANN was carried out.
+
+Termination criterion in the competition was simply the available time, the algorithm was running for several weeks parallel on our cluster, which is used also for other research, i.e. only a small number of 4 or 8-core processors were available for each domain in average.
+
+The parameters of DAEx controlled are described in table \ref{table:parameters}. For a detailed description of these parameters, see \cite{BibGECCO:2010}. The feature set consists of 12 features. First the number of fluents, goals, predicates, objects and types in the domain or instance, respectively add up to 5 features. One further feature is called mutex density, which is the number of mutexes divided by the number of all fluent-pairs. We also added number of lines, words and byte-count - obtained by the linux command called "wc" - of the instance and the domain file as some not so serious, primitive features. These later one add up to 6 features.
+
+\section{Conclusions}
+\label{section:conclusions}	
+
+
+\section{Future Work}
+\label{section:futurework}	
+
+Since LaO is only a framework, as indicated other kind of learning methods, and other kind of optimization techniques may be tried. Also the benefit of gene-transfer and/or cross-over might be investigated further. One shall also test, how inter-domain generalization works. Maybe it is possible to learn a mapping for all the domains, since the features may grasp the specificity of a domain. Naturally, the set of features may always be extended, or tested. Feature-selection would become important only if data with a considerable number of features and instances are present. This is not the case yet.
+
 
 \section*{Acknowledgements}
 
