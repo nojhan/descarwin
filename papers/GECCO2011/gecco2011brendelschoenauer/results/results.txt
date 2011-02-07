@@ -1,0 +1,63 @@
+Section \ref{section:competition} describes the special settings of our system used in the competition. Finally, Section \ref{section:future} gives some pointers to future plans and work.  
+
+
+\section{The IPC Competition}
+\label{section:competition}
+
+In the Planning and Learning Part of IPC2011 (IPC), there were 5 domains published, with a corresponding problem-generator for each domain. The 5 domains are Ferry, Freecell, Grid, Mprime, and Sokoban. We generated approximately 100 instances for each domain, since this seemed to be appropriate for a running time of 2-3 weeks. The description of the track fixes running time as 15 minutes. Since we use number of evaluations as a terminating criterion, we carried out a run for each instances on our own server to measure the median of number of evaluations for each instance with our default parameters. The median of 11 runs were taken and used as a termination criterion for each instance in the train set. For many instances we did not have any result in 15 minutes, those we had to drop. The remaining instances were used for training. 
+
+ \begin{table*}[ht]
+\centering
+\begin{tabular}{l c c c c c c}
+\hline\hline
+Name & \# of iterations & \# of training instances &  ANN-error & quality-ratio LaO& quality-ratio ANN \\ 
+\hline
+Ferry & 12 & 32 & 0.17 & 1.06 & 0.59   \\
+Freecell& 12 & 108 & 0.08 & 1.09 & 1.05   \\
+Grid & 9 & 55 & 0.09 & 1.09 & 1.0   \\
+Mprime & 8 & 64 & 0.16 & 1.11 & 1.01 \\
+Sokoban & 8 & 32 & 0.11 & 1.22 & 0.79  \\
+\hline
+\end{tabular}
+\label{table:domains}
+\caption{Domains: note that only the actually usable training instances are shown. ANN-error is given as MSE, returned by FANN}
+\end{table*} 
+
+\begin{table*}[ht]
+\centering
+\begin{tabular}{l c c c}
+\hline\hline
+Name & Minimum & Maximum & Default value \\ 
+\hline
+Probability of crossover & 0.0 & 1 & 0.8 \\
+Probability of mutation & 0.0& 1& 0.2 \\
+Rate of mutation add station& 0& 10& 1 \\
+Rate of mutation delete station& 0& 10& 3 \\
+Rate of mutation add atom& 0& 10& 1 \\
+Rate of mutation delete atom& 0& 10& 1 \\
+Mean average for mutations& 0.0& 1& 0.8 \\
+Time interval radius& 0& 10& 2 \\
+Maximum number of stations& 5& 50& 20 \\
+Maximum number of nodes& 100& 100000& 10000 \\
+Population size& 10& 300& 100 \\
+Number of offsprings& 100& 2000& 700 \\
+\hline
+\end{tabular}
+\label{table:parameters}
+\caption{Controlled Parameters}
+\end{table*} 
+
+Table \ref{table:domains} shows the data for each domain, as you can see from the approximately 100 instances from each domain we could only use all instances in the domain Freecell. In the other domains we got much less usable instances. The Mean Square Error (MSE) is shown for each domain. Note that since there can be multiple optimal parameters for the same instance (fitness-function is discrete), there might be an unavoidable error of the ANN.
+
+5 iterations of CMA-ES were carried out, followed by one ANN and one gene-transfer, and this cycle were iterated in the algorithm. This means that for example CMA-ES was running for 50 iterations for the Grid domain.
+
+The ANN had 3 fully connected layers, and the hidden layer had the same number of neurons as the input. Learning was done by the conventional back-propagation algorithm, which is the default in FANN. The ANN was only trained for 50 iterations in one iterations of LaO, so that we avoid over-training. Over the 10 iterations of LaO this means that 500 iterations of the ANN was carried out.
+
+Termination criterion in the competition was simply the available time, the algorithm was running for several weeks parallel on our cluster, which is used also for other research, i.e. only a small number of 4 or 8-core processors were available for each domain in average.
+
+The parameters of DAEx controlled are described in table \ref{table:parameters}. For a detailed description of these parameters, see \cite{BibGECCO:2010}. The feature set consists of the number of fluent, goals predicates objects and types in the domain or instance, respectively. One further feature is called mutex density, which is the number of mutexes divided by the number of all fluent-pairs. We also added number of lines, words and byte-count - obtained by the linux command called "wc" - of the instance and the domain file as some not so serious, primitive features.
+
+\section{Future Work}
+\label{section:future}	
+
+Since LaO is only a framework, as indicated other kind of learning methods, and other kind of optimization techniques may be tried. Also the benefit of gene-transfer and/or cross-over might be investigated further. One shall also test, how inter-domain generalization works. Maybe it is possible to learn a mapping for all the domains, since the features may grasp the specificity of a domain. Naturally, the set of features may always be extended, or tested. Feature-selection would become important only if data with a considerable number of features and instances are present. This is not the case yet.
