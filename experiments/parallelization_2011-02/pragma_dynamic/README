@@ -1,0 +1,39 @@
+Effet de la parallélisation des evaluations sur le temps de calcul et la qualité des solutions de DaE
+
+3 expériences, toutes sur :
+* seq-sat/elevators_12
+* tempo-sat/openstacks_17
+* chaque run * 11
+* parallélisme dynamique
+
+1. Influence du nombre de processeur
+------------------------------------
+Speed-up linéaire en fonction du nb de proc ?
+*_PROC_*
+* pop-size=48
+* offsprings = pop-size*7 = 336
+* critère d'arret steady-state=50
+* nbproc = 1, 24, 48
+* 1 start
+
+
+2. influence de la taille de la population
+------------------------------------------
+Croissance amortie du speed-up en fonction de la taille de la pop ?
+*_POP_*
+* nbproc = 48
+* 1 start
+* pop-size = 1, 24, 48, 72, 96
+* offsprings = pop-size * 7
+* steady-state=50
+
+
+3. influence du nb de proc, avec multi-start
+--------------------------------------------
+Baisse amortie du makespan/cost en fonction du nb de proc ?
+*_RESTART_PROC_*
+* pop-size=96* offspring = popsize*7
+* contrat de temps = 30 minutes
+* multi-start sur steady-state=50
+* nbproc = 1, 24, 48
+
