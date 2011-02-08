@@ -88,6 +88,21 @@ def cut( strings, field, delimiter=None ):
         else:
             yield string.split(delimiter)[field]
 
+def reformat( strings, ftype="mm:ss" ):
+    for string in strings:
+        # the time command output a line like:
+        # Elapsed (wall clock) time (h:mm:ss or m:ss): 0:08.64
+        if ftype=="h:mm:ss":
+            h,m,s = ( int(string.split(":")[0]), 
+                    int(string.split(':')[0].split('.')[0]),
+                    float(string.split(':')[0].split('.')[1]) )
+            yield h*60*60+m*60+s
+        elif ftype=="m:ss":
+            m,s = ( int(string.split(":")[0]), 
+                    float(string.split(':')[1]) )
+            yield m*60+s
+        else:
+            yield string
 
 
 ######################################
@@ -152,7 +167,12 @@ def parse( pattern, keyword = "MakeSpan" ):
 
     rawlines = lines(pattern)
     greped = grep( rawlines, keyword )
-    strs = cut( greped, -1 ) # -1 = the last item
+    cuts = cut( greped, -1 ) # -1 = the last item
+
+    # FIXME ugly hack
+    strs = cuts
+    if keyword=="Elapsed (wall clock) time":
+        strs = reformat( cuts, "m:ss" )
 
     # NOTE scipy 0.6 does not handle generators, thus we must expand it in a list
     res = [ float(i) for i in strs ]
@@ -400,7 +420,7 @@ def plotdistrib( filenames, key ):
     # plot the distributions
     tab = []
     for pattern in filenames:
-        tab.append( parse( pattern, key ) )
+        tab.append( [ parse( pattern, key ) ] )
 
     plot_histo( tab, common_characters(filenames), labels=filenames )
 
