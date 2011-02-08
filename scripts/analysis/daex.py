@@ -405,6 +405,15 @@ def plotdistrib( filenames, key ):
     plot_histo( tab, common_characters(filenames), labels=filenames )
 
 
+def boxplot( filenames, key ):
+    # plot the distributions
+    tab = []
+    for pattern in filenames:
+        tab.append( [ parse( pattern, key ) ] )
+
+    plot_box( tab, common_characters(filenames), labels=filenames )
+
+
 def compare_median( filenames, key, p_thresh = 0.95 ):
     ms = []
     for pattern in filenames:
@@ -608,6 +617,9 @@ def process_commands( opts, filepatterns ):
     if opts.plotdistrib:
         plotdistrib(filepatterns,key)
 
+    if opts.boxplot:
+        boxplot(filepatterns,key)
+
     if opts.function:
         f = available_functions[opts.function]
         tab = parse_func( filepatterns, [f], key, labels=has_labels )
@@ -675,7 +687,10 @@ Comparing the distributions of several runs for 3 algorithms, by instance and sh
     parser.add_option("-b", "--basestats", dest="basestats", action="store_true",
             help="display basic statistics" )
 
-    parser.add_option("-d", "--plotdistrib", dest="plotdistrib", action="store_true",
+    parser.add_option("-x", "--plotdistrib", dest="plotdistrib", action="store_true",
+            help="plot as histograms" )
+
+    parser.add_option("-d", "--boxplot", dest="boxplot", action="store_true",
             help="plot as histograms" )
 
     parser.add_option("-p", "--plot", dest="plot", action="store_true",
