@@ -264,21 +264,21 @@ OpenMP primarily consists of a set of compiler directives (pragmas) that are ins
 
 \paragraph{EO \& OpenMP} % (CC, JD)
 
-\subparagraph{Evolving Object, an evolutionary computation framework}\\
+%\subparagraph{Evolving Object, an evolutionary computation framework}\\
 
-Standing for Evolving Object\footnote{Evolving Object: \url{http://eodev.sf.net}}, EO is a largely used and known framework in evolutionary computation. Anyone can easily design evolutionary algorithms that will find solutions to virtually all kind of hard optimization problems, from continuous to combinatorial ones.\\
+Standing for Evolving Object\footnote{Evolving Object: \url{http://eodev.sf.net}}, EO is a largely used and known framework in evolutionary computation. Anyone can easily design evolutionary algorithms that will find solutions to virtually all kind of hard optimization problems, from continuous to combinatorial ones.
 
-\subparagraph{OpenMP and parallelization paradigms}\\
+%\subparagraph{OpenMP and parallelization paradigms}\\
 
-OpenMP\footnote{OpenMP: \url{http://www.openmp.org}} is a parallelization API based on shared memory in contrast with distributed paradigm. The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explain in further details later.\\
+OpenMP\footnote{OpenMP: \url{http://www.openmp.org}} is a parallelization API based on shared memory in contrast with distributed paradigm. The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explain in further details later.
 
-In order to parallelize a large scope of the framework EO, an analyze was done to identify the most used resources by almost all structures. The most EO classes use the pattern ``Functor''. They can be describe as follow: take a population in input and make their own cooking. This is done by iterating through the population.\\
+In order to parallelize a large scope of the framework EO, an analyze was done to identify the most used resources by almost all structures. Most of the EO classes use the pattern ``Functor''. They can be described as follows: take a population in input and make their own cooking. This is done by iterating through the population.
 
-Hence the population's manipulation would be our target to parallelize. Indeed, since we have several steps in evolutionary algorithms, in a most cases the operations done on individuals can be made in parallel without data dependancies. At this time the only operation parallelized is the evaluation. There are several classes through a long hierachy in EO implementing evaluation operators but all of them calls a common function to apply the evaluation, this is the function ``apply''.
+Hence the population's manipulation would be our target to parallelize. Indeed, since we have several steps in evolutionary algorithms, in most cases the operations done on individuals can be made in parallel without data dependancies. At this time the only operation parallelized is the evaluation which by far the most time-consuming part of the algorithm. There are several classes through a long hierachy in EO implementing evaluation operators but all of them calls a common function to apply the evaluation, this is the function ``apply''.
 
 \paragraph{EO::apply} % (CC)
-
-The function called ``apply''\footnote{Look at the header file apply.h available in the sources of EO} takes in parameter a population and an operation to apply at each individual.\\
+%\footnote{Look at the header file apply.h available in the sources of EO}
+The function called ``apply'' takes as parameters a population and an function to apply to each individual.
 
 %% TODO: refaire algo proprement avec algorithm2e
 
