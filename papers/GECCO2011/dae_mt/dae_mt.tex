@@ -250,6 +250,98 @@ OpenMP primarily consists of a set of compiler directives (pragmas) that are ins
 \cite{dae:gecco2010}
 \cite{yahsp:icaps2004}
 
+\section{Methods}
+
+\subsection{Algorithms}
+
+\paragraph{DaE} % (PS)
+\paragraph{YAHSP} % (VV)
+\paragraph{Parts that can theoretically be parallelized} %  (JD, VV, PS)
+
+\subsection{Implementation}
+
+\paragraph{Locks, thread-safe \& reentrant subroutines} % (VV)
+
+\paragraph{EO \& OpenMP} % (CC, JD)
+
+\subparagraph{Evolving Object, an evolutionary computation framework}\\
+
+Standing for Evolving Object\footnote{Evolving Object: \url{http://eodev.sf.net}}, EO is a largely used and known framework in evolutionary computation. Anyone can easily design evolutionary algorithms that will find solutions to virtually all kind of hard optimization problems, from continuous to combinatorial ones.\\
+
+\subparagraph{OpenMP and parallelization paradigms}\\
+
+OpenMP\footnote{OpenMP: \url{http://www.openmp.org}} is a parallelization API based on shared memory in contrast with distributed paradigm. The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explain in further details later.\\
+
+In order to parallelize a large scope of the framework EO, an analyze was done to identify the most used resources by almost all structures. The most EO classes use the pattern ``Functor''. They can be describe as follow: take a population in input and make their own cooking. This is done by iterating through the population.\\
+
+Hence the population's manipulation would be our target to parallelize. Indeed, since we have several steps in evolutionary algorithms, in a most cases the operations done on individuals can be made in parallel without data dependancies. At this time the only operation parallelized is the evaluation. There are several classes through a long hierachy in EO implementing evaluation operators but all of them calls a common function to apply the evaluation, this is the function ``apply''.
+
+\paragraph{EO::apply} % (CC)
+
+The function called ``apply''\footnote{Look at the header file apply.h available in the sources of EO} takes in parameter a population and an operation to apply at each individual.\\
+
+%% TODO: refaire algo proprement avec algorithm2e
+
+\begin{figure}[here]
+\centering
+\begin{verbatim}
+template < typename EOT >
+void apply< EOT >( eoUF< EOT, void >& proc,
+                   std::vector< EOT >& pop )
+{
+  for ( size_t i = 0; i < pop.size(); ++i )
+    proc( pop[i] );
+}
+\end{verbatim}
+\caption{Original apply function}
+\end{figure}
+
+%% Here is the pseudo code of this function:
+% \begin{algorithmic}
+  % \WHILE {$i\geq population size$}
+  % \STATE $$
+  % \ENDWHILE
+% \end{algorithmic}
+
+The parallelization of this region of code is done thanks to the pragma ``omp for''. This can be translated in the PRAM model by the use of CREW\footnote{CREW: Concurantial Read Exclusive Write} model.
+
+%%According to the PRAM\footnote{wikipedia PRAM} models we are using a CREW\footnote{Concurantial Read Exclusive Write} model.
+
+%% TODO: refaire algo proprement avec algorithm2e
+
+\begin{figure}[here]
+\centering
+\begin{verbatim}
+template < typename EOT >
+void apply< EOT >( eoUF< EOT, void >& proc,
+                   std::vector< EOT >& pop )
+{
+#pragma omp for
+  for ( size_t i = 0; i < pop.size(); ++i )
+    proc( pop[i] );
+}
+\end{verbatim}
+\caption{Parallelize apply function in using OpenMP directives}
+\end{figure}
+
+\section{Experimental study}
+
+\subsection{Context}
+
+\paragraph{Hardware} % (PS)
+\paragraph{IPC benchmark} % (PS)
+\paragraph{Algorithm parameters} % (PS)
+
+\subsection{Results}
+
+% FIXME: in restart mode an instance launched with more than 1 thread stops before the 30 minutes defined with --max-seconds, Pierre things that the reason is because the time is defined in user-time and not in wall-clock.
+
+% FIXME: .out empty, why ?!?
+
+\paragraph{Speed-up against nb of cores} % (CC, JD)
+\paragraph{Speed-up against pop size} % (CC, JD)
+\paragraph{Comparaison of static and dynamic scheduling} % (CC, JD)
+
 \section{Discussion and Conclusion}
 
 %ACKNOWLEDGMENTS are optional
