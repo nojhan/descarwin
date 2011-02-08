@@ -593,7 +593,7 @@ def process_commands( opts, filepatterns ):
     # the result to return, if necessary
     tab = []
 
-    key="Makespan"
+    key=opts.marker
     if opts.seq:
         key="TotalCost"
 
@@ -674,6 +674,10 @@ Comparing the distributions of several runs for 3 algorithms, by instance and sh
 
     parser.add_option("-s", "--seq", dest="seq", action="store_true",
             help="sequential problem (default to temporal)" )
+
+    parser.add_option("-a", "--marker", dest="marker", 
+            action="store", type="str", default="Makespan", metavar="MARK",
+            help="data marker, superseeded by --seq if given, the script will grep for lines having this marker, split it on space characters and take the last element as the data to consider" )
 
     parser.add_option("-l", "--labels", dest="labels", action="store_true",
             help="display labels related to the data" )
