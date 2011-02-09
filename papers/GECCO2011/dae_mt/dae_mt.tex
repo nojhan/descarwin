@@ -208,6 +208,50 @@ In the current release this number is estimated during the population initializa
 
 Furthermore we add the capability to perform restarts within a time contract in order to increase solution quality.
 
+\section{Previous works in Parallel EO and Parallel Planning}
+
+\paragraph{Parallel Planning} % (VV)
+
+Several  approaches to  parallel planning  have been  proposed in  recent years.
+Parallel Retracting A* \cite{PRA-star},  was implemented on a Connection Machine
+and  had  to  deal with  very  severe  memory  limitations. In  that  algorithm,
+a distributed  hash function is  used to allocate  generated states to  a unique
+processing unit  and avoid unnecessary  state duplications. PRA* dealt  with the
+memory limitation  through a retraction  mechanism which allowed a  processor to
+free its memory by dropping states. In order to confirm the transfer of a state,
+synchronous communication channels  had to be used, which  seriously slowed down
+the  search  process.  Transposition-table  driven  work scheduling  \cite{TDS},
+similarly to PRA* uses a hash function to avoid duplication. It is based on IDA*
+and, running  on a  standard architecture, does  not necessitate  any retraction
+mechanism  and  can  efficiently  exploit asynchronous  communication  channels.
+Parallel  Frontier  A*  with  Delayed  Duplicate  Detection  \cite{PFADDD}  uses
+a strategy  based on intervals computed  by sampling to  distribute the workload
+among several workstations, targetting  distributed-memory systems as opposed to
+previous approaches.  In \cite{HDA-star}, the authors introduce Hash Distributed
+A*  (HDA*) which combines  successful ideas  from previous  parallel algorithms.
+HDA*  uses a  hash  function which  assigns  each generated  state  to a  unique
+processing unit  in order to avoid  the duplication of the  search efforts. This
+mechanism  was  introduced  in   PRA*,  which  unfortunately  combined  it  with
+synchronous communication channels which caused  a lot of overhead. This problem
+was  addressed  in  HDA*  by  the  use  of  non-blocking  communication  (as  in
+\cite{TDS}).   In   \cite{burns:ijcai2009,burns:JAIR2010}  the  authors  present
+Parallel  Best-NBlock-First (PBNF).   It uses  an abstraction  to  partition the
+state space.  PBNF  allows each thread to expand the  most promising nodes while
+detecting duplicate states.  Rather than  sleeping if a lock cannot be acquired,
+a thread can  perform ``speculative'' expansions by continuing  the expansion of
+its current part  of the space.  This technique keeps cores  busy at the expense
+of  duplicate work.  \cite{dovetailing}  adapts to  planning a  technique called
+dovetailing, in  which several  instances of a  search algorithm  with different
+parameter settings  are run in parallel. We  use this approach in  this paper as
+a  bottom-line, and show  how our  approach improves  over a  simple dovetailing
+strategy.  Finally,  \cite{vidal:socs2010} proposed a multi-core  version of the
+YAHSP planner \cite{yahsp:icaps2004} where  many concurrent threads expand nodes
+from a common open list, yielding to early exploration of branches of the search
+tree that  would have  been delayed  by a classical  search, which  can speed-up
+search by several orders of magnitude.
+
+
+
 \section{IPC Benchmarks}
 
 We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for cost planning and Openstacks-17 for temporal planning.
@@ -242,14 +286,10 @@ OpenMP primarily consists of a set of compiler directives (pragmas) that are ins
 \cite{alba:IEEE2002}
 \cite{alba:COR2008}
 \cite{alba:IPL2002}
-\cite{burns:JAIR2010}
-\cite{burns:icaps2009}
-\cite{burns:ijcai2009}
-\cite{vidal:socs2010}
 \cite{dae:icaps2010}
 \cite{dae:evocop2006}
 \cite{dae:gecco2010}
-\cite{yahsp:icaps2004}
+
 
 \section{Methods}
 
