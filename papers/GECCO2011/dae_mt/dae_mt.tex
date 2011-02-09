@@ -302,16 +302,30 @@ use of  this lookahead strategy in  a complete best-first  search algorithm have
 demonstrated that in numerous planning benchmark domains, the improvement of the
 performance in  terms of running time and  size of problems that  can be handled
 are been  drastically improved (cf. \cite{yahsp:icaps2004}).   The YAHSP planner
-has been  awarded a second place  in the 4th  International Planning Competition
+has been  awarded a second place  in the $4^{th}$  International Planning Competition
 \cite{ipc4:jair05} and some  recent results \cite{rintanen:acai2010} demonstrate
 that  it is still  extremely competitive  with more  recent planners.   A second
 motivation in the use  of YAHSP in \DAEX\ is its ability  to answer very fast to
 the considerable number of planning requests emanating from \DAEX, as opposed to
 modern  techniques such  as  the  landmark heuristics  implemented  in the  LAMA
-planner   \cite{lama:jair2010}  (winner  of   the  6th   International  Planning
+planner   \cite{lama:jair2010}  (winner  of   the  $6^{th}$   International  Planning
 Competition) which require a costly analysis for each new initial state.
 
 \paragraph{Parts that can theoretically be parallelized} %  (JD, VV, PS)
+% Correctness of the \DAEYAHSP\ parallel release
+% Burns et al.:
+%Soundness: Soundness holds trivially because no solution is returned that does not pass the goal test.
+%Deadlock: There is only one lock in PBNF and the thread that currently holds it never attempts to acquire it a secondtime, so deadlock cannot arise.
+%Livelock:
+%Completeness This follows easily from liveness:
+
+% Wikipedia: 
+%A deadlock is a situation where in two or more competing actions are each waiting for the other to finish, and thus neither ever does.
+%A livelock is similar to a deadlock, except that the states of the processes involved in the livelock constantly change with regard to one another, none progressing. Livelock is a special case of resource starvation; the general definition only states that a specific process is not progressing.
+%A real-world example of livelock occurs when two people meet in a narrow corridor, and each tries to be polite by moving aside to let the other pass, but they end up swaying from side to side without making any progress because they both repeatedly move the same way at the same time.
+%Livelock is a risk with some algorithms that detect and recover from deadlock. If more than one process takes action, the deadlock detection algorithm can be repeatedly triggered. This can be avoided by ensuring that only one process (chosen randomly or by priority) takes action
+
+
 
 \subsection{Implementation}
 
@@ -404,6 +418,9 @@ The openstacks domain is based on the "minimum maximum simultaneous open stacks"
 
 \paragraph{Algorithm Parameters} % (PS)
 
+All the experiments were done with the parameter set described in \cite{dae:icaps2010} except for the population size.
+
+
 \subsection{Results}
 
 % FIXME: in restart mode an instance launched with more than 1 thread stops before the 30 minutes defined with --max-seconds, Pierre things that the reason is because the time is defined in user-time and not in wall-clock.
@@ -461,7 +478,7 @@ decrease that is similar on both problems. The dispersions of the distribution
 is due to the steady-state stopping criterion that may be reached after different
 times.
 
-\paragraph{Comparaison of static and dynamic scheduling} % (CC, JD)
+\paragraph{Comparaison of Static and Dynamic Scheduling} % (CC, JD)
 
 OpenMP lets the choice between the both static and dynamic task scheduling. The default one is the static scheduling.
 
