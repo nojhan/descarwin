@@ -303,17 +303,41 @@ necessitating to change the scope of this data.
 %\subparagraph{Evolving Object, an evolutionary computation framework}\\
 %\DAEYAHSP\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library. 
 
-Standing for Evolving Objects\footnote{Evolving Objects: \url{http://eodev.sf.net}}, EO is largely used and known framework in evolutionary computation based on template approach in C++. Anyone can easily design evolutionary algorithms that will find solutions to virtually all kind of hard optimization problems, from continuous to combinatorial ones.
+Standing for Evolving Object\footnote{Evolving Object:
+\url{http://eodev.sf.net}}, EO is largely used and known framework in
+evolutionary computation based on template approach in C++. It helps at
+designing evolutionary algorithms for hard optimization problems, from
+continuous to combinatorial ones.
+
+An extension of EO for parallelization of algorithms, ParadisEO, has been
+proposed by Cahon et al. FIXME. It uses the Message Passing Interface API and
+proposes several parallelization scheme, available by calling wrappers around
+common functions of EO. We have choose not to use this framework because we
+were targeting multicore architecture, where message passing is useless and may
+introduce an overhead higher than OpenMP.
 
 %\subparagraph{OpenMP and parallelization paradigms}\\
 
-OpenMP\footnote{OpenMP: \url{http://www.openmp.org}} is a parallelization API based on shared memory in contrast with distributed paradigm. The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explained in further details later.
+OpenMP\footnote{OpenMP: \url{http://www.openmp.org}} is a parallelization API
+based on shared memory that differs from over frameworks base on distributed
+paradigm, like MPI.
+%The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explained in further details later.
 
 % parler de la genericite de la technique de parallelisation, n'importe qui peut utiliser EO pour avoir du code parallel independament de DaE/Yahsp.
 
-In order to parallelize a large scope of the framework EO, an analyze was done to identify the most used resources by almost all structures. Most of the EO classes use the pattern ``Functor''\footnote{Also called object function}. The advantages of these design is to bring on one hand the genericity and on the other hand the benefits given by classes behind a single call to a function. But concretely EO Functors take generaly a population in input calling then their own functions. This is done by iterating through the population.
+In order to parallelize a large scope of the framework EO, an analyze was done
+to identify the most used resources by almost all structures. Most of the EO
+classes use the ``Functor''\footnote{Also called function object} pattern. The
+advantages of this design is to get the genericity and the benefits given by
+classes while keeping the simplicity of a single call to a function. EO Functors
+generaly take a population as argument.
 
-Hence the population's manipulation would be our target to parallelize. Indeed, since we have several steps in evolutionary algorithms, in most cases the operations done on individuals can be made in parallel without data dependancies. At this time the only operation parallelized is the evaluation which is by far the most time-consuming part of the algorithm. There are several classes through a long hierachy in EO implementing evaluation operators but all of them call a common function to apply the evaluation, this is the function ``apply''.
+Considering that the evaluation of the population is the most costly part of the
+algorithm, this step is our first target to parallelize. Moreover, in most cases
+the evaluation done on individuals can be made in parallel without data
+dependencies.  There are several classes in EO implementing evaluation operators
+but all of them call a common function to apply the evaluation on a population,
+this is the function ``apply''.
 
 \paragraph{EO::apply} % (CC)
 %\footnote{Look at the header file apply.h available in the sources of EO}
