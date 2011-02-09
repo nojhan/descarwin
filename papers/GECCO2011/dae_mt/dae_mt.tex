@@ -568,13 +568,13 @@ The limit of $A_p$ as $p$ approaches infinity is equal to the sequential part of
 $$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
 
 %% Results
-\paragraph{Speed-up against nb of cores} % (CC, JD)
+\paragraph{Speed-up against number of cores} % (CC, JD)
 
 \begin{figure}[htpb]
   \begin{center}
-    \subfigure[elevators 12]{\includegraphics[width=0.2\textwidth]{images/elevators_proc_time.pdf}}
+    \subfigure[elevators 12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
     \hfill
-    \subfigure[openstacks 17]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+    \subfigure[openstacks 17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
   \end{center}
   \caption{Absolute wallclock time distributions of 11 runs of \DAEYAHSP\ according to the number of processors.}
   \label{fig:proc_elevators_vs_openstacks}
@@ -617,9 +617,9 @@ $S^d_p$ is the speedup for the dynamic one.\\
 
 \begin{figure}[htpb]
   \begin{center}
-    \subfigure[static]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_static.pdf}}
+    \subfigure[static]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_static.pdf}}
     \hfill
-    \subfigure[dynamic]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+    \subfigure[dynamic]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
   \end{center}
   \caption{Absolute wallclock time distributions of 11 runs of \DAEYAHSP\ according to the number of processors, on the temporal openstacks-17 problem.}
   \label{fig:proc_static_vs_dynamic}
@@ -628,15 +628,15 @@ $S^d_p$ is the speedup for the dynamic one.\\
 Figure \ref{fig:proc_static_vs_dynamic} shows that the dynamic parallelization
 scheme does not permits a significant speed-up comparing to the static one. The
 Wilcoxon signed-rank test cannot reject the null hypothesis that the samples come
-from the same distribution ($$p=0.03$$).
+from the same distribution ($p=0.03$).
 
 \paragraph{Speed-up against pop size} % (CC, JD)
 
 \begin{figure}[htpb]
   \begin{center}
-    \subfigure[full scale]{\includegraphics[width=0.2\textwidth]{images/elevators_pop_time.pdf}}
+    \subfigure[full scale]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time.pdf}}
     \hfill
-    \subfigure[rescaled]{\includegraphics[width=0.2\textwidth]{images/elevators_pop_time_zoom.pdf}}
+    \subfigure[rescaled]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_zoom.pdf}}
   \end{center}
   \caption{Absolute wallclock time distributions of 11 runs of \DAEYAHSP\ according to the population size, on the sequential elevators-12 problem, using 48 processors.}
   \label{fig:elevators_pop}
@@ -651,14 +651,35 @@ population size is small.
 \section{Discussion and Conclusion}
 %In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
 
-We made a proof-of-concept of an evaluation shared-memory parallelization scheme based on the OpenMP directive-based API on a common 48-core machine.
-Thanks to the abstraction level provided by the EO framework, this scheme is immediately available for any evolutionary algorithm as far as the individual local context is protected.
+We made a proof-of-concept of a shared-memory parallelization of the evauation
+step of the \DAE algorithm, based on the OpenMP directive-based API on a common
+48-core machine.  Thanks to the abstraction level provided by the EO framework,
+this scheme is immediately available for any evolutionary algorithm as far as
+the context of the evaluation functor is thread-local and reentrant.
 
-The implementation scheme presented here is very simple, but works extremely well.
-A further development will consist in parallelizing other steps of the evolutionary loop in particular the offspring generation which is also inherently parallel.
-On our 48-core Dell Machine a roughly $\times40$ was obtained on the two benchmarks tested.
+As expected, on our 48-core Dell Machine a roughly $\times40$ was obtained on
+the tested benchmark, this speed-up being the same on all the instances. 
 
-The queue mapping management of threads onto cores did not provide a significant improvement. Our hypothesis was that the goal sequences shows a diversity in length and thus should have shown very diverse times of evaluation computations. But we observed that the algorithm converges rapidly to a same length for all individuals.
+The dispersion of the measured times is mainly due to the
+combination of the steady-state stopping criterion and to the stochastic nature
+of the search, which may or may not reach a fitness plateus early. The
+relationship between this dispersion and the hardness of the problem solved
+remains to be explored.
+
+Our results show that the stopping criterion should be chosen carefully, along
+with the population size, as it has an impact on the dispersions of the
+distribution of computation time. 
+
+The queue mapping management of threads onto cores did not provide a significant
+improvement. Our hypothesis was that the goal sequences shows a diversity in
+length and thus should have shown very diverse times of evaluation computations.
+But we observed that the algorithm converges rapidly to a same length for all
+individuals.
+
+The implementation scheme presented here is very simple, but works extremely
+well. A further development will consist in parallelizing other steps of the
+evolutionary loop in particular the offspring generation which is also
+inherently parallel, as it use independant variation operators.
 
 % Impact on the EA design
 
