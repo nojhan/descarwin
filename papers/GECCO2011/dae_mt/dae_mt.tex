@@ -527,6 +527,9 @@ after at least 10 generations, evolution is stopped if no improvement of the
 best fitness in the population is made during 50 generations, with a maximum of
 1000 generations.
 
+The \DAE algorithm being stochastic, each run is repeated 11 times and the
+resulting distributions are presented as standard boxplots.
+
 \subsection{Results}
 
 % FIXME: in restart mode an instance launched with more than 1 thread stops before the 30 minutes defined with --max-seconds, Pierre things that the reason is because the time is defined in user-time and not in wall-clock.
