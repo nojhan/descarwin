@@ -117,20 +117,23 @@ This preliminary work opens an avenue for parallelizing any evolutionary algorit
 %            R=concevoir d'abord un algorithme évolutionnaire puis paralléliser sa fonction d'évaluation
 
 % The Planning Problem
-The classical planning problem is to find a path in a transition system: a
-sequence of actions which maps an initial state $I$ into a state $G$ including a
-set of desired goals. Usually a metric is associated with the solution plan such
-as length, cost or duration. In domain-independent planning, problems are
-described with the Planning Domain Description Language (PDDL)
-\cite{pddl:jair2003}; states of the world are defined by a set of atoms
-instanciated from a set of predicates and a set of objects.
-Instances of the planning problem, called planing tasks, can model all kinds of abstract reasoning problems and are known to be NP-hard.
+The  classical planning problem  in Artificial  Intelligence \cite{gnt04}  is to
+find a path in a transition system:  a sequence of actions which maps an initial
+state $I$ into a  state $G$ satisfying a set of desired  goals. Usually a metric
+is associated  with the solution  plan such as  length, cost or  duration (where
+concurrent actions  are allowed).  In domain-independent  planning, problems are
+described    with   the    Planning   Domain    Description    Language   (PDDL)
+\cite{pddl:jair2003}.  In  the simplest  STRIPS model, states  of the  world are
+defined by  sets of atoms  instantiated from  a set of  predicates and a  set of
+objects, and  actions are triples of  sets of atoms:  preconditions, add effets,
+del effects.  Instances of the planning problem, called planing tasks, can model
+many kinds of abstract reasoning problems and are known to be PSPACE-hard.
 
-To solve such planning tasks, numerous heuristic search algorithms have been proposed in the past but none of them are easily parallelizable.
-They require a great amount of technical work to provide efficiency while preserving correctness \cite{burns:ijcai2009,burns:JAIR2010}.
+To solve such planning tasks, several heuristic search algorithms have been proposed in the past but none of them are easily parallelizable.
+They require a great amount of technical work to provide efficiency while preserving correctness \cite{burns:JAIR2010,burns:ijcai2009}.
 
 Recently the \DAEX\ evolutionary metaheuristic has been proposed to solve such planning tasks \cite{dae:icaps2010,dae:evocop2006}.
-As an evolutionary algorithm \DAEX\ provides an inherent parallelism: the individual evaluation stage, which is the most time-consuming stage during the evolutionary generation loop.
+As an evolutionary algorithm \DAEX\ provides an inherent parallelism: the individual evaluation stage, which is often the most time-consuming stage during the evolutionary generation loop.
 This nice property opens an avenue towards the design of a parallel planning system without going deeply inside a whole reconstruction of the sequential version.
 
 Moreover, the implementation of \DAEX\ has been made with the STL-based Evolving Objects framework\footnote{\url{http://eodev.sf.net}} which provides an abstract control structure to develop any kind of evolutionary algorithm. Therefore our parallelization scheme is easily transposable to any evolutionary algorithm developed with the EO framework.
@@ -138,21 +141,30 @@ Moreover, the implementation of \DAEX\ has been made with the STL-based Evolving
 
 % Il manque un argument pour dire que les archis parallel shared-memory sont bien adaptées à notre cas au contraire des GPGPU (on a pas choisi une archi multi-core au hasard !)
 For the proof of concept we implemented a multi-threaded version of \DAEYAHSP, the instantiation of \DAEX\ with the heurictic forward search \YAHSP\ planner \cite{yahsp:icaps2004}, using the OpenMP directive-based API\footnote{\url{http://www.openmp.org}}. 
-The design of experiment is built on problems extracted from the last international planning competition\footnote{\url{http://ipc.icaps-conference.org}} with the multithreaded \DAEX\ release mapped onto a 48-core parallel machine.
+The design of experiment is built on problems extracted from the last international planning competition\footnote{\url{http://ipc.icaps-conference.org}} with the multithreaded \DAEYAHSP\ release mapped onto a 48-core parallel machine.
 
 % FIXME : plan de l'article
+is outilined as follows. We first  describe some previous works in the fields of
+parallel evolutionary  computation and AI planning, before  presenting with more
+details  the  main  algorithms  on  which  our parallel  system  is  based:  the
+evolutionary  metaheuristic  \DAEX\ and  the  forward-chaining heuristic  search
+planner YAHSP.  The parallel implementation of \DAEYAHSP\ is then described, as
+well as the specific problems,  due to the shared-memory programming model, that
+arose during  this implementation.  After having  demonstrated the effectiveness
+of our parallel implementation of \DAEYAHSP\ on two planning benchmark tasks, we
+conclude and provide some insights of possible future works.
 
-\section{Previous Works in Parallel EA and Parallel Planning}
+\section{Previous Works in Parallel EAs and Parallel Planning}
 
-\paragraph{Parallel EA}
+\paragraph{Parallel EAs}
 
-A large litterature deals with the parallelization techniques of evolutionary
-algorithms. Depending on the targeted architecture, the parallelization scheme
-may be chosen differently. The main approches may be classified among: simple
-{\it independant runs parallelism}, EA with {\it global parallelism} where the
-evaluation is decentralized but not the other operators, cellular EAs (cEA)
-where the selection and reproduction steps are decentralized, {\it dEA} approach
-using a multi-population {\it island parallelism}. 
+A large  litterature deals with  the parallelization techniques  of Evolutionary
+Algorithms (EAs).  Depending on  the targeted architecture,  the parallelization
+scheme may be  chosen differently. The main approaches  may be classified among:
+simple  {\it independant  runs parallelism},  EA with  {\it  global parallelism}
+where the evaluation is decentralized  but not the other operators, cellular EAs
+(cEA) where  the selection and  reproduction steps are decentralized,  {\it dEA}
+approach using a multi-population {\it island parallelism}.
 
 The runs parallelism being trivially achieved by running several runs, the first
 step when parallelizing a new algorithm is often the lobal parallelization
