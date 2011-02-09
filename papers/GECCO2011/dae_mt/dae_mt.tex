@@ -806,33 +806,33 @@ premature convergence.
 %the .tex source file and comment out
 %the command \texttt{{\char'134}thebibliography}.
 \end{document}
-
-\DAE\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library. 
-The fixed {\em evolution engine} is a (100+700)-ES: 100 individuals generate 700 offsprings without selection. The survival selection is performed among those 800 individuals using a {\em deterministic tournament} of size 5. For all runs, the {\bf stopping criterion} is the following: After at least 10 generations, evolution is stopped if no improvement of the best fitness in the population is made during 50 generations, with a maximum of 1000 generations. Furthermore, all runs were allowed a maximum CPU time of 30mn (running on 3.4 GHz cores).
-
-
-Multicore machines are becoming a standard way to speep up the system performance.
-
-This paper describes a multi-threaded release of \DAEYAHSP.
-
-This paper describes a parallel shared-memory release of the \DAEYAHSP\ planning system.
-using the OpenMP directive-based API.
-
-to obtain high levels of performance special care has been given to get reentrant procedures.
-isolate context variables 
-
+%
+%\DAE\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library. 
+%The fixed {\em evolution engine} is a (100+700)-ES: 100 individuals generate 700 offsprings without selection. The survival selection is performed among those 800 individuals using a {\em deterministic tournament} of size 5. For all runs, the {\bf stopping criterion} is the following: After at least 10 generations, evolution is stopped if no improvement of the best fitness in the population is made during 50 generations, with a maximum of 1000 generations. Furthermore, all runs were allowed a maximum CPU time of 30mn (running on 3.4 GHz cores).
+%
+%
+%Multicore machines are becoming a standard way to speep up the system performance.
+%
+%This paper describes a multi-threaded release of \DAEYAHSP.
+%
+%This paper describes a parallel shared-memory release of the \DAEYAHSP\ planning system.
+%using the OpenMP directive-based API.
+%
+%to obtain high levels of performance special care has been given to get reentrant procedures.
+%isolate context variables 
+%
 % concurrent programming
+%
+%OpenMP primarily consists of a set of compiler directives (pragmas) that are inserted into a Fortran, C or C++ program to convey information to an OpenMP compiler.
 
-OpenMP primarily consists of a set of compiler directives (pragmas) that are inserted into a Fortran, C or C++ program to convey information to an OpenMP compiler.
-
-
-\cite{paradiseo:JHeuristics2004}
-\cite{paradiseo:ParallelComputing2004}
-\cite{alba:IEEE2002}
-\cite{alba:COR2008}
-\cite{alba:IPL2002}
-\cite{dae:icaps2010}
-\cite{dae:evocop2006}
-\cite{dae:gecco2010}
-
-In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
+%
+%\cite{paradiseo:JHeuristics2004}
+%\cite{paradiseo:ParallelComputing2004}
+%\cite{alba:IEEE2002}
+%\cite{alba:COR2008}
+%\cite{alba:IPL2002}
+%\cite{dae:icaps2010}
+%\cite{dae:evocop2006}
+%\cite{dae:gecco2010}
+%
+%In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
