@@ -225,7 +225,7 @@ search by several orders of magnitude.
 domain-independent satisficing planning system based on Evolutionary Computation
 \cite{dae:evocop2006}. The basic principle is to carry out a {\em
 Divide-and-Conquer} strategy driven by an evolutionary algorithm. The algorithm
-is detailed in \cite{dae:icaps2010} and compare with state-of-the-art planners.
+is detailed in \cite{dae:icaps2010} and compared with state-of-the-art planners.
 In order to solve a planning task ${\cal P}_D(I,G)$, the basic idea of \DAEX\ is
 to find a sequence of states $S_1, \ldots, S_n$, and to rely on an embedded
 planner $X$ to solve the series of planning tasks ${\cal P}_D(S_{k},S_{k+1})$,
@@ -252,11 +252,12 @@ related to the variation operators have been tuned using the Racing method
 \cite{dae:gecco2010}.
 
 All experiments were done with \DAEYAHSP: the instantiation of \DAEX\ with the
-YAHSP heuristic forward search solver \cite{yahsp:icaps2004}. % + YAHSP memoing
-shared by all searches.  We added two novelties to the version described in
+YAHSP heuristic forward search  solver \cite{yahsp:icaps2004}. % + YAHSP memoing
+                                % shared by all searches.  
+We added two novelties to the version described in
 \cite{dae:icaps2010}.  One important parameter is the maximum number of expanded
 nodes allowed to the \YAHSP\ sub-solver which defines empirically what is
-considered as an easy problem for \YAHSP. As the matter of fact, the minimum
+considered as an easy problem for \YAHSP. As a matter of fact, the minimum
 number of required nodes varies from few nodes to thousands depending of the
 planning task.  In the current release this number is estimated during the
 population initialization stage. An incremental loop is performed until the
@@ -351,7 +352,7 @@ only parallelized the latter.
 Even  if  being  very  natural   in  the  context  of  evolutionary  algorithms,
 parallelizing individual evaluations in \DAEX\  requires to be carefully made in
 order to avoid some typical problems that can happen with shared-memory parallel
-implementations.  Indeed,  even if  the evaluation of  the individuals  are made
+implementations.  Indeed,  even if the  evaluations of the individuals  are made
 independently of each  other, some concurrent access to  shared memory are still
 required  (for  example, a  basic  one  is  incrementing some  global  counter),
 especially in YAHSP (detailed below). Furthermore, the implementations of \DAEX\
