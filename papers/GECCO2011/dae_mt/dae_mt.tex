@@ -590,7 +590,7 @@ without violating the maximum number of stacks constraints.
 All the experiments were done with the parameter set described in
 \cite{dae:icaps2010} except for the population size which varies according to
 the experiment.  The fixed evolution engine is a (pop size+ $7 \times$ pop
-size)-ES: $n$ individuals generate $7 \times n$ offsprings without selection.
+size)-ES: $n$ individuals generate $7 \times n$ offspring without selection.
 For all runs, the following steady-state stopping condition has been applied:
 after at least 10 generations, evolution is stopped if no improvement of the
 best fitness in the population is made during 50 generations, with a maximum of
@@ -658,21 +658,18 @@ times.
 
 \paragraph{Comparison of Static and Dynamic Scheduling} % (CC, JD)
 
-OpenMP lets the choice between the both static and dynamic task scheduling. The default one is the static scheduling.
-
-%static scheduling
-
-To iterate through a set of tasks we divide the number of tasks by the number of processus available. This means that each processus has some defined tasks to accomplish.
-
-%dynamic scheduling
-
-Regarding dynamic scheduling, during the runtime if one processus has finished these tasks it is going to work on another task available. It is similar to a tasks' queue.
+OpenMP let the choice between static and dynamic task scheduling. The default one is the static scheduling.
+In the static scheduling, a loop iterating through a set of tasks will be
+divided in several tasks according to the number of available processors.
+Regarding dynamic scheduling, during the runtime if one thread has finished
+these tasks it get the next available one, in a queue.
 
 % As the goal is to optimize the time cost used by a problem solved in a variable time, we have to verify whether the dynamic scheduling brings a better efficiency.
 
 % some hypotheses
 
-Two hypotheses have driven us to test the dynamic scheduling. The first one consists to say that as long as we are using a problem solved in a variable time, the dynamic scheduling should be faster than the static scheduling does. The second one assumes that we use a population size higher than the number of cores available, the dynamic mode should bring a better efficiency.
+% on a pas teste tout ça en pratique
+%Two hypotheses have driven us to test the dynamic scheduling. The first one consists to say that as long as we are using a problem solved in a variable time, the dynamic scheduling should be faster than the static scheduling does. The second one assumes that we use a population size higher than the number of cores available, the dynamic mode should bring a better efficiency.
 
 % less time consuming
 
