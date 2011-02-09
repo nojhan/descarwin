@@ -119,6 +119,7 @@ Preliminary work
 \section{Previous Works in Parallel EO and Parallel Planning}
 
 \paragraph{Parallel Planning} % (VV)
+\label{section:previous-work}
 
 Several  approaches to  parallel planning  have been  proposed in  recent years.
 Parallel Retracting A* \cite{PRA-star},  was implemented on a Connection Machine
@@ -234,6 +235,22 @@ planner   \cite{lama:jair2010}  (winner  of   the  $6^{th}$   International  Pla
 Competition) which require a costly analysis for each new initial state.
 
 \paragraph{Parts that can theoretically be parallelized} %  (JD, VV, PS)
+
+As  shown in  Section \ref{section:previous-work},  heuristic  search algorithms
+used in automated  AI planners can be parallelized in  many ways, although there
+is no obvious and  natural way to do so.  However, our goal  in this work is not
+to  parallelize the  underlying planner,  but the  evolutionary  algorithm which
+controls the  planner, which can  be made in  a very efficient way.   Indeed, in
+typical  population-based  algorithms   such  as  evolutionary  algorithms,  the
+evaluation of individuals can be made independently of each other, a fortiori in
+a parallel way.  Applying variation operators can also be performed in parallel;
+and  depending  on  the  application,  parallelism  on  variation  operators  or
+individual  evaluation will  have a  different impact  on the  running  time and
+utilization  of the  computational  resources.  In \DAEX,  the  running time  of
+applying the variation operators is negligible w.r.t.  the running time required
+by the individual evaluations by an embedded planner, which is the reason why we
+only parallelized the latter.
+
 % Correctness of the \DAEYAHSP\ parallel release
 % Burns et al.:
 %Soundness: Soundness holds trivially because no solution is returned that does not pass the goal test.
@@ -248,10 +265,38 @@ Competition) which require a costly analysis for each new initial state.
 %Livelock is a risk with some algorithms that detect and recover from deadlock. If more than one process takes action, the deadlock detection algorithm can be repeatedly triggered. This can be avoided by ensuring that only one process (chosen randomly or by priority) takes action
 
 
-
 \subsection{Implementation}
 
 \paragraph{Locks, thread-safe \& reentrant subroutines} % (VV)
+
+Even  if  being  very  natural   in  the  context  of  evolutionary  algorithms,
+parallelizing individual evaluations in \DAEX\  requires to be carefully made in
+order to avoid some typical problems that can happen with shared-memory parallel
+implementations.  Indeed,  even if  the evaluation of  the individuals  are made
+independently of each  other, some concurrent access to  shared memory are still
+required  (for  example, a  basic  one  is  incrementing some  global  counter),
+especially in YAHSP (detailed below). Furthermore, the implementations of \DAEX\
+and  YAHSP where  not  designed with  parallelism  in mind,  which implied  some
+modifications to render them thread-safe.
+
+One first problem that can  happen in a shared-memory parallel implementation is
+\emph{deadlocks}, which are situations where at least two concurrent threads are
+each waiting  for the  other to finish,  and thus  neither ever does.   This can
+happen for example when a thread $t_1$ acquires a lock on a shared variable $x$,
+and then tries  to acquire a lock  on another shared variable $y$;  while in the
+same time a thread $t_2$ acquired a lock on $y$ and then tries to acquire a lock
+on $x$.  Each thread  waiting for the other one to release  the lock on the next
+variable locked by the other  thread, nothing happens.  A variation of deadlocks
+is \emph{livelocks},  where the  threads are still  able to continue  doing some
+work but cannot go through some portion of the code due to a similar phenomenon.
+
+Another problem  that can arise is the  concurrent use of a  given subroutine by
+several threads, when such a subroutine or some subroutine called by it modifies
+some  global data.   This is  a  typical problem  of reentrancy,  which must  be
+carefully analyzed in order to render thread-safe a parallel implementation. Two
+cases can then occur: either the  global data must shared by some threads, which
+requires to protect its  access, or it can be made private  to each thread, thus
+necessitating to change the scope of this data.
 
 \paragraph{EO \& OpenMP} % (CC, JD)
 
@@ -321,6 +366,20 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 \end{verbatim}
 \end{algorithm}
 \vspace{-0.2cm}
+
+
+\paragraph{YAHSP \& OpenMP} % (VV)
+
+The design  of YAHSP has  been made in  C with efficiency  in mind, and  kept as
+light as  possible. This is typically  the kind of  implementation, making heavy
+use of global  variables, not designed for a concurrent  use by several parallel
+threads, and where thread-safety is clearly not ensured.  However, OpenMP offers
+a facility  to deal with global variables,  in order to change  their scope: the
+``omp threadprivate'' pragma.  It takes as parameter a  list of global variables
+whose  scope must  be changed  from shared  by all  threads to  private  to each
+thread.   And  finally, specifying  which  global  variable  should be  rendered
+private to each thread  was the only thing we had to  do to ensure thread-safety
+in YAHSP.
 
 \section{Experimental Study}
 
