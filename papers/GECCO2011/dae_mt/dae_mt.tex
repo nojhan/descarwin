@@ -265,9 +265,9 @@ In the current release this number is estimated during the population initializa
 
 Furthermore we add the capability to perform restarts within a time contract in order to increase solution quality.
 
-\paragraph{YAHSP} % (VV)
+\paragraph{Yet Another Heuristic Search Planner} % (VV)
 
-The   YAHSP  planning   system  (``Yet   Another  Heuristic   Search  Planner'')
+The YAHSP planning system 
 \cite{yahsp:icaps2004}  extends  a  technique   introduced  in  the  FF  planner
 \cite{ff:jair01}  for calculating  the  heuristic, based  on  the extraction  of
 a solution  from a planning graph  computed for the relaxed  problem obtained by
@@ -334,8 +334,9 @@ Competition) which require a costly analysis for each new initial state.
 \paragraph{EO \& OpenMP} % (CC, JD)
 
 %\subparagraph{Evolving Object, an evolutionary computation framework}\\
+%\DAEYAHSP\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library. 
 
-Standing for Evolving Object\footnote{Evolving Object: \url{http://eodev.sf.net}}, EO is largely used and known framework in evolutionary computation based on template approach in C++. Anyone can easily design evolutionary algorithms that will find solutions to virtually all kind of hard optimization problems, from continuous to combinatorial ones.
+Standing for Evolving Objects\footnote{Evolving Objects: \url{http://eodev.sf.net}}, EO is largely used and known framework in evolutionary computation based on template approach in C++. Anyone can easily design evolutionary algorithms that will find solutions to virtually all kind of hard optimization problems, from continuous to combinatorial ones.
 
 %\subparagraph{OpenMP and parallelization paradigms}\\
 
@@ -418,8 +419,10 @@ The openstacks domain is based on the "minimum maximum simultaneous open stacks"
 
 \paragraph{Algorithm Parameters} % (PS)
 
-All the experiments were done with the parameter set described in \cite{dae:icaps2010} except for the population size.
-
+All the experiments were done with the parameter set described in \cite{dae:icaps2010} except for the population size which varies according to the experiment.
+The fixed evolution engine is a (pop size+ $7 \times$ pop size)-ES: $n$ individuals generate $7 \times n$ offsprings without selection.
+For all runs, the following steady-state stopping condition has been applied: after at least 10 generations, evolution is stopped if no improvement of the best fitness in the
+population is made during 50 generations, with a maximum of 1000 generations.
 
 \subsection{Results}
 
