@@ -143,6 +143,21 @@ The design of experiment is built on problems extracted from the last internatio
 
 \paragraph{Parallel EA}
 
+A large litterature deals with the parallelization techniques of evolutionary
+algorithms. Depending on the targeted architecture, the parallelization scheme
+may be chosen differently. The main approches may be classified among: simple
+{\it independant runs parallelism}, EA with {\it global parallelism} where the
+evaluation is decentralized but not the other operators, cellular EAs (cEA)
+where the selection and reproduction steps are decentralized, {\it dEA} approach
+using a multi-population {\it island parallelism}. 
+
+The runs parallelism being trivially achieved by running several runs, the first
+step when parallelizing a new algorithm is often the lobal parallelization
+approach, which is prefered because the evaluation step is often the most costly
+part of EAs and because it is intrinsiquely race-conditions free.
+
+FIXME CITE ALBA
+
 
 
 FIXME
