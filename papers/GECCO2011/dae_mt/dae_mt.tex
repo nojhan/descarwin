@@ -313,13 +313,12 @@ proposed by Cahon et al. FIXME. It uses the Message Passing Interface API and
 proposes several parallelization scheme, available by calling wrappers around
 common functions of EO. We have choose not to use this framework because we
 were targeting multicore architecture, where message passing is useless and may
-introduce an overhead higher than OpenMP.
+introduce an overhead higher than other approaches. 
 
 %\subparagraph{OpenMP and parallelization paradigms}\\
 
-OpenMP\footnote{OpenMP: \url{http://www.openmp.org}} is a parallelization API
-based on shared memory that differs from over frameworks base on distributed
-paradigm, like MPI.
+For multicore architecture, shared memory parallelization approach is a better
+candidate. In this work, we have used OpenMP\footnote{OpenMP: \url{http://www.openmp.org}}.
 %The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explained in further details later.
 
 % parler de la genericite de la technique de parallelisation, n'importe qui peut utiliser EO pour avoir du code parallel independament de DaE/Yahsp.
@@ -390,6 +389,17 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 \end{algorithm}
 \vspace{-0.2cm}
 
+In order to permits OpenMP to build a multithreaded algorithm without side
+effects, the evaluation functor (the ``proc'' in the apply function) must fulfil certain requirement. 
+In EO, the evaluation functors are supposed to be instanciated only once. In a
+sequential mode, the same instance is used to evaluate every individuals in a
+population. In a parallelized mode, one must ensure that the evaluation functor
+have thread-local data structures.
+
+When parallelizing the evaluation loop in an evolutionary algorithm, there
+exists a synchronization step at each iteration, this ensure that no race-condition
+may occurs. Indeed, individuals being evaluated are all independent, which is
+the case in the majority of evolutionary algorithm, and also in DAE.
 
 \paragraph{YAHSP \& OpenMP} % (VV)
 
@@ -406,6 +416,18 @@ in YAHSP.   For example, the  global arrays used  to compute the  heuristic, the
 relaxed plans and the lookahead plans  are made private to each thread, ensuring
 that concurrent  excutions of YAHSP do not  use the same portions  of the global
 memory.
+
+\paragraph{DAE-specific parallelization issues} % (JD)
+
+DAE evaluation step calls the YAHSP solver several times on the same
+decomposition and thus uses several variables to keep the state of the
+evaluation over the searches between intermediate goals (namely $k$, $B$ and
+$U$).  As the evaluation functor is a single instance, it must be guaranted
+reentrant and not use static variables nor attributes. A way to achieve the
+re-entrancy is to define those variables as attributes of the decomposition
+itself, and not as attributes of the evaluation functor.
+
+
 
 \section{Experimental Study}
 
