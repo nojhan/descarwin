@@ -166,16 +166,6 @@ computing, multi-core architecture are gaining popularity as they become the
 share similar characteristics, but are not well suited for executing programs
 that would not be designed for it.
 
-For the proof of concept we implemented a multi-threaded version of \DAEYAHSP,
-the instantiation of \DAEX\ with the heurictic forward search \YAHSP\ planner
-\cite{yahsp:icaps2004}, using the OpenMP directive-based
-API\footnote{\url{http://www.openmp.org}}.  
-
-The design of experiment is built on
-problems extracted from the last international planning
-competition\footnote{\url{http://ipc.icaps-conference.org}} with the
-multi-threaded \DAEX\ release mapped onto a 48-core parallel machine.
-
 The paper is  outlined as follows. We first describe some  previous works in the
 fields of  parallel evolutionary computation and AI  planning, before presenting
 with more details the main algorithms on which our parallel system is based: the
