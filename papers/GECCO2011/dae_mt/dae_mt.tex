@@ -47,6 +47,7 @@
 
 \documentclass{sig-alternate}
 \usepackage{url}
+\usepackage{subfigure}
 %\documentclass{acm_proc_article-sp}
 %\def\BibTeX{Bib\TeX}
 %\parindent=0pt
@@ -382,6 +383,43 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 % FIXME: in restart mode an instance launched with more than 1 thread stops before the 30 minutes defined with --max-seconds, Pierre things that the reason is because the time is defined in user-time and not in wall-clock.
 
 % FIXME: .out empty, why ?!?
+
+\begin{figure}[htpb]
+  \begin{center}
+    \subfigure[elevators
+    12]{\includegraphics[width=0.2\textwidth]{images/elevators_proc_time.pdf}}
+    \hfill
+    \subfigure[openstacks 17]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+  \end{center}
+  \caption{Absolute wallclock time distributions of 11 runs of DAE according to
+  the number of processors.}
+  \label{fig:static_vs_dynamic}
+\end{figure}
+
+
+\begin{figure}[htpb]
+  \begin{center}
+    \subfigure[static]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_static.pdf}}
+    \hfill
+    \subfigure[dynamic]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+  \end{center}
+  \caption{Absolute wallclock time distributions of 11 runs of DAE according to
+  the number of processors, on the temporal openstacks-17 problem.}
+  \label{fig:static_vs_dynamic}
+\end{figure}
+
+
+\begin{figure}[htpb]
+  \begin{center}
+    \subfigure[full scale]{\includegraphics[width=0.2\textwidth]{images/elevators_pop_time.pdf}}
+    \hfill
+    \subfigure[rescaled]{\includegraphics[width=0.2\textwidth]{images/elevators_pop_time_zoom.pdf}}
+  \end{center}
+  \caption{Absolute wallclock time distributions of 11 runs of DAE according to
+  the population size, on the sequential elevators-12 problem.}
+  \label{fig:elevators_pop}
+\end{figure}
+
 
 \paragraph{Speed-up against nb of cores} % (CC, JD)
 \paragraph{Speed-up against pop size} % (CC, JD)
