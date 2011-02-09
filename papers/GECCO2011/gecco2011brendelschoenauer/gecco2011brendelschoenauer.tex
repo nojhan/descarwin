@@ -239,7 +239,9 @@ Naturally, our algorithm also has some parameters, which can be tuned again. Par
 \section{Future Work}
 \label{section:futurework}	
 
-The most important experiment to carry out in the future is simply to test the algorithm with more iterations and more domains this takes several month of work even using a cluster. Since LaO is only a framework, as indicated other kind of learning methods, and other kind of optimization techniques may be incorporated. Also the benefit of gene-transfer and/or cross-over might be investigated further. Gene-transfer shall be improved so that chromosomes are transfered deterministically in order of similarity of instances measured by similarity of features.
+The most important experiment to carry out in the future is simply to test the algorithm with more iterations and more domains this takes several month of work even using a cluster. Since LaO is only a framework, as indicated other kind of learning methods, and other kind of optimization techniques may be incorporated. If an ANN is used, the optimal structure has to be determined, or a more sophisticated solution is to apply one of the so-called Growing Neural Network architectures \cite{Qiang}.
+
+Also the benefit of gene-transfer and/or cross-over might be investigated further. Gene-transfer shall be improved so that chromosomes are transfered deterministically in order of similarity of instances measured by similarity of features.
 
 One shall also test, how inter-domain generalization works. Maybe it is possible to learn a mapping for all the domains, since the features may grasp the specificity of a domain. Our results indicate that the current feature-set may be too small and it has to be extended for better results. Feature-selection would become important only if the number of features are more than half of the number of examples (well known rule of thumb). Unfortunately, this is not the case yet.
 
