@@ -73,31 +73,6 @@
 %\title{A Multicore Implementation of the Individual Evaluation in the Divide-and-Evolve Planner}
 \title{Parallel Divide-and-Evolve: Experiments with OpenMP on a Multicore Machine}
 
-
-%
-% You need the command \numberofauthors to handle the 'placement
-% and alignment' of the authors beneath the title.
-%
-% For aesthetic reasons, we recommend 'three authors at a time'
-% i.e. three 'name/affiliation blocks' be placed beneath the title.
-%
-% NOTE: You are NOT restricted in how many 'rows' of
-% "name/affiliations" may appear. We just ask that you restrict
-% the number of 'columns' to three.
-%
-% Because of the available 'opening page real-estate'
-% we ask you to refrain from putting more than six authors
-% (two rows with three columns) beneath the article title.
-% More than six makes the first-page appear very cluttered indeed.
-%
-% Use the \alignauthor commands to handle the names
-% and affiliations for an 'aesthetic maximum' of six authors.
-% Add names, affiliations, addresses for
-% the seventh etc. author(s) as the argument for the
-% \additionalauthors command.
-% These 'additional authors' will be output/set for you
-% without further effort on your part as the last section in
-% the body of your article BEFORE References or any Appendices.
 \numberofauthors{2} % 4 is a bug!
 
 \author{
@@ -124,55 +99,6 @@ Vincent Vidal\\
        \email{vincent.vidal@onera.fr}
 }
 
-
-%\numberofauthors{2}
-%\author{
-%\alignauthor
-%Caner Candan\\
-%Johann Dr{\'e}o\\
-%Pierre Sav{\'e}ant\\
-%\affaddr{Thales Research \& Technology}\\
-%\affaddr{Palaiseau, France}\\
-%\email{first.last@thalesgroup.com}
-%\alignauthor
-%Vincent Vidal\\
-%\affaddr{ONERA -- DCSD}\\
-%\affaddr{Toulouse, France}\\
-%\email{Vincent.Vidal@onera.fr}
-%}
-
-%\numberofauthors{2}
-%\author{
-%\alignauthor
-%Caner Candan$^{1}$ ~~~~~~~~ Johann Dr{\'e}o$^{1}$\\
-%\affaddr{$^{1}$Thales Research \& Technology}\\
-%\affaddr{Palaiseau, France}\\
-%\email{first.last@thalesgroup.com}
-%\alignauthor
-%Pierre Sav{\'e}ant$^{1}$ ~~~~~~~~ Vincent Vidal$^{2}$\\
-%\affaddr{$^{2}$ONERA -- DCSD}\\
-%\affaddr{Toulouse, France}\\
-%\email{Vincent.Vidal@onera.fr}
-%}
-
-%\numberofauthors{4}
-%\author{
-%\alignauthor
-%Caner Candan\\
-%\affaddr{Thales Research \& Technology}\\
-%\affaddr{Palaiseau, France}\\
-%\email{first.last@thalesgroup.com}
-%\alignauthor
-%Johann Dr{\'e}o\\
-%\alignauthor
-%Pierre Sav{\'e}ant\\
-%\alignauthor
-%Vincent Vidal\\
-%\affaddr{ONERA -- DCSD}\\
-%\affaddr{Toulouse, France}\\
-%\email{Vincent.Vidal@onera.fr}
-%}
-
 \maketitle
 \begin{abstract}
 This paper provides 
@@ -184,14 +110,13 @@ proof of concept with DAE.
 \end{abstract}
 
 \section{Introduction}
-
-$\UU$ denotes a uniform random draw from the set given as argument.
+Multicore machines are becoming a standard way to speep up the system performance.
 
 
 Preliminary work
 
 
-\section{Previous works in Parallel EO and Parallel Planning}
+\section{Previous Works in Parallel EO and Parallel Planning}
 
 \paragraph{Parallel Planning} % (VV)
 
@@ -232,9 +157,6 @@ YAHSP planner \cite{yahsp:icaps2004} where  many concurrent threads expand nodes
 from a common open list, yielding to early exploration of branches of the search
 tree that  would have  been delayed  by a classical  search, which  can speed-up
 search by several orders of magnitude.
-
-
-
 
 \section{Methods}
 
@@ -543,9 +465,10 @@ that may be reached after different times, with a higher probability when the
 population size is small.
 
 \section{Discussion and Conclusion}
+%In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
 
 We made a proof-of-concept of an evaluation shared-memory parallelization scheme based on the OpenMP directive-based API on a common 48-core machine.
-Thanks to the abstraction level provided by the EO framework, this scheme is available for any evolutionary algorithm as far as the individual local context is protected.
+Thanks to the abstraction level provided by the EO framework, this scheme is immediately available for any evolutionary algorithm as far as the individual local context is protected.
 
 The implementation scheme presented here is extremely basic, but works extremely well.
 A further development will consist in parallelizing other steps of the evolutionary loop in particular the offspring generation which is also inherently parallel.
@@ -614,3 +537,4 @@ OpenMP primarily consists of a set of compiler directives (pragmas) that are ins
 \cite{dae:evocop2006}
 \cite{dae:gecco2010}
 
+In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
