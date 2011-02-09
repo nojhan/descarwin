@@ -187,23 +187,27 @@ $\UU$ denotes a uniform random draw from the set given as argument.
 
 Preliminary work
 
-\section{Divide-and-Evolve}
+\section{Divide and Evolve}
+% The Planning Problem
+The classical planning problem is to find a path in a transition system: a sequence of actions which maps an initial state $I$ into a state $G$ including a set of desired goals. Usually a metric is associated with the solution plan such as length, cost or duration. In domain-independent planning, problems are described with the Planning Domain Description Language (PDDL) \cite{pddl:jair2003}; states of the world are defined by a set of atoms instanciated from a set of predicates and a set of objects. Although there are several families of problems, we concentrate here on cost planning and temporal planning. In cost planning a cost is attached to each action and the objective is to minimize the sum of all costs for a sequential plan whereas in temporal planning actions have a duration and can be run in parallel. In temporal planning the objective is to minimize the total makespan of the parallel plan.
 
-The planning problem is to find a path in a transition system from an initial state to a state including a set of desired goals. In domain-independent planning, problems are described with the Planning Domain Description Language (PDDL); states of the world are defined by a set of atoms instanciated from a set of predicates and a set of objects. Although there are several families of problems, we concentrate here on cost planning and temporal planning. In cost planning a cost is attached to each action and the objective is to minimize the sum of all costs for a sequential plan whereas in temporal planning actions have a duration and can be run in parallel. In temporal planning the objective is to minimize the total makespan of the parallel plan.
+% DaE
+\DAEX, the concrete implementation of the \dae\ paradigm, is a domain-independent satisficing planning system \cite{dae:evocop2006} based on Evolutionary Computation. The basic principle is to carry out a {\em Divide-and-Conquer} strategy driven by an evolutionary algorithm. The algorithm is detailed in \cite{dae:icaps2010} and compare with state-of-the-art planners.
+In order to solve a planning task ${\cal P}_D(I,G)$, the basic idea of \DAEX\ is to find a sequence of states $S_1, \ldots, S_n$, and to rely on an embedded planner $X$ to solve the series of planning tasks ${\cal P}_D(S_{k},S_{k+1})$, for $k \in [0,n]$ (with $S_0 = I$ and $S_{n+1} = G$). 
+A \DAEX\ individual is a sequence of goals which define a sequence of subproblems to be solved. These subproblems are submitted successively to an embedded planner $X$ and the global solution is obtained after the compression of these intermediate solutions. The overall optimization process is controled by an evolutionary algorithm.
 
-\DAEX\ is a domain-independent satisficing planning system \cite{dae:evocop2006} based on Evolutionary Computation. The basic principle is to carry out a {\em Divide-and-Conquer} strategy driven by an evolutionary algorithm. The algorithm is detailed in \cite{dae:icaps2010} and compare with state-of-the-art planners.
-
-A \DAEX\ individual is a sequence of goals which define a sequence of subproblems to be solved. These subproblems are submitted to an embedded planner and the global solution is obtained after a compression step. The overall optimization process is controled by an evolutionary algorithm.
 The fitness implements a gradient towards feasability for unfeasible individuals and a gradient towards optimality for feasible individuals.
-Beside a standard one point crossover, four mutations have been defined at the individual level and at the goal level.
+Population initialization as well as variation operators are driven by the critical path $h^1$ heuristic \cite{h1:aips2000} in order to discard inconsistent state orderings, and atom mutual exclusivity inference in order to discard inconsistent states.
+Beside a standard one-point crossover for variable length representations, four mutations have been defined: addition (resp. removal) of a goal in a sequence, addition (resp. removal) of an atom in a goal.
 The selection is a comparison-based deterministic tournament of size 5.
+
 % Parameter tuning
-For the sequential release, Darwinian-related parameters of \DAEX\ have been fixed after some early experiments \cite{dae:evocop2006} wheras 
-parameters related to the variation operators have been tuned using Racing \cite{dae:gecco2010}.
+For the sequential release, Darwinian-related parameters of \DAEX\ have been fixed after some early experiments \cite{dae:evocop2006} whereas 
+parameters related to the variation operators have been tuned using the Racing method \cite{dae:gecco2010}.
 
 All experiments were done with \DAEYAHSP: the instantiation of \DAEX\ with the YAHSP heuristic forward search solver \cite{yahsp:icaps2004}. % + YAHSP memoing shared by all searches.
 We added two novelties to the version described in \cite{dae:icaps2010}. 
-One important parameter is the maximum number of expanded nodes allowed to the \YAHSP\ sub-solver which defines empirically what is considered as an easy problem for \YAHSP. As the matter of fact, the minimum number of required nodes varies from few nodes to thousands depending of the problem. 
+One important parameter is the maximum number of expanded nodes allowed to the \YAHSP\ sub-solver which defines empirically what is considered as an easy problem for \YAHSP. As the matter of fact, the minimum number of required nodes varies from few nodes to thousands depending of the planning task. 
 In the current release this number is estimated during the population initialization stage. An incremental loop is performed until the ratio of feasible individals is over a given theshold or a maximum boundary has been reached. By default this number is doubled at each iteration until at least one feasible individual is produced or 100000 has been reached.
 
 Furthermore we add the capability to perform restarts within a time contract in order to increase solution quality.
@@ -256,11 +260,11 @@ search by several orders of magnitude.
 
 We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for cost planning and Openstacks-17 for temporal planning.
 
-The elevators domain\footnote{\url{http://ipc.informatik.uni-freiburg.de/Domains}} is stated as follows: there is a building with N+1 floors, numbered from 0 to N. The building can be separated in blocks of size M+1, where M divides N. Adjacent blocks have a common floor. The building has K fast (accelarating) elevators that stop only in floors that are multiple of M/2 (so M has to be an even number). Each fast elevator has a capacity of X persons. Furthermore, within each block, there are L slow elevators, that stop at every floor of the block. Each slow elevator has a capacity of Y persons (usually Y<X).
+The elevators domain is stated as follows: there is a building with N+1 floors, numbered from 0 to N. The building can be separated in blocks of size M+1, where M divides N. Adjacent blocks have a common floor. The building has K fast (accelarating) elevators that stop only in floors that are multiple of M/2 (so M has to be an even number). Each fast elevator has a capacity of X persons. Furthermore, within each block, there are L slow elevators, that stop at every floor of the block. Each slow elevator has a capacity of Y persons (usually Y<X).
 There are costs associated with each elavator starting/stoping and moving. There are several passengers, for which their current location and their destination are given.
 The objective function is to minimize the total cost of moving the passengers to their destinations. The total cost is increased each time an elevator starts/stops or moves.
 
-The openstacks domain\footnote{\url{http://ipc.informatik.uni-freiburg.de/Domains}} is based on the "minimum maximum simultaneous open stacks" combinatorial optimization problem, which can be stated as follows: a manufacturer has a number of orders, each for a combination of different products, and can only make one product at a time. The problem is to order the making of the different products so that the maximum number of stacks that are in use simultaneously, or equivalently the number of orders that are in simultaneous production, is minimized. The problem is NP-hard and known to be equivalent to several other problems. In the temporal case a maximum number of stacks is given and the goal is to find the plan with the least makespan, without violating the maximum number of stacks constraints.
+The openstacks domain is based on the "minimum maximum simultaneous open stacks" combinatorial optimization problem, which can be stated as follows: a manufacturer has a number of orders, each for a combination of different products, and can only make one product at a time. The problem is to order the making of the different products so that the maximum number of stacks that are in use simultaneously, or equivalently the number of orders that are in simultaneous production, is minimized. The problem is NP-hard and known to be equivalent to several other problems. In the temporal case a maximum number of stacks is given and the goal is to find the plan with the least makespan, without violating the maximum number of stacks constraints.
 
 
 \section{Hardware}
