@@ -678,6 +678,25 @@ dispersions of the distribution is due to the steady-state stopping criterion
 that may be reached after different times, with a higher probability when the
 population size is small.
 
+
+\begin{figure}[htpb]
+  \begin{center}
+    \subfigure[elevators 12]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_speedup.pdf}}
+    \hfill
+    \subfigure[openstacks 17]{\includegraphics[width=0.23\textwidth]{images/openstacks_pop_time_speedup.pdf}}
+  \end{center}
+  \caption{Absolute speedup distributions of 11 runs of \DAEYAHSP\ according to the population size, on the both sequential elevators-12 and openstacks problems, using 48 processors.}
+  \label{fig:speedup_pop}
+\end{figure}
+
+Figure \ref{fig:speedup_pop}
+%shows that the median computation time on a
+% multicore machine increase linearly with the size of the population. The 
+% dispersions of the distribution is due to the steady-state stopping criterion 
+% that may be reached after different times, with a higher probability when the
+% population size is small.
+
+
 \section{Discussion and Conclusion}
 %In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
 
