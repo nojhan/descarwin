@@ -98,28 +98,46 @@ Vincent Vidal\\
 
 \maketitle
 \begin{abstract}
+Multicore machines are becoming a standard way to speep up the system performance.
 After having instantiated the evolutionary metaheuristic \DAEX\ with the forward search \YAHSP\ planner, 
 we investigate on the global parallelism approach, which exploits the inherent parallelism of the individual evaluation.
 This paper describes a parallel shared-memory release of the \DAEYAHSP\ planning system using the OpenMP directive-based API.
 The parallelization scheme applies at a high level abstraction and thus can be used by any evolutionary algorithm implemented with the Evolving Objects framework.
 The proof of concept is made on a 48-core machine with two planning tasks extracted from the last international planning competition.
 Experiments show significant speedups along the number of cores and along the size of the population.
-
+This preliminary work opens an avenue for parallelizing any evolutionary algorithm developed with EO.
 
 \end{abstract}
 
 \section{Introduction}
-Multicore machines are becoming a standard way to speep up the system performance.
-
 % argument : Q=Comment paralléliser un algo de recherche de plans ? 
 %            R=concevoir d'abord un algorithme évolutionnaire puis paralléliser sa fonction d'évaluation
 
+% The Planning Problem
+The classical planning problem is to find a path in a transition system: a
+sequence of actions which maps an initial state $I$ into a state $G$ including a
+set of desired goals. Usually a metric is associated with the solution plan such
+as length, cost or duration. In domain-independent planning, problems are
+described with the Planning Domain Description Language (PDDL)
+\cite{pddl:jair2003}; states of the world are defined by a set of atoms
+instanciated from a set of predicates and a set of objects.
+Instances of the planning problem, called planing tasks, can model all kinds of abstract reasoning problems and are known to be NP-hard.
+
+To solve such planning tasks, numerous heuristic search algorithms have been proposed in the past but none of them are easily parallelizable.
+They require a great amount of technical work to provide efficiency while preserving correctness \cite{burns:ijcai2009,burns:JAIR2010}.
+
+Recently the \DAEX\ evolutionary metaheuristic has been proposed to solve such planning tasks \cite{dae:icaps2010,dae:evocop2006}.
+As an evolutionary algorithm \DAEX\ provides an inherent parallelism: the individual evaluation stage, which is the most time-consuming stage during the evolutionary generation loop.
+This nice property opens an avenue towards the design of a parallel planning system without going deeply inside a whole reconstruction of the sequential version.
+
+Moreover, the implementation of \DAEX\ has been made with the STL-based Evolving Objects framework\footnote{\url{http://eodev.sf.net}} which provides an abstract control structure to develop any kind of evolutionary algorithm. Therefore our parallelization scheme is easily transposable to any evolutionary algorithm developed with the EO framework.
 
 
+% Il manque un argument pour dire que les archis parallel shared-memory sont bien adaptées à notre cas au contraire des GPGPU (on a pas choisi une archi multi-core au hasard !)
+For the proof of concept we implemented a multi-threaded version of \DAEYAHSP, the instantiation of \DAEX\ with the heurictic forward search \YAHSP\ planner \cite{yahsp:icaps2004}, using the OpenMP directive-based API\footnote{\url{http://www.openmp.org}}. 
+The design of experiment is built on problems extracted from the last international planning competition\footnote{\url{http://ipc.icaps-conference.org}} with the multithreaded \DAEX\ release mapped onto a 48-core parallel machine.
 
-
-Preliminary work
-
+% FIXME : plan de l'article
 
 \section{Previous Works in Parallel EA and Parallel Planning}
 
@@ -159,11 +177,9 @@ detecting duplicate states.  Rather than  sleeping if a lock cannot be acquired,
 a thread can  perform ``speculative'' expansions by continuing  the expansion of
 its current part  of the space.  This technique keeps cores  busy at the expense
 of  duplicate work.  \cite{dovetailing}  adapts to  planning a  technique called
-dovetailing, in  which several  instances of a  search algorithm  with different
-parameter settings  are run in parallel. We  use this approach in  this paper as
-a  bottom-line, and show  how our  approach improves  over a  simple dovetailing
-strategy.  Finally,  \cite{vidal:socs2010} proposed a multi-core  version of the
-YAHSP planner \cite{yahsp:icaps2004} where  many concurrent threads expand nodes
+dovetailing, in  which several  instm-line, and show  how our  approach improves  over a  simple dovetailing
+strategy. Finally, \cite{vidal:socs2010} proposed a multi-core version of the
+planner \cite{yahsp:icaps2004} where many concurrent threads expand nodes
 from a common open list, yielding to early exploration of branches of the search
 tree that  would have  been delayed  by a classical  search, which  can speed-up
 search by several orders of magnitude.
@@ -173,21 +189,6 @@ search by several orders of magnitude.
 \subsection{Algorithms}
 
 \paragraph{Divide and Evolve} % (PS)
-% The Planning Problem
-The classical planning problem is to find a path in a transition system: a
-sequence of actions which maps an initial state $I$ into a state $G$ including a
-set of desired goals. Usually a metric is associated with the solution plan such
-as length, cost or duration. In domain-independent planning, problems are
-described with the Planning Domain Description Language (PDDL)
-\cite{pddl:jair2003}; states of the world are defined by a set of atoms
-instanciated from a set of predicates and a set of objects. Although there are
-several families of problems, we concentrate here on cost planning and temporal
-planning. In cost planning a cost is attached to each action and the objective
-is to minimize the sum of all costs for a sequential plan whereas in temporal
-planning actions have a duration and can be run in parallel. In temporal
-planning the objective is to minimize the total makespan of the parallel plan.
-
-% DaE
 \DAEX, the concrete implementation of the \dae\ paradigm, is a
 domain-independent satisficing planning system based on Evolutionary Computation
 \cite{dae:evocop2006}. The basic principle is to carry out a {\em
@@ -486,10 +487,14 @@ library (GOMP), both version 4.4.4. It is run on a 48-core DELL PowerEdge R815
 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB
 cache) processors with 192GB of RAM, under Linux x86\_64 2.6.32.
 
-\paragraph{Benchmarks} % (PS) We have tested the above implementation on two
-benchmarks from the satisficing track of the $6^{th}$ International Planning
-Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for
-cost planning and Openstacks-17 for temporal planning.
+\paragraph{Benchmarks} % (PS)
+Although there are several families of problems, we concentrate here on cost planning and temporal
+planning. In cost planning a cost is attached to each action and the objective
+is to minimize the sum of all costs for a sequential plan whereas in temporal
+planning actions have a duration and can be run in parallel. In temporal
+planning the objective is to minimize the total makespan of the parallel plan.
+
+We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for cost planning and Openstacks-17 for temporal planning.
 
 The elevators domain is stated as follows: there is a building with N+1 floors,
 numbered from 0 to N. The building can be separated in blocks of size M+1, where
@@ -527,7 +532,7 @@ after at least 10 generations, evolution is stopped if no improvement of the
 best fitness in the population is made during 50 generations, with a maximum of
 1000 generations.
 
-The \DAE algorithm being stochastic, each run is repeated 11 times and the
+The \DAEX algorithm being stochastic, each run is repeated 11 times and the
 resulting distributions are presented as standard boxplots.
 
 \subsection{Results}
@@ -652,7 +657,7 @@ population size is small.
 %In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
 
 We made a proof-of-concept of a shared-memory parallelization of the evauation
-step of the \DAE algorithm, based on the OpenMP directive-based API on a common
+step of the \DAEX algorithm, based on the OpenMP directive-based API on a common
 48-core machine.  Thanks to the abstraction level provided by the EO framework,
 this scheme is immediately available for any evolutionary algorithm as far as
 the context of the evaluation functor is thread-local and reentrant.
@@ -681,8 +686,10 @@ well. A further development will consist in parallelizing other steps of the
 evolutionary loop in particular the offspring generation which is also
 inherently parallel, as it use independant variation operators.
 
-% Impact on the EA design
+% FIX ME Further research: adapting the YAHSP memoing feature to the parallelization scheme : 2 modes global vs local memoing
 
+% Impact on the EA design
+% Do you agree below?
 A further research axis deals with the impact on solution quality and in particular how to escape from premature convergence.
 
 
