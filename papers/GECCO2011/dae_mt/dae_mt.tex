@@ -544,6 +544,25 @@ population size is small.
 
 \section{Discussion and Conclusion}
 
+We made a proof-of-concept of an evaluation shared-memory parallelization scheme based on the OpenMP directive-based API on a common 48-core machine.
+Thanks to the abstraction level provided by the EO framework, this scheme is available for any evolutionary algorithm as far as the individual local context is protected.
+
+The implementation scheme presented here is extremely basic, but works extremely well.
+A further development will consist in parallelizing other steps of the evolutionary loop in particular the offspring generation which is also inherently parallel.
+On our 48-core Dell Machine a roughly $\times40$ was obtained on the two benchmarks tested.
+
+The queue mapping management of threads onto cores did not provide a significant improvement. Our hypothesis was that the goal sequences had diverse lengths and thus should ahve show very diverse time of evaluation computations. But we observed that the algorithm converges rapidly to a same length for all individuals.
+
+% Impact on the EA design
+
+A further research axis deals with the impact on solution quality and in particular how to escape from premature convergence.
+
+
+
+
+
+
+
 %ACKNOWLEDGMENTS are optional
 %\section{Acknowledgments}
 
