@@ -398,11 +398,14 @@ light as  possible. This is typically  the kind of  implementation, making heavy
 use of global  variables, not designed for a concurrent  use by several parallel
 threads, and where thread-safety is clearly not ensured.  However, OpenMP offers
 a facility  to deal with global variables,  in order to change  their scope: the
-``omp threadprivate'' pragma.  It takes as parameter a  list of global variables
+``omp threadprivate'' pragma.  It takes  as parameter a list of global variables
 whose  scope must  be changed  from shared  by all  threads to  private  to each
 thread.   And  finally, specifying  which  global  variable  should be  rendered
 private to each thread  was the only thing we had to  do to ensure thread-safety
-in YAHSP.
+in YAHSP.   For example, the  global arrays used  to compute the  heuristic, the
+relaxed plans and the lookahead plans  are made private to each thread, ensuring
+that concurrent  excutions of YAHSP do not  use the same portions  of the global
+memory.
 
 \section{Experimental Study}
 
