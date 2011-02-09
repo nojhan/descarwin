@@ -256,6 +256,51 @@ OpenMP primarily consists of a set of compiler directives (pragmas) that are ins
 
 \paragraph{DaE} % (PS)
 \paragraph{YAHSP} % (VV)
+
+The   YAHSP  planning   system  (``Yet   Another  Heuristic   Search  Planner'')
+\cite{yahsp:icaps2004}  extends  a  technique   introduced  in  the  FF  planner
+\cite{ff:jair01}  for calculating  the  heuristic, based  on  the extraction  of
+a solution  from a planning graph  computed for the relaxed  problem obtained by
+ignoring deletes of actions.  It can  be performed in polynomial time and space,
+and  the length in  number of  actions of  the relaxed  plan extracted  from the
+planning  graph represents  the heuristic  value of  the evaluated  state.  This
+heuristic  is used  in  a  forward-chaining search  algorithm  to evaluate  each
+encountered state.
+
+A novel  way has been  introduced in YAHSP  for extracting information  from the
+computation of  the heuristic,  by considering the  high quality of  the relaxed
+plans  extracted by  the heuristic  function in  numerous domains.   Indeed, the
+beginning of these plans can often  be extended to solution plans of the initial
+problem, and there  are often a lot  of other actions from these  plans that can
+effectively be  used in a solution  plan. YAHSP uses an  algorithm for combining
+some actions from each  relaxed plan, in order to find the  beginning of a valid
+plan that can lead to a reachable  state. Thanks to the quality of the extracted
+relaxed  plans,  these states  frequently  guide  search  closer to  a  solution
+state. The lookahead states thus calculated  are then added to the list of nodes
+that can be chosen to be expanded  by increasing order of the numerical value of
+the  heuristic.
+
+This lookahead  strategy can be used  in different search  algorithms. In YAHSP,
+a classical  best-first search algorithm  has been modified  in such a  way that
+completeness is preserved.   It simply consists in augmenting  the list of nodes
+to be  expanded (the open  list) with some  new nodes computed by  the lookahead
+algorithm.  The branching factor is slightly increased, but the performances are
+generally better and completeness is not affected.
+
+A first motivation in  the use of YAHSP in \DAEX\ is  that experiments about the
+use of  this lookahead strategy in  a complete best-first  search algorithm have
+demonstrated that in numerous planning benchmark domains, the improvement of the
+performance in  terms of running time and  size of problems that  can be handled
+are been  drastically improved (cf. \cite{yahsp:icaps2004}).   The YAHSP planner
+has been  awarded a second place  in the 4th  International Planning Competition
+\cite{ipc4:jair05} and some  recent results \cite{rintanen:acai2010} demonstrate
+that  it is still  extremely competitive  with more  recent planners.   A second
+motivation in the use  of YAHSP in \DAEX\ is its ability  to answer very fast to
+the considerable number of planning requests emanating from \DAEX, as opposed to
+modern  techniques such  as  the  landmark heuristics  implemented  in the  LAMA
+planner   \cite{lama:jair2010}  (winner  of   the  6th   International  Planning
+Competition) which require a costly analysis for each new initial state.
+
 \paragraph{Parts that can theoretically be parallelized} %  (JD, VV, PS)
 
 \subsection{Implementation}
