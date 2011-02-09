@@ -358,8 +358,8 @@ only parallelized the latter.
 Even  if  being  very  natural   in  the  context  of  evolutionary  algorithms,
 parallelizing individual evaluations in \DAEX\  requires to be carefully made in
 order to avoid some typical problems that can happen with shared-memory parallel
-implementations.  Indeed,  even if the  evaluations of the individuals  are made
-independently of each  other, some concurrent access to  shared memory are still
+implementations. Indeed, even if individual evaluations are made
+independently of each other, some concurrent accesses to shared memory are still
 required  (for  example, a  basic  one  is  incrementing some  global  counter),
 especially in YAHSP (detailed below). Furthermore, the implementations of \DAEX\
 and  YAHSP where  not  designed with  parallelism  in mind,  which implied  some
@@ -380,7 +380,7 @@ Another problem  that can arise is the  concurrent use of a  given subroutine by
 several threads, when such a subroutine or some subroutine called by it modifies
 some  global data.   This is  a  typical problem  of reentrancy,  which must  be
 carefully analyzed in order to render thread-safe a parallel implementation. Two
-cases can then occur: either the  global data must shared by some threads, which
+cases can then occur: either the  global data must be shared by some threads, which
 requires to protect its  access, or it can be made private  to each thread, thus
 necessitating to change the scope of this data.
 
@@ -397,21 +397,21 @@ continuous to combinatorial ones.
 
 An extension of EO for parallelization of algorithms, ParadisEO, has been
 proposed by Cahon et al. \cite{paradiseo:JHeuristics2004}. It uses the Message
-Passing Interface (MPI \footnote{on the MPICH2 implementation:
+Passing Interface (MPI\footnote{on the MPICH2 implementation:
 \url{http://www.mcs.anl.gov/research/projects/mpich2/}}) API and proposes
 several parallelization schemes, available by calling wrappers around common
 functions of EO. ParadisEO targets multi-processors machines, especially
 clusters and grids, for running large-scale general purpose EAs.
 
-We have chosen not to use this framework because we were targeting multicore
+We have chosen not to use this framework because we were a targeting multicore
 architecture, where message passing is somewhat useless and may introduce an
-overhead higher than other approaches. For multicore architecture, shared
+overhead higher than other approaches. For a multicore architecture, shared
 memory parallelization approach is a better candidate as it does not necessitate
 heavy libraries linked to the core program. In this work, we have used
 OpenMP\footnote{OpenMP: \url{http://www.openmp.org}}, that uses a set of compiler
 directives to tell the compiler which part of a program should be parallelized.
 The main advantage of OpenMP is that it is designed to make easy to parallelize
-an existing program.
+an existing program \cite{special:parallelComputing2005}.
 
 % parler de la genericite de la technique de parallelisation, n'importe qui peut utiliser EO pour avoir du code parallel independament de DaE/Yahsp.
 
