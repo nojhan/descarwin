@@ -656,24 +656,24 @@ population size is small.
 \section{Discussion and Conclusion}
 %In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
 
-We made a proof-of-concept of a shared-memory parallelization of the evauation
+We made a proof-of-concept of a shared-memory parallelization of the evaluation
 step of the \DAEX algorithm, based on the OpenMP directive-based API on a common
 48-core machine.  Thanks to the abstraction level provided by the EO framework,
 this scheme is immediately available for any evolutionary algorithm as far as
 the context of the evaluation functor is thread-local and reentrant.
 
 As expected, on our 48-core Dell Machine a roughly $\times40$ was obtained on
-the tested benchmark, this speed-up being the same on all the instances. 
+the tested benchmark, this speed-up being the same for all instances. 
 
 The dispersion of the measured times is mainly due to the
-combination of the steady-state stopping criterion and to the stochastic nature
-of the search, which may or may not reach a fitness plateus early. The
+combination of the steady-state stopping criterion with the stochastic nature
+of the search, which may or may not reach a fitness plateau early. The
 relationship between this dispersion and the hardness of the problem solved
 remains to be explored.
 
 Our results show that the stopping criterion should be chosen carefully, along
-with the population size, as it has an impact on the dispersions of the
-distribution of computation time. 
+with the population size, as it has an impact on the dispersion of the
+distribution of computation times. 
 
 The queue mapping management of threads onto cores did not provide a significant
 improvement. Our hypothesis was that the goal sequences shows a diversity in
@@ -690,9 +690,7 @@ inherently parallel, as it use independant variation operators.
 
 % Impact on the EA design
 % Do you agree below?
-A further research axis deals with the impact on solution quality and in particular how to escape from premature convergence.
-
-
+A further research axis deals with the impact on solution quality and in particular how to take advantage of the parallelization scheme to escape from premature convergence.
 
 
 
