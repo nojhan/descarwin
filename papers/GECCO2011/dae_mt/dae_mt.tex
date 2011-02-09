@@ -115,7 +115,11 @@ Multicore machines are becoming a standard way to speep up the system performanc
 Preliminary work
 
 
-\section{Previous Works in Parallel EO and Parallel Planning}
+\section{Previous Works in Parallel EA and Parallel Planning}
+
+\paragraph{Parallel EA}
+
+FIXME
 
 \paragraph{Parallel Planning} % (VV)
 \label{section:previous-work}
@@ -164,28 +168,65 @@ search by several orders of magnitude.
 
 \paragraph{Divide and Evolve} % (PS)
 % The Planning Problem
-The classical planning problem is to find a path in a transition system: a sequence of actions which maps an initial state $I$ into a state $G$ including a set of desired goals. Usually a metric is associated with the solution plan such as length, cost or duration. In domain-independent planning, problems are described with the Planning Domain Description Language (PDDL) \cite{pddl:jair2003}; states of the world are defined by a set of atoms instanciated from a set of predicates and a set of objects. Although there are several families of problems, we concentrate here on cost planning and temporal planning. In cost planning a cost is attached to each action and the objective is to minimize the sum of all costs for a sequential plan whereas in temporal planning actions have a duration and can be run in parallel. In temporal planning the objective is to minimize the total makespan of the parallel plan.
+The classical planning problem is to find a path in a transition system: a
+sequence of actions which maps an initial state $I$ into a state $G$ including a
+set of desired goals. Usually a metric is associated with the solution plan such
+as length, cost or duration. In domain-independent planning, problems are
+described with the Planning Domain Description Language (PDDL)
+\cite{pddl:jair2003}; states of the world are defined by a set of atoms
+instanciated from a set of predicates and a set of objects. Although there are
+several families of problems, we concentrate here on cost planning and temporal
+planning. In cost planning a cost is attached to each action and the objective
+is to minimize the sum of all costs for a sequential plan whereas in temporal
+planning actions have a duration and can be run in parallel. In temporal
+planning the objective is to minimize the total makespan of the parallel plan.
 
 % DaE
-\DAEX, the concrete implementation of the \dae\ paradigm, is a domain-independent satisficing planning system based on Evolutionary Computation \cite{dae:evocop2006}. The basic principle is to carry out a {\em Divide-and-Conquer} strategy driven by an evolutionary algorithm. The algorithm is detailed in \cite{dae:icaps2010} and compare with state-of-the-art planners.
-In order to solve a planning task ${\cal P}_D(I,G)$, the basic idea of \DAEX\ is to find a sequence of states $S_1, \ldots, S_n$, and to rely on an embedded planner $X$ to solve the series of planning tasks ${\cal P}_D(S_{k},S_{k+1})$, for $k \in [0,n]$ (with $S_0 = I$ and $S_{n+1} = G$). 
-A \DAEX\ individual is a sequence of goals which define a sequence of subproblems to be solved. These subproblems are submitted successively to an embedded planner $X$ and the global solution is obtained after the compression of these intermediate solutions. The overall optimization process is controled by an evolutionary algorithm.
+\DAEX, the concrete implementation of the \dae\ paradigm, is a
+domain-independent satisficing planning system based on Evolutionary Computation
+\cite{dae:evocop2006}. The basic principle is to carry out a {\em
+Divide-and-Conquer} strategy driven by an evolutionary algorithm. The algorithm
+is detailed in \cite{dae:icaps2010} and compare with state-of-the-art planners.
+In order to solve a planning task ${\cal P}_D(I,G)$, the basic idea of \DAEX\ is
+to find a sequence of states $S_1, \ldots, S_n$, and to rely on an embedded
+planner $X$ to solve the series of planning tasks ${\cal P}_D(S_{k},S_{k+1})$,
+for $k \in [0,n]$ (with $S_0 = I$ and $S_{n+1} = G$).  A \DAEX\ individual is a
+sequence of goals which define a sequence of subproblems to be solved. These
+subproblems are submitted successively to an embedded planner $X$ and the global
+solution is obtained after the compression of these intermediate solutions. The
+overall optimization process is controled by an evolutionary algorithm.
 
-The fitness implements a gradient towards feasability for unfeasible individuals and a gradient towards optimality for feasible individuals.
-Population initialization as well as variation operators are driven by the critical path $h^1$ heuristic \cite{h1:aips2000} in order to discard inconsistent state orderings, and atom mutual exclusivity inference in order to discard inconsistent states.
-Beside a standard one-point crossover for variable length representations, four mutations have been defined: addition (resp. removal) of a goal in a sequence, addition (resp. removal) of an atom in a goal.
-The selection is a comparison-based deterministic tournament of size 5.
+The fitness implements a gradient towards feasability for unfeasible individuals
+and a gradient towards optimality for feasible individuals.  Population
+initialization as well as variation operators are driven by the critical path
+$h^1$ heuristic \cite{h1:aips2000} in order to discard inconsistent state
+orderings, and atom mutual exclusivity inference in order to discard
+inconsistent states.  Beside a standard one-point crossover for variable length
+representations, four mutations have been defined: addition (resp. removal) of a
+goal in a sequence, addition (resp. removal) of an atom in a goal.  The
+selection is a comparison-based deterministic tournament of size 5.
 
 % Parameter tuning
-For the sequential release, Darwinian-related parameters of \DAEX\ have been fixed after some early experiments \cite{dae:evocop2006} whereas 
-parameters related to the variation operators have been tuned using the Racing method \cite{dae:gecco2010}.
+For the sequential release, Darwinian-related parameters of \DAEX\ have been
+fixed after some early experiments \cite{dae:evocop2006} whereas parameters
+related to the variation operators have been tuned using the Racing method
+\cite{dae:gecco2010}.
 
-All experiments were done with \DAEYAHSP: the instantiation of \DAEX\ with the YAHSP heuristic forward search solver \cite{yahsp:icaps2004}. % + YAHSP memoing shared by all searches.
-We added two novelties to the version described in \cite{dae:icaps2010}. 
-One important parameter is the maximum number of expanded nodes allowed to the \YAHSP\ sub-solver which defines empirically what is considered as an easy problem for \YAHSP. As the matter of fact, the minimum number of required nodes varies from few nodes to thousands depending of the planning task. 
-In the current release this number is estimated during the population initialization stage. An incremental loop is performed until the ratio of feasible individals is over a given theshold or a maximum boundary has been reached. By default this number is doubled at each iteration until at least one feasible individual is produced or 100000 has been reached.
+All experiments were done with \DAEYAHSP: the instantiation of \DAEX\ with the
+YAHSP heuristic forward search solver \cite{yahsp:icaps2004}. % + YAHSP memoing
+shared by all searches.  We added two novelties to the version described in
+\cite{dae:icaps2010}.  One important parameter is the maximum number of expanded
+nodes allowed to the \YAHSP\ sub-solver which defines empirically what is
+considered as an easy problem for \YAHSP. As the matter of fact, the minimum
+number of required nodes varies from few nodes to thousands depending of the
+planning task.  In the current release this number is estimated during the
+population initialization stage. An incremental loop is performed until the
+ratio of feasible individals is over a given theshold or a maximum boundary has
+been reached. By default this number is doubled at each iteration until at least
+one feasible individual is produced or 100000 has been reached.
 
-Furthermore we add the capability to perform restarts within a time contract in order to increase solution quality.
+Furthermore we add the capability to perform restarts within a time contract in
+order to increase solution quality.
 
 \paragraph{Yet Another Heuristic Search Planner} % (VV)
 
@@ -399,7 +440,7 @@ have thread-local data structures.
 When parallelizing the evaluation loop in an evolutionary algorithm, there
 exists a synchronization step at each iteration, this ensure that no race-condition
 may occurs. Indeed, individuals being evaluated are all independent, which is
-the case in the majority of evolutionary algorithm, and also in DAE.
+the case in the majority of evolutionary algorithm, and also in \DAE.
 
 \paragraph{YAHSP \& OpenMP} % (VV)
 
@@ -417,9 +458,9 @@ relaxed plans and the lookahead plans  are made private to each thread, ensuring
 that concurrent  excutions of YAHSP do not  use the same portions  of the global
 memory.
 
-\paragraph{DAE-specific parallelization issues} % (JD)
+\paragraph{\DAE-specific parallelization issues} % (JD)
 
-DAE evaluation step calls the YAHSP solver several times on the same
+\DAE evaluation step calls the YAHSP solver several times on the same
 decomposition and thus uses several variables to keep the state of the
 evaluation over the searches between intermediate goals (namely $k$, $B$ and
 $U$).  As the evaluation functor is a single instance, it must be guaranted
