@@ -111,6 +111,12 @@ Experiments show significant speedups along the number of cores and along the si
 \section{Introduction}
 Multicore machines are becoming a standard way to speep up the system performance.
 
+% argument : Q=Comment paralléliser un algo de recherche de plans ? 
+%            R=concevoir d'abord un algorithme évolutionnaire puis paralléliser sa fonction d'évaluation
+
+
+
+
 
 Preliminary work
 
@@ -197,13 +203,13 @@ solution is obtained after the compression of these intermediate solutions. The
 overall optimization process is controled by an evolutionary algorithm.
 
 The fitness implements a gradient towards feasability for unfeasible individuals
-and a gradient towards optimality for feasible individuals.  Population
-initialization as well as variation operators are driven by the critical path
+and a gradient towards optimality for feasible individuals. Feasible individuals are always preferred to unfeasible ones.
+Population initialization as well as variation operators are driven by the critical path
 $h^1$ heuristic \cite{h1:aips2000} in order to discard inconsistent state
 orderings, and atom mutual exclusivity inference in order to discard
-inconsistent states.  Beside a standard one-point crossover for variable length
+inconsistent states. Beside a standard one-point crossover for variable length
 representations, four mutations have been defined: addition (resp. removal) of a
-goal in a sequence, addition (resp. removal) of an atom in a goal.  The
+goal in a sequence, addition (resp. removal) of an atom in a goal. The
 selection is a comparison-based deterministic tournament of size 5.
 
 % Parameter tuning
@@ -440,7 +446,7 @@ have thread-local data structures.
 When parallelizing the evaluation loop in an evolutionary algorithm, there
 exists a synchronization step at each iteration, this ensure that no race-condition
 may occurs. Indeed, individuals being evaluated are all independent, which is
-the case in the majority of evolutionary algorithm, and also in \DAE.
+the case in the majority of evolutionary algorithm, and also in \DAEX.
 
 \paragraph{YAHSP \& OpenMP} % (VV)
 
@@ -458,9 +464,9 @@ relaxed plans and the lookahead plans  are made private to each thread, ensuring
 that concurrent  excutions of YAHSP do not  use the same portions  of the global
 memory.
 
-\paragraph{\DAE-specific parallelization issues} % (JD)
+\paragraph{\DAEX-Specific Parallelization Issues} % (JD)
 
-\DAE evaluation step calls the YAHSP solver several times on the same
+\DAEX evaluation step calls the YAHSP solver several times on the same
 decomposition and thus uses several variables to keep the state of the
 evaluation over the searches between intermediate goals (namely $k$, $B$ and
 $U$).  As the evaluation functor is a single instance, it must be guaranted
@@ -472,7 +478,7 @@ itself, and not as attributes of the evaluation functor.
 
 \section{Experimental Study}
 
-\subsection{Context}
+\subsection{Setup}
 
 \paragraph{Hardware} % (PS)
 The algorithm is programmed in C++ using the GNU OpenMP threading library (GOMP) and run on a 48-core DELL PowerEdge R815 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB cache) processors with 192GB of RAM.
@@ -618,7 +624,7 @@ population size is small.
 We made a proof-of-concept of an evaluation shared-memory parallelization scheme based on the OpenMP directive-based API on a common 48-core machine.
 Thanks to the abstraction level provided by the EO framework, this scheme is immediately available for any evolutionary algorithm as far as the individual local context is protected.
 
-The implementation scheme presented here is extremely basic, but works extremely well.
+The implementation scheme presented here is very simple, but works extremely well.
 A further development will consist in parallelizing other steps of the evolutionary loop in particular the offspring generation which is also inherently parallel.
 On our 48-core Dell Machine a roughly $\times40$ was obtained on the two benchmarks tested.
 
