@@ -104,7 +104,7 @@
 
 Multicore machines are becoming a standard way to speed up the system performance.
 After having instantiated the evolutionary metaheuristic \DAEX\ with the forward search \YAHSP\ planner, 
-we investigate on the global parallelism approach, which exploits the inherent parallelism of the individual evaluation.
+we investigate on the global parallelism approach, which exploits the intrinsic parallelism of the individual evaluation.
 This paper describes a parallel shared-memory version of the \DAEYAHSP\ planning system using the OpenMP directive-based API.
 The parallelization scheme applies at a high level abstraction and thus can be used by any evolutionary algorithm implemented with the Evolving Objects framework.
 The proof of concept is validated on a 48-core machine with two planning tasks extracted from the last international planning competition.
@@ -143,7 +143,7 @@ proposed in the past but none of them can be easily parallelized.
 They require a great amount of technical work to provide efficiency while preserving correctness \cite{burns:JAIR2010,burns:ijcai2009}.
 
 Recently the \DAEX\ evolutionary metaheuristic has been proposed to solve such planning tasks \cite{dae:icaps2010,dae:evocop2006}.
-As an evolutionary algorithm \DAEX\ provides an inherent parallelism: the individual evaluation stage, which is often the most time-consuming stage during the evolutionary generation loop.
+As an evolutionary algorithm \DAEX\ provides an intrinsic parallelism: the individual evaluation stage, which is often the most time-consuming stage during the evolutionary generation loop.
 This nice property opens an avenue towards the design of a parallel planning system without going deeply inside a whole reconstruction of the sequential version.
 
 Moreover, the implementation of \DAEX\ has been made with the STL-based Evolving
@@ -769,7 +769,7 @@ individuals.
 The implementation scheme presented here is very simple, but works extremely
 well. A further development will consist in parallelizing other steps of the
 evolutionary loop in particular the offspring generation which is also
-inherently parallel, as it use independent variation operators.
+intrinsically parallel, as it use independent variation operators.
 
 % FIX ME Further research: adapting the YAHSP memoing feature to the parallelization scheme : 2 modes global vs local memoing
 
