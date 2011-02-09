@@ -6,30 +6,34 @@
 \parskip=\baselineskip
 
 \begin{document}
-\title{Optimize-and-Learn: a Parameter Tuning Framework applied for the Divide-and-Evolve Method in AI Planning}
+\title{Instance-based Parameter Tuning\\
+for Evolutionary AI Planning}
 
-\numberofauthors{2}
+\numberofauthors{1}
 
-\author{
-\alignauthor
-M{\'a}ty{\'a}s Brendel\\
-       \affaddr{Projet TAO, INRIA Saclay \& LRI}\\
-       \affaddr{Universit{\'e} Paris Sud}\\
-       \affaddr{Orsay, France}\\
-       \email{matthias.brendel@lri.fr}
-\alignauthor
-Marc Schoenauer\\
-       \affaddr{Projet TAO, INRIA Saclay \& LRI}\\
-       \affaddr{Universit{\'e} Paris Sud}\\
-       \affaddr{Orsay, France}\\
-       \email{marc.schoenauer@inria.fr}
-}
+\author{This work is submitted to the {\large \em Self-* Search} track of GECCO'2011}
+
+% \numberofauthors{2}
+% 
+% \author{
+% \alignauthor
+% M{\'a}ty{\'a}s Brendel\\
+%        \affaddr{Projet TAO, INRIA Saclay \& LRI}\\
+%        \affaddr{Universit{\'e} Paris Sud}\\
+%        \affaddr{Orsay, France}\\
+%        \email{matthias.brendel@lri.fr}
+% \alignauthor
+% Marc Schoenauer\\
+%        \affaddr{Projet TAO, INRIA Saclay \& LRI}\\
+%        \affaddr{Universit{\'e} Paris Sud}\\
+%        \affaddr{Orsay, France}\\
+%        \email{marc.schoenauer@inria.fr}
+% }
 
 \date{February 9, 2011}
 \maketitle
 \begin{abstract}
-\noindent Our novel method presented in this paper is a surrogate-model based, combined learner and optimizer (LaO) for parameter tuning. In this paper LaO is used to tune our Evolutionary Algorithm based Divide-and-Evolve (Dae) method applied for AI Planning. The LaO framework makes it possible to learn the relation between the features of the planning instances and the optimal parameters, thus it makes it possible to generalize this relation to unknown instances in the domain. Moreover, the learned intermediate model is iteratively used as a surrogate-model in optimization to improve it and vice versa. This way we aim to solve intra-domain and extra-domain tuning and generalization in one single framework. Our realization of LaO uses an Artificial Neural Network for learning the mapping and a Covariance Matrix Adaptation Evolution Strategy for optimization. We demonstrate that our algorithm is capable of improving the quality of the DaE algorithm considerably even with only a few iterations. The transfer of the relational information to the ANN model has its limits probably because the feature-set used is not yet rich enough. However, the learned model perform with almost the same quality in the independent tests, which means that the learned model is capable of generalization at least in the domain. Multiple-domain tuning is currently solved by training models per domain.
-
+\noindent Learn-and-Optimize (LaO) is a generic surrogate-model based method for parameter tuning combining learning and optimizing. In this paper LaO is used to tune Divide-and-Evolve (DaE), an Evolutionary Algorithm for AI Planning. The LaO framework makes it possible to learn the relation between some features describing a given instance and the optimal parameters for this instance, thus making it possible to extrapolate this relation to unknown instances in the same domain, or even to instance in a new domain. Moreover, the learned model is already used as a surrogate-model to accelerate the search for the optimal parameters. It hence ebcomes possible to solve intra-domain and extra-domain tuning and generalization in a single framework. The proposed implementatin of LaO uses an Artificial Neural Network for learning the mapping between features and optimal parameters, and the Covariance Matrix Adaptation Evolution Strategy for optimization. Reuslts demonstrate that LaO is capable of improving the quality of the DaE results even with only a few iterations. THe main limitation of the DAE case-study is the limited amount of meaningful features that are available to describe the instances. However, the learned model reaches almost the same performance on the test instances, which means that it is capable of generalization, at least in a single-domain setting. 
 \end{abstract}
 
 \category{I.2.8}{Computing Methodologies}{Artificial Intelligence }{Problem Solving, Control Methods, and Search}
@@ -64,16 +68,16 @@ The initial state is complete, whereas the goal might be a partial state. An act
 
 A solution to a planning task is a consistent schedule of grounded actions whose execution in the initial state leads to a state that contains one goal state, i.e., where all atoms of the problem goal are true. A planning task defined on domain $D$ with initial state $I$ and goal $G$ will be denoted in the following as ${\cal P}_D(I,G)$.
 
-\section{Our Divide-and-Evolve Algorithm}
+\section{Divide-and-Evolve}
 \label{section:dae}
 
-Our Divide-and-Evolve (DaE) approach is fully described in \cite{BibEvoCop:2010}, and no change has been made in the algorithm used in this paper. We consider DaE here as a black-box algorithm, whose parameter has to be tuned. In this section nevertheless we present a shorter description of DaE.
+Divide-and-Evolve (DaE) is fully described in \cite{BibEvoCop:2010}, and no change has been made in the algorithm used in this paper. However, for the sake of parameter tuning, DaE will be considered here as a black-box. This Section nevertheless presents a shorter description of DaE.
 
-Early approaches to AI Planning using Evolutionary Algorithms directly handled possible solutions, i.e. possible plans: an individual is an ordered sequence of actions see \cite{Spector-AAAI-94}, \cite{muslea97}, \cite{westerberg:2000}, \cite{westerberg:2001}, and \cite{Morignot-2005}. However, as it is often the case in Evolutionary Combinatorial optimizamtion, those direct encoding approaches have limited performance in comparison to the traditional AI planning approaches, and hybridization with classical methods had been the way to success in many combinatorial domains, as witnessed by the fruitful emerging domain of memetic algorithms \cite{MemeticBook:2005}. Along those lines, though relying on an original ``memetization'' principle, a novel hybridization of Evolutionary Algorithms (EAs) with AI Planning, termed Divide-and-Evolve (DaE) has been proposed \cite{DAE:EvoCOP06} \cite{DAE:book-2007}. For a complete formal description, see \cite{Bibai:ICAPS2010}.
+Early approaches to AI Planning using Evolutionary Algorithms directly handled possible solutions, i.e. possible plans: an individual is an ordered sequence of actions see \cite{Spector-AAAI-94,muslea97,westerberg:2000,westerberg:2001,Morignot-2005}. However, as it is often the case in Evolutionary Combinatorial optimization, those direct encoding approaches have limited performance in comparison to the traditional AI planning approaches, and hybridization with classical methods had been the way to success in many combinatorial domains, as witnessed by the fruitful emerging domain of memetic algorithms \cite{MemeticBook:2005}. Along those lines, though relying on an original ``memetization'' principle, a novel hybridization of Evolutionary Algorithms (EAs) with AI Planning, termed Divide-and-Evolve (DaE) has been proposed \cite{DAE:EvoCOP06,DAE:book-2007}. For a complete formal description, see \cite{Bibai:ICAPS2010}.
 
 The basic idea of DaE in order to solve a planning task ${\cal P}_D(I,G)$ is to find a sequence of states $S_1, \ldots, S_n$, and to use some embedded planner to solve the series of planning tasks ${\cal P}_D(S_{k},S_{k+1})$, for $k \in [0,n]$ (with the convention that $S_0 = I$ and $S_{n+1} = G$). The generation and optimization of the sequence of states $(S_i)$ is driven by an evolutionary algorithm. 
 
-The fitness (quality criterion) of a list of partial states $S_1, \ldots, S_n$ is computed by repeatedly calling an external 'embedded' planner to solve the sequence of problems ${\cal P}_D(S_{k},S_{k+1})$, $\{k=0,\ldots,n\}$. Any existing planner could be used, but since guaranty of optimality at all calls is not mandatory in order for DaE to obtain good quality results, a sub-optimal, but quicker planner, YAHSP is used. YAHSP2 \cite{V:icaps04} is a lookahead strategy planning system for sub-optimal planning which uses the  actions in the relaxed plan to compute reachable states in order to speed up the search process. 
+The fitness (quality criterion) of a list of partial states $S_1, \ldots,$ $S_n$ is computed by repeatedly calling an external 'embedded' planner to solve the sequence of problems ${\cal P}_D(S_{k},S_{k+1})$, $\{k=0,\ldots,n\}$. Any existing planner could be used, but since guaranty of optimality at all calls is not mandatory in order for DaE to obtain good quality results, a sub-optimal, but quicker planner, YAHSP is used. YAHSP2 \cite{V:icaps04} is a lookahead strategy planning system for sub-optimal planning which uses the  actions in the relaxed plan to compute reachable states in order to speed up the search process. 
 
 A state is a list of atoms built over the set of predicates and the set of object instances. However, searching the space of complete states would result in a rapid explosion of the size of the search space. Moreover, goals of planning problem need only be to defined as partial states. It thus seems more practical to search only sequences of partial states, and to limit the choice of possible atoms used within such partial states. However, this raises the issue of the choice of the atoms to be used to represent individuals, among all possible atoms. The result of the previous experiments on different domains of temporal planning tasks from the IPC benchmark series \cite{BibEvoCop2009} demonstrates the need for a very careful choice of the atoms that are used to build the partial states. 
 
@@ -99,7 +103,7 @@ a state; or at the state level by adding (addAtom) or removing (delAtom) some at
 
 Note that the initialization process and these variation operators maintain the chronology between atoms in a sequence of states and the local consistency of a state, i.e. avoiding pairwise mutexes.
 
-\section{The Learn-and-Optimize Parameter Tuning Framework}
+\section{Learn-and-Optimize for Parameter Tuning}
 \label{section:LaO}
 
 \subsection{The General LaO Framework}
@@ -128,7 +132,7 @@ It seems most reasonable that the stopping criterion of LaO is determined by the
 
 As it is obvious, our LaO algorithm is an open framework: one could use any appropriate learner for the mapping and any kind of optimizer for parameter tuning. LaO can also be generalized to parameter tunning outside of AI planning. In most of the cases, where the parameters of an algorithm are to be tuned, there are instances of application, and in each of these cases there is a possibility to improve the tuning by also learning the relation of some features and the optimal parameters.
 
-\subsection{Our Implementation of the LaO Framework}
+\subsection{An Implementation of LaO}
 
 Our choice for supervised learning method was a multilayer Feed-Forward Artificial Neural Network (ANN), but other algorithms may also be used. We can suppose that the relation \begin{math}p_F\end{math} is not very complex, which means that a simple ANN may be used. One mapping shall be trained for one domain. One can also try to train a single domain-independent ANN, but that will be left to the future.
 
@@ -249,8 +253,8 @@ One shall also test, how inter-domain generalization works. Maybe it is possible
 
 
 \section{Acknowledgements}
-
-\section{Restrictions on Further Use}
+This work is funded through French ANR project DESCARWIN ANR-09-COSI-002.
+% \section{Restrictions on Further Use}
 
 \bibliographystyle{abbrv}
 \bibliography{gecco2011brendelschoenauer}
