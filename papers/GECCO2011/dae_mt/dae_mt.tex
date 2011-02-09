@@ -234,43 +234,6 @@ tree that  would have  been delayed  by a classical  search, which  can speed-up
 search by several orders of magnitude.
 
 
-\section{IPC Benchmarks} % (PS)
-
-We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for cost planning and Openstacks-17 for temporal planning.
-
-The elevators domain is stated as follows: there is a building with N+1 floors, numbered from 0 to N. The building can be separated in blocks of size M+1, where M divides N. Adjacent blocks have a common floor. The building has K fast (accelarating) elevators that stop only in floors that are multiple of M/2 (so M has to be an even number). Each fast elevator has a capacity of X persons. Furthermore, within each block, there are L slow elevators, that stop at every floor of the block. Each slow elevator has a capacity of Y persons (usually Y<X).
-There are costs associated with each elavator starting/stoping and moving. There are several passengers, for which their current location and their destination are given.
-The objective function is to minimize the total cost of moving the passengers to their destinations. The total cost is increased each time an elevator starts/stops or moves.
-
-The openstacks domain is based on the "minimum maximum simultaneous open stacks" combinatorial optimization problem, which can be stated as follows: a manufacturer has a number of orders, each for a combination of different products, and can only make one product at a time. The problem is to order the making of the different products so that the maximum number of stacks that are in use simultaneously, or equivalently the number of orders that are in simultaneous production, is minimized. The problem is NP-hard and known to be equivalent to several other problems. In the temporal case a maximum number of stacks is given and the goal is to find the plan with the least makespan, without violating the maximum number of stacks constraints.
-
-
-\section{Hardware} % (PS)
-The algorithm is programmed in C++ using the GNU OpenMP threading library (GOMP) and run on a 48-core DELL PowerEdge R815 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB cache) processors with 192GB of RAM.
-
-Multicore machines are becoming a standard way to speep up the system performance.
-
-This paper describes a multi-threaded release of \DAEYAHSP.
-
-This paper describes a parallel shared-memory release of the \DAEYAHSP\ planning system.
-using the OpenMP directive-based API.
-
-to obtain high levels of performance special care has been given to get reentrant procedures.
-isolate context variables 
-
-% concurrent programming
-
-OpenMP primarily consists of a set of compiler directives (pragmas) that are inserted into a Fortran, C or C++ program to convey information to an OpenMP compiler.
-
-
-\cite{paradiseo:JHeuristics2004}
-\cite{paradiseo:ParallelComputing2004}
-\cite{alba:IEEE2002}
-\cite{alba:COR2008}
-\cite{alba:IPL2002}
-\cite{dae:icaps2010}
-\cite{dae:evocop2006}
-\cite{dae:gecco2010}
 
 
 \section{Methods}
@@ -422,13 +385,24 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 \end{algorithm}
 \vspace{-0.2cm}
 
-\section{Experimental study}
+\section{Experimental Study}
 
 \subsection{Context}
 
 \paragraph{Hardware} % (PS)
+The algorithm is programmed in C++ using the GNU OpenMP threading library (GOMP) and run on a 48-core DELL PowerEdge R815 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB cache) processors with 192GB of RAM.
+
 \paragraph{IPC benchmark} % (PS)
-\paragraph{Algorithm parameters} % (PS)
+We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for cost planning and Openstacks-17 for temporal planning.
+
+The elevators domain is stated as follows: there is a building with N+1 floors, numbered from 0 to N. The building can be separated in blocks of size M+1, where M divides N. Adjacent blocks have a common floor. The building has K fast (accelarating) elevators that stop only in floors that are multiple of M/2 (so M has to be an even number). Each fast elevator has a capacity of X persons. Furthermore, within each block, there are L slow elevators, that stop at every floor of the block. Each slow elevator has a capacity of Y persons (usually Y<X).
+There are costs associated with each elavator starting/stoping and moving. There are several passengers, for which their current location and their destination are given.
+The objective function is to minimize the total cost of moving the passengers to their destinations. The total cost is increased each time an elevator starts/stops or moves.
+
+The openstacks domain is based on the "minimum maximum simultaneous open stacks" combinatorial optimization problem, which can be stated as follows: a manufacturer has a number of orders, each for a combination of different products, and can only make one product at a time. The problem is to order the making of the different products so that the maximum number of stacks that are in use simultaneously, or equivalently the number of orders that are in simultaneous production, is minimized. The problem is NP-hard and known to be equivalent to several other problems. In the temporal case a maximum number of stacks is given and the goal is to find the plan with the least makespan, without violating the maximum number of stacks constraints.
+
+
+\paragraph{Algorithm Parameters} % (PS)
 
 \subsection{Results}
 
@@ -577,51 +551,31 @@ population size is small.
 %the command \texttt{{\char'134}thebibliography}.
 \end{document}
 
-
-IPC-6 ELEVATORS DOMAIN
-
-The idea for this domain came up from the Miconic domain of IPC2, however the domain has been designed from scratch. The scenario is the following: There is a building with N+1 floors, numbered from 0 to N. The building can be separated in blocks of size M+1, where M divides N. Adjacent blocks have a common floor. For example, suppose N=12 and M=4, then we have 13 floors in total (ranging from 0 to 12), which form 3 blocks of 5 floors each, being 0 to 4, 4 to 8 and 8 to 12.
-
-The building has K fast (accelarating) elevators that stop only in floors that are multiple of M/2 (so M has to be an even number). Each fast elevator has a capacity of X persons. Furthermore, within each block, there are L slow elevators, that stop at every floor of the block. Each slow elevator has a capacity of Y persons (usually Y<X).
-
-There are costs associated with each elavator starting/stoping and moving. In particular, fast (accelarating) elevators have negligible cost of starting/stoping but have significant cost while moving. On the other hand, slow (constant speed) elevators have significant cost when starting/stoping and negligible cost while moving. Travelling times between floors are given for any type of elevator, taking into account the constant speed of the slow elevators and the constant acceleration of the fast elevators.
-
-There are several passengers, for which their current location (i.e. the floor they are) and their destination are given. The planning problem is to find a plan that moves the passengers to their destinations while it maximizes some criterion.
-
-The versions of this domain are the following:
-
-    * Sequential: The objective function is to minimize the total cost of moving the passengers to their destinations . The total cost is increased each time an elevator starts/stops or moves.
-    * Time: Each action has a duration. The goal is to minimize the makespan of the plan.
-          o Time-numeric: Similar to the 'time' version; numeric fluents have been used to represent floors and capacities. 
-    * Net-benefit: Having the passengers to their destinations is a soft-goal. There is a penalty associated with any passenger not being in their destination floor. The penalty is a function of the difference between the origin and the destination floor (it is supposed that the passenger with use the stairs). The objective function is to minimize the total cost expressed as a function of the cost of moving the elevators and the cost of not serving the passengers.
-          o Net-benefit - numeric: Similar to net-benefit; numeric fluents have been used to represent floors and capacity constraints. 
-
-
-IPC-6 OPENSTACKS DOMAIN
-
-This domain has been used first at IPC-2006. At IPC-2008 we kept the same scenario, however we produced entirely new problem sets. So, the scenario is the following (adapted from the IPC-2006 description):
-
-The openstacks domain is based on the "minimum maximum simultaneous open stacks" combinatorial optimization problem, which can be stated as follows: A manufacturer has a number of orders, each for a combination of different products, and can only make one product at a time.
-
-The total required quantity of each product is made at the same time (because changing from making one product to making another requires a production stop). From the time that the first product included in an order is made to the time that all products included in the order have been made, the order is said to be "open" and during this time it requires a "stack" (a temporary storage space). The problem is to order the making of the different products so that the maximum number of stacks that are in use simultaneously, or equivalently the number of orders that are in simultaneous production, is minimized (because each stack takes up space in the production area).
-
-The problem is NP-hard and known to be equivalent to several other problems. It was recently posed as a challenge problem for the constraint programming community (see http://www.dcs.st-and.ac.uk/~ipg/challenge/).
-
-Note that this is an optimization problem: for any instance of the problem every ordering of the making of products is a solution, which at worst uses as many simultaneously open stacks as there are orders. Thus, finding a plan is quite trivial (in the sense that there exists a domain-specific linear-time algorithm that solves the problem), but finding a plan of high quality is hard (even for a domain-specific algorithm).
-
-The following versions of the Openstacks domain have been used at IPC-2008:
-
-    * Sequential: The goal is to minimize the total number of stacks. The number of stacks is represented using symbols. There are two versions of the domain in this track:
-          o ADL: Universally quantified preconditions are used in order to ensure that all related orders have been started before making a product, or that all related products have been produced before shipping an order.
-          o Semiground: Universally quantified preconditions have been replaced by multiple semiground actions. 
-    * Time: In this case a maximum number of stacks is given and the goal is to find the plan with the least makespan, wothout violating the maximum number of stacks constraint. There are four versions of the domain in this track:
-          o ADL: Similar to ADL of sequential track.
-          o Semiground: Similar to semiground of sequential track.
-          o ADL-numeric: Similar to ADL, but numeric fluents are used to represent the number of stacks.
-          o Semiground-numeric: Similar to semiground, but numeric fluents are used to represent the number of stacks. 
-    * Net-benefit: There is a cost associated with each additional stack used to make the products. Howeverm we can ship an order without all of its products beeing delivered with it. A product is considered "delivered" wrt a specific order, if the order includes the product, the product has been made and at the time the product has been made the order was open. A penalty is associated for each non-delivered product of order. There are two versions of the openstacks domain for this track:
-          o ADL: Similar to ADL of the time track.
-          o ADL-numeric: Similar to the ADL-numeric of the time track. 
-
 \DAE\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library. 
-The fixed {\em evolution engine} is a (100+700)-ES: 100 individuals generate 700 offsprings without selection. The survival selection is performed among those 800 individuals using a {\em deterministic tournament} of size 5. For all runs, the {\bf stopping criterion} is the following: After at least 10 generations, evolution is stopped if no improvement of the best fitness in the population is made during 50 generations, with a maximum of 1000 generations. Furthermore, all runs were allowed a maximum CPU time of 30mn (running on 3.4 GHz cores).\\
+The fixed {\em evolution engine} is a (100+700)-ES: 100 individuals generate 700 offsprings without selection. The survival selection is performed among those 800 individuals using a {\em deterministic tournament} of size 5. For all runs, the {\bf stopping criterion} is the following: After at least 10 generations, evolution is stopped if no improvement of the best fitness in the population is made during 50 generations, with a maximum of 1000 generations. Furthermore, all runs were allowed a maximum CPU time of 30mn (running on 3.4 GHz cores).
+
+
+Multicore machines are becoming a standard way to speep up the system performance.
+
+This paper describes a multi-threaded release of \DAEYAHSP.
+
+This paper describes a parallel shared-memory release of the \DAEYAHSP\ planning system.
+using the OpenMP directive-based API.
+
+to obtain high levels of performance special care has been given to get reentrant procedures.
+isolate context variables 
+
+% concurrent programming
+
+OpenMP primarily consists of a set of compiler directives (pragmas) that are inserted into a Fortran, C or C++ program to convey information to an OpenMP compiler.
+
+
+\cite{paradiseo:JHeuristics2004}
+\cite{paradiseo:ParallelComputing2004}
+\cite{alba:IEEE2002}
+\cite{alba:COR2008}
+\cite{alba:IPL2002}
+\cite{dae:icaps2010}
+\cite{dae:evocop2006}
+\cite{dae:gecco2010}
+
