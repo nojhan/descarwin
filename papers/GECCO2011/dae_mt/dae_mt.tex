@@ -392,7 +392,7 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 \paragraph{Hardware} % (PS)
 The algorithm is programmed in C++ using the GNU OpenMP threading library (GOMP) and run on a 48-core DELL PowerEdge R815 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB cache) processors with 192GB of RAM.
 
-\paragraph{IPC benchmark} % (PS)
+\paragraph{Benchmarks} % (PS)
 We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for cost planning and Openstacks-17 for temporal planning.
 
 The elevators domain is stated as follows: there is a building with N+1 floors, numbered from 0 to N. The building can be separated in blocks of size M+1, where M divides N. Adjacent blocks have a common floor. The building has K fast (accelarating) elevators that stop only in floors that are multiple of M/2 (so M has to be an even number). Each fast elevator has a capacity of X persons. Furthermore, within each block, there are L slow elevators, that stop at every floor of the block. Each slow elevator has a capacity of Y persons (usually Y<X).
@@ -450,8 +450,7 @@ $$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
     \hfill
     \subfigure[openstacks 17]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
   \end{center}
-  \caption{Absolute wallclock time distributions of 11 runs of DAE according to
-  the number of processors.}
+  \caption{Absolute wallclock time distributions of 11 runs of \DAEYAHSP\ according to the number of processors.}
   \label{fig:proc_elevators_vs_openstacks}
 \end{figure}
 
@@ -496,8 +495,7 @@ $S^d_p$ is the speedup for the dynamic one.\\
     \hfill
     \subfigure[dynamic]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
   \end{center}
-  \caption{Absolute wallclock time distributions of 11 runs of DAE according to
-  the number of processors, on the temporal openstacks-17 problem.}
+  \caption{Absolute wallclock time distributions of 11 runs of \DAEYAHSP\ according to the number of processors, on the temporal openstacks-17 problem.}
   \label{fig:proc_static_vs_dynamic}
 \end{figure}
 
@@ -514,9 +512,7 @@ from the same distribution ($$p=0.03$$).
     \hfill
     \subfigure[rescaled]{\includegraphics[width=0.2\textwidth]{images/elevators_pop_time_zoom.pdf}}
   \end{center}
-  \caption{Absolute wallclock time distributions of 11 runs of DAE according to
-  the population size, on the sequential elevators-12 problem, usong 48
-  processors.}
+  \caption{Absolute wallclock time distributions of 11 runs of \DAEYAHSP\ according to the population size, on the sequential elevators-12 problem, using 48 processors.}
   \label{fig:elevators_pop}
 \end{figure}
 
