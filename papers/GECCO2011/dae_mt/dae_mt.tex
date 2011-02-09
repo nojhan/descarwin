@@ -433,6 +433,10 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 
 % FIXME: .out empty, why ?!?
 
+<<<<<<< .mine
+\paragraph{Speed-up against nb of cores} % (CC, JD)
+
+=======
 \paragraph{Measures}
 
 % wall-clock: pourquoi wall-clock est pas user-time ...
@@ -468,16 +472,23 @@ $$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
 
 \begin{figure}[htpb]
   \begin{center}
-    \subfigure[elevators
-    12]{\includegraphics[width=0.2\textwidth]{images/elevators_proc_time.pdf}}
+    \subfigure[elevators 12]{\includegraphics[width=0.2\textwidth]{images/elevators_proc_time.pdf}}
     \hfill
     \subfigure[openstacks 17]{\includegraphics[width=0.2\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
   \end{center}
   \caption{Absolute wallclock time distributions of 11 runs of DAE according to
   the number of processors.}
-  \label{fig:static_vs_dynamic}
+  \label{fig:proc_elevators_vs_openstacks}
 \end{figure}
 
+Figure \ref{fig:proc_elevators_vs_openstacks} shows that on both problems, the
+computation time decrease with the number of processors used. Comparing to the
+sequential version (running on a single processor), the parallel one permit a
+decrease that is similar on both problems. The dispersions of the distribution 
+is due to the steady-state stopping criterion that may be reached after different
+times.
+
+\paragraph{Comparaison of static and dynamic scheduling} % (CC, JD)
 
 \begin{figure}[htpb]
   \begin{center}
@@ -487,9 +498,15 @@ $$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
   \end{center}
   \caption{Absolute wallclock time distributions of 11 runs of DAE according to
   the number of processors, on the temporal openstacks-17 problem.}
-  \label{fig:static_vs_dynamic}
+  \label{fig:proc_static_vs_dynamic}
 \end{figure}
 
+Figure \ref{fig:proc_static_vs_dynamic} shows that the dynamic parallelization
+scheme does not permits a significant speed-up comparing to the static one. The
+Wilcoxon signed-rank test cannot reject the null hypothesis that the samples come
+from the same distribution ($$p=0.03$$).
+ 
+\paragraph{Speed-up against pop size} % (CC, JD)
 
 \begin{figure}[htpb]
   \begin{center}
@@ -498,13 +515,16 @@ $$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
     \subfigure[rescaled]{\includegraphics[width=0.2\textwidth]{images/elevators_pop_time_zoom.pdf}}
   \end{center}
   \caption{Absolute wallclock time distributions of 11 runs of DAE according to
-  the population size, on the sequential elevators-12 problem.}
+  the population size, on the sequential elevators-12 problem, usong 48
+  processors.}
   \label{fig:elevators_pop}
 \end{figure}
 
-\paragraph{Speed-up against nb of cores} % (CC, JD)
-\paragraph{Speed-up against pop size} % (CC, JD)
-\paragraph{Comparaison of static and dynamic scheduling} % (CC, JD)
+Figure \ref{fig:elevators_pop} shows that the median computation time on a
+multicore machine increase linearly with the size of the population. The 
+dispersions of the distribution is due to the steady-state stopping criterion 
+that may be reached after different times, with a higher probability when the
+population size is small.
 
 OpenMP lets the choice between the both static and dynamic task scheduling. The default one is the static scheduling.
 
