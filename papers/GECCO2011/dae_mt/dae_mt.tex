@@ -143,6 +143,8 @@ The design of experiment is built on problems extracted from the last internatio
 
 \paragraph{Parallel EA}
 
+
+
 FIXME
 
 \paragraph{Parallel Planning} % (VV)
@@ -358,16 +360,21 @@ continuous to combinatorial ones.
 
 An extension of EO for parallelization of algorithms, ParadisEO, has been
 proposed by Cahon et al. \cite{paradiseo:JHeuristics2004}. It uses the Message
-Passing Interface API and proposes several parallelization scheme, available by
-calling wrappers around common functions of EO. We have choose not to use this
-framework because we were targeting multicore architecture, where message
-passing is useless and may introduce an overhead higher than other approaches. 
+Passing Interface (MPI \footnote{on the MPICH2 implementation:
+\url{http://www.mcs.anl.gov/research/projects/mpich2/}}) API and proposes
+several parallelization scheme, available by calling wrappers around common
+functions of EO. ParadisEO targets multi-processors machines, especially
+clusters and grids, for running large-scale general purpose EAs.
 
-%\subparagraph{OpenMP and parallelization paradigms}\\
-
-For multicore architecture, shared memory parallelization approach is a better
-candidate. In this work, we have used OpenMP\footnote{OpenMP: \url{http://www.openmp.org}}.
-%The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explained in further details later.
+We have choose not to use this framework because we were targeting multicore
+architecture, where message passing is somewhat useless and may introduce an
+overhead higher than other approaches. For multicore architecture, shared
+memory parallelization approach is a better candidate as it does not necessitate
+heavy librairies linked to the core program. In this work, we have used
+OpenMP\footnote{OpenMP: \url{http://www.openmp.org}}, that use a set of compiler
+directives to tell the compiler which part of a program should be parallelized.
+The main advantage of OpenMP is that it is designed to make easy to parallelize
+an existing program.
 
 % parler de la genericite de la technique de parallelisation, n'importe qui peut utiliser EO pour avoir du code parallel independament de DaE/Yahsp.
 
