@@ -601,40 +601,34 @@ resulting distributions are presented as standard boxplots.
 
 \subsection{Results}
 
-% FIXME: in restart mode an instance launched with more than 1 thread stops before the 30 minutes defined with --max-seconds, Pierre things that the reason is because the time is defined in user-time and not in wall-clock.
-
+% FIXME: in restart mode an instance launched with more than 1 thread stops
+% before the 30 minutes defined with --max-seconds, Pierre things that the
+% reason is because the time is defined in user-time and not in wall-clock.
 % FIXME: .out empty, why ?!?
 
-\paragraph{Measures}
+%\paragraph{Measures}
 
-% wall-clock: pourquoi wall-clock est pas user-time ...
-% lister les mesures
+%Here is the three equations of measure used: the speedup, the efficiency and
+%the advanced speedup introduced by the Amdahl's law.
 
-Here is the three equations of measure used: the speedup, the efficiency and the advanced speedup introduced by the Amdahl's law.
+% $$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} S_{p_{kl}}$$
+% according to the speedup equation: $S_p = \frac{T^*_1}{T_p}$
+% we get the following equation:
+% $$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} \frac{T^*_{1_{kl}}}{T_{p_{kl}}}$$
 
-$$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} S_{p_{kl}}$$
+%The efficiency measure equation is the following.
+%$$Efficiency\ measure = r \sum^{P,d}_{k=0,l=0} E_{p_{kl}}$$
 
-according to the speedup equation: $S_p = \frac{T^*_1}{T_p}$
-
-we get the following equation:
-
-$$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} \frac{T^*_{1_{kl}}}{T_{p_{kl}}}$$
-
-The efficiency measure equation is the following.
-
-$$Efficiency\ measure = r \sum^{P,d}_{k=0,l=0} E_{p_{kl}}$$
-
-And finally the advanced speedup provided by Amdahl's law:
-
-$$A_p = \frac{1}{(1-s) + \frac{s}{p}}$$
-
-$s$ being the parallelizable part of the program and $p$ the number of cores used.
-
-This equation allows to extract the sequential part of the program not parallelized and what ever number of cores we use, this sequential part will still be there.
-
-The limit of $A_p$ as $p$ approaches infinity is equal to the sequential part of the program.
-
-$$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
+%And finally the advanced speedup provided by Amdahl's law:
+%$$A_p = \frac{1}{(1-s) + \frac{s}{p}}$$
+%$s$ being the parallelizable part of the program and $p$ the number of cores
+%used.
+%This equation allows to extract the sequential part of the program not
+%parallelized and what ever number of cores we use, this sequential part will
+%still be there.
+%The limit of $A_p$ as $p$ approaches infinity is equal to the sequential part
+%of the program.
+%$$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
 
 %% Results
 \paragraph{Speed-up against number of cores} % (CC, JD)
@@ -652,7 +646,7 @@ $$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
 Figure \ref{fig:proc_elevators_vs_openstacks} shows that on both problems, the
 computation time decrease with the number of processors used. Comparing to the
 sequential version (running on a single processor), the parallel one permit a
-decrease that is similar on both problems. The dispersions of the distribution 
+decrease that is similar on both problems. The dispersions of the distribution
 is due to the steady-state stopping criterion that may be reached after different
 times.
 
@@ -664,22 +658,16 @@ divided in several tasks according to the number of available processors.
 Regarding dynamic scheduling, during the runtime if one thread has finished
 these tasks it get the next available one, in a queue.
 
-% As the goal is to optimize the time cost used by a problem solved in a variable time, we have to verify whether the dynamic scheduling brings a better efficiency.
-
 % some hypotheses
 
 % on a pas teste tout ça en pratique
 %Two hypotheses have driven us to test the dynamic scheduling. The first one consists to say that as long as we are using a problem solved in a variable time, the dynamic scheduling should be faster than the static scheduling does. The second one assumes that we use a population size higher than the number of cores available, the dynamic mode should bring a better efficiency.
 
-% less time consuming
-
-To determine the quality of the dynamicity in front of statical schedule, we are using the following formula:
-
-$$D_p = \frac{S^s_p}{S^d_p}$$
-
-$S^s_p$ is the speedup for the static scheduling.\\
-$S^d_p$ is the speedup for the dynamic one.\\
-
+% To determine the quality of the dynamicity in front of statical schedule, we
+% are using the following formula:
+% $$D_p = \frac{S^s_p}{S^d_p}$$
+% $S^s_p$ is the speedup for the static scheduling.\\
+% $S^d_p$ is the speedup for the dynamic one.\\
 
 \begin{figure}[htpb]
   \begin{center}
@@ -709,11 +697,10 @@ from the same distribution ($p=0.03$).
 \end{figure}
 
 Figure \ref{fig:elevators_pop} shows that the median computation time on a
-multicore machine increase linearly with the size of the population. The 
-dispersions of the distribution is due to the steady-state stopping criterion 
+multicore machine increase linearly with the size of the population. The
+dispersions of the distribution is due to the steady-state stopping criterion
 that may be reached after different times, with a higher probability when the
 population size is small.
-
 
 \begin{figure}[htpb]
   \begin{center}
@@ -726,17 +713,19 @@ population size is small.
 \end{figure}
 
 Figure \ref{fig:speedup_pop} shows that the expected speed-up of $40$ is met,
-and that it decrease with the population size.
+and that it decrease with the population size. The measures were done according
+to the speedup equation.
 
-%shows that the median computation time on a
-% multicore machine increase linearly with the size of the population. The 
-% dispersions of the distribution is due to the steady-state stopping criterion 
-% that may be reached after different times, with a higher probability when the
-% population size is small.
+$$S_p = \frac{T^*_1}{T_p}$$
+
+The parameters $T^*_1$ and $T_p$ are respectively the time used for a sequential and a parallel execution.
+
+%%$$Speedup\ measure = r \sum^{P}_{k=0} \frac{T^*_{1_k}}{T_{p_k}}$$
 
 
 \section{Discussion and Conclusion}
-%In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
+%In order to scale up the capabilities of \DAEYAHSP, this paper investigated the
+%parallelization of the individual evaluation.
 
 We made a proof-of-concept of a shared-memory parallelization of the evaluation
 step of the \DAEX algorithm, based on the OpenMP directive-based API on a common
@@ -745,7 +734,7 @@ this scheme is immediately available for any evolutionary algorithm as far as
 the context of the evaluation functor is thread-local and reentrant.
 
 As expected, on our 48-core Dell Machine a roughly $\times40$ speed-up was obtained on
-the tested benchmark, this speed-up being the same for all instances. 
+the tested benchmark, this speed-up being the same for all instances.
 
 The dispersion of the measured times is mainly due to the
 combination of the steady-state stopping criterion with the stochastic nature
@@ -755,7 +744,7 @@ remains to be explored.
 
 Our results show that the stopping criterion should be chosen carefully, along
 with the population size, as it has an impact on the dispersion of the
-distribution of computation times. 
+distribution of computation times.
 
 The dynamic queue mapping management of threads onto cores did not provide a significant
 improvement. Our hypothesis was that the goal sequences shows a diversity in
@@ -768,7 +757,8 @@ well. A further development will consist in parallelizing other steps of the
 evolutionary loop in particular the offspring generation which is also
 intrinsically parallel, as it use independent variation operators.
 
-% FIX ME Further research: adapting the YAHSP memoing feature to the parallelization scheme : 2 modes global vs local memoing
+% FIX ME Further research: adapting the YAHSP memoing feature to the
+% parallelization scheme : 2 modes global vs local memoing
 
 % Impact on the EA design
 % Do you agree below?
@@ -803,7 +793,7 @@ premature convergence.
 %the command \texttt{{\char'134}thebibliography}.
 \end{document}
 %
-%\DAE\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library. 
+%\DAE\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library.
 %The fixed {\em evolution engine} is a (100+700)-ES: 100 individuals generate 700 offsprings without selection. The survival selection is performed among those 800 individuals using a {\em deterministic tournament} of size 5. For all runs, the {\bf stopping criterion} is the following: After at least 10 generations, evolution is stopped if no improvement of the best fitness in the population is made during 50 generations, with a maximum of 1000 generations. Furthermore, all runs were allowed a maximum CPU time of 30mn (running on 3.4 GHz cores).
 %
 %
@@ -815,7 +805,7 @@ premature convergence.
 %using the OpenMP directive-based API.
 %
 %to obtain high levels of performance special care has been given to get reentrant procedures.
-%isolate context variables 
+%isolate context variables
 %
 % concurrent programming
 %
