@@ -480,25 +480,52 @@ itself, and not as attributes of the evaluation functor.
 
 \subsection{Setup}
 
-\paragraph{Hardware} % (PS)
-The algorithm is programmed in C++ using the GNU OpenMP threading library (GOMP) and run on a 48-core DELL PowerEdge R815 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB cache) processors with 192GB of RAM.
+\paragraph{Plateform} % (PS)
+The algorithm is programmed in C++ using GCC and the GNU OpenMP threading
+library (GOMP), both version 4.4.4. It is run on a 48-core DELL PowerEdge R815
+Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB
+cache) processors with 192GB of RAM, under Linux x86\_64 2.6.32.
 
-\paragraph{Benchmarks} % (PS)
-We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for cost planning and Openstacks-17 for temporal planning.
+\paragraph{Benchmarks} % (PS) We have tested the above implementation on two
+benchmarks from the satisficing track of the $6^{th}$ International Planning
+Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for
+cost planning and Openstacks-17 for temporal planning.
 
-The elevators domain is stated as follows: there is a building with N+1 floors, numbered from 0 to N. The building can be separated in blocks of size M+1, where M divides N. Adjacent blocks have a common floor. The building has K fast (accelarating) elevators that stop only in floors that are multiple of M/2 (so M has to be an even number). Each fast elevator has a capacity of X persons. Furthermore, within each block, there are L slow elevators, that stop at every floor of the block. Each slow elevator has a capacity of Y persons (usually Y<X).
-There are costs associated with each elavator starting/stoping and moving. There are several passengers, for which their current location and their destination are given.
-The objective function is to minimize the total cost of moving the passengers to their destinations. The total cost is increased each time an elevator starts/stops or moves.
+The elevators domain is stated as follows: there is a building with N+1 floors,
+numbered from 0 to N. The building can be separated in blocks of size M+1, where
+M divides N. Adjacent blocks have a common floor. The building has K fast
+(accelarating) elevators that stop only in floors that are multiple of M/2 (so M
+has to be an even number). Each fast elevator has a capacity of X persons.
+Furthermore, within each block, there are L slow elevators, that stop at every
+floor of the block. Each slow elevator has a capacity of Y persons (usually
+Y<X).  There are costs associated with each elavator starting/stoping and
+moving. There are several passengers, for which their current location and their
+destination are given.  The objective function is to minimize the total cost of
+moving the passengers to their destinations. The total cost is increased each
+time an elevator starts/stops or moves.
 
-The openstacks domain is based on the "minimum maximum simultaneous open stacks" combinatorial optimization problem, which can be stated as follows: a manufacturer has a number of orders, each for a combination of different products, and can only make one product at a time. The problem is to order the making of the different products so that the maximum number of stacks that are in use simultaneously, or equivalently the number of orders that are in simultaneous production, is minimized. The problem is NP-hard and known to be equivalent to several other problems. In the temporal case a maximum number of stacks is given and the goal is to find the plan with the least makespan, without violating the maximum number of stacks constraints.
+The openstacks domain is based on the "minimum maximum simultaneous open stacks"
+combinatorial optimization problem, which can be stated as follows: a
+manufacturer has a number of orders, each for a combination of different
+products, and can only make one product at a time. The problem is to order the
+making of the different products so that the maximum number of stacks that are
+in use simultaneously, or equivalently the number of orders that are in
+simultaneous production, is minimized. The problem is NP-hard and known to be
+equivalent to several other problems. In the temporal case a maximum number of
+stacks is given and the goal is to find the plan with the least makespan,
+without violating the maximum number of stacks constraints.
 
 
 \paragraph{Algorithm Parameters} % (PS)
 
-All the experiments were done with the parameter set described in \cite{dae:icaps2010} except for the population size which varies according to the experiment.
-The fixed evolution engine is a (pop size+ $7 \times$ pop size)-ES: $n$ individuals generate $7 \times n$ offsprings without selection.
-For all runs, the following steady-state stopping condition has been applied: after at least 10 generations, evolution is stopped if no improvement of the best fitness in the
-population is made during 50 generations, with a maximum of 1000 generations.
+All the experiments were done with the parameter set described in
+\cite{dae:icaps2010} except for the population size which varies according to
+the experiment.  The fixed evolution engine is a (pop size+ $7 \times$ pop
+size)-ES: $n$ individuals generate $7 \times n$ offsprings without selection.
+For all runs, the following steady-state stopping condition has been applied:
+after at least 10 generations, evolution is stopped if no improvement of the
+best fitness in the population is made during 50 generations, with a maximum of
+1000 generations.
 
 \subsection{Results}
 
