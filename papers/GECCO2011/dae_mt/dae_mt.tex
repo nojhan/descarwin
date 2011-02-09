@@ -101,7 +101,7 @@
 
 \maketitle
 \begin{abstract}
-Multicore machines are becoming a standard way to speep up the system performance.
+Multicore machines are becoming a standard way to speed up the system performance.
 After having instantiated the evolutionary metaheuristic \DAEX\ with the forward search \YAHSP\ planner, 
 we investigate on the global parallelism approach, which exploits the inherent parallelism of the individual evaluation.
 This paper describes a parallel shared-memory release of the \DAEYAHSP\ planning system using the OpenMP directive-based API.
@@ -125,7 +125,7 @@ concurrent actions  are allowed).  In domain-independent  planning, problems are
 described    with   the    Planning   Domain    Description    Language   (PDDL)
 \cite{pddl:jair2003}.  In  the simplest  STRIPS model, states  of the  world are
 defined by  sets of atoms  instantiated from  a set of  predicates and a  set of
-objects, and  actions are triples of  sets of atoms:  preconditions, add effets,
+objects, and  actions are triples of  sets of atoms:  preconditions, add effects,
 del effects.  Instances of the planning problem, called planing tasks, can model
 many kinds of abstract reasoning problems and are known to be PSPACE-hard.
 
@@ -140,7 +140,7 @@ Moreover, the implementation of \DAEX\ has been made with the STL-based Evolving
 
 
 % Il manque un argument pour dire que les archis parallel shared-memory sont bien adaptées à notre cas au contraire des GPGPU (on a pas choisi une archi multi-core au hasard !)
-For the proof of concept we implemented a multi-threaded version of \DAEYAHSP, the instantiation of \DAEX\ with the heurictic forward search \YAHSP\ planner \cite{yahsp:icaps2004}, using the OpenMP directive-based API\footnote{\url{http://www.openmp.org}}. 
+For the proof of concept we implemented a multi-threaded version of \DAEYAHSP, the instantiation of \DAEX\ with the heuristic forward search \YAHSP\ planner \cite{yahsp:icaps2004}, using the OpenMP directive-based API\footnote{\url{http://www.openmp.org}}. 
 The design of experiment is built on problems extracted from the last international planning competition\footnote{\url{http://ipc.icaps-conference.org}} with the multithreaded \DAEYAHSP\ release mapped onto a 48-core parallel machine.
 
 % FIXME : plan de l'article
@@ -158,18 +158,18 @@ conclude and provide some insights of possible future works.
 
 \paragraph{Parallel EAs}
 
-A large  litterature deals with  the parallelization techniques  of Evolutionary
+A large  literature deals with  the parallelization techniques  of Evolutionary
 Algorithms (EAs).  Depending on  the targeted architecture,  the parallelization
 scheme may be  chosen differently. The main approaches  may be classified among:
-simple  {\it independant  runs parallelism},  EA with  {\it  global parallelism}
+simple  {\it independent  runs parallelism},  EA with  {\it  global parallelism}
 where the evaluation is decentralized  but not the other operators, cellular EAs
 (cEA) where  the selection and  reproduction steps are decentralized,  {\it dEA}
 approach using a multi-population {\it island parallelism}.
 
 The runs parallelism being trivially achieved by running several runs, the first
-step when parallelizing a new algorithm is often the lobal parallelization
-approach, which is prefered because the evaluation step is often the most costly
-part of EAs and because it is intrinsiquely race-conditions free.
+step when parallelizing a new algorithm is often the global parallelization
+approach, which is preferred because the evaluation step is often the most costly
+part of EAs and because it is intrinsically race-conditions free.
 
 FIXME CITE ALBA
 
@@ -194,7 +194,7 @@ and, running  on a  standard architecture, does  not necessitate  any retraction
 mechanism  and  can  efficiently  exploit asynchronous  communication  channels.
 Parallel  Frontier  A*  with  Delayed  Duplicate  Detection  \cite{PFADDD}  uses
 a strategy  based on intervals computed  by sampling to  distribute the workload
-among several workstations, targetting  distributed-memory systems as opposed to
+among several workstations, targeting  distributed-memory systems as opposed to
 previous approaches.  In \cite{HDA-star}, the authors introduce Hash Distributed
 A*  (HDA*) which combines  successful ideas  from previous  parallel algorithms.
 HDA*  uses a  hash  function which  assigns  each generated  state  to a  unique
@@ -233,9 +233,9 @@ for $k \in [0,n]$ (with $S_0 = I$ and $S_{n+1} = G$).  A \DAEX\ individual is a
 sequence of goals which define a sequence of subproblems to be solved. These
 subproblems are submitted successively to an embedded planner $X$ and the global
 solution is obtained after the compression of these intermediate solutions. The
-overall optimization process is controled by an evolutionary algorithm.
+overall optimization process is controlled by an evolutionary algorithm.
 
-The fitness implements a gradient towards feasability for unfeasible individuals
+The fitness implements a gradient towards feasibility for unfeasible individuals
 and a gradient towards optimality for feasible individuals. Feasible individuals are always preferred to unfeasible ones.
 Population initialization as well as variation operators are driven by the critical path
 $h^1$ heuristic \cite{h1:aips2000} in order to discard inconsistent state
@@ -261,7 +261,7 @@ considered as an easy problem for \YAHSP. As a matter of fact, the minimum
 number of required nodes varies from few nodes to thousands depending of the
 planning task.  In the current release this number is estimated during the
 population initialization stage. An incremental loop is performed until the
-ratio of feasible individals is over a given theshold or a maximum boundary has
+ratio of feasible individuals is over a given threshold or a maximum boundary has
 been reached. By default this number is doubled at each iteration until at least
 one feasible individual is produced or 100000 has been reached.
 
@@ -334,7 +334,7 @@ only parallelized the latter.
 % Correctness of the \DAEYAHSP\ parallel release
 % Burns et al.:
 %Soundness: Soundness holds trivially because no solution is returned that does not pass the goal test.
-%Deadlock: There is only one lock in PBNF and the thread that currently holds it never attempts to acquire it a secondtime, so deadlock cannot arise.
+%Deadlock: There is only one lock in PBNF and the thread that currently holds it never attempts to acquire it a second time, so deadlock cannot arise.
 %Livelock:
 %Completeness This follows easily from liveness:
 
@@ -401,7 +401,7 @@ We have chosen not to use this framework because we were targeting multicore
 architecture, where message passing is somewhat useless and may introduce an
 overhead higher than other approaches. For multicore architecture, shared
 memory parallelization approach is a better candidate as it does not necessitate
-heavy librairies linked to the core program. In this work, we have used
+heavy libraries linked to the core program. In this work, we have used
 OpenMP\footnote{OpenMP: \url{http://www.openmp.org}}, that uses a set of compiler
 directives to tell the compiler which part of a program should be parallelized.
 The main advantage of OpenMP is that it is designed to make easy to parallelize
@@ -414,7 +414,7 @@ to identify the most used resources by almost all structures. Most of the EO
 classes use the ``Functor''\footnote{Also called function object} pattern. The
 advantages of this design is to get the genericity and the benefits given by
 classes while keeping the simplicity of a single call to a function. EO Functors
-generaly take a population as argument.
+generally take a population as argument.
 
 Considering that the evaluation of the population is the most costly part of the
 algorithm, this step is our first target to parallelize. Moreover, in most cases
@@ -452,9 +452,9 @@ void apply< EOT >( eoUF< EOT, void >& proc,
   % \ENDWHILE
 % \end{algorithmic}
 
-The parallelization of this region of code is done thanks to the pragma ``omp for''. This can be translated in the PRAM model by the use of CREW\footnote{CREW: Concurantial Read Exclusive Write} model.
+The parallelization of this region of code is done thanks to the pragma ``omp for''. This can be translated in the PRAM model by the use of CREW\footnote{CREW: Concurrent Read Exclusive Write} model.
 
-%%According to the PRAM\footnote{wikipedia PRAM} models we are using a CREW\footnote{Concurantial Read Exclusive Write} model.
+%%According to the PRAM\footnote{wikipedia PRAM} models we are using a CREW\footnote{[A[Concurrent Read Exclusive Write} model.
 
 %% TODO: refaire algo proprement avec algorithm2e
 
@@ -477,7 +477,7 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 
 In order to permit OpenMP to build a multithreaded algorithm without side
 effects, the evaluation functor (the ``proc'' in the apply function) must fulfil certain requirement. 
-In EO, the evaluation functors are supposed to be instanciated only once. In a
+In EO, the evaluation functors are supposed to be instantiated only once. In a
 sequential mode, the same instance is used to evaluate every individuals in a
 population. In a parallelized mode, one must ensure that the evaluation functor
 have thread-local data structures.
@@ -500,7 +500,7 @@ each thread.  And  finally, specifying which global variable  should be rendered
 private to each thread  was the only thing we had to  do to ensure thread-safety
 in YAHSP.   For example, the  global arrays used  to compute the  heuristic, the
 relaxed plans and the lookahead plans  are made private to each thread, ensuring
-that concurrent  excutions of YAHSP do not  use the same portions  of the global
+that concurrent  executions of YAHSP do not  use the same portions  of the global
 memory.
 
 \paragraph{\DAEX-Specific Parallelization Issues} % (JD)
@@ -508,7 +508,7 @@ memory.
 \DAEX\ evaluation step calls the YAHSP solver several times on the same
 decomposition and thus uses several variables to keep the state of the
 evaluation over the searches between intermediate goals (namely $k$, $B$ and
-$U$).  As the evaluation functor is a single instance, it must be guaranted
+$U$).  As the evaluation functor is a single instance, it must be guaranteed
 reentrant and not use static variables nor attributes. A way to achieve the
 re-entrancy is to define those variables as attributes of the decomposition
 itself, and not as attributes of the evaluation functor.
@@ -519,7 +519,7 @@ itself, and not as attributes of the evaluation functor.
 
 \subsection{Setup}
 
-\paragraph{Plateform} % (PS)
+\paragraph{Platform} % (PS)
 The algorithm is programmed in C++ using GCC and the GNU OpenMP threading
 library (GOMP), both version 4.4.4. It is run on a 48-core DELL PowerEdge R815
 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB
@@ -537,11 +537,11 @@ We have tested the above implementation on two benchmarks from the satisficing t
 The elevators domain is stated as follows: there is a building with N+1 floors,
 numbered from 0 to N. The building can be separated in blocks of size M+1, where
 M divides N. Adjacent blocks have a common floor. The building has K fast
-(accelarating) elevators that stop only in floors that are multiple of M/2 (so M
+(accelerating) elevators that stop only in floors that are multiple of M/2 (so M
 has to be an even number). Each fast elevator has a capacity of X persons.
 Furthermore, within each block, there are L slow elevators, that stop at every
 floor of the block. Each slow elevator has a capacity of Y persons (usually
-Y<X).  There are costs associated with each elavator starting/stoping and
+Y<X).  There are costs associated with each elevator starting/stopping and
 moving. There are several passengers, for which their current location and their
 destination are given.  The objective function is to minimize the total cost of
 moving the passengers to their destinations. The total cost is increased each
@@ -584,7 +584,7 @@ resulting distributions are presented as standard boxplots.
 % wall-clock: pourquoi wall-clock est pas user-time ...
 % lister les mesures
 
-Here is the three equations of measure used: the speedup, the efficiency and the advanced speedup introduced by the Amdhal's law.
+Here is the three equations of measure used: the speedup, the efficiency and the advanced speedup introduced by the Amdahl's law.
 
 $$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} S_{p_{kl}}$$
 
@@ -598,7 +598,7 @@ The efficiency measure equation is the following.
 
 $$Efficiency\ measure = r \sum^{P,d}_{k=0,l=0} E_{p_{kl}}$$
 
-And finally the advanced speedup provided by Amdhal's law:
+And finally the advanced speedup provided by Amdahl's law:
 
 $$A_p = \frac{1}{(1-s) + \frac{s}{p}}$$
 
@@ -630,7 +630,7 @@ decrease that is similar on both problems. The dispersions of the distribution
 is due to the steady-state stopping criterion that may be reached after different
 times.
 
-\paragraph{Comparaison of Static and Dynamic Scheduling} % (CC, JD)
+\paragraph{Comparison of Static and Dynamic Scheduling} % (CC, JD)
 
 OpenMP lets the choice between the both static and dynamic task scheduling. The default one is the static scheduling.
 
@@ -741,7 +741,7 @@ individuals.
 The implementation scheme presented here is very simple, but works extremely
 well. A further development will consist in parallelizing other steps of the
 evolutionary loop in particular the offspring generation which is also
-inherently parallel, as it use independant variation operators.
+inherently parallel, as it use independent variation operators.
 
 % FIX ME Further research: adapting the YAHSP memoing feature to the parallelization scheme : 2 modes global vs local memoing
 
