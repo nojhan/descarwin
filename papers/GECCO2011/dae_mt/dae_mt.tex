@@ -376,8 +376,10 @@ The function called ``apply'' takes as parameters a population and a function to
 
 %% TODO: refaire algo proprement avec algorithm2e
 
-\begin{figure}[here]
-\centering
+\vspace{-0.2cm}
+\begin{algorithm}[h!]
+\caption{apply(proc, pop)}
+\vspace{0.2cm}
 \begin{verbatim}
 template < typename EOT >
 void apply< EOT >( eoUF< EOT, void >& proc,
@@ -387,8 +389,8 @@ void apply< EOT >( eoUF< EOT, void >& proc,
     proc( pop[i] );
 }
 \end{verbatim}
-\caption{Original apply function}
-\end{figure}
+\end{algorithm}
+\vspace{-0.2cm}
 
 %% Here is the pseudo code of this function:
 % \begin{algorithmic}
@@ -403,8 +405,10 @@ The parallelization of this region of code is done thanks to the pragma ``omp fo
 
 %% TODO: refaire algo proprement avec algorithm2e
 
-\begin{figure}[here]
-\centering
+\vspace{-0.2cm}
+\begin{algorithm}[h!]
+\caption{apply(proc, pop) parallelized using OpenMP directives}
+\vspace{0.2cm}
 \begin{verbatim}
 template < typename EOT >
 void apply< EOT >( eoUF< EOT, void >& proc,
@@ -415,8 +419,8 @@ void apply< EOT >( eoUF< EOT, void >& proc,
     proc( pop[i] );
 }
 \end{verbatim}
-\caption{Parallelize apply function in using OpenMP directives}
-\end{figure}
+\end{algorithm}
+\vspace{-0.2cm}
 
 \section{Experimental study}
 
