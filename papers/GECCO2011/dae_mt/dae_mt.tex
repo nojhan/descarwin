@@ -551,7 +551,7 @@ The implementation scheme presented here is extremely basic, but works extremely
 A further development will consist in parallelizing other steps of the evolutionary loop in particular the offspring generation which is also inherently parallel.
 On our 48-core Dell Machine a roughly $\times40$ was obtained on the two benchmarks tested.
 
-The queue mapping management of threads onto cores did not provide a significant improvement. Our hypothesis was that the goal sequences had diverse lengths and thus should ahve show very diverse time of evaluation computations. But we observed that the algorithm converges rapidly to a same length for all individuals.
+The queue mapping management of threads onto cores did not provide a significant improvement. Our hypothesis was that the goal sequences shows a diversity in length and thus should have shown very diverse times of evaluation computations. But we observed that the algorithm converges rapidly to a same length for all individuals.
 
 % Impact on the EA design
 
