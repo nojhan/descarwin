@@ -744,7 +744,7 @@ step of the \DAEX algorithm, based on the OpenMP directive-based API on a common
 this scheme is immediately available for any evolutionary algorithm as far as
 the context of the evaluation functor is thread-local and reentrant.
 
-As expected, on our 48-core Dell Machine a roughly $\times40$ was obtained on
+As expected, on our 48-core Dell Machine a roughly $\times40$ speed-up was obtained on
 the tested benchmark, this speed-up being the same for all instances. 
 
 The dispersion of the measured times is mainly due to the
@@ -757,7 +757,7 @@ Our results show that the stopping criterion should be chosen carefully, along
 with the population size, as it has an impact on the dispersion of the
 distribution of computation times. 
 
-The queue mapping management of threads onto cores did not provide a significant
+The dynamic queue mapping management of threads onto cores did not provide a significant
 improvement. Our hypothesis was that the goal sequences shows a diversity in
 length and thus should have shown very diverse times of evaluation computations.
 But we observed that the algorithm converges rapidly to a same length for all
