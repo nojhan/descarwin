@@ -356,19 +356,21 @@ Competition) which require a costly analysis for each new initial state.
 
 %\subparagraph{Evolving Object, an evolutionary computation framework}\\
 
-Standing for Evolving Object\footnote{Evolving Object: \url{http://eodev.sf.net}}, EO is a largely used and known framework in evolutionary computation. Anyone can easily design evolutionary algorithms that will find solutions to virtually all kind of hard optimization problems, from continuous to combinatorial ones.
+Standing for Evolving Object\footnote{Evolving Object: \url{http://eodev.sf.net}}, EO is largely used and known framework in evolutionary computation based on template approach in C++. Anyone can easily design evolutionary algorithms that will find solutions to virtually all kind of hard optimization problems, from continuous to combinatorial ones.
 
 %\subparagraph{OpenMP and parallelization paradigms}\\
 
-OpenMP\footnote{OpenMP: \url{http://www.openmp.org}} is a parallelization API based on shared memory in contrast with distributed paradigm. The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explain in further details later.
+OpenMP\footnote{OpenMP: \url{http://www.openmp.org}} is a parallelization API based on shared memory in contrast with distributed paradigm. The choice between the both shared memory and distributed paradigms has been done with OpenMP according to our resources used for experiences which is only one machine. This is going to be explained in further details later.
 
-In order to parallelize a large scope of the framework EO, an analyze was done to identify the most used resources by almost all structures. Most of the EO classes use the pattern ``Functor''. They can be described as follows: take a population in input and make their own cooking. This is done by iterating through the population.
+% parler de la genericite de la technique de parallelisation, n'importe qui peut utiliser EO pour avoir du code parallel independament de DaE/Yahsp.
 
-Hence the population's manipulation would be our target to parallelize. Indeed, since we have several steps in evolutionary algorithms, in most cases the operations done on individuals can be made in parallel without data dependancies. At this time the only operation parallelized is the evaluation which by far the most time-consuming part of the algorithm. There are several classes through a long hierachy in EO implementing evaluation operators but all of them calls a common function to apply the evaluation, this is the function ``apply''.
+In order to parallelize a large scope of the framework EO, an analyze was done to identify the most used resources by almost all structures. Most of the EO classes use the pattern ``Functor''\footnote{Also called object function}. The advantages of these design is to bring on one hand the genericity and on the other hand the benefits given by classes behind a single call to a function. But concretely EO Functors take generaly a population in input calling then their own functions. This is done by iterating through the population.
+
+Hence the population's manipulation would be our target to parallelize. Indeed, since we have several steps in evolutionary algorithms, in most cases the operations done on individuals can be made in parallel without data dependancies. At this time the only operation parallelized is the evaluation which is by far the most time-consuming part of the algorithm. There are several classes through a long hierachy in EO implementing evaluation operators but all of them call a common function to apply the evaluation, this is the function ``apply''.
 
 \paragraph{EO::apply} % (CC)
 %\footnote{Look at the header file apply.h available in the sources of EO}
-The function called ``apply'' takes as parameters a population and an function to apply to each individual.
+The function called ``apply'' takes as parameters a population and a function to apply to each individual.
 
 %% TODO: refaire algo proprement avec algorithm2e
 
@@ -428,6 +430,39 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 
 % FIXME: .out empty, why ?!?
 
+\paragraph{Measures}
+
+% wall-clock: pourquoi wall-clock est pas user-time ...
+% lister les mesures
+
+Here is the three equations of measure used: the speedup, the efficienty and the advanced speedup introduced by the Amdhal's law.
+
+$$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} S_{p_{kl}}$$
+
+according to the speedup equation: $S_p = \frac{T^*_1}{T_p}$
+
+we get the following equation:
+
+$$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} \frac{T^*_{1_{kl}}}{T_{p_{kl}}}$$
+
+The efficiency measure equation is the following.
+
+$$Efficiency\ measure = r \sum^{P,d}_{k=0,l=0} E_{p_{kl}}$$
+
+And finally the advanced speedup provided by Amdhal's law:
+
+$$A_p = \frac{1}{(1-s) + \frac{s}{p}}$$
+
+$s$ being the parallelizable part of the program and $p$ the number of cores used.
+
+This equation allows to extract the sequential part of the program not parallelized and what ever number of cores we use, this sequential part will still be there.
+
+The limit of $A_p$ as $p$ approaches infinity is equal to the sequential part of the program.
+
+$$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
+
+%% Results
+
 \begin{figure}[htpb]
   \begin{center}
     \subfigure[elevators
@@ -464,10 +499,34 @@ void apply< EOT >( eoUF< EOT, void >& proc,
   \label{fig:elevators_pop}
 \end{figure}
 
-
 \paragraph{Speed-up against nb of cores} % (CC, JD)
 \paragraph{Speed-up against pop size} % (CC, JD)
 \paragraph{Comparaison of static and dynamic scheduling} % (CC, JD)
+
+OpenMP lets the choice between the both static and dynamic task scheduling. The default one is the static scheduling.
+
+%static scheduling
+
+To iterate through a set of tasks we divide the number of tasks by the number of processus available. This means that each processus has some defined tasks to accomplish.
+
+%dynamic scheduling
+
+Regarding dynamic scheduling, during the runtime if one processus has finished these tasks it is going to work on another task available. It is similar to a tasks' queue.
+
+% As the goal is to optimize the time cost used by a problem solved in a variable time, we have to verify whether the dynamic scheduling brings a better efficiency.
+
+% some hypotheses
+
+Two hypotheses have driven us to test the dynamic scheduling. The first one consists to say that as long as we are using a problem solved in a variable time, the dynamic scheduling should be faster than the static scheduling does. The second one assumes that we use a population size higher than the number of cores available, the dynamic mode sould bring a better efficiency.
+
+% less time consuming
+
+To determine the quality of the dynamicity in front of statical schedule, we are using the following formula:
+
+$$D_p = \frac{S^s_p}{S^d_p}$$
+
+$S^s_p$ is the speedup for the static scheduling.\\
+$S^d_p$ is the speedup for the dynamic one.\\
 
 \section{Discussion and Conclusion}
 
