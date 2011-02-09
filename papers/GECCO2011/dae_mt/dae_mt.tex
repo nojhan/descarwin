@@ -384,7 +384,7 @@ necessitating to change the scope of this data.
 %\DAEYAHSP\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library. 
 
 Standing for Evolving Object\footnote{Evolving Object:
-\url{http://eodev.sf.net}}, EO is largely used and known framework in
+\url{http://eodev.sf.net}}, EO is a largely used and known framework in
 evolutionary computation based on template approach in C++. It helps at
 designing evolutionary algorithms for hard optimization problems, from
 continuous to combinatorial ones.
@@ -393,16 +393,16 @@ An extension of EO for parallelization of algorithms, ParadisEO, has been
 proposed by Cahon et al. \cite{paradiseo:JHeuristics2004}. It uses the Message
 Passing Interface (MPI \footnote{on the MPICH2 implementation:
 \url{http://www.mcs.anl.gov/research/projects/mpich2/}}) API and proposes
-several parallelization scheme, available by calling wrappers around common
+several parallelization schemes, available by calling wrappers around common
 functions of EO. ParadisEO targets multi-processors machines, especially
 clusters and grids, for running large-scale general purpose EAs.
 
-We have choose not to use this framework because we were targeting multicore
+We have chosen not to use this framework because we were targeting multicore
 architecture, where message passing is somewhat useless and may introduce an
 overhead higher than other approaches. For multicore architecture, shared
 memory parallelization approach is a better candidate as it does not necessitate
 heavy librairies linked to the core program. In this work, we have used
-OpenMP\footnote{OpenMP: \url{http://www.openmp.org}}, that use a set of compiler
+OpenMP\footnote{OpenMP: \url{http://www.openmp.org}}, that uses a set of compiler
 directives to tell the compiler which part of a program should be parallelized.
 The main advantage of OpenMP is that it is designed to make easy to parallelize
 an existing program.
@@ -475,7 +475,7 @@ void apply< EOT >( eoUF< EOT, void >& proc,
 \end{algorithm}
 \vspace{-0.2cm}
 
-In order to permits OpenMP to build a multithreaded algorithm without side
+In order to permit OpenMP to build a multithreaded algorithm without side
 effects, the evaluation functor (the ``proc'' in the apply function) must fulfil certain requirement. 
 In EO, the evaluation functors are supposed to be instanciated only once. In a
 sequential mode, the same instance is used to evaluate every individuals in a
@@ -495,8 +495,8 @@ use of global  variables, not designed for a concurrent  use by several parallel
 threads, and where thread-safety is clearly not ensured.  However, OpenMP offers
 a facility  to deal with global variables,  in order to change  their scope: the
 ``omp threadprivate'' pragma.  It takes  as parameter a list of global variables
-whose  scope must  be changed  from shared  by all  threads to  private  to each
-thread.   And  finally, specifying  which  global  variable  should be  rendered
+whose scope  must be changed  from shared by  all threads to private  (local) to
+each thread.  And  finally, specifying which global variable  should be rendered
 private to each thread  was the only thing we had to  do to ensure thread-safety
 in YAHSP.   For example, the  global arrays used  to compute the  heuristic, the
 relaxed plans and the lookahead plans  are made private to each thread, ensuring
@@ -505,7 +505,7 @@ memory.
 
 \paragraph{\DAEX-Specific Parallelization Issues} % (JD)
 
-\DAEX evaluation step calls the YAHSP solver several times on the same
+\DAEX\ evaluation step calls the YAHSP solver several times on the same
 decomposition and thus uses several variables to keep the state of the
 evaluation over the searches between intermediate goals (namely $k$, $B$ and
 $U$).  As the evaluation functor is a single instance, it must be guaranted
