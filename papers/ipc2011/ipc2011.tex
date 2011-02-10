@@ -95,6 +95,41 @@ Since the parallel architecture used in our algorithm is somewhat heterogeneous,
 
 Moreover, since DaE is not deterministic, we carried out 11 runs and took the median fitness-value as the result for that instance and that parameter-settings.
 
+\begin{table*}[ht]
+\centering
+\begin{tabular}{l c c c}
+\hline\hline
+Name & Min & Max & Default \\ 
+\hline
+Probability of crossover & 0.0 & 1 & 0.8 \\
+Probability of mutation & 0.0& 1& 0.2 \\
+Rate of mutation add station& 0& 10& 1 \\
+Rate of mutation delete station& 0& 10& 3 \\
+Rate of mutation add atom& 0& 10& 1 \\
+Rate of mutation delete atom& 0& 10& 1 \\
+Mean average for mutations& 0.0& 1& 0.8 \\
+Time interval radius& 0& 10& 2 \\
+Maximum number of stations& 5& 50& 20 \\
+Maximum number of nodes& 100& 100 000& 10 000 \\
+Population size& 10& 300& 100 \\
+Number of offspring & 100& 2 000& 700 \\
+\hline
+\end{tabular}
+\caption{DaE parameters that are controlled by LaO}
+\label{table:parameters}
+\end{table*} 
+
+
+5 iterations of CMA-ES were carried out, followed by one ANN and one Genetransferer, and this cycle was iterated in the algorithm. This means that for example for the Grid domain LaO was running for 10 iterations and CMA-ES was called 50 times in total. One has to note that this is not much, but we were restricted by time.
+
+The ANN had 3 fully connected layers, and the hidden layer had the same number of neurons as the input. Learning was done by the conventional back-propagation algorithm, which is the default in FANN. In one iterations of LaO the ANN was only trained once for 50 iterations (called epochs in FANN) without reseting the weights, so that we avoid over-training. The aim of not reseting the weights was that the ANN makes a graded transition from the previous best known parameter-set to the new best known parameter-set, which could help optimization by trying some intermediate values. This means that over the 10 iterations of LaO in the domain Grid 500 iterations (epochs) of the ANN were carried out in total. However, note that the best parameters were trained with much less iterations, depending on the time when they were found. In the worst case, if the best parameter was found in the last iteration of LaO, it was trained for only 50 epochs and not used anymore, only recorded in the logs. This is why retraining is needed in the end.
+
+Termination criterion in the competition was simply the available time, the algorithm was running for several weeks on our cluster, which is used also for other research, i.e. only a small number of 4 or 8-core processors were available for each domain in average. After stopping LaO, retraining was made with 300 ANN epochs with the best data, because the ANN's saved directly from LaO may be under-trained. The MSE error of the ANN did not decrease using more epochs, which indicates that 300 iterations are enough at least for this amount of data and for this size of the ANN. Tests with 1000 iterations did not produce better results and neither training the ANN uniquely with the first found best parameters.
+
+The controlled parameters of DAEx are described in table \ref{table:parameters}. For a detailed description of these parameters, see \cite{BibGECCO:2010}. The feature-set consists of 12 features. First there are 5 important features: the number of fluents, goals, predicates, objects and types. These were extracted from the domain file or the instance file using the PDDL parser. One further feature we think could even be more important is called mutex-density, which is the number of mutexes divided by the number of all fluent-pairs. We also kept 6 less important features: number of lines, words and byte-count - obtained by the linux command "wc" - of the instance and the domain file. These features were kept only for historical reasons: they were used in the beginning as some "dummy" features.
+
+Since testing was also carried out on the cluster, the termination criterion for testing was also the number of evaluations fixed for each instance.
+
 
 \section{Acknowledgements}
 This work is funded through French ANR project DESCARWIN ANR-09-COSI-002.\\~\\
