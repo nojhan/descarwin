@@ -42,11 +42,9 @@ Divide-and-Evolve (DaE) -- a novel hybridization of Evolutionary Algorithms (EAs
 
 The basic idea of DaE in order to solve a planning task ${\cal P}_D(I,G)$ is to find a sequence of states $S_1, \ldots, S_n$, and to use some embedded planner to solve the series of planning problems ${\cal P}_D(S_{k},S_{k+1})$, for $k \in [0,n]$ (with the convention that $S_0 = I$ and $S_{n+1} = G$). The generation and optimization of the sequence of states $(S_i)_{i \in [1,n]}$ is driven by an evolutionary algorithm. 
 The fitness (quality criterion) of a list of partial states $S_1, \ldots,$ $S_n$ is computed by repeatedly calling the external 'embedded' planner to solve the sequence of problems ${\cal P}_D(S_{k},S_{k+1})$, $\{k=0,\ldots,n\}$. The concatenation of the corresponding plans (possibly with some compression step) is a solution of the initial problem.
-Any existing planner can be used as embedded planner, but since guaranty of optimality at all calls is not mandatory in order for DaE to obtain good quality results \cite{Bibai:ICAPS2010}, a sub-optimal, but fast planner is used: YAHSP \cite{V:icaps04} is a lookahead strategy planning system for sub-optimal planning which uses the  actions in the relaxed plan to compute reachable states in order to speed up the search process. 
+A sub-optimal, but fast planner is used as an embedded planner: YAHSP \cite{V:icaps04} is a lookahead strategy planning system for sub-optimal planning which uses the  actions in the relaxed plan to compute reachable states in order to speed up the search process. 
 
-A state is a list of atoms built over the set of predicates and the set of object instances. However, searching the space of complete states would result in a rapid explosion of the size of the search space. Moreover, goals of planning problem need only be to defined as partial states. It thus seems more practical to search only sequences of partial states, and to limit the choice of possible atoms used within such partial states. However, this raises the issue of the choice of the atoms to be used to represent individuals, among all possible atoms. The result of the previous experiments on different domains of temporal planning tasks from the IPC benchmark series \cite{BibEvoCop2009} demonstrates the need for a very careful choice of the atoms that are used to build the partial states. 
-
-The method used to build the partial states is based on an estimation of the earliest time from which an atom can become true. Such estimation can be obtained by any admissible heuristic function (e.g $h^1,h^2...$ \cite{HaslumGeffner-AIPS-2000}). The possible start times are then used in order to restrict the candidate atoms for each partial state. A partial state is built at a given time by randomly choosing among several atoms that are possibly true at this time. The sequence of states is then built by preserving the estimated chronology between atoms (time consistency).
+A state is a list of atoms built over the set of predicates and the set of object instances. However, searching the space of complete states would result in a rapid explosion of the size of the search space. Moreover, goals of planning problem need only be to defined as partial states. It thus seems more practical to search only sequences of partial states, and to limit the choice of possible atoms used within such partial states. However, this raises the issue of the choice of the atoms to be used to represent individuals, among all possible atoms.
 
 An individual in DaE is hence represented as a variable-length ordered time-consistent list of partial states, and each state is a variable-length list of atoms that are not pairwise mutex, as far as the initial grounding of all atoms  can tell (exactly determining if two atoms are mutex amounts to solving a complete planning problem). Furthermore, all operators that manipulate the representation (see below) maintain the chronology between atoms and the approximate local consistency of a state, i.e. avoid pairwise mutexes.
 
@@ -83,19 +81,15 @@ It seems most reasonable that the stopping criterion of LaO is determined by the
 
 Our choice for supervised learning method was a multilayer Feed-Forward Artificial Neural Network (ANN), but other algorithms may also be used. We can suppose that the relation \begin{math}p_F\end{math} is not very complex, which means that a simple ANN may be used. One mapping shall be trained for one domain. One can also try to train a single domain-independent ANN, but that will be left to the future.
 
-The only open decision is which optimizer to use for parameter tuning. Since we have several instances to run, we can only afford a simple optimizer, therefore simply a Covariance Matrix Adaptation Evolution Strategy was chosen, specifically, a (1+1)-CMA-ES (in short, CMA-ES, see \cite{hansen2001ecj}). We started CMA-ES with a known set of good default parameters, taken from \cite{BibGECCO:2010}.
+Since we have several instances to run, we can only afford a simple optimizer, therefore simply a Covariance Matrix Adaptation Evolution Strategy was chosen, specifically, a (1+1)-CMA-ES (in short, CMA-ES, see \cite{hansen2001ecj}). We started CMA-ES with a known set of good default parameters, taken from \cite{BibGECCO:2010}.
 
 There is one element added to a conventional CMA-ES, and this is gene-transfer between instances. We have one (1+1)-CMA-ES running for each instance, because we can not afford to use a larger population for a single instance. However, the (1+1)-CMA-ES instances of all the instances form a set of individuals. Crossover between individuals is usually not used in ES, however, in our case a good chromosome of one instance may at least help another instance. Thus it may be used as a hint in the optimization. Therefore random gene-transfer was used in our algorithm. When the Genetransferer is requested for a hint for one instance, it returns with uniform random distribution the so-far best parameter of a different instance. Naturally, the default parameters are not tried twice.
 
-There is one additional technical problem with CMA-ES, this is that each parameter is restricted to an interval. This seems reasonable and makes our algorithm more stable. The parameters are actually normalized linearly to the [0,1] interval. For the boundary problem we applied a simple version of the box constraint handling technique described in \cite{hansen2009tec}. Our penalty term was simply \begin{math}||p^{feas}-p|| \end{math}, where \begin{math}p^{feas}\end{math} is the closest value in the box. Moreover, only \begin{math}p^{feas}\end{math} was recorded as a feasible solution to pass to the ANN. Note that the Genetransferer and the ANN itself can not give hints outside of the box. In order to not to compromise too much CMA-ES several iterations of this were carried out for one hint of the ANN and one gene-transfer.
-
 Our realization of our LaO algorithm uses the Shark library (\cite{shark08}) for CMA-ES and the FANN library for ANN (\cite{nissen}). To evaluate each parameter-setting with each instance, we use a computer-cluster with approximately 60 computers, most of them have 4 cores, but some have 8. The cluster is used by many researchers, therefore our algorithm contains a scheduler to use the free capacity on this cluster.
 
-Since the parallel architecture used in our algorithm is somewhat heterogeneous, we can not rely on a fixed running time, which depends on the hardware. Therefore, for each evaluation the number of evaluations is fixed for DaE. Note that the number of YASHP evaluations is approximately proportional with running time, so that the execution time for a particular computer is also determined independently of the parameter-settings. For example, even if the size of the population is increased, with fixed number of evaluation the number of generations will be limited respectively resulting approximatively in the same running time for each parameter-settings. 
+Since the parallel architecture used in our algorithm is somewhat heterogeneous, we can not rely on a fixed running time, which depends on the hardware. Therefore, for each evaluation the number of evaluations is fixed for DaE. Moreover, since DaE is not deterministic, we carried out 11 runs and took the median fitness-value as the result for that instance and that parameter-settings.
 
-Moreover, since DaE is not deterministic, we carried out 11 runs and took the median fitness-value as the result for that instance and that parameter-settings.
-
-\begin{table*}[ht]
+\begin{table}[ht]
 \centering
 \begin{tabular}{l c c c}
 \hline\hline
@@ -103,33 +97,28 @@ Name & Min & Max & Default \\
 \hline
 Probability of crossover & 0.0 & 1 & 0.8 \\
 Probability of mutation & 0.0& 1& 0.2 \\
-Rate of mutation add station& 0& 10& 1 \\
-Rate of mutation delete station& 0& 10& 3 \\
-Rate of mutation add atom& 0& 10& 1 \\
-Rate of mutation delete atom& 0& 10& 1 \\
-Mean average for mutations& 0.0& 1& 0.8 \\
+Rate of mut. add station& 0& 10& 1 \\
+Rate of mut. delete stat.& 0& 10& 3 \\
+Rate of mut. add atom& 0& 10& 1 \\
+Rate of mut. delete atom& 0& 10& 1 \\
+Mean average for mut.& 0.0& 1& 0.8 \\
 Time interval radius& 0& 10& 2 \\
-Maximum number of stations& 5& 50& 20 \\
-Maximum number of nodes& 100& 100 000& 10 000 \\
+Max. number of stations& 5& 50& 20 \\
+Max. number of nodes& 100& 100 000& 10 000 \\
 Population size& 10& 300& 100 \\
-Number of offspring & 100& 2 000& 700 \\
+Number of offsprings & 100& 2 000& 700 \\
 \hline
 \end{tabular}
 \caption{DaE parameters that are controlled by LaO}
 \label{table:parameters}
-\end{table*} 
+\end{table} 
 
 
-5 iterations of CMA-ES were carried out, followed by one ANN and one Genetransferer, and this cycle was iterated in the algorithm. This means that for example for the Grid domain LaO was running for 10 iterations and CMA-ES was called 50 times in total. One has to note that this is not much, but we were restricted by time.
-
-The ANN had 3 fully connected layers, and the hidden layer had the same number of neurons as the input. Learning was done by the conventional back-propagation algorithm, which is the default in FANN. In one iterations of LaO the ANN was only trained once for 50 iterations (called epochs in FANN) without reseting the weights, so that we avoid over-training. The aim of not reseting the weights was that the ANN makes a graded transition from the previous best known parameter-set to the new best known parameter-set, which could help optimization by trying some intermediate values. This means that over the 10 iterations of LaO in the domain Grid 500 iterations (epochs) of the ANN were carried out in total. However, note that the best parameters were trained with much less iterations, depending on the time when they were found. In the worst case, if the best parameter was found in the last iteration of LaO, it was trained for only 50 epochs and not used anymore, only recorded in the logs. This is why retraining is needed in the end.
+5 iterations of CMA-ES were carried out, followed by one ANN and one Genetransferer, and this cycle was iterated in the algorithm. The ANN had 3 fully connected layers, and the hidden layer had the same number of neurons as the input. Learning was done by the conventional back-propagation algorithm, which is the default in FANN. In one iterations of LaO the ANN was only trained once for 50 iterations (called epochs in FANN) without reseting the weights, so that we avoid over-training. The aim of not reseting the weights was that the ANN makes a graded transition from the previous best known parameter-set to the new best known parameter-set, which could help optimization by trying some intermediate values. This is why retraining of the ANN is needed in the end.
 
 Termination criterion in the competition was simply the available time, the algorithm was running for several weeks on our cluster, which is used also for other research, i.e. only a small number of 4 or 8-core processors were available for each domain in average. After stopping LaO, retraining was made with 300 ANN epochs with the best data, because the ANN's saved directly from LaO may be under-trained. The MSE error of the ANN did not decrease using more epochs, which indicates that 300 iterations are enough at least for this amount of data and for this size of the ANN. Tests with 1000 iterations did not produce better results and neither training the ANN uniquely with the first found best parameters.
 
 The controlled parameters of DAEx are described in table \ref{table:parameters}. For a detailed description of these parameters, see \cite{BibGECCO:2010}. The feature-set consists of 12 features. First there are 5 important features: the number of fluents, goals, predicates, objects and types. These were extracted from the domain file or the instance file using the PDDL parser. One further feature we think could even be more important is called mutex-density, which is the number of mutexes divided by the number of all fluent-pairs. We also kept 6 less important features: number of lines, words and byte-count - obtained by the linux command "wc" - of the instance and the domain file. These features were kept only for historical reasons: they were used in the beginning as some "dummy" features.
-
-Since testing was also carried out on the cluster, the termination criterion for testing was also the number of evaluations fixed for each instance.
-
 
 \section{Acknowledgements}
 This work is funded through French ANR project DESCARWIN ANR-09-COSI-002.\\~\\
