@@ -1,5 +1,14 @@
-\documentclass{acm_proc_article-sp}
+\documentclass{MYsig-alternate}
+%  \documentclass{acm_proc_article-sp}
+\usepackage{algorithm}
 \usepackage{url}
+\usepackage[noend]{algorithmic}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{subfig}
+\DeclareCaptionType{copyrightbox}
 
 \def\BibTeX{Bib\TeX}
 \parindent=0pt
@@ -39,7 +48,7 @@ for Evolutionary AI Planning -- $Revision: 4461$}
 \date{February 9, 2011}
 \maketitle
 \begin{abstract}
-\noindent Learn-and-Optimize (LaO) is a generic surrogate-model based method for parameter tuning combining learning and optimization. In this paper LaO is used to tune Divide-and-Evolve (DaE), an Evolutionary Algorithm for AI Planning. The LaO framework makes it possible to learn the relation between some features describing a given instance and the optimal parameters for this instance, thus it enables to extrapolate this relation to unknown instances in the same domain. Moreover, the learned model is used as a surrogate-model to accelerate the search for the optimal parameters. It hence becomes possible to solve intra-domain and extra-domain generalization in a single framework. The proposed implementation of LaO uses an Artificial Neural Network for learning the mapping between features and optimal parameters, and the Covariance Matrix Adaptation Evolution Strategy for optimization. Results demonstrate that LaO is capable of improving the quality of the DaE results even with only a few iterations. The main limitation of the DaE case-study is the limited amount of meaningful features that are available to describe the instances. However, the learned model reaches almost the same performance on the test instances, which means that it is capable of generalization. 
+\noindent Learn-and-Optimize ~(LaO) ~is ~a ~generic ~surrogate ~based method for parameter tuning combining learning and optimization. In this paper LaO is used to tune Divide-and-Evolve (DaE), an Evolutionary Algorithm for AI Planning. The LaO framework makes it possible to learn the relation between some features describing a given instance and the optimal parameters for this instance, thus it enables to extrapolate this relation to unknown instances in the same domain. Moreover, the learned model is used as a surrogate-model to accelerate the search for the optimal parameters. It hence becomes possible to solve intra-domain and extra-domain generalization in a single framework. The proposed implementation of LaO uses an Artificial Neural Network for learning the mapping between features and optimal parameters, and the Covariance Matrix Adaptation Evolution Strategy for optimization. Results demonstrate that LaO is capable of improving the quality of the DaE results even with only a few iterations. The main limitation of the DaE case-study is the limited amount of meaningful features that are available to describe the instances. However, the learned model reaches almost the same performance on the test instances, which means that it is capable of generalization. 
 
 \end{abstract}
 
@@ -148,39 +157,24 @@ Using the ANN and the Genetransferer as external hints in addition to the CMA-ES
 \centering
 \begin{tabular}{l c c c c c c c}
 \hline\hline
-Name & numiter & size of training & size of test &  ANN-error & Q in LAO & Q of ANN on train & Q of ANN on test \\ 
+Domain & \# of & \# training & \# test &  ANN & quality-ratio & quality-ratio & quality-ratio \\ 
+Name & iterations  & instances &  instances &  error & in LaO & ANN on train & ANN on test \\ 
 \hline
 Freecell& 16 & 108 & 230 & 0.1 & 1.09 & 1.05 & 1.04  \\
 Grid & 10 & 55 & 124 & 0.09 & 1.09 & 1.05 & 1.03  \\
 Mprime & 8 & 64 & 152 & 0.08 & 1.11 & 1.05 & 1.04   \\
 \hline
 \end{tabular}
-\caption{Domains: note that only the actually usable training instances are shown. numiter=number of LaO iterations. Size of train specifies the number of train instances. ANN-error is given as MSE, returned by FANN. Q=quality-improvement ratio. "In Lao" means best found parameter-set in LaO.}
+\caption{Results by domains (only the actually usable training instances are shown). ANN-error is given as MSE, as returned by FANN. The quality-improvement ratio in Lao is that of the best parameter-set found by LaO.}
 \label{table:domains}
 \end{table*} 
-
- \begin{table*}[ht]
-\centering
-\begin{tabular}{l c c c c c c}
-\hline\hline
-Name & \ default parameters & \ CMA-ES &  Genetrasnferer & ANN \\ 
-\hline
-Freecell & 0/0.09& 0.64/0.66  & 0.18/0.08  & 0.18/0.17     \\
-Grid & 0.02/0.24 & 0.66/0.6  & 0.16/0.11 & 0.17/0.05  &    \\
-Mprime &  0.02/0.45& 0.59/0.36 & 0.2/0.11  & 0.18/0.08  &    \\
-\hline
-\end{tabular}
-\caption{The share of the different sources of hint (default, CMA-ES, Genetransferer or ANN) to the best parameter-set. Each cell shows ratios. The first number shows the ratio the corresponding source contributed to the best results if tie-breaks are taken into account, i.e. parameters of the same fitness are counted. The second number shows the same ratio, if only the first found best parameter-set is taken into account.}
-\label{table:hints}
-\end{table*} 
-
 
 
 \begin{table*}[ht]
 \centering
 \begin{tabular}{l c c c}
 \hline\hline
-Name & Minimum & Maximum & Default value \\ 
+Name & Min & Max & Default \\ 
 \hline
 Probability of crossover & 0.0 & 1 & 0.8 \\
 Probability of mutation & 0.0& 1& 0.2 \\
@@ -191,12 +185,12 @@ Rate of mutation delete atom& 0& 10& 1 \\
 Mean average for mutations& 0.0& 1& 0.8 \\
 Time interval radius& 0& 10& 2 \\
 Maximum number of stations& 5& 50& 20 \\
-Maximum number of nodes& 100& 100000& 10000 \\
+Maximum number of nodes& 100& 100 000& 10 000 \\
 Population size& 10& 300& 100 \\
-Number of offsprings& 100& 2000& 700 \\
+Number of offspring & 100& 2 000& 700 \\
 \hline
 \end{tabular}
-\caption{Controlled Parameters}
+\caption{DaE parameters that are controlled by LaO}
 \label{table:parameters}
 \end{table*} 
 
@@ -212,7 +206,23 @@ Moreover, since DaE is not deterministic, we carried out 11 runs and took the me
 \section{Results}
 \label{section:results}
 
-In the Planning and Learning Part of IPC2011 (IPC), there were 5 sample domains pre-published, with a corresponding problem-generator for each domain. The 5 domains are Ferry, Freecell, Grid, Mprime, and Sokoban. We excluded Ferry and Sokoban from this paper, since there were not enough number of instances to learn a mapping. For the remaining 4 domains we generated approximately 100 instances for each one, since this seemed to be appropriate for a running time of 2-3 weeks. The description of the track fixes running time as 15 minutes. Since we use number of YASHP evaluations as a terminating criterion 11 runs were carried out for each instance on our own, dedicated server to measure the median of number of evaluations with our default parameters. The median of 11 runs were taken and used as a termination criterion for each instance in the train set on any computer. For many instances we did not have any result in 15 minutes, those we had to drop. The remaining instances were used for training. 
+In the Planning and Learning Part of IPC2011 (IPC), 5 sample domains were pre-published, with a corresponding problem-generator for each domain: Ferry, Freecell, Grid, Mprime, and Sokoban. Ferry and Sokoban were excluded from this study since there were not enough number of instances to learn any mapping. For each of the remaining 3 domains, 100 instances were generated, since this seemed to be appropriate for a running time of approximately 2-3 weeks: The competition track description fixes running time as 15 minutes. Since For each instance, 11 independent trials were run on a dedicated server to measure the median of number of evaluations with our default parameters. The termination criterion was the number of YASHP evaluations. The median of those 11 runs were used as a termination criterion for each instance in the train set on any computer. However, many instances were never solved within 15 minutes, and those instances were dropped from the rest of experiment. The remaining instances were used for training.
+
+
+ \begin{table}[tb!]
+\centering
+\begin{tabular}{l c c c c c c}
+\hline\hline
+Name & \ Default & \ CMA-ES &  Transferer & ANN \\ 
+\hline
+Freecell & ~0 -- ~9& 64 -- 66  & 18 -- ~8  & 18 -- 17     \\
+Grid & ~2 -- 24 & 66 -- ~6  & 16 -- 11 & 17 -- ~5  &    \\
+Mprime &  ~2 -- 45& 59 -- 36 & ~2 -- 11  & 18 -- ~8  &    \\
+\hline
+\end{tabular}
+\caption{For each method (default, CMA-ES, Genetransferer or ANN), the percentage of instances on which this method gave the best parameter set. Each cell shows 2 figures: the first one considers all occurences of a method, no matter if another method also lead to the same parameter set. The second figures only considers the first method (from left to right) that discovered the best parameter-set.}
+\label{table:hints}
+\end{table} 
 
 
 Table \ref{table:domains} shows the data for each domain, as you can see from the approximately 100 instances from each domain we could use all of the training instances (108) only in the domain Freecell. In the other domains we got much less usable instances. The Mean Square Error (MSE) of the retrained ANN is shown for each domain. Note that since there can be multiple optimal parameters for the same instance (fitness-function is discrete), there might be an unavoidable error of the ANN.
