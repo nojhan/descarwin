@@ -1,18 +1,23 @@
-#This script supposes that we are in a root directory where descarwin, eo and cpt is downloaded
+basedirectory=`pwd`
+#cd descarwin/trunk
+#rm -r -f dae
+#svn checkout --username brendel https://scm.gforge.inria.fr/svn/descarwin/trunk/dae
+#rm -r -f cpt
+#svn checkout --username brendel https://scm.gforge.inria.fr/svn/descarwin/trunk/cpt
+#cd cpt
+#mkdir lib
+#cd src
+#make
+#cd $basedirectory
 
-mv eo paradiseo-eo
-cd paradiseo-eo
-cmake -DBUILD_SHARED_LIBS=OFF .
-cmake .
-make
-mkdir build
-cp -r lib build/lib
-cd ..
-cd CPT
-mkdir lib
-cd src
-make
-cd ../..
+#cd eo
+#cmake -DBUILD_SHARED_LIBS=OFF .
+#cmake .
+#make
+#cp -r lib release
+
+#cd $basedirectory
+
 cp install.cmake descarwin/trunk/dae/install.cmake
 cd descarwin/trunk/dae
 cmake -DBUILD_SHARED_LIBS=OFF . 
