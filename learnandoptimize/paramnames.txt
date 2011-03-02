@@ -1,0 +1,14 @@
+pCross 0.0 1 0.8
+pMut 0.0 1 0.2
+mut1Rate 0 10 3
+mut2Rate 0 10 3
+mut3Rate 0 10 3
+mut4Rate 0 10 3
+pMeanAveragePerMutation 0.0 1 0.8
+rayonBoule 0 10 2
+stationMax 5 50 20
+maxb 100 100000 10000
+popSize 10 300 100
+nbOffspring 100 2000 700
+
+

@@ -1,0 +1,1 @@
+less $1 | grep -v adl | grep -v numeric | grep -v cybersec

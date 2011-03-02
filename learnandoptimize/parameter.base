@@ -1,0 +1,83 @@
+
+######                 General    ######
+# --help=0                                 # -h : Prints this message
+# --stopOnUnknownParam=1                   # Stop if unkown param entered
+# --seed=1248250898                        # -S : Random number seed
+
+######    DAE parameters          ######
+# --debug=0                                # -d : Debug mode 
+# --maxSize=2                              # -l : Maximal atoms number per state
+# --maxDist=2                              # -D : Maximal number of predicate per station
+# --distance=2                             # -a : Number atoms per station
+# --avgNbAtChange=1.5                      # Avg number of changes fir each predicates in atInit (>1)
+# --pAddRemovePredicate=0.2                # Probability to change the 'present' state in init and mutation
+--pMeanAveragePerMutation=0.8            # -A : Mean probability to change fluent of the  state in mutation
+# --penalite=1e+60                         # -p : Penality
+--stationMax=20                          # -m : nombre de stations maximum autorisees
+--runTime=999999                         # -t : run duration
+# --nbPred=0                               # -P : nombre de predicat dans variables globales
+--maxb=10000                              # nombre maximum de backtracks autorises
+# --atMutRatePerGoal=0.1                   # Mutation Rate per Patial Goal
+# --liste=/                                # liste des predicats
+# --precision=1e-05                        # -v : Validator precision
+--heuristique=1                          # -h : heuristique de l'evaluation des dates des atomes
+# --seuil=90                               # -s : seuil d'acceptation d'un atome
+# --planner=yahsp                          # plannificateur embarque: cpt ou yahsp
+ --rayonBoule=2                           # -r : rayon de la boule pour l'ajout d'un atome dans un etat
+# --seq=0                                  # -x : sequentiel=1/autre=0(valeur par defaut)
+# --InitBksSet=med                         # Nombre de backtracks autorise apres l'initialisation: max/min/med/none
+
+######    Evolution Engine        ######
+--popSize=100                            # -P : Population Size
+--selection=DetTour(5)                   # -S : Selection: DetTour(T), StochTour(t), Roulette, Ranking(p,e) or Sequential(ordered/unordered)
+--nbOffspring=700%                       # -O : Nb of offspring (percentage or absolute)
+# --replacement=Comma                      # -R : Replacement: Comma, Plus or EPTour(T), SSGAWorst, SSGADet(T), SSGAStoch(t)
+--weakElitism=1                          # -w : Old best parent replaces new worst offspring *if necessary*
+
+######    Input                   ######
+--f=p001.pddl.bz2                        # -f : name of objects file
+--o=domain.pddl.bz2                      # -o : name of domain file 
+
+######    My application          ######
+# --coutCPTEO_V1Stat=0                     # Prints my stat to screen, one line per generation
+# --fileCPTEO_V1Stat=0                     # Saves my stat to file (in resDir
+# --plotCPTEO_V1Stat=0                     # On-line plots my stat using gnuplot
+
+######    Output                  ######
+# --fileResult=result                      # -r : name of output file
+# --useEval=1                              # Use nb of eval. as counter (vs nb of gen.)
+# --useTime=1                              # Display time (s) every generation
+--printBestStat=1                        # Print Best/avg/stdev every gen.
+# --printPop=0                             # Print sorted pop. every gen.
+
+######    Output - Disk           ######
+# --resDir=Res                             # Directory to store DISK outputs
+# --eraseDir=1                             # erase files in dirName if any
+ --fileBestStat=1                         # Output bes/avg/std to file
+
+######    Output - Graphical      ######
+# --plotBestStat=0                         # Plot Best/avg Stat
+# --plotHisto=0                            # Plot histogram of fitnesses
+
+######    Persistence             ######
+# --Load=                                  # -L : A save file to restart from
+# --recomputeFitness=0                     # -r : Recompute the fitness after re-loading the pop.?
+--saveFrequency=1                        # Save every F generation (0 = only final state, absent = never)
+# --saveTimeInterval=0                     # Save every T seconds (0 or absent = never)
+# --status=./boule.status                  # Status file
+
+######    Stopping criterion      ######
+--maxGen=0                            # -G : Maximum number of generations () = none)
+--steadyGen=50                           # -s : Number of generations with no improvement
+--minGen=0                              # -g : Minimum number of generations
+# --maxEval=0                              # -E : Maximum number of evaluations (0 = none)
+# --targetFitness=0                        # -T : Stop when fitness reaches
+# --CtrlC=0                                # -C : Terminate current generation upon Ctrl C
+
+######    Variation Operators     ######
+--mut1Rate=1                             # -1 : Relative rate for atoms modification mutation 1
+--mut2Rate=3                             # -2 : Relative rate for add station mutation
+--mut3Rate=1                             # -2 : Relative rate for del station mutation
+--mut4Rate=1                             # -2 : Relative rate for del atoms mutation
+--pCross=0.2                             # -C : Probability of Crossover
+--pMut=0.8                               # -M : Probability of Mutation
