@@ -1,0 +1,1 @@
+kill `ps -ef | grep DAEx | grep -v grep | awk '{print $2}'`

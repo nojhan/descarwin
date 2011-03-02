@@ -1,0 +1,1 @@
+daex_revac.sh "/users/tao/brendel/Desktop/domains/ipc6_2008/tempo-sat/openstacks-strips" 2 3 200 3 5

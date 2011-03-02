@@ -1,0 +1,2 @@
+p = pathdef;
+path(p);

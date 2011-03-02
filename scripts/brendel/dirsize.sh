@@ -1,0 +1,1 @@
+du -ch | grep total
