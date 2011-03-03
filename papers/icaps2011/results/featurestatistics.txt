@@ -1,0 +1,21 @@
+
+
+
+ \begin{table*}[ht]
+\centering
+\begin{tabular}{l c c c c }
+\hline\hline
+Domain &\# goals & \# fluents  & \# objects  & mutexdensity &  \\ 
+\hline
+Freecell & 2 & [28,34] 31.17, 1.68  & [32, 38] 35.17, 1.68  & [0.14, 0,17] 0.15, 0.005     \\
+Grid & [7,9] 8, 1  & [58,59] 74.07, 9.38 & [56,90] 72.07, 9.38  & [0.08, 0.1] 0.09, 0.009     \\
+Mprime & [8,9] 9, 1 & [32,40] 36, 2.09  & [42,52] 47, 2.009 & [0.03 0.03] 0.03, 0 &    \\
+IPC6 all& [1,110] 23.32, 19.2 & [4,217] 30.6, 25.5  & [7,301] 45.2, 35.16  & [0,0.48] 0.1, 0.07 &    \\
+
+
+\hline
+\end{tabular}
+\label{table:domains}
+\caption{Statistics of some features per domains in the train-set [min,max] average standard deviation}
+\end{table*} 
+
