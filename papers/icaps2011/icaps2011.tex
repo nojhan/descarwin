@@ -233,8 +233,21 @@ IPC6 all& [1,110] 23.32, 19.2 & [4,217] 30.6, 25.5  & [7,301] 45.2, 35.16  & [0,
 
 \begin{figure}[h!]
   \centering
+    \includegraphics[width=0.5\textwidth]{results/freecell_train_objects_mutex-density.png}
+  \caption{Distribution of the features "number of objects" and "mutex-density" in train-set in domain Freecell.}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+    \includegraphics[width=0.5\textwidth]{results/freecell_lao_objects_mutrate.png}
+  \caption{Relation of the feature "number of objects" and the parameter "mutation rate" in LaO, in the train-set in domain Freecell. Values of "mutatiom rate" are the optimal values found by LaO. This looks bad, but not unexpected. We can explain this. It is however questionable to show it.}
+\end{figure}
+
+
+\begin{figure}[h!]
+  \centering
     \includegraphics[width=0.5\textwidth]{results/freecell_test_objects_mutrate.png}
-  \caption{Relation of the feature "numbre of objects" and the parameter "mutation rate" as learned by the ANN, during evaluation on the test-set.}
+  \caption{Relation of the feature "number of objects" and the parameter "mutation rate" as learned by the ANN, during evaluation on the test-set in domain Freecell.}
 \end{figure}
 
 
