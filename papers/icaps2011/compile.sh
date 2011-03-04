@@ -1,8 +1,8 @@
 rm  icaps2011.pdf
 
-pdflatex  icaps2011
+#pdflatex  icaps2011
 bibtex  icaps2011
-bibtex  icaps2011r
+#bibtex  icaps2011r
 
 
 pdflatex  icaps2011
