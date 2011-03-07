@@ -4,6 +4,7 @@
 #include <functional>   // for less
 #include <string>
 #include "utils/pddl_load.h" 
+#include <utils/eoParserLogger.h> 
 #include "src_cpt/dae.h" 
 
 
@@ -293,18 +294,21 @@ cout<<" mutexlastquartile "<<thirdquartile;
 int main ( int argc, char* argv[] )
 {
 
+eoParserLogger parser(argc, argv);
+
+//make_verbose(parser);
+
+
+std::string domain = parser.createParam( (std::string)"p01-domain.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
+std::string instance = parser.createParam( (std::string)"p01.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
+
+bool sequential = parser.createParam( true, "sequential", "Is instance sequential", 'S', "Problem", true ).value();
+
+cout<<"sequential "<<sequential<<endl;
+
 pddlLoad* pddload;
 
-if (argc>2)
-	if (argv[3]>0) 
-		{
-		cout<<"sequential"<<endl;
-		pddload=new pddlLoad( argv[1],argv[2],  SOLVER_YAHSP,  HEURISTIC_H1, true);
-		}
-	else
-		pddload= new pddlLoad(argv[1],argv[2]);
-else
-	pddload=new pddlLoad(argv[1],argv[2]);
+pddload=new pddlLoad( domain,instance,  SOLVER_YAHSP,  HEURISTIC_H1, sequential);
 
 //pddload->compute_chrono_partition();
 
