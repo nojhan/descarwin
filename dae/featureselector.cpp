@@ -1,19 +1,16 @@
-#include <iostream>
+	#include <iostream>
 #include <set>
 #include <algorithm>    // for set_intersection, set_union
 #include <functional>   // for less
 #include <string>
-
-#include "pddl_load.h"
-#include "../../src_cpt/dae.h" 
+#include "utils/pddl_load.h" 
+#include "src_cpt/dae.h" 
 
 
 
 
 using namespace daex;
 using namespace std;
-
-
 
 
 
