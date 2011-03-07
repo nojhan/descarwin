@@ -184,7 +184,7 @@ int main ( int argc, char* argv[] )
             "Size of the deterministic tournament for the selection", 't', "Selection" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "toursize" << toursize << std::endl;
 
-    double offsprings = parser.createParam( (double)700, "offsprings", 
+    double offsprings = parser.createParam( (double)pop_size*7, "offsprings", 
             "Number of offsprings to produces", 'f', "Selection" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "offsprings" << offsprings << std::endl;
 
