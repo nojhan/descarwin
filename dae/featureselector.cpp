@@ -285,6 +285,9 @@ cout<<" mutexlastquartile "<<thirdquartile;
 
 
 
+
+
+
 }
 
 
@@ -296,30 +299,18 @@ int main ( int argc, char* argv[] )
 
 eoParserLogger parser(argc, argv);
 
-//make_verbose(parser);
-
-
 std::string domain = parser.createParam( (std::string)"p01-domain.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
 std::string instance = parser.createParam( (std::string)"p01.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
 
-bool sequential = parser.createParam( true, "sequential", "Is instance sequential", 'S', "Problem", true ).value();
-
-cout<<"sequential "<<sequential<<endl;
 
 pddlLoad* pddload;
 
-pddload=new pddlLoad( domain,instance,  SOLVER_YAHSP,  HEURISTIC_H1, sequential);
+pddload=new pddlLoad( domain,instance,  SOLVER_YAHSP,  HEURISTIC_H1);
 
-//pddload->compute_chrono_partition();
-
-string path(argv[2]);
-
-//cout<<"path"<<path;
-
-string directory=path.substr(0, path.find_last_of( "/" )+1);
 
 cout<<"features ";
-cout<< directory;
+
+
 
 
 CPTPredicateArray predicatearray;
@@ -347,8 +338,32 @@ extractsomefeatures();
 
 cout<<endl;
 
+const ChronoPartition & chronopartition=pddload->chronoPartitionAtom();
+
+vector<unsigned int> chronopartitionhistogram(chronopartition.size(),0); 
+
+std::map<TimeVal, std::vector< daex::Atom*> >::const_iterator it=chronopartition.begin();
 
 
-    return 0;
+for (unsigned int i=0;it!=chronopartition.end();++it,++i)
+{
+chronopartitionhistogram[i]=(*it).second.size();
+//cout<<chronopartitionhistogram[i]<<" ";
+}
+
+double mean, median, minrange, maxrange, firstquartile, thirdquartile;
+
+histogramfeatures(chronopartitionhistogram, mean, median, firstquartile, thirdquartile, minrange, maxrange);
+
+
+cout<<" chronomedianpermean "<<double(median)/mean;
+cout<<" chronominrange "<<minrange;
+cout<<" chronomaxrange "<<maxrange;
+cout<<" chronofirstquartile "<<firstquartile;
+cout<<" chronolastquartile "<<thirdquartile;
+
+
+
+return 0;
 }
 
