@@ -13,9 +13,27 @@ logger = logging.getLogger("GECCO2011")
 SAMPLES = [("IPC6_SEQ_ELEVATORS_12",
             "/tools/pddl/ipc/ipc2008/seq-sat/elevators-strips/p12-domain.pddl",
             "/tools/pddl/ipc/ipc2008/seq-sat/elevators-strips/p12.pddl"),
+
            ("IPC6_TEMPO_OPENSTACKS_17",
             "/tools/pddl/ipc/ipc2008/tempo-sat/openstacks-strips/p17-domain.pddl",
-            "/tools/pddl/ipc/ipc2008/tempo-sat/openstacks-strips/p17.pddl")]
+            "/tools/pddl/ipc/ipc2008/tempo-sat/openstacks-strips/p17.pddl"),
+
+           ("IPC3_STRIPS_DEPOTS_13",
+            "/tools/pddl/ipc/IPC3/Tests1/Depots/Strips/Depots.pddl",
+            "/tools/pddl/ipc/IPC3/Tests1/Depots/Strips/pfile13"),
+
+           ("IPC3_STRIPS_DRIVERLOG_11",
+            "/tools/pddl/ipc/IPC3/Tests1/DriverLog/Strips/driverlog.pddl",
+            "/tools/pddl/ipc/IPC3/Tests1/DriverLog/Strips/pfile11"),
+
+           ("IPC6_COST_SCANALYSER_22",
+            "/tools/pddl/ipc/ipc2008/seq-sat/scanalyzer-strips/p22-domain.pddl",
+            "/tools/pddl/ipc/ipc2008/seq-sat/scanalyzer-strips/p22.pddl"),
+
+           ("IPC6_TEMPO_PARCPRINTER_11",
+            "/tools/pddl/ipc/ipc2008/tempo-sat/parcprinter-strips/p11-domain.pddl",
+            "/tools/pddl/ipc/ipc2008/tempo-sat/parcprinter-strips/p11.pddl"),
+           ]
 
 ### MAIN SETTINGS ENDS ###
 
@@ -25,10 +43,11 @@ PATTERN_PLAN_FILENAME = "%(RESDIR)s/%(NAME)s_%(FIELD)s.soln.%(NUM)s"
 
 PATTERN_CMD = \
     "/usr/bin/time -v -o %(TIME_FILENAME)s "\
-    "./dae "\
+    "timelimit -t 1800 "\
+    "./%(COMMAND)s "\
     "--domain=%(DOMAIN)s "\
     "--instance=%(INSTANCE)s "\
-    "--plan-file= %(PLAN_FILENAME)s "\
+    "--plan-file=%(PLAN_FILENAME)s "\
     "--runs-max=%(RUNMAX)s "\
     "--popSize=%(POPSIZE)s "\
     "--offsprings=%(OFFSPRINGS)s "\
@@ -123,28 +142,31 @@ def do_pop(resdir, timedir):
     EXPS on IPC6_SEQ_ELEVATORS_12 & IPC6_TEMPO_OPENSTACKS_17
     nthreads=48 & steadyState=50
     1) runmax=1 & maxseconds=0
-    2) RESTART case: runmax=0 & maxseconds=1799
+    2) RESTART case: runmax=0 & maxseconds=0
     foreach popSize: 1, 24, 48, 72, 96
     repeat 11 times
     """
 
     if not options.sizes: return
 
-    for field, runmax, maxseconds in [
-        ("POP", 1, 0),
-        #("RESTART_POP", 0, 1799)
+    for field, runmax, maxseconds, command in [
+        #("POP", 1, 0),
+        ("RESTART_POP", 0, 0, "dae"),
+        ("RESTART_POP_SHARED_MEMOIZATION", 0, 0, "dae_shared_memoization")
         ]:
         for name, domain, instance in SAMPLES:
             local_logger = logging.getLogger("GECCO2011.POP.%s" % name)
             plotdata = []
             for num in range(1, options.nruns+1):
                 subdata = []
-                for popsize in [1, 24, 48, 72, 96]:
+                #for popsize in [1, 24, 48, 72, 96]:
+                for popsize in [48, 96, 1152, 2304, 3456, 4608]:
                     field_name = "%s_%s_%d" % (field, "DYNAMIC" if options.dynamic else "STATIC", popsize)
                     time_filename = PATTERN_TIME_FILENAME % {"TIMEDIR": timedir, "NAME": name, "FIELD": field_name, "NUM": num}
                     res_filename = PATTERN_RES_FILENAME % {"RESDIR": resdir, "NAME": name, "FIELD": field_name, "NUM": num}
                     plan_filename = PATTERN_PLAN_FILENAME % {"RESDIR": resdir, "NAME": name, "FIELD": field_name, "NUM": num}
-                    cmd = PATTERN_CMD % {"DOMAIN": domain,
+                    cmd = PATTERN_CMD % {"COMMAND": command,
+                                         "DOMAIN": domain,
                                          "INSTANCE": instance,
                                          "LOOP": 1,
                                          "DYNAMIC": 1 if options.dynamic else 0,
