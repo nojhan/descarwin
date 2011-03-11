@@ -36,7 +36,7 @@
 % \setcounter{secnumdepth}{0}
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{Divide-and-Evolve: the marriage of Descartes and Darwin\thanks{This work is being partially funded by Agence Nationale de la Recherche under research contract ANR-09-COSI-002-01}}
+\title{Divide-and-Evolve: the Marriage of Descartes and Darwin}
 % Please leave SVN version number $Revision: 1131 $
 
 %\author{Blind submission \#14}
@@ -85,14 +85,14 @@ intermediate solutions. The overall optimization process is controlled by
 an evolutionary algorithm.
 
 The decomposition principle of \DAEX\ is very general and could be applied to any type of planning tasks.
-The scope of the planner is of course the one of the embbeded planner $X$. 
+The scope of the planner is of course the one of the embedded planner $X$. 
 The release that has been submitted to the competition is \DAEYAHSP, the instantiation of \DAEX\ with the
 heuristic forward search \YAHSP\ planner \cite{yahsp:icaps2004,yahsp:ipc:2011}.
 The target is thus temporal satificing planning with conservative semantics, cost planning and classical STRIPS planning.
 The marriage of \DAE\ and \YAHSP\ matches a clean role separation:
 \YAHSP\ gets a few tries to find a solution quickly whereas \DAE\ controls the optimization process.
 In the current release we have introduced an initial estimation processing of the maximum number of tries allowed to YAHSP for all individual evaluations.
-This parameter is crucial for the time consumption of the algoritm.
+This parameter is crucial for the time consumption of the algorithm.
 
 \section{The Evolutionary Engine}
 
@@ -123,7 +123,7 @@ The selection is a comparison-based deterministic tournament of size 5.
 For the sequential release, Darwinian-related parameters of \DAEX\ have been
 fixed after some early experiments \cite{dae:evocop2006} whereas parameters
 related to the variation operators have been tuned using the Racing method
-\cite{dae:gecco2010}. It should be noted that, due to the conditions of the competition, the parameter setting is global to all domains. In \cite{dae:gecco2010} we showed that a specific tuning for an instance provides better results and that what we would do for a real-life planning task.
+\cite{dae:gecco2010}. It should be noted that, due to the conditions of the competition, the parameter setting is global to all domains. In \cite{dae:gecco2010} we showed that a specific tuning for an instance provides better results as expected and that what we would do for a real-life planning task.
 
 We added two novelties to the version described in
 \cite{dae:icaps2010}. One important parameter is the maximum number of expanded
@@ -152,7 +152,7 @@ Objects framework\footnote{\url{http://eodev.sf.net}} which provides an abstract
 control structure to develop any kind of evolutionary algorithm in C++.
 \YAHSP\ is written in the C language.
 
-In order to speed up the search, a memoing mechanism has been introduced in \YAHSP\ and carefully controled to leave memory space for \DAE.
+In order to speed up the search, a memoing mechanism has been introduced in \YAHSP\ and carefully controlled to leave memory space for \DAE.
 
 
 
@@ -169,9 +169,11 @@ In order to speed up the search, a memoing mechanism has been introduced in \YAH
 % Echec à la dernière station
 %return _fitness_penalty * ((double)_l_max -(double)decompo.get_number_useful_goals() + 1.0); }
 
-
-
 \section{Conclusion}
+
+\section{Acknowledgments}
+This work is being partially funded by the French National Research Agency (ANR) through the COSINUS programme, under the research contract DESCARWIN (ANR-09-COSI-002-01).
+
 
 \bibliographystyle{aaai}
 \bibliography{dae_mt}
