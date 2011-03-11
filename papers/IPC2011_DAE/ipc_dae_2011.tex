@@ -109,11 +109,13 @@ and a gradient towards optimality for feasible individuals. Feasible individuals
 are always preferred to unfeasible ones. Population initialization as well as
 variation operators are driven by the critical path $h^1$ heuristic
 \cite{h1:aips2000} in order to discard inconsistent state orderings, and atom
-mutual exclusivity inference in order to discard inconsistent states. Beside a
-standard one-point crossover for variable length representations, four mutations
-have been defined: addition (resp. removal) of a goal in a sequence, addition
-(resp. removal) of an atom in a goal. The selection is a comparison-based
-deterministic tournament of size 5.
+mutual exclusivity inference in order to discard inconsistent states. These two computations are done by YAHSP in an initial phase.
+
+Beside a standard one-point crossover for variable length representations, four mutations
+have been defined: addition (resp. removal) of a goal in a sequence, addition (resp. removal) of an atom in a goal. 
+Variation operators relax the strictly $h^1$ ordering of atoms within individuals, since it is only a heuristic estimate.
+
+The selection is a comparison-based deterministic tournament of size 5.
 
 % Parameter tuning
 For the sequential release, Darwinian-related parameters of \DAEX\ have been
@@ -141,6 +143,13 @@ The fitness used for the competition differs from the one described in \cite{dae
 The fitness for bad individuals has been simplified by withdrawing the Hamming distance to the goal.
 The new fitness depends only on the ``decomposition distance'': the number of intermediate goals reached and more specifically the one that are ``useful''.
 A useful intermediate goal is a goal that require a non-empty plan to be reached.
+
+
+% Implementation
+\section{Implementation}
+
+
+
 
 
 
