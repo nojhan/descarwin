@@ -7,6 +7,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{url}
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % PDFMARK for TeX and GhostScript
 % Uncomment and complete the following for metadata if
@@ -48,6 +49,7 @@
 %\newcommand{\spread}{\linespread{0.8}}
 \newcommand{\spread}{\linespread{1.0}}
 \newcommand{\dae}{{\em Divide-and-Evolve}}
+\newcommand{\DAE}{{\sc DaE}}
 \newcommand{\DAEX}{{\sc DaE$_{\text{X}}$}}
 \newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
 \newcommand{\YAHSP}{{\sc YAHSP}}
@@ -61,8 +63,8 @@ The basic principle is to carry out a {\em Divide-and-Conquer} strategy driven b
 The key components of \DAEX\ are a state-based decomposition principle, an evolutionary algorithm to drive the optimization process, and an embedded planner $X$ to solve the sub-problems.
 The release that has been submitted to the competition is \DAEYAHSP, the instantiation of \DAEX\ with the
 heuristic forward search \YAHSP\ planner.
-The marriage of {\sc DaE} and \YAHSP\ matches a clean role separation:
-\YAHSP\ gets a few tries to find a solution quickly whereas {\sc DaE} controls the optimization process.
+The marriage of \DAE\ and \YAHSP\ matches a clean role separation:
+\YAHSP\ gets a few tries to find a solution quickly whereas \DAE\ controls the optimization process.
 \end{abstract}
 
 
@@ -87,8 +89,8 @@ The scope of the planner is of course the one of the embbeded planner $X$.
 The release that has been submitted to the competition is \DAEYAHSP, the instantiation of \DAEX\ with the
 heuristic forward search \YAHSP\ planner \cite{yahsp:icaps2004,yahsp:ipc:2011}.
 The target is thus temporal satificing planning with conservative semantics, cost planning and classical STRIPS planning.
-The marriage of {\sc DaE} and \YAHSP\ matches a clean role separation:
-\YAHSP\ gets a few tries to find a solution quickly whereas {\sc DaE} controls the optimization process.
+The marriage of \DAE\ and \YAHSP\ matches a clean role separation:
+\YAHSP\ gets a few tries to find a solution quickly whereas \DAE\ controls the optimization process.
 In the current release we have introduced an initial estimation processing of the maximum number of tries allowed to YAHSP for all individual evaluations.
 This parameter is crucial for the time consumption of the algoritm.
 
@@ -147,8 +149,12 @@ A useful intermediate goal is a goal that require a non-empty plan to be reached
 
 % Implementation
 \section{Implementation}
+The implementation of \DAEX\ has been made with the STL-based Evolving
+Objects framework\footnote{\url{http://eodev.sf.net}} which provides an abstract
+control structure to develop any kind of evolutionary algorithm in C++.
+\YAHSP\ is written in the C language.
 
-
+In order to speed up the search, a memoing mechanism has been introduced in \YAHSP\ and carefully controled to leave space for \DAE.
 
 
 
