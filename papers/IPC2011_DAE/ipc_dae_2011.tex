@@ -123,9 +123,7 @@ The selection is a comparison-based deterministic tournament of size 5.
 For the sequential release, Darwinian-related parameters of \DAEX\ have been
 fixed after some early experiments \cite{dae:evocop2006} whereas parameters
 related to the variation operators have been tuned using the Racing method
-\cite{dae:gecco2010}.
-
-
+\cite{dae:gecco2010}. It should be noted that, due to the conditions of the competition, the parameter setting is global to all domains. In \cite{dae:gecco2010} we showed that a specific tuning for an instance provides better results and that what we would do for a real-life planning task.
 
 We added two novelties to the version described in
 \cite{dae:icaps2010}. One important parameter is the maximum number of expanded
@@ -154,7 +152,7 @@ Objects framework\footnote{\url{http://eodev.sf.net}} which provides an abstract
 control structure to develop any kind of evolutionary algorithm in C++.
 \YAHSP\ is written in the C language.
 
-In order to speed up the search, a memoing mechanism has been introduced in \YAHSP\ and carefully controled to leave space for \DAE.
+In order to speed up the search, a memoing mechanism has been introduced in \YAHSP\ and carefully controled to leave memory space for \DAE.
 
 
 
