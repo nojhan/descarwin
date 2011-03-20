@@ -98,7 +98,7 @@ This parameter is crucial for the time consumption of the algorithm.
 
 \begin{figure}[h]
 \hskip -1cm
-\includegraphics[width=0.6\textwidth]{DAE.pdf}
+%\includegraphics[width=0.6\textwidth]{DAE.pdf}
 %\includegraphics[width=10cm]{DAE.pdf}
 \vskip -0.5cm
 \caption{The standard evolutionary loop}
@@ -152,9 +152,36 @@ Objects framework\footnote{\url{http://eodev.sf.net}} which provides an abstract
 control structure to develop any kind of evolutionary algorithm in C++.
 \YAHSP\ is written in the C language.
 
-In order to speed up the search, a memoing mechanism has been introduced in \YAHSP\ and carefully controlled to leave memory space for \DAE.
+In  order to  speed up  search, a  memozation mechanism  has been  introduced in
+\YAHSP\ and carefully controlled to leave memory space for \DAE. Indeed, most of
+the time during a run of \YAHSP, and as a consequence during a run of \DAEYAHSP,
+is spent  in computing the $h^{add}$  heuristic for each  encountered state (see
+\cite{yahsp:ipc:2011} for more  details about the algorithms of  the new version
+of the  \YAHSP\ planner).  During  a single run  of YAHSP, duplicate  states are
+discarded;  but during  a run  of \DAEYAHSP,  the same  state can  be encoutered
+multiple times.  We therefore keep track  of the $h^{add}$ costs of all atoms in
+the problem for each state, in order to avoid recomputing these values each time
+a  duplicate state  is reached.   This generally  leads to  a  speedup comprised
+between 2  and 4. When  \DAEYAHSP\ runs out  of memory, which  obviously happens
+much  faster with  the memoization  strategy, all  stored states  and associated
+costs   are  flushed.   More  sophisticated   strategies  may   be  implemented,
+e.g. flushing the oldest or less often encountered states; but we found that the
+simplest solution  of completely freeing the memoized  information was efficient
+enough.
 
-
+Several  biases have  been introduced  in \YAHSP,  in order  to  help \DAEYAHSP\
+finding better  solutions. The main  one is that  actions of lower  duration are
+preferred to  break ties  between several actions  of same $h^{add}$  cost, when
+computing relaxed plans and performing the relaxed plan repair strategy. Another
+bias is  that the  cost incrementation made  during $h^{add}$, which  is usually
+equal to 1 for each applied action,  is made equal to either the duration or the
+cost of the action. Although these biases do not change a lot the quality of the
+plans  produced by  \YAHSP\ alone,  we found  that they  are of  better  help to
+\DAEYAHSP. However, introducing such biases is not very satisfactorily; it would
+be  better to  exactly use  the version  described in  \cite{yahsp:ipc:2011}. We
+still  have to better  investigate the  relationships between  the evolutionnary
+engine and the  embedded planner, in order to determine how  to manage such kind
+of biases and other tie-breaking strategies.
 
 
 
