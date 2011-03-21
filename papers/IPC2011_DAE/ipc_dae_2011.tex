@@ -96,14 +96,6 @@ This parameter is crucial for the time consumption of the algorithm.
 
 \section{The Evolutionary Engine}
 
-\begin{figure}[h]
-\hskip -1cm
-%\includegraphics[width=0.6\textwidth]{DAE.pdf}
-%\includegraphics[width=10cm]{DAE.pdf}
-\vskip -0.5cm
-\caption{The standard evolutionary loop}
-\label{fig:daeloop1}
-\end{figure}
 
 Figure \ref{fig:daeloop1} depicts the standard evolutionary loop which mimics a biological evolution.
 The fitness implements a gradient towards feasibility for unfeasible individuals
@@ -112,6 +104,15 @@ are always preferred to unfeasible ones. Population initialization as well as
 variation operators are driven by the critical path $h^1$ heuristic
 \cite{h1:aips2000} in order to discard inconsistent state orderings, and atom
 mutual exclusivity inference in order to discard inconsistent states. These two computations are done by YAHSP in an initial phase.
+
+\begin{figure}[h]
+\hskip -1cm
+\includegraphics[width=0.6\textwidth]{DAE.pdf}
+%\includegraphics[width=10cm]{DAE.pdf}
+\vskip -0.5cm
+\caption{The standard evolutionary loop}
+\label{fig:daeloop1}
+\end{figure}
 
 Beside a standard one-point crossover for variable length representations, four mutations
 have been defined: addition (resp. removal) of a goal in a sequence, addition (resp. removal) of an atom in a goal. 
@@ -196,7 +197,7 @@ of biases and other tie-breaking strategies.
 % Echec à la dernière station
 %return _fitness_penalty * ((double)_l_max -(double)decompo.get_number_useful_goals() + 1.0); }
 
-\section{Conclusion}
+%\section{Conclusion}
 
 \section{Acknowledgments}
 This work is being partially funded by the French National Research Agency (ANR) through the COSINUS programme, under the research contract DESCARWIN (ANR-09-COSI-002).
