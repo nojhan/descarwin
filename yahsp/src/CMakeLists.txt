@@ -1,0 +1,62 @@
+SET(SOURCES
+  pddl.cpp
+  instantiation.cpp
+  var.cpp
+  options.cpp
+  max_atom.cpp
+  problem.cpp
+  plan.cpp
+  preprocess.cpp
+  propagations.cpp
+  resources.cpp
+  scheduling.cpp
+  heuristics.cpp
+  branching.cpp
+  trace_planner.cpp
+  dae.cpp
+  solve.cpp
+  )
+
+SET(YSOURCES yahsp-seq.cpp)
+SET(MTYSOURCES yahsp-mt.cpp)
+
+FIND_PACKAGE(BISON REQUIRED)
+FIND_PACKAGE(FLEX REQUIRED)
+
+BISON_TARGET(MyParser parser.y ${CMAKE_CURRENT_BINARY_DIR}/parser.tab.cpp)
+FLEX_TARGET(MyScanner parser.lex ${CMAKE_CURRENT_BINARY_DIR}/parser.yy.cpp)
+ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
+
+ADD_LIBRARY(${PROJECT_NAME}-common STATIC ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS} ${SOURCES})
+ADD_LIBRARY(${PROJECT_NAME} STATIC ${YSOURCES})
+ADD_LIBRARY(${PROJECT_NAME}-sm STATIC ${YSOURCES})
+ADD_LIBRARY(${PROJECT_NAME}-mt STATIC ${MTYSOURCES})
+ADD_LIBRARY(${PROJECT_NAME}-mt-sm STATIC ${MTYSOURCES})
+ADD_LIBRARY(${PROJECT_NAME}-dae STATIC ${YSOURCES})
+# ADD_LIBRARY(${PROJECT_NAME}-wct STATIC ${BISON_MyParser_OUTPUTS} ${FLEX_MyScanner_OUTPUTS} ${SOURCES} ${YSOURCES})
+
+SET_TARGET_PROPERTIES(
+  ${PROJECT_NAME}-common
+  ${PROJECT_NAME}
+  ${PROJECT_NAME}-mt
+  ${PROJECT_NAME}-dae
+  PROPERTIES
+  COMPILE_FLAGS "${OpenMP_C_FLAGS}"
+  )
+
+SET_TARGET_PROPERTIES(
+  ${PROJECT_NAME}-sm
+  ${PROJECT_NAME}-mt-sm
+  PROPERTIES
+  COMPILE_FLAGS "${OpenMP_C_FLAGS} -DDAE -DSHARED_MEMOIZATION"
+  )
+
+SET_TARGET_PROPERTIES(
+  ${PROJECT_NAME}-dae
+  PROPERTIES COMPILE_FLAGS "${OpenMP_C_FLAGS} -DDAE"
+  )
+
+# SET_TARGET_PROPERTIES(
+#   ${PROJECT_NAME}-wct
+#   PROPERTIES COMPILE_FLAGS "${OpenMP_C_FLAGS} -DWALLCLOCK_TIME"
+#   )
