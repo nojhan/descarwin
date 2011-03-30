@@ -184,7 +184,7 @@ int main ( int argc, char* argv[] )
             "Size of the deterministic tournament for the selection", 't', "Selection" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "toursize" << toursize << std::endl;
 
-    double offsprings = parser.createParam( (double)pop_size*7, "offsprings", 
+    unsigned int offsprings = parser.createParam( (unsigned int)pop_size*7, "offsprings", 
             "Number of offsprings to produces", 'f', "Selection" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "offsprings" << offsprings << std::endl;
 
@@ -373,7 +373,6 @@ int main ( int argc, char* argv[] )
 
     // randomly generate the population with the init operator
     eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
-
 
     /************************************
      * Incremental strategy to fix bmax 
@@ -743,7 +742,7 @@ int main ( int argc, char* argv[] )
     eoSGAGenOp<daex::Decomposition> variator( crossover, proba_cross, mutator, proba_mut);
 
     // selector, variator, rate (for selection), interpret_as_rate
-    eoGeneralBreeder<daex::Decomposition> breed( *p_selectone, variator, offsprings, false ); 
+    eoGeneralBreeder<daex::Decomposition> breed( *p_selectone, variator, (double)offsprings, false );
     // FIXME tester si on veut 700% ou 700
 
 
@@ -785,7 +784,7 @@ int main ( int argc, char* argv[] )
       }
 
     // ALGORITHM
-    eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, (*pt_replace) );
+    eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, (*pt_replace), offsprings );
 
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
