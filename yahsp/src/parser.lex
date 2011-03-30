@@ -6,12 +6,12 @@
  * Copyright (C) 2005, 2006  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
-%option prefix="pddl_" outfile="parser.yy.c" case-insensitive never-interactive noyywrap nounput
+%option prefix="pddl_" case-insensitive never-interactive noyywrap nounput
 
 %{
 #include "cpt.h"
 #include "pddl.h"
-#include "parser.tab.h"
+#include "parser.tab.hpp"
 
 #define YY_NO_INPUT
 #define YY_DECL int pddl_lex(PDDLDomain *domain)
