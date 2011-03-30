@@ -13,7 +13,7 @@
 #ifndef __WIN32__
 #define WITHOUT_GDSL_TYPES
 #endif
-#include "gdsl/include/gdsl.h"
+#include <gdsl.h>
 
 
 typedef enum {POS_MOD, NEG_MOD} SignModality;
