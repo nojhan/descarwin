@@ -230,8 +230,8 @@ detecting duplicate states. Rather than sleeping if a lock cannot be acquired,
 a thread can perform ``speculative'' expansions by continuing the expansion of
 its current part of the space. This technique keeps cores busy at the expense
 of duplicate work. \cite{dovetailing} adapts to planning a technique called
-dovetailing, in which several instm-line, and show how our approach improves over a simple dovetailing
-strategy. Finally, \cite{vidal:socs2010} proposed a multi-core version of the
+dovetailing, in which several instances of a search algorithm with different parameter
+settings are run in parallel. Finally, \cite{vidal:socs2010} proposed a multi-core version of the
 planner \cite{yahsp:icaps2004} where many concurrent threads expand nodes
 from a common open list, yielding to early exploration of branches of the search
 tree that would have been delayed by a classical search, which can speed-up
