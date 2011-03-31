@@ -25,8 +25,8 @@ int main ( int argc, char* argv[] )
     std::string domain = parser.createParam( (std::string)"domain-zeno-time.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
     std::string instance = parser.createParam( (std::string)"zeno10.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
     //bool is_sequential = parser.createParam( (bool)false, "sequential", "Is the problem a sequential one?", 'q', "Problem", true ).value();
-    unsigned int runs = parser.createParam( (unsigned int)1, "runs", 
-            "Number of distributions to produce", 'r' ).value();
+    // unsigned int runs = parser.createParam( (unsigned int)1, "runs", 
+    //         "Number of distributions to produce", 'r' ).value();
     unsigned int l_max_init_coef = parser.createParam( (unsigned int)2, "lmax-initcoef", 
             "l_max will be set to the size of the chrono partition * this coefficient", 'C', "Initialization" ).value();
     unsigned int l_min = parser.createParam( (unsigned int)1, "lmin", 
