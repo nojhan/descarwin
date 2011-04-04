@@ -69,6 +69,7 @@
 \pdfpageheight=11in
 
 \begin{document}
+
 \conferenceinfo{GECCO'11,} {July 12--16, 2011, Dublin, Ireland.}
 \CopyrightYear{2011}
 \crdata{978-1-4503-0557-0/11/07}
@@ -108,7 +109,6 @@ Vincent Vidal\\
 
 \maketitle
 \begin{abstract}
-
 Multicore machines are becoming a standard way to speed up the system performance.
 After having instantiated the evolutionary metaheuristic \DAEX\ with the forward search \YAHSP\ planner, 
 we investigate on the global parallelism approach, which exploits the intrinsic parallelism of the individual evaluation.
@@ -116,13 +116,13 @@ This paper describes a parallel shared-memory version of the \DAEYAHSP\ planning
 The parallelization scheme applies at a high level of abstraction and thus can be used by any evolutionary algorithm implemented with the Evolving Objects framework.
 The proof of concept is validated on a 48-core machine with two planning tasks extracted from the last international planning competition.
 Experiments show significant speedups with an increasing number of cores.
-This preliminary work opens an avenue for parallelizing any evolutionary algorithm developed with EO that would target multi-core architectures.
+This preliminary work opens an avenue for parallelizing any evolutionary algorithm developed with EO that would target multicore architectures.
 \end{abstract}
 
-\category{I.2.8}{Computing Methodologies}{Artificial In\-tel\-ligen\-ce}[Problem Solving, Control Methods, and Search]
+\category{I.2.8}{Artificial In\-tel\-ligen\-ce}{Problem Solving, Control Methods, and Search}%[Plan execution, formation, and generation]
 \category{D.1.3}{Pro\-gramming Techniques}{Concurrent Programming}[Parallel Programming]
 \terms{Algorithms, Experimentation, Performance.}
-\keywords{Parallel Evolutionary Algorithm, Automated Planning, Parallel Shared-Memory, Multicore.\\} % NOT required for Proceedings
+\keywords{Evolutionary Computation, Automated Planning, Parallel Shared-Memory, Multicore.\\\\} % NOT required for Proceedings
 
 \section{Introduction}
 % The Planning Problem
@@ -175,9 +175,9 @@ arose during this implementation. After having demonstrated the effectiveness
 of our parallel implementation of \DAEYAHSP\ on two planning benchmark tasks, we
 conclude and provide some insights of possible future works.
 
-\section{Previous Works in Parallel EAs and Parallel Planning}
+\section{Related Work}
 
-\paragraph{Parallel EAs}
+\paragraph{Parallel Evolutionary Algorithms}
 
 A large literature deals with the parallelization techniques of Evolutionary
 Algorithms (EAs). Depending on the targeted architecture, the parallelization
@@ -225,7 +225,7 @@ a thread can perform ``speculative'' expansions by continuing the expansion of
 its current part of the space. This technique keeps cores busy at the expense
 of duplicate work. \cite{dovetailing} adapts to planning a technique called
 dovetailing, in which several instances of a search algorithm with different parameter
-settings are run in parallel. Finally, \cite{vidal:socs2010} proposed a multi-core version of the
+settings are run in parallel. Finally, \cite{vidal:socs2010} proposed a multicore version of the
 planner \cite{yahsp:icaps2004} where many concurrent threads expand nodes
 from a common open list, yielding to early exploration of branches of the search
 tree that would have been delayed by a classical search, which can speed-up
@@ -586,7 +586,7 @@ resulting distributions are presented as standard boxplots.
 %$$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
 
 %% Results
-\paragraph{Speed-up against number of cores} % (CC, JD)
+\paragraph{Speed-up by number of processors} % (CC, JD)
 
 \begin{figure}[htpb]
  \begin{center}
@@ -639,7 +639,7 @@ scheme does not permit a significant speed-up comparing to the static one. The
 Wilcoxon signed-rank test cannot reject the null hypothesis that the samples come
 from the same distribution ($p=0.03$).
 
-\paragraph{Speed-up against population size} % (CC, JD)
+\paragraph{Speed-up by population size} % (CC, JD)
 
 \begin{figure}[htpb]
  \begin{center}
