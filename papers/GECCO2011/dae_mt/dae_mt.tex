@@ -62,14 +62,19 @@
 \newcommand{\YAHSP}{{\sc YAHSP}}
 \newcommand{\PARADISEO}{{\sc ParadisEO}}
 \newcommand{\OPENMP}{{\sc OpenMP}}
+\newcommand{\OPENSTACKS}{{\sc Openstacks}}
+\newcommand{\ELEVATORS}{{\sc Elevators}}
+
+\pdfpagewidth=8.5in
+\pdfpageheight=11in
 
 \begin{document}
+\conferenceinfo{GECCO'11,} {July 12--16, 2011, Dublin, Ireland.}
+\CopyrightYear{2011}
+\crdata{978-1-4503-0557-0/11/07}
+\clubpenalty=10000
+\widowpenalty = 10000
 
-%\title{A Multicore Implementation of the Divide-and-Evolve Algorithm}
-%\title{Speeding Up the Individual Evaluation of the Divide-and-Evolve Algorithm}
-%\title{Multithreading the Divide-and-Evolve Algorithm for a Multicore Machine}
-%\title{A Multithreaded Release of the Divide-and-Evolve Planning System for a Multicore Machine}
-%\title{A Multicore Implementation of the Individual Evaluation in the Divide-and-Evolve Planner}
 \title{Parallel Divide-and-Evolve:\\ Experiments with OpenMP on a Multicore Machine}
 
 \numberofauthors{2} % 4 is a bug!
@@ -111,30 +116,16 @@ This paper describes a parallel shared-memory version of the \DAEYAHSP\ planning
 The parallelization scheme applies at a high level of abstraction and thus can be used by any evolutionary algorithm implemented with the Evolving Objects framework.
 The proof of concept is validated on a 48-core machine with two planning tasks extracted from the last international planning competition.
 Experiments show significant speedups with an increasing number of cores.
-This preliminary work opens an avenue for parallelizing any evolutionary
-algorithm developed with EO that would target multi-core architectures.
+This preliminary work opens an avenue for parallelizing any evolutionary algorithm developed with EO that would target multi-core architectures.
 \end{abstract}
 
 \category{I.2.8}{Computing Methodologies}{Artificial In\-tel\-ligen\-ce}[Problem Solving, Control Methods, and Search]
-%
 \category{D.1.3}{Pro\-gramming Techniques}{Concurrent Programming}[Parallel Programming]
-
-% A category with the (minimum) three required fields
-%\category{H.4}{Information Systems Applications}{Miscellaneous}[Problem Solving, Control Methods, and Search]
-%A category including the fourth, optional field follows...
-%\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
-
-%General Terms: This section is limited to the following 16 terms. Select one of the following general terms that best describes the content of your submission: Algorithms, Management, Measurement, Documentation, Performance, Design, Economics, Reliability, Experimentation, Security, Human Factors, Standardization, Languages, Theory, Legal Aspects, Verification
-\terms{Algorithms, Experimentation, Performance}
-
-\keywords{Parallel Evolutionary Algorithm, Automated Planning, Parallel Shared-Memory, Implementation} % NOT required for Proceedings
+\terms{Algorithms, Experimentation, Performance.}
+\keywords{Parallel Evolutionary Algorithm, Automated Planning, Parallel Shared-Memory, Multicore.\\} % NOT required for Proceedings
 
 \section{Introduction}
-% argument : Q=Comment paralléliser un algo de recherche de plans ? 
-%      R=concevoir d'abord un algorithme évolutionnaire puis paralléliser sa fonction d'évaluation
-
 % The Planning Problem
-
 The classical planning problem in Artificial Intelligence \cite{gnt04} is to
 find a path in a transition system: a sequence of actions which maps an initial
 state $I$ into a state $G$ satisfying a set of desired goals. Usually, a metric
@@ -147,8 +138,7 @@ objects, and actions are triples of sets of atoms: preconditions, add effects,
 del effects. Instances of the planning problem, called planing tasks, can model
 many kinds of abstract reasoning problems and are known to be PSPACE-hard.
 
-To solve such planning tasks, several heuristic search algorithms have been
-proposed in the past but none of them can be easily parallelized.
+To solve such planning tasks, several heuristic search algorithms have been proposed in the past but none of them can be easily parallelized.
 They require a great amount of technical work to provide efficiency while preserving correctness \cite{burns:JAIR2010,burns:ijcai2009}.
 
 Recently, the \DAEX\ evolutionary metaheuristic has been proposed to solve such planning tasks \cite{dae:icaps2010,dae:evocop2006}.
@@ -276,14 +266,13 @@ deterministic  tournament  of  size  5.
 % Parameter tuning
 For the sequential release, Darwinian-related parameters of \DAEX\ have been
 fixed after some early experiments \cite{dae:evocop2006} whereas parameters
-related to the variation operators have been tuned using the Racing method
-\cite{dae:gecco2010}.
+related to the variation operators have been tuned using the Racing method \cite{dae:gecco2010}.
 
 All experiments were done with \DAEYAHSP: the instantiation of \DAEX\ with the
 YAHSP heuristic forward search solver \cite{yahsp:icaps2004}. % + YAHSP memoing
                 % shared by all searches. 
-We added two novelties to the version described in
-\cite{dae:icaps2010}. One important parameter is the maximum number of expanded
+We added two novelties to the version described in \cite{dae:icaps2010}.
+One important parameter is the maximum number of expanded
 nodes allowed to the \YAHSP\ sub-solver which defines empirically what is
 considered as an easy problem for \YAHSP. As a matter of fact, the minimum
 number of required nodes varies from few nodes to thousands depending of the
@@ -293,9 +282,8 @@ ratio of feasible individuals is over a given threshold or a maximum boundary ha
 been reached. By default this number is doubled at each iteration until at least
 one feasible individual is produced or 100000 has been reached.
 
-% inutilise en l'etat
-%Furthermore we add the capability to perform restarts within a time contract in
-%order to increase solution quality.
+Furthermore we add the capability to perform restarts within a time contract in
+order to increase solution quality.
 
 \paragraph{Yet Another Heuristic Search Planner} % (VV)
 
@@ -420,7 +408,7 @@ This reason discards the \PARADISEO\ framework.
 
 For a multicore architecture, a shared-memory parallelization approach is thus a better candidate. 
 In order to garantee a non-blocking algorithm, we apply the Concurrent Read Exclusive Write (CREW) strategy\footnote{Multiple processors can read a memory cell but only one can write at a time.} of the Parallel Random Access Machine (PRAM).
-In this work, we have used \OPENMP\ which defines a set of compiler directives to tell which part of a program should be parallelized and which part of memory can be shared out. 
+In this work, we used \OPENMP\ which defines a set of compiler directives to tell which part of a program should be parallelized and which part of memory can be shared out. 
 The main advantage of \OPENMP\ is that it is designed to make easy to parallelize an existing program \cite{special:parallelComputing2005}. The parallel shared-memory scheme may also be used as a simple approach to program clusters, either with a dedicated method, or through a virtual symmetric multiprocessing machine \cite{Huang:openmpGlobalArrays2005}.
 
 %In order to parallelize a large scope of the framework EO, a profiling was done to identify the most time-consuming steps. 
@@ -429,9 +417,8 @@ Considering that the evaluation of the population is the most costly part of the
 algorithm, this step is our first target to parallelize. Moreover, in most cases
 the evaluation done on individuals can be made in parallel without data
 dependencies. There are several classes in EO implementing evaluation operators
-but all of them call a common function to apply the evaluation on a population,
-this is the function {\tt apply}. The {\tt apply} function takes a functor as argument.
-The advantages of the {\tt Functor} pattern is to get the genericity and the modularity given by
+but all of them call a common function to apply the evaluation on a population. The {\tt apply} function takes a functor as argument.
+The advantages of the {\tt Functor} pattern is to meet the genericity and the modularity offered by
 object-oriented programming while keeping the simplicity of a single call to a function. EO functors
 generally take a population (a vector of individuals) as argument.
 In order to enable \OPENMP\ to build a multi-threaded algorithm without memory bounds, the evaluation functor ({\tt proc} in the apply function) must
@@ -501,16 +488,15 @@ relaxed plans and the lookahead plans are made private to each thread, ensuring
 that concurrent executions of YAHSP do not use the same portions of the global
 memory.
 
-\paragraph{\DAEYAHSP\ Specific Parallelization Issues} % (JD)
+\paragraph{Specific Parallelization Issues} % (JD)
 
 \DAEYAHSP\ evaluation step calls the YAHSP solver several times on the same
 decomposition and thus uses several variables to keep the state of the
 evaluation over the searches between intermediate goals (namely $k$, $B$ and $U$
 in the original article). As the evaluation functor is a single instance, it
-must be guaranteed reentrant and not use static variables nor attributes. A way
+must be guaranteed reentrant by not using static variables nor attributes. A way
 to achieve the re-entrancy is to define those variables as attributes of the
-decomposition itself, and not as attributes of the evaluation  functor.
-
+decomposition itself, and not as attributes of the evaluation functor.
 
 \section{Experimental Study}
 
@@ -529,22 +515,22 @@ is to minimize the sum of all costs for a sequential plan whereas in temporal
 planning actions have a duration and can be run in parallel. In temporal
 planning the objective is to minimize the total makespan of the parallel plan.
 
-We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition\footnote{\url{http://ipc.icaps-conference.org}}: Elevators-12 for cost planning and Openstacks-17 for temporal planning.
+We have tested the above implementation on two benchmarks from the satisficing track of the $6^{th}$ International Planning Competition: \ELEVATORS-12 for cost planning and \OPENSTACKS-17 for temporal planning.
 
-The elevators domain is stated as follows: there is a building with N+1 floors,
-numbered from 0 to N. The building can be separated in blocks of size M+1, where
-M divides N. Adjacent blocks have a common floor. The building has K fast
-(accelerating) elevators that stop only in floors that are multiple of M/2 (so M
-has to be an even number). Each fast elevator has a capacity of X persons.
-Furthermore, within each block, there are L slow elevators, that stop at every
-floor of the block. Each slow elevator has a capacity of Y persons (usually
-Y<X). There are costs associated with each elevator starting/stopping and
+The \ELEVATORS\ domain is stated as follows: there is a building with $N+1$ floors,
+numbered from $0$ to $N$. The building can be separated in blocks of size $M+1$, where
+$M$ divides $N$. Adjacent blocks have a common floor. The building has $K$ fast
+(accelerating) elevators that stop only in floors that are multiple of $M/2$. 
+Each fast elevator has a capacity of $X$ persons.
+Furthermore, within each block, there are $L$ slow elevators, that stop at every
+floor of the block. Each slow elevator has a capacity of $Y$ persons (usually
+$Y<X$). There are costs associated with each elevator starting/stopping and
 moving. There are several passengers, for which their current location and their
 destination are given. The objective function is to minimize the total cost of
 moving the passengers to their destinations. The total cost is increased each
 time an elevator starts/stops or moves.
 
-The openstacks domain is based on the "minimum maximum simultaneous open stacks"
+The \OPENSTACKS\ domain is based on the ``minimum maximum simultaneous open stacks''
 combinatorial optimization problem, which can be stated as follows: a
 manufacturer has a number of orders, each for a combination of different
 products, and can only make one product at a time. The problem is to order the
@@ -552,7 +538,7 @@ making of the different products so that the maximum number of stacks that are
 in use simultaneously, or equivalently the number of orders that are in
 simultaneous production, is minimized. The problem is NP-hard and known to be
 equivalent to several other problems. In the temporal case a maximum number of
-stacks is given and the goal is to find the plan with the least makespan,
+stacks is given and the goal is to find the plan with the minimum makespan,
 without violating the maximum number of stacks constraints.
 
 
@@ -604,11 +590,11 @@ resulting distributions are presented as standard boxplots.
 
 \begin{figure}[htpb]
  \begin{center}
-  \subfigure[elevators 12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
+  \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
   \hfill
-  \subfigure[openstacks 17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+  \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
  \end{center}
- \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ reletive to the number of processors used.}
+ \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors used.}
  \label{fig:proc_elevators_vs_openstacks}
 \end{figure}
 
@@ -644,7 +630,7 @@ these tasks it gets the next available one, in a queue.
   \hfill
   \subfigure[dynamic]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
  \end{center}
- \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors, on the temporal openstacks-17 problem.}
+ \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors, on the temporal \OPENSTACKS-17 problem.}
  \label{fig:proc_static_vs_dynamic}
 \end{figure}
 
@@ -661,7 +647,7 @@ from the same distribution ($p=0.03$).
   \hfill
   \subfigure[rescaled]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_zoom.pdf}}
  \end{center}
- \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the sequential elevators-12 problem, using 48 processors.}
+ \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the sequential \ELEVATORS-12 problem, using 48 processors.}
  \label{fig:elevators_pop}
 \end{figure}
 
@@ -673,11 +659,11 @@ population size is small.
 
 \begin{figure}[htpb]
  \begin{center}
-  \subfigure[elevators 12]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_speedup.pdf}}
+  \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_speedup.pdf}}
   \hfill
-  \subfigure[openstacks 17]{\includegraphics[width=0.23\textwidth]{images/openstacks_pop_time_speedup.pdf}}
+  \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_pop_time_speedup.pdf}}
  \end{center}
- \caption{Speedup distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the both sequential elevators-12 and temporal openstacks-17 problems, using 48 processors.}
+ \caption{Speedup distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the both sequential \ELEVATORS-12 and temporal \OPENSTACKS-17 problems, using 48 processors.}
  \label{fig:speedup_pop}
 \end{figure}
 
