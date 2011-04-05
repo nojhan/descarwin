@@ -83,25 +83,25 @@
 \author{
 \alignauthor
 Caner Candan\\
-    \affaddr{Thales Research \& Technology}\\
-    \affaddr{Palaiseau, France}\\
-    \email{caner.candan@thalesgroup.com}
+\affaddr{Thales Research \& Technology}\\
+\affaddr{Palaiseau, France}\\
+\email{caner.candan@thalesgroup.com}
 \alignauthor
 Johann Dr{\'e}o\\
-    \affaddr{Thales Research \& Technology}\\
-    \affaddr{Palaiseau, France}\\
-    \email{johann.dreo@thalesgroup.com}
+\affaddr{Thales Research \& Technology}\\
+\affaddr{Palaiseau, France}\\
+\email{johann.dreo@thalesgroup.com}
 \and
 \alignauthor
 Pierre Sav{\'e}ant\\
-    \affaddr{Thales Research \& Technology}\\
-    \affaddr{Palaiseau, France}\\
-    \email{pierre.saveant@thalesgroup.com}
+\affaddr{Thales Research \& Technology}\\
+\affaddr{Palaiseau, France}\\
+\email{pierre.saveant@thalesgroup.com}
 \alignauthor
 Vincent Vidal\\
-    \affaddr{ONERA -- DCSD}\\
-    \affaddr{Toulouse, France}\\
-    \email{vincent.vidal@onera.fr}
+\affaddr{ONERA -- DCSD}\\
+\affaddr{Toulouse, France}\\
+\email{vincent.vidal@onera.fr}
 }
 
 %\numberofauthors{1}
@@ -126,20 +126,15 @@ This preliminary work opens an avenue for parallelizing any evolutionary algorit
 
 \section{Introduction}
 % The Planning Problem
-The classical planning problem in Artificial Intelligence \cite{gnt04} is to
-find a path in a transition system: a sequence of actions which maps an initial
-state $I$ into a state $G$ satisfying a set of desired goals. Usually, a metric
-is associated with the solution plan such as length, cost or duration (where
-concurrent actions are allowed). In domain-independent planning, problems are
-described  with  the  Planning  Domain  Description  Language  (PDDL)
-\cite{pddl:jair2003}. In the simplest STRIPS model, states of the world are
-defined by sets of atoms instantiated from a set of predicates and a set of
-objects, and actions are triples of sets of atoms: preconditions, add effects,
-del effects. Instances of the planning problem, called planing tasks, can model
-many kinds of abstract reasoning problems and are known to be PSPACE-hard.
+The classical planning problem in Artificial Intelligence \cite{gnt04} is to find a path in a transition system: a sequence of actions which maps an initial
+state $I$ into a state $G$ satisfying a set of desired goals. Usually, a metric is associated with the solution plan such as length, cost or duration (where
+concurrent actions are allowed). In domain-independent planning, problems are described with the Planning Domain Description Language (PDDL) \cite{pddl:jair2003}. 
+In the simplest STRIPS model, states of the world are defined by sets of atoms instantiated from a set of predicates and a set of
+objects, and actions are triples of sets of atoms: preconditions, add effects, del effects. 
+Instances of the planning problem, called planning tasks, can model many kinds of abstract reasoning problems and are known to be PSPACE-hard.
 
 To solve such planning tasks, several heuristic search algorithms have been proposed in the past but none of them can be easily parallelized.
-They require a great amount of technical work to provide efficiency while preserving correctness \cite{burns:JAIR2010,burns:ijcai2009}.
+They require a great amount of work to provide efficiency while preserving correctness \cite{burns:JAIR2010,burns:ijcai2009}.
 
 Recently, the \DAEX\ evolutionary metaheuristic has been proposed to solve such planning tasks \cite{dae:icaps2010,dae:evocop2006}.
 As an evolutionary algorithm, \DAEX\ provides an intrinsic parallelism: the individual evaluation stage, which is often the most time-consuming stage during the evolutionary generation loop.
@@ -177,22 +172,16 @@ conclude and provide some insights of possible future works.
 
 \section{Related Work}
 
-\paragraph{Parallel Evolutionary Algorithms}
+\subsection{Parallel Evolutionary Algorithms}
 
-A large literature deals with the parallelization techniques of Evolutionary
-Algorithms (EAs). Depending on the targeted architecture, the parallelization
-scheme may be chosen differently. The main approaches may be classified among:
-simple {\it run level parallelism}, EA with {\it global parallelism}
-where the evaluation stage is parallelized but not the other operators, cellular EAs
-(cEA) where the selection and reproduction steps are parallelized, and the {\it dEA}
-approach, using a multi-population {\it island parallelism} \cite{alba:IEEE2002}.
+A large literature deals with the parallelization techniques of Evolutionary Algorithms (EAs). 
+Depending on the targeted architecture, the parallelization scheme may be chosen accordingly. The main approaches may be classified among:
+simple {\it run level parallelism}, EA with {\it global parallelism} where the evaluation stage is parallelized but not the other operators, and {\it island-based} in which the population is partitioned into separate subpopulations. These structured EAs further split into cellular EAs (cEA) where the selection and reproduction steps are parallelized, and distributed EAs {\it dEA} with a controlled migration between islands \cite{alba:IEEE2002}.
 
 The run level parallelism being trivially achieved by running several runs concurrently, the first step when parallelizing a new algorithm is often to try the global
 parallelization approach, because the evaluation step is often the most costly part of EAs and because individual evaluations are generally intrinsically independent.
 
-%Doing a review of existing algorithms being beyond the scope of this paper, we redirect the reader on the review of Alba and Tomassini \cite{alba:IEEE2002}.
-
-\paragraph{Parallel Planning} % (VV)
+\subsection{Parallel Planning}
 \label{section:previous-work}
 
 Several approaches to parallel planning have been proposed in recent years.
@@ -214,11 +203,11 @@ previous approaches. In \cite{HDA-star}, the authors introduce Hash Distributed
 A* (HDA*) which combines successful ideas from previous parallel algorithms.
 HDA* uses a hash function which assigns each generated state to a unique
 processing unit in order to avoid the duplication of the search efforts. This
-mechanism was introduced in  PRA*, which unfortunately combined it with
+mechanism was introduced in PRA*, which unfortunately combined it with
 synchronous communication channels which caused a lot of overhead. This problem
 was addressed in HDA* by the use of non-blocking communication (as in
-\cite{TDS}).  In  \cite{burns:ijcai2009,burns:JAIR2010} the authors present
-Parallel Best-NBlock-First (PBNF).  It uses an abstraction to partition the
+\cite{TDS}). In \cite{burns:ijcai2009,burns:JAIR2010} the authors present
+Parallel Best-NBlock-First (PBNF). It uses an abstraction to partition the
 state space. PBNF allows each thread to expand the most promising nodes while
 detecting duplicate states. Rather than sleeping if a lock cannot be acquired,
 a thread can perform ``speculative'' expansions by continuing the expansion of
@@ -235,11 +224,11 @@ search by several orders of magnitude.
 
 \subsection{Algorithms}
 
-\paragraph{Divide and Evolve} % (PS)
+\paragraph{Divide and Evolve}
 
-\DAEX,  the  concrete  implementation  of  the  \dae\  paradigm,  is  a
+\DAEX, the concrete implementation of the \dae\ paradigm, is a
 domain-independent satisficing planning system based on Evolutionary Computation
-\cite{dae:evocop2006}.  The basic principle is  to  carry  out  a  {\em
+\cite{dae:evocop2006}. The basic principle is to carry out a {\em
 Divide-and-Conquer} strategy driven by an evolutionary algorithm. The algorithm
 is detailed in \cite{dae:icaps2010} and compared with state-of-the-art planners.
 In order to solve a planning task ${\cal P}_D(I,G)$, the basic idea of \DAEX\ is
@@ -255,40 +244,33 @@ an evolutionary algorithm.
 The fitness implements a gradient towards feasibility for unfeasible individuals
 and a gradient towards optimality for feasible individuals. Feasible individuals
 are always preferred to unfeasible ones. Population initialization as well as
-variation operators are driven by the  critical  path  $h^1$  heuristic
+variation operators are driven by the critical path $h^1$ heuristic
 \cite{h1:aips2000} in order to discard inconsistent state orderings, and atom
 mutual exclusivity inference in order to discard inconsistent states. Beside a
 standard one-point crossover for variable length representations, four mutations
 have been defined: addition (resp. removal) of a goal in a sequence, addition
-(resp. removal) of an atom in a goal.  The selection is a comparison-based
-deterministic  tournament  of  size  5.
+(resp. removal) of an atom in a goal. The selection is a comparison-based
+deterministic tournament of size 5.
 
 % Parameter tuning
 For the sequential release, Darwinian-related parameters of \DAEX\ have been
 fixed after some early experiments \cite{dae:evocop2006} whereas parameters
 related to the variation operators have been tuned using the Racing method \cite{dae:gecco2010}.
 
-All experiments were done with \DAEYAHSP: the instantiation of \DAEX\ with the
-YAHSP heuristic forward search solver \cite{yahsp:icaps2004}. % + YAHSP memoing
-                % shared by all searches. 
+All experiments were done with \DAEYAHSP: the instantiation of \DAEX\ with the \YAHSP\ heuristic forward search solver \cite{yahsp:icaps2004}. % + YAHSP memoing
+                                                                                                                                               % shared by all searches. 
 We added two novelties to the version described in \cite{dae:icaps2010}.
-One important parameter is the maximum number of expanded
-nodes allowed to the \YAHSP\ sub-solver which defines empirically what is
-considered as an easy problem for \YAHSP. As a matter of fact, the minimum
-number of required nodes varies from few nodes to thousands depending of the
-planning task. In the current release this number is estimated during the
-population initialization stage. An incremental loop is performed until the
-ratio of feasible individuals is over a given threshold or a maximum boundary has
-been reached. By default this number is doubled at each iteration until at least
+One important parameter is the maximum number of expanded nodes allowed to the \YAHSP\ sub-solver which defines empirically what is
+considered as an easy problem for \YAHSP. As a matter of fact, the minimum number of required nodes varies from few nodes to thousands depending of the
+planning task. In the current release this number is estimated during the population initialization stage. An incremental loop is performed until the
+ratio of feasible individuals is over a given threshold or a maximum boundary has been reached. By default this number is doubled at each iteration until at least
 one feasible individual is produced or 100000 has been reached.
 
-Furthermore we add the capability to perform restarts within a time contract in
-order to increase solution quality.
+Furthermore we add the capability to perform restarts within a time contract in order to increase solution quality.
 
-\paragraph{Yet Another Heuristic Search Planner} % (VV)
+\paragraph{Yet Another Heuristic Search Planner}
 
-The YAHSP planning system 
-\cite{yahsp:icaps2004} extends a technique  introduced in the FF planner
+The \YAHSP\ planning system \cite{yahsp:icaps2004} extends a technique introduced in the FF planner
 \cite{ff:jair01} for calculating the heuristic, based on the extraction of
 a solution from a planning graph computed for the relaxed problem obtained by
 ignoring deletes of actions. It can be performed in polynomial time and space,
@@ -297,12 +279,12 @@ planning graph represents the heuristic value of the evaluated state. This
 heuristic is used in a forward-chaining search algorithm to evaluate each
 encountered state.
 
-A novel way has been introduced in YAHSP for extracting information from the
+A novel way has been introduced in \YAHSP\ for extracting information from the
 computation of the heuristic, by considering the high quality of the relaxed
-plans extracted by the heuristic function in numerous domains.  Indeed, the
+plans extracted by the heuristic function in numerous domains. Indeed, the
 beginning of these plans can often be extended to solution plans of the initial
 problem, and there are often a lot of other actions from these plans that can
-effectively be used in a solution plan. YAHSP uses an algorithm for combining
+effectively be used in a solution plan. \YAHSP\ uses an algorithm for combining
 some actions from each relaxed plan, in order to find the beginning of a valid
 plan that can lead to a reachable state. Thanks to the quality of the extracted
 relaxed plans, these states frequently guide search closer to a solution
@@ -310,35 +292,35 @@ state. The lookahead states thus calculated are then added to the list of nodes
 that can be chosen to be expanded by increasing order of the numerical value of
 the heuristic.
 
-This lookahead strategy can be used in different search algorithms. In YAHSP,
+This lookahead strategy can be used in different search algorithms. In \YAHSP,
 a classical best-first search algorithm has been modified in such a way that
-completeness is preserved.  It simply consists in augmenting the list of nodes
+completeness is preserved. It simply consists in augmenting the list of nodes
 to be expanded (the open list) with some new nodes computed by the lookahead
 algorithm. The branching factor is slightly increased, but the performances are
 generally better and completeness is not affected.
 
-A first motivation in the use of YAHSP in \DAEX\ is that experiments about the
+A first motivation in the use of \YAHSP\ in \DAEX\ is that experiments about the
 use of this lookahead strategy in a complete best-first search algorithm have
 demonstrated that in numerous planning benchmark domains, the improvement of the
 performance in terms of running time and size of problems that can be handled
-are been drastically improved (cf. \cite{yahsp:icaps2004}).  The YAHSP planner
+are been drastically improved (cf. \cite{yahsp:icaps2004}). The \YAHSP\ planner
 has been awarded a second place in the $4^{th}$ International Planning Competition
 \cite{ipc4:jair05} and some recent results \cite{rintanen:acai2010} demonstrate
-that it is still extremely competitive with more recent planners.  A second
-motivation in the use of YAHSP in \DAEX\ is its ability to answer very fast to
+that it is still extremely competitive with more recent planners. A second
+motivation in the use of \YAHSP\ in \DAEX\ is its ability to answer very fast to
 the considerable number of planning requests emanating from \DAEX, as opposed to
 modern techniques such as the landmark heuristics implemented in the LAMA
-planner  \cite{lama:jair2010} (winner of  the $6^{th}$  International Planning
+planner \cite{lama:jair2010} (winner of the $6^{th}$ International Planning
 Competition) which require a costly analysis for each new initial state.
 
-\paragraph{Parts that can theoretically be parallelized} % (JD, VV, PS)
+\paragraph{Parts that can Theoretically be Parallelized}
 
 As shown in Section \ref{section:previous-work}, heuristic search algorithms
 used in automated AI planners can be parallelized in many ways, although there
 is no obvious and natural way to do so. However, our goal in this work is not
 to parallelize the underlying planner, but the evolutionary algorithm which
-controls the planner, which can be made in a very efficient way.  Indeed, in
-typical population-based algorithms  such as evolutionary algorithms, the
+controls the planner, which can be made in a very efficient way. Indeed, in
+typical population-based algorithms such as evolutionary algorithms, the
 evaluation of individuals can be made independently of each other, a fortiori in
 a parallel way. Applying variation operators can also be performed in parallel;
 and depending on the application, parallelism on variation operators or
@@ -364,21 +346,21 @@ only parallelized the latter.
 
 \subsection{Implementation}
 
-\paragraph{Locks, thread-safe \& reentrant subroutines} % (VV)
+\paragraph{Locks, Thread-Safe \& Reentrant Subroutines}
 
-Even if being very natural  in the context of evolutionary algorithms,
+Even if being very natural in the context of evolutionary algorithms,
 parallelizing individual evaluations in \DAEX\ requires to be carefully made in
 order to avoid some typical problems that can happen with shared-memory parallel
 implementations. Indeed, even if individual evaluations are made
 independently of each other, some concurrent accesses to shared memory are still
 required (for example, a basic one is incrementing some global counter),
-especially in YAHSP (detailed below). Furthermore, the original implementations of \DAEX\
-and YAHSP where not designed with parallelism in mind, which implied some
+especially in \YAHSP\ (detailed below). Furthermore, the original implementations of \DAEX\
+and \YAHSP\ where not designed with parallelism in mind, which implied some
 modifications to render them thread-safe.
 
 One first problem that can happen in a shared-memory parallel implementation is
 \emph{deadlocks}, which are situations where at least two concurrent threads are
-each waiting for the other one to finish, and thus neither ever does.  This can
+each waiting for the other one to finish, and thus neither ever does. This can
 happen for example when a thread $t_1$ acquires a lock on a shared variable $x$,
 and then tries to acquire a lock on another shared variable $y$; while in the
 same time a thread $t_2$ acquired a lock on $y$ and then tries to acquire a lock
@@ -389,17 +371,13 @@ work but cannot go through some portion of the code due to a similar phenomenon.
 
 Another problem that can arise is the concurrent use of a given subroutine by
 several threads, when such a subroutine or some subroutine called by it modifies
-some global data.  This is a typical problem of reentrancy, which must be
+some global data. This is a typical problem of reentrancy, which must be
 carefully analyzed in order to render thread-safe a parallel implementation. Two
 cases can then occur: either the global data must be shared by some threads, which
 requires to protect its access, or it can be made private to each thread, thus
 necessitating to change the scope of this data.
 
-\paragraph{EO \& OpenMP} % (CC, JD)
-
-%\subparagraph{Evolving Object, an evolutionary computation framework}\\
-%\DAEYAHSP\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library. 
-
+\paragraph{EO \& OpenMP}
 Standing for Evolving Objects, EO is a largely used and known framework in evolutionary computation based on the C++ template approach. It helps at designing evolutionary algorithms for hard optimization problems, from continuous to combinatorial ones.
 
 A parallel extension of EO, \PARADISEO, has been proposed by Cahon et al. \cite{paradiseo:JHeuristics2004}. It is based on the Message Passing Interface and proposes several parallelization schemes, available by calling wrappers around common functions of EO. \PARADISEO\ targets multi-processors machines, especially clusters and grids, for running large-scale, general purpose EAs.
@@ -407,7 +385,7 @@ As we are targeting a multicore architecture, and since our evaluation function 
 This reason discards the \PARADISEO\ framework.
 
 For a multicore architecture, a shared-memory parallelization approach is thus a better candidate. 
-In order to garantee a non-blocking algorithm, we apply the Concurrent Read Exclusive Write (CREW) strategy\footnote{Multiple processors can read a memory cell but only one can write at a time.} of the Parallel Random Access Machine (PRAM).
+In order to guarantee a non-blocking algorithm, we apply the Concurrent Read Exclusive Write (CREW) strategy\footnote{Multiple processors can read a memory cell but only one can write at a time.} of the Parallel Random Access Machine (PRAM).
 In this work, we used \OPENMP\ which defines a set of compiler directives to tell which part of a program should be parallelized and which part of memory can be shared out. 
 The main advantage of \OPENMP\ is that it is designed to make easy to parallelize an existing program \cite{special:parallelComputing2005}. The parallel shared-memory scheme may also be used as a simple approach to program clusters, either with a dedicated method, or through a virtual symmetric multiprocessing machine \cite{Huang:openmpGlobalArrays2005}.
 
@@ -425,16 +403,12 @@ In order to enable \OPENMP\ to build a multi-threaded algorithm without memory b
 fulfill certain requirements. In EO, the evaluation functors are supposed to be
 instantiated only once. In a sequential mode, the same instance is used to
 evaluate every individuals in a population. In a parallelized mode, one must
-ensure that the evaluation functor have  thread-local  data  structures.
+ensure that the evaluation functor have thread-local data structures.
 
-
-
-\paragraph{EO::apply} % (CC)
+\paragraph{EO::apply}
 %\footnote{Look at the header file apply.h available in the sources of EO}
 The {\tt apply} function takes as parameters a population and a function to be applied to each individual.
 The parallelization of this region of code is done thanks to the pragma {\tt omp for}.
-
-%% TODO: refaire algo proprement avec algorithm2e
 
 %\vspace{-0.2cm}
 \begin{algorithm}[h!]
@@ -472,9 +446,8 @@ exists a synchronization step at each iteration, this ensure that no race-condit
 may occurs. Indeed, individuals being evaluated are all independent, which is
 the case in the majority of evolutionary algorithms, and also in \DAEX.
 
-\paragraph{YAHSP \& OpenMP} % (VV)
-
-The design of YAHSP has been made in C with efficiency in mind, and kept as
+\paragraph{YAHSP \& OpenMP}
+The design of \YAHSP\ has been made in C with efficiency in mind, and kept as
 light as possible. This is typically the kind of implementation, making heavy
 use of global variables, not designed for a concurrent use by several parallel
 threads, and where thread-safety is clearly not ensured. However, \OPENMP\ offers
@@ -483,14 +456,13 @@ a facility to deal with global variables, in order to change their scope: the
 whose scope must be changed from shared by all threads to private (local) to
 each thread. And finally, specifying which global variable should be rendered
 private to each thread was the only thing we had to do to ensure thread-safety
-in YAHSP.  For example, the global arrays used to compute the heuristic, the
+in \YAHSP. For example, the global arrays used to compute the heuristic, the
 relaxed plans and the lookahead plans are made private to each thread, ensuring
-that concurrent executions of YAHSP do not use the same portions of the global
+that concurrent executions of \YAHSP\ do not use the same portions of the global
 memory.
 
-\paragraph{Specific Parallelization Issues} % (JD)
-
-\DAEYAHSP\ evaluation step calls the YAHSP solver several times on the same
+\paragraph{Specific Parallelization Issues}
+\DAEYAHSP\ evaluation step calls the \YAHSP\ solver several times on the same
 decomposition and thus uses several variables to keep the state of the
 evaluation over the searches between intermediate goals (namely $k$, $B$ and $U$
 in the original article). As the evaluation functor is a single instance, it
@@ -502,13 +474,13 @@ decomposition itself, and not as attributes of the evaluation functor.
 
 \subsection{Setup}
 
-\paragraph{Platform} % (PS)
+\paragraph{Platform}
 The algorithm is programmed in C++ using GCC and the GNU \OPENMP\ threading
 library (GOMP), both version 4.4.4. It is run on a 48-core DELL PowerEdge R815
 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB
 cache) processors with 192GB of RAM, under Linux x86\_64 2.6.32.
 
-\paragraph{Benchmarks} % (PS)
+\paragraph{Benchmarks}
 Although there are several families of problems, we concentrate here on cost planning and temporal
 planning. In cost planning a cost is attached to each action and the objective
 is to minimize the sum of all costs for a sequential plan whereas in temporal
@@ -542,8 +514,7 @@ stacks is given and the goal is to find the plan with the minimum makespan,
 without violating the maximum number of stacks constraints.
 
 
-\paragraph{Algorithm Parameters} % (PS)
-
+\paragraph{Algorithm Parameters}
 All the experiments were done with the parameter set described in
 \cite{dae:icaps2010} except for the population size which varies depending on the experiment. The fixed evolution engine is a (popsize + $7 \times$ popsize)-ES: $n$ individuals generate $7 \times n$ offspring without selection.
 For all runs, the following steady-state stopping condition has been applied:
@@ -555,11 +526,6 @@ The \DAEX algorithm being stochastic, each run is repeated 11 times and the
 resulting distributions are presented as standard boxplots.
 
 \subsection{Results}
-
-% FIXME: in restart mode an instance launched with more than 1 thread stops
-% before the 30 minutes defined with --max-seconds, Pierre things that the
-% reason is because the time is defined in user-time and not in wall-clock.
-% FIXME: .out empty, why ?!?
 
 %\paragraph{Measures}
 
@@ -586,13 +552,13 @@ resulting distributions are presented as standard boxplots.
 %$$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
 
 %% Results
-\paragraph{Speed-up by number of processors} % (CC, JD)
+\paragraph{Speed-up against the Number of Processors}
 
 \begin{figure}[htpb]
  \begin{center}
-  \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
-  \hfill
-  \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+ \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
+ \hfill
+ \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
  \end{center}
  \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors used.}
  \label{fig:proc_elevators_vs_openstacks}
@@ -605,8 +571,7 @@ decrease that is similar on both problems. The dispersions of the distribution
 is due to the steady-state stopping criterion that may be reached after different
 times.
 
-\paragraph{Comparison of Static and Dynamic Scheduling} % (CC, JD)
-
+\paragraph{Comparison of Static and Dynamic Scheduling}
 \OPENMP\ lets the choice between static and dynamic task scheduling. The default one is the static scheduling.
 In the static scheduling, a loop iterating through a set of tasks will be
 divided in several tasks relative to the number of available processors.
@@ -626,9 +591,9 @@ these tasks it gets the next available one, in a queue.
 
 \begin{figure}[htpb]
  \begin{center}
-  \subfigure[static]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_static.pdf}}
-  \hfill
-  \subfigure[dynamic]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+ \subfigure[static]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_static.pdf}}
+ \hfill
+ \subfigure[dynamic]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
  \end{center}
  \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors, on the temporal \OPENSTACKS-17 problem.}
  \label{fig:proc_static_vs_dynamic}
@@ -639,36 +604,33 @@ scheme does not permit a significant speed-up comparing to the static one. The
 Wilcoxon signed-rank test cannot reject the null hypothesis that the samples come
 from the same distribution ($p=0.03$).
 
-\paragraph{Speed-up by population size} % (CC, JD)
+\paragraph{Speed-up against the Population Size} % (CC, JD)
 
 \begin{figure}[htpb]
  \begin{center}
-  \subfigure[full scale]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time.pdf}}
-  \hfill
-  \subfigure[rescaled]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_zoom.pdf}}
+ \subfigure[full scale]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time.pdf}}
+ \hfill
+ \subfigure[rescaled]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_zoom.pdf}}
  \end{center}
  \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the sequential \ELEVATORS-12 problem, using 48 processors.}
  \label{fig:elevators_pop}
 \end{figure}
 
-Figure \ref{fig:elevators_pop} shows that the median computation time on a
-multicore machine increases linearly with the size of the population. The
-dispersion of the distribution is due to the steady-state stopping criterion
-that may be reached after different times, with a higher probability when the
+Figure \ref{fig:elevators_pop} shows that the median computation time on a multicore machine increases linearly with the size of the population. 
+The dispersion of the distribution is due to the steady-state stopping criterion that may be reached after different times, with a higher probability when the
 population size is small.
 
 \begin{figure}[htpb]
  \begin{center}
-  \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_speedup.pdf}}
-  \hfill
-  \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_pop_time_speedup.pdf}}
+ \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_speedup.pdf}}
+ \hfill
+ \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_pop_time_speedup.pdf}}
  \end{center}
  \caption{Speedup distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the both sequential \ELEVATORS-12 and temporal \OPENSTACKS-17 problems, using 48 processors.}
  \label{fig:speedup_pop}
 \end{figure}
 
-Figure \ref{fig:speedup_pop} shows that the expected speed-up of $40$ is met,
-and that it decrease with the population size. The measures were done according
+Figure \ref{fig:speedup_pop} shows that the expected speed-up of $40$ is met, and that it decrease with the population size. The measures were done according
 to the speedup equation.
 
 $$S_p = \frac{T^*_1}{T_p}$$
@@ -676,7 +638,6 @@ $$S_p = \frac{T^*_1}{T_p}$$
 The parameters $T^*_1$ and $T_p$ are respectively the time used for a sequential and a parallel execution.
 
 %%$$Speedup\ measure = r \sum^{P}_{k=0} \frac{T^*_{1_k}}{T_{p_k}}$$
-
 
 \section{Discussion and Conclusion}
 %In order to scale up the capabilities of \DAEYAHSP, this paper investigated the
@@ -720,8 +681,6 @@ intrinsically parallel, as it use independent variation operators.
 A further research axis deals with the impact on solution quality and in
 particular how to take advantage of the parallelization scheme to escape from
 premature convergence.
-
-
 
 \section{Acknowledgments}
 This work is being partially funded by the French National Research Agency through the COSINUS programme, under the research contract DESCARWIN (ANR-09-COSI-002).
