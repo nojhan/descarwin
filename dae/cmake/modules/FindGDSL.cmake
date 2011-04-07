@@ -8,21 +8,25 @@
 # - GDSL_FOUND
 #
 
-FIND_PATH(
-  GDSL_INCLUDE_DIR
-  gdsl.h
-  PATHS
-  /usr/include
-  /usr/local/include
-  )
+IF(NOT GDSL_INCLUDE_DIR)
+  FIND_PATH(
+    GDSL_INCLUDE_DIR
+    gdsl.h
+    PATHS
+    /usr/include
+    /usr/local/include
+    )
+ENDIF(NOT GDSL_INCLUDE_DIR)
 
-FIND_LIBRARY(
-  GDSL_LIBRARY
-  NAMES gdsl
-  PATHS
-  /usr/lib
-  /usr/local/lib
-  )
+IF(NOT GDSL_LIBRARY)
+  FIND_LIBRARY(
+    GDSL_LIBRARY
+    NAMES gdsl
+    PATHS
+    /usr/lib
+    /usr/local/lib
+    )
+ENDIF(NOT GDSL_LIBRARY)
 
 IF(GDSL_INCLUDE_DIR)
   IF(GDSL_LIBRARY)

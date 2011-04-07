@@ -10,6 +10,10 @@ SET(EO_DIR "<<PATH_TO_EO>>" CACHE PATH "EO directory" FORCE)
 # directory where YAHSP has been installed
 SET(YAHSP_DIR "<<PATH_TO_YAHSP>>" CACHE PATH "YAHSP directory" FORCE)
 
+# directory where GDSL has been installed
+SET(GDSL_INCLUDE_DIR "<<PATH_TO_GDSL_INCLUDE_DIR>>")
+SET(GDSL_LIBRARY "<<PATH_TO_GDSL_LIBRARY>>")
+
 # automagically set parameters, do not edit
 
 SET(EO_SRC_DIR "${EO_DIR}/src" CACHE PATH "EO source directory" FORCE)
