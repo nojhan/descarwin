@@ -57,6 +57,7 @@
 %\parskip=\baselineskip
 
 \newcommand{\dae}{{\em Divide-and-Evolve}}
+\newcommand{\DAE}{{\sc DaE}}
 \newcommand{\DAEX}{{\sc DaE$_{\text{X}}$}}
 \newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
 \newcommand{\YAHSP}{{\sc YAHSP}}
@@ -313,6 +314,20 @@ modern techniques such as the landmark heuristics implemented in the LAMA
 planner \cite{lama:jair2010} (winner of the $6^{th}$ International Planning
 Competition) which require a costly analysis for each new initial state.
 
+In order to speed up the search process, a memoization mechanism has been introduced in
+\YAHSP\ and carefully controlled to leave memory space for \DAE. Indeed, most of
+the time during a run of \YAHSP, and as a consequence during a run of \DAEYAHSP,
+is spent in computing the $h^{add}$ heuristic for each encountered state. During a single run of YAHSP, duplicate states are
+discarded; but during a run of \DAEYAHSP, the same state can be encoutered
+multiple times. We therefore keep track of the $h^{add}$ costs of all atoms in
+the problem for each state, in order to avoid recomputing these values each time
+a duplicate state is reached. This generally leads to a speedup comprised
+between 2 and 4. When \DAEYAHSP\ runs out of memory, which obviously happens
+much faster with the memoization strategy, all stored states and associated
+costs are flushed.
+For the parallel scheme, we experimented two strategies: a global memoization shared by all individual evaluations against a memoization local to each individual evaluation. 
+Results are presented in section \ref{section:results}.
+
 \paragraph{Parts that can Theoretically be Parallelized}
 
 As shown in Section \ref{section:previous-work}, heuristic search algorithms
@@ -526,7 +541,7 @@ The \DAEX algorithm being stochastic, each run is repeated 11 times and the
 resulting distributions are presented as standard boxplots.
 
 \subsection{Results}
-
+\label{section:results}
 %\paragraph{Measures}
 
 %Here is the three equations of measure used: the speedup, the efficiency and
