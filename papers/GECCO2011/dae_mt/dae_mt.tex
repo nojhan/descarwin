@@ -674,14 +674,12 @@ population size is small.
  \label{fig:speedup_pop}
 \end{figure}
 
-Figure \ref{fig:speedup_pop} shows that the expected speed-up of $40$ is met, and that it decrease with the population size. The measures were done according
-to the speedup equation.
+Figure \ref{fig:speedup_pop} shows that an average speedup of $40$ is met, and that it decreases with the population size. 
+The speedup is measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
+For instance 3182\% means a speedup of 31.82.
 
-$$S_p = \frac{T^*_1}{T_p}$$
 
-The parameters $T^*_1$ and $T_p$ are respectively the time used for a sequential and a parallel execution.
 
-%%$$Speedup\ measure = r \sum^{P}_{k=0} \frac{T^*_{1_k}}{T_{p_k}}$$
 
 \section{Discussion and Conclusion}
 %In order to scale up the capabilities of \DAEYAHSP, this paper investigated the
