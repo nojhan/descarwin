@@ -507,7 +507,9 @@ relaxed plans and the lookahead plans are made private to each thread, ensuring
 that concurrent executions of \YAHSP\ do not use the same portions of the global
 memory.
 
+
 \paragraph{Specific Parallelization Issues}
+
 \DAEYAHSP\ evaluation step calls the \YAHSP\ solver several times on the same
 decomposition and thus uses several variables to keep the state of the
 evaluation over the searches between intermediate goals (namely $k$, $B$ and $U$
@@ -515,6 +517,16 @@ in the original article). As the evaluation functor is a single instance, it
 must be guaranteed reentrant by not using static variables nor attributes. A way
 to achieve the re-entrancy is to define those variables as attributes of the
 decomposition itself, and not as attributes of the evaluation functor.
+
+
+\paragraph{Static and Dynamic Scheduling}
+
+\OPENMP\  lets  the  choice  between  static  (the  default)  and  dynamic  task
+scheduling.  In the static  scheduling,  a  loop  iterating  through  a  set  of
+tasks will be divided in several tasks  relative  to  the  number  of  available
+processors.  In dynamic  scheduling,  if  one  thread  has  finished  its  tasks
+it   gets   the   next    available    one,    using    a    queue    structure.
+
 
 \section{Experimental Study}
 
@@ -575,15 +587,16 @@ The \DAEX algorithm being stochastic, each run is repeated 11 times and the resu
 
 This experiment uses the same version of \DAEYAHSP\ than the one  used  for  the
 International Planning Competition, in a similar experimental environment.   The
-algorithm uses the shared memoization and a static parallelization  scheme.   It
-has 30 minutes to achieve its search, and performs a complete restart each  time
-it is stucked during 50 generations without improvement.  Number of  cores  used
-range   from   6   to   48,   11   runs   being   performed   each   6    cores.
+algorithm uses the shared memoization and a static parallelization scheme,  with
+a population of 48 and 96  individuals.   It  has  30  minutes  to  achieve  its
+search, and performs a complete restart  each  time  it  is  stucked  during  50
+generations  without  improvement.   Number  of  cores  used  range  from  6  to
+48,   11   runs   being   performed   each   6    cores.
 
 
 \paragraph{Alternative version, varying population size}
 
-This experiments test performances of four versions of the algorithm,  combining
+This experiment tests performances of four versions of the algorithm,  combining
 the memoization scheme (separated or on shared memory) and  the  parallelization
 scheme (static or dynamic).  The 48 available cores are used for  the  following
 population sizes: 48, 1152, 2304, 3456, 4608, 5760.  21 runs are  performed  for
@@ -602,15 +615,6 @@ generations without improvement.
 % we use as problems: elevator12
 % we repeat tests 11 times
 % and the used parallelization scheme is the static one
-
-
-\paragraph{Comparison of Static and Dynamic Scheduling}
-\OPENMP\ lets the choice between static and dynamic task scheduling. The default one is the static scheduling.
-In the static scheduling, a loop iterating through a set of tasks will be
-divided in several tasks relative to the number of available processors.
-Regarding dynamic scheduling, during the runtime if one thread has finished
-these tasks it gets the next available one, in a queue.
-
 
 
 \subsection{Results}
