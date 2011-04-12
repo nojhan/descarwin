@@ -161,9 +161,9 @@ computing, multicore architectures are gaining popularity as they become the
 share similar characteristics, but require a specific programming language.
 As a consequence we would have to rewrite entirely the \YAHSP\ solver called by our evaluation function.
 
-The paper is outlined as follows. We first describe some previous works in the
+The paper is outlined as follows. We first review related works in the
 fields of parallel evolutionary computation and AI planning, before presenting
-with more details the main algorithms on which our parallel system is based: the
+in more details the main algorithms on which our parallel system is based: the
 evolutionary metaheuristic \DAEX\ and the forward-chaining heuristic search
 planner YAHSP. The parallel implementation of \DAEYAHSP\ is then described, as
 well as the specific problems, due to the shared-memory programming model, that
@@ -171,7 +171,7 @@ arose during this implementation. After having demonstrated the effectiveness
 of our parallel implementation of \DAEYAHSP\ on two planning benchmark tasks, we
 conclude and provide some insights of possible future works.
 
-\section{Related Work}
+\section{Related Works}
 
 \subsection{Parallel Evolutionary Algorithms}
 
@@ -467,6 +467,7 @@ void apply< EOT >(eoUF< EOT, void >& proc,
        proc(pop[i]);
 }
 \end{verbatim}
+\vspace{-0.2cm}
 \end{algorithm}
 
 \begin{algorithm}[h!]
@@ -482,8 +483,9 @@ void apply< EOT >(eoUF< EOT, void >& proc,
        proc( pop[i] );
 }
 \end{verbatim}
+\vspace{-0.2cm}
 \end{algorithm}
-%\vspace{-0.2cm}
+
 
 When parallelizing the evaluation loop in an evolutionary algorithm, there
 exists a synchronization step at each iteration, this ensure that no race-condition
