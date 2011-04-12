@@ -569,6 +569,39 @@ best fitness in the population is made during 50 generations, with a maximum of
 
 The \DAEX algorithm being stochastic, each run is repeated 11 times and the resulting distributions are presented as standard boxplots.
 
+% have to describe in this part the 4 experiments done, here are the summaries of these experiments:
+
+% EXP1
+% we are using 48 cores
+% through the sizes of population: 48, 1152, 2304, 3456, 4608, 5760
+% we only make test on the version dae-sm (shared memoization)
+% we use as problems: elevator12 et openstack17
+% we are using the restart mode
+% the stop criteria is the time limit fixed to 30"
+% we repeat tests 11 times
+% and the used parallelization scheme is the static one
+
+% EXP2
+% we are using 48 and 96 individuals as population size
+% through the core' sizes: 6, 12, 18, 24, 30, 36, 42, 48
+% we are testing on dae and dae-sm (shared memoization)
+% we use as problems: openstack17 and elevator12
+% we dont use the restart mode
+% no stopping criteria defined
+% we repeat tests 21 times
+% and the used parallelization schemes are the both static and dynamic ones
+
+% EXP3
+% Recording of the elapsed time in evaluation and variation step
+% --------------------------------------------------------------
+% we are using 48 cores
+% through the sizes of population: 48, 1152, 2304, 3456, 4608, 5760
+% we only make test on the version dae-sm (shared memoization)
+% we use as problems: elevator12
+% we repeat tests 11 times
+% and the used parallelization scheme is the static one
+
+
 \subsection{Results}
 \label{section:results}
 %\paragraph{Measures}
@@ -664,11 +697,35 @@ Figure \ref{fig:elevators_pop} shows that the median computation time on a multi
 The dispersion of the distribution is due to the steady-state stopping criterion that may be reached after different times, with a higher probability when the
 population size is small.
 
+% \begin{figure}[htpb]
+%  \begin{center}
+%  \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_speedup.pdf}}
+%  \hfill
+%  \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_pop_time_speedup.pdf}}
+%  \end{center}
+%  \caption{Speedup distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the both sequential \ELEVATORS-12 and temporal \OPENSTACKS-17 problems, using 48 processors.}
+%  \label{fig:speedup_pop}
+% \end{figure}
+
+
+% EXP1's results
+
 \begin{figure}[htpb]
  \begin{center}
- \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_speedup.pdf}}
+ \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/EXP1_Efficiency_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}}
  \hfill
- \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_pop_time_speedup.pdf}}
+ \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/EXP1_Efficiency_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}}
+ \end{center}
+ \caption{Efficiency distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the both sequential \ELEVATORS-12 and temporal \OPENSTACKS-17 problems, using 48 processors.}
+ \label{fig:efficiency_pop}
+\end{figure}
+
+
+\begin{figure}[htpb]
+ \begin{center}
+ \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/EXP1_Speedup_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}}
+ \hfill
+ \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/EXP1_Speedup_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}}
  \end{center}
  \caption{Speedup distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the both sequential \ELEVATORS-12 and temporal \OPENSTACKS-17 problems, using 48 processors.}
  \label{fig:speedup_pop}
@@ -677,6 +734,7 @@ population size is small.
 Figure \ref{fig:speedup_pop} shows that an average speedup of $40$ is met, and that it decreases with the population size. 
 The speedup is measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
 For instance 3182\% means a speedup of 31.82.
+
 
 
 
