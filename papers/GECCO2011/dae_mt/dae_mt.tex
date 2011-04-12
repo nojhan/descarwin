@@ -10,10 +10,10 @@
 %
 % ----------------------------------------------------------------------------------------------------------------
 % This .tex file (and associated .cls V2.4) produces:
-%    1) The Permission Statement
-%    2) The Conference (location) Info information
-%    3) The Copyright Line with ACM data
-%    4) NO page numbers
+% 1) The Permission Statement
+% 2) The Conference (location) Info information
+% 3) The Copyright Line with ACM data
+% 4) NO page numbers
 %
 % as against the acm_proc_article-sp.cls file which
 % DOES NOT produce 1) thru' 3) above.
@@ -175,88 +175,88 @@ conclude and provide some insights of possible future works.
 
 \subsection{Parallel Evolutionary Algorithms}
 
-A large literature deals with the  parallelization  techniques  of  Evolutionary
-Algorithms (EAs).  Depending on the targeted architecture,  the  parallelization
-scheme may be chosen accordingly.  The main approaches may be classified  among:
-simple {\it run level parallelism}, EA with {\it global parallelism}  where  the
-evaluation  stage  is  parallelized   but   not   the   other   operators,   and
-{\it   island-based}   in   which   the   population   is    partitioned    into
-separate subpopulations.  These  structured  EAs  further  split  into  cellular
-EAs (cEA) where the selection  and  reproduction  steps  are  parallelized,  and
-distributed  EAs  {\it  dEA}  with  a  controlled  migration   between   islands
+A large literature deals with the parallelization techniques of Evolutionary
+Algorithms (EAs). Depending on the targeted architecture, the parallelization
+scheme may be chosen accordingly. The main approaches may be classified among:
+simple {\it run level parallelism}, EA with {\it global parallelism} where the
+evaluation stage is parallelized but not the other operators, and
+{\it island-based} in which the population is partitioned into
+separate subpopulations. These structured EAs further split into cellular
+EAs (cEA) where the selection and reproduction steps are parallelized, and
+distributed EAs {\it dEA} with a controlled migration between islands
 \cite{alba:IEEE2002}.
 
-The run level parallelism being  trivially  achieved  by  running  several  runs
-concurrently, the first step when parallelizing a new algorithm is often to  try
-the global parallelization approach, because the evaluation step  is  often  the
-most costly part  of  EAs  and  because  individual  evaluations  are  generally
+The run level parallelism being trivially achieved by running several runs
+concurrently, the first step when parallelizing a new algorithm is often to try
+the global parallelization approach, because the evaluation step is often the
+most costly part of EAs and because individual evaluations are generally
 intrinsically independent.
 
-A parallel extension of EO, \PARADISEO,  has  been  proposed  by  Cahon  et  al.
-\cite{paradiseo:JHeuristics2004}.  It is based on the Message Passing  Interface
-(MPI)  and  proposes  several  parallelization  schemes,  available  by  calling
-wrappers around common functions of EO.   \PARADISEO\  targets  multi-processors
-machines, especially  clusters  and  grids,  for  running  large-scale,  general
-purpose EAs.  As we are  targeting  a  multicore  architecture,  and  since  our
-evaluation function has a large memory footprint, message passing may  introduce
-a time consuming memory copy overhead.  This  reason  discards  the  \PARADISEO\
+A parallel extension of EO, \PARADISEO, has been proposed by Cahon et al.
+\cite{paradiseo:JHeuristics2004}. It is based on the Message Passing Interface
+(MPI) and proposes several parallelization schemes, available by calling
+wrappers around common functions of EO. \PARADISEO\ targets multiprocessor
+machines, especially clusters and grids, for running large-scale, general
+purpose EAs. As we are targeting a multicore architecture, and since our
+evaluation function has a large memory footprint, message passing may introduce
+a time consuming memory copy overhead. This reason discards the \PARADISEO\
 framework.
 
-Another attractive parallel architecture is the GPGPU  card  with  a  very  good
+Another attractive parallel architecture is the GPGPU card with a very good
 processor-price ratio. The work described in \cite{maitre:gecco2009} shows how a
-simple general scheme can be designed for EAs, by parralelizing  the  evaluation
-step.  But the limitations that are pointed out can hardly  be  avoided  in  our
-case.  Firstly, without stack, functional calls are forbidden on a  GPGPU  card:
-the whole code must  be  inlined;  this  would  entail  to  inline  the  \YAHSP\
-solver entirely, which would overcome the  available  length  limit.   Secondly,
-it necessitate flat genomes representations, which in  our  case  would  implies
-a lot of copies of the  atoms  objects  instances,  which  can  be  numerous  on
-large problems.  Moreover; \YAHSP\ uses  a  memoization  mechanism  which  is  a
-global shared-memory that  save  previous  computations.   It  greatly  speed-up
-the search but cannot be used on  GPGPU  because  it  may  need  up  to  several
-gigabyte  of  memory  on  hard   problem,   where   GPGPU   cards   have   heavy
-limitations on memory.  And finally speedups may  be  obtained  for  very  large
-size of population (e.g.  5000, 20000) which  is  not  the  average  case  here.
-For   these   reasons   we   also   discarded   this   type   of   architecture.
+simple general scheme can be designed for EAs, by parallelizing the evaluation
+step. But the limitations that are pointed out can hardly be avoided in our
+case. Firstly, without stack, functional calls are forbidden on a GPGPU card:
+the whole code must be inlined; this would entail to inline the \YAHSP\
+solver entirely, which would overcome the available length limit. Secondly,
+it necessitates flat genome representations, which in our case would imply
+a lot of copies of the atoms objects instances, which can be numerous on
+large problems. Moreover, \YAHSP\ uses a memoization mechanism which is a
+global shared-memory that save previous computations. It greatly speeds up
+the search but cannot be used on a GPGPU because it may need up to several
+gigabytes of memory on hard problems, where GPGPU cards have heavy
+limitations on memory space. And finally speedups may be obtained for very large
+sizes of population (e.g. 5000, 20000) which is not the average case here.
+For these reasons we also discarded this type of architecture.
 
 \subsection{Parallel Planning}
 \label{section:previous-work}
 
-Several approaches to parallel planning have  been  proposed  in  recent  years.
-Parallel Retracting A* \cite{PRA-star}, was implemented on a Connection  Machine
-and had to deal with very severe  memory  limitations.   In  that  algorithm,  a
-distributed hash function is used to  allocate  generated  states  to  a  unique
-processing unit and avoid unnecessary state duplications.  PRA* deals  with  the
+Several approaches to parallel planning have been proposed in recent years.
+Parallel Retracting A* \cite{PRA-star}, was implemented on a Connection Machine
+and had to deal with very severe memory limitations. In that algorithm, a
+distributed hash function is used to allocate generated states to a unique
+processing unit and avoid unnecessary state duplications. PRA* deals with the
 memory limitation through a retraction mechanism which allow a processor to free
-its memory by dropping states.  In order to confirm the  transfer  of  a  state,
-synchronous communication channels must be used, which seriously slow  down  the
+its memory by dropping states. In order to confirm the transfer of a state,
+synchronous communication channels must be used, which seriously slow down the
 search process. Transposition-table driven work scheduling \cite{TDS}, similarly
-to PRA*, uses a hash function to avoid duplication.  It is based  on  IDA*  and,
-running  on  a  standard  architecture,  does  not  necessitate  any  retraction
-mechanism and  can  efficiently  exploit  asynchronous  communication  channels.
-Parallel Frontier A* with  Delayed  Duplicate  Detection  \cite{PFADDD}  uses  a
-strategy based on intervals computed by  sampling  to  distribute  the  workload
-among several workstations, targeting distributed-memory systems as  opposed  to
+to PRA*, uses a hash function to avoid duplication. It is based on IDA* and,
+running on a standard architecture, does not necessitate any retraction
+mechanism and can efficiently exploit asynchronous communication channels.
+Parallel Frontier A* with Delayed Duplicate Detection \cite{PFADDD} uses a
+strategy based on intervals computed by sampling to distribute the workload
+among several workstations, targeting distributed-memory systems as opposed to
 previous approaches. In \cite{HDA-star}, the authors introduce Hash Distributed
-A* (HDA*) which combines successful ideas  from  previous  parallel  algorithms.
-HDA* uses a hash function  which  assigns  each  generated  state  to  a  unique
-processing unit in order to avoid the duplication of the search  efforts.   This
-mechanism  was  introduced  in  PRA*,  which  unfortunately  combined  it   with
+A* (HDA*) which combines successful ideas from previous parallel algorithms.
+HDA* uses a hash function which assigns each generated state to a unique
+processing unit in order to avoid the duplication of the search efforts. This
+mechanism was introduced in PRA*, which unfortunately combined it with
 synchronous communication channels which caused a lot of overhead. This problem
-was  addressed  in  HDA*  by  the  use  of  non-blocking  communication  (as  in
-\cite{TDS}).   In  \cite{burns:ijcai2009,burns:JAIR2010}  the  authors   present
+was addressed in HDA* by the use of non-blocking communication (as in
+\cite{TDS}). In \cite{burns:ijcai2009,burns:JAIR2010} the authors present
 Parallel Best-NBlock-First (PBNF). It uses an abstraction to partition the state
-space.  PBNF allows each  thread  to  expand  the  most  promising  nodes  while
+space. PBNF allows each thread to expand the most promising nodes while
 detecting duplicate states. Rather than sleeping if a lock cannot be acquired, a
 thread can perform ``speculative'' expansions by continuing the expansion of its
-current part of the space.  This technique keeps cores busy at  the  expense  of
-duplicate work.   \cite{dovetailing}  adapts  to  planning  a  technique  called
-dovetailing, in which several instances of a  search  algorithm  with  different
+current part of the space. This technique keeps cores busy at the expense of
+duplicate work. \cite{dovetailing} adapts to planning a technique called
+dovetailing, in which several instances of a search algorithm with different
 parameter settings are run in parallel. Finally, \cite{vidal:socs2010} proposed
-a multicore version of the planner \cite{yahsp:icaps2004} where many  concurrent
-threads expand nodes from a common open list, yielding to early  exploration  of
-branches of the search tree that would have been delayed by a classical  search,
-which   can    speed-up    search    by    several    orders    of    magnitude.
+a multicore version of the planner \cite{yahsp:icaps2004} where many concurrent
+threads expand nodes from a common open list, yielding to early exploration of
+branches of the search tree that would have been delayed by a classical search,
+which can speed-up search by several orders of magnitude.
 
 \section{Methods}
 
@@ -594,16 +594,16 @@ The \DAEX algorithm being stochastic, each run is repeated 11 times and the resu
 %$$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
 
 %% Results
-\paragraph{Speed-up against the Number of Processors}
+\paragraph{Speedup against Number of Processors}
 
 \begin{figure}[htpb]
- \begin{center}
- \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
- \hfill
- \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
- \end{center}
- \caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors used.}
- \label{fig:proc_elevators_vs_openstacks}
+\begin{center}
+\subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
+\hfill
+\subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+\end{center}
+\caption{Wallclock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors used.}
+\label{fig:proc_elevators_vs_openstacks}
 \end{figure}
 
 Figure \ref{fig:proc_elevators_vs_openstacks} shows that on both problems, the
@@ -646,7 +646,7 @@ scheme does not permit a significant speed-up comparing to the static one. The
 Wilcoxon signed-rank test cannot reject the null hypothesis that the samples come
 from the same distribution ($p=0.03$).
 
-\paragraph{Speed-up against the Population Size} % (CC, JD)
+\paragraph{Speedup against Population Size} % (CC, JD)
 
 \begin{figure}[htpb]
  \begin{center}
