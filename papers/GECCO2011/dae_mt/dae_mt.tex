@@ -604,6 +604,15 @@ generations without improvement.
 % and the used parallelization scheme is the static one
 
 
+\paragraph{Comparison of Static and Dynamic Scheduling}
+\OPENMP\ lets the choice between static and dynamic task scheduling. The default one is the static scheduling.
+In the static scheduling, a loop iterating through a set of tasks will be
+divided in several tasks relative to the number of available processors.
+Regarding dynamic scheduling, during the runtime if one thread has finished
+these tasks it gets the next available one, in a queue.
+
+
+
 \subsection{Results}
 \label{section:results}
 %\paragraph{Measures}
@@ -633,29 +642,67 @@ generations without improvement.
 %% Results
 \paragraph{Speedup against Number of Processors}
 
+% \begin{figure}[htpb]
+% \begin{center}
+% \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
+% \hfill
+% \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+% \end{center}
+% \caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors used.}
+% \label{fig:proc_elevators_vs_openstacks}
+% \end{figure}
+
+
+% EXP2's results
+
+
+% efficiency elevators 12 begins
+
+% \begin{figure}[htpb]
+% \begin{center}
+% \includegraphics[width=0.5\textwidth]{images/EXP2_Efficiency_IPC6_SEQ_ELEVATORS_12_S48.pdf}
+% \caption{Efficiency distributions of 21 runs of \DAEYAHSP\ relative to the number of cores, on \ELEVATORS-12, along with the population size fixed to 48.}
+% \label{fig:exp2_efficiency_core_elevator_12_pop_48}\end{center}
+% \end{figure}
+
 \begin{figure}[htpb]
 \begin{center}
-\subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
-\hfill
-\subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
-\end{center}
-\caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors used.}
-\label{fig:proc_elevators_vs_openstacks}
+\includegraphics[width=0.5\textwidth]{images/EXP2_Efficiency_IPC6_SEQ_ELEVATORS_12_S96.pdf}
+\caption{Efficiency distributions of 21 runs of \DAEYAHSP\ relative to the number of processors, on \ELEVATORS-12, along with the population size fixed to 96.}
+\label{fig:exp2_efficiency_core_elevators_12_pop_96}\end{center}
 \end{figure}
 
-Figure \ref{fig:proc_elevators_vs_openstacks} shows that on both problems, the
+% efficiency elevators 12 ends
+
+
+
+% efficiency openstacks 17 begins
+
+% \begin{figure}[htpb]
+% \begin{center}
+% \includegraphics[width=0.5\textwidth]{images/EXP2_Efficiency_IPC6_TEMPO_OPENSTACKS_17_S48.pdf}
+% \caption{Efficiency distributions of 21 runs of \DAEYAHSP\ relative to the number of processors, on \OPENSTACKS-17, along with the population size fixed to 48.}
+% \label{fig:exp2_efficiency_core_openstacks_17_pop_48}\end{center}
+% \end{figure}
+
+\begin{figure}[htpb]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{images/EXP2_Efficiency_IPC6_TEMPO_OPENSTACKS_17_S96.pdf}
+\caption{Efficiency distributions of 21 runs of \DAEYAHSP\ relative to the number of processors, on \OPENSTACKS-17, along with the population size fixed to 96.}
+\label{fig:exp2_efficiency_core_openstacks_17_pop_96}\end{center}
+\end{figure}
+
+% efficiency openstacks 17 ends
+
+
+Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and \ref{fig:exp2_efficiency_core_openstacks_17_pop_96}
+%\ref{fig:proc_elevators_vs_openstacks} 
+show that on both problems, the
 computation time decreases with the number of processors used. Comparing to the
 sequential version (running on a single processor), the parallel one permit a
 decrease that is similar on both problems. The dispersions of the distribution
 is due to the steady-state stopping criterion that may be reached after different
 times.
-
-\paragraph{Comparison of Static and Dynamic Scheduling}
-\OPENMP\ lets the choice between static and dynamic task scheduling. The default one is the static scheduling.
-In the static scheduling, a loop iterating through a set of tasks will be
-divided in several tasks relative to the number of available processors.
-Regarding dynamic scheduling, during the runtime if one thread has finished
-these tasks it gets the next available one, in a queue.
 
 % some hypotheses
 
@@ -668,36 +715,37 @@ these tasks it gets the next available one, in a queue.
 % $S^s_p$ is the speedup for the static scheduling.\\
 % $S^d_p$ is the speedup for the dynamic one.\\
 
-\begin{figure}[htpb]
- \begin{center}
- \subfigure[static]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_static.pdf}}
- \hfill
- \subfigure[dynamic]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
- \end{center}
- \caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors, on the temporal \OPENSTACKS-17 problem.}
- \label{fig:proc_static_vs_dynamic}
-\end{figure}
+% \begin{figure}[htpb]
+%  \begin{center}
+%  \subfigure[static]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_static.pdf}}
+%  \hfill
+%  \subfigure[dynamic]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
+%  \end{center}
+%  \caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors, on the temporal \OPENSTACKS-17 problem.}
+%  \label{fig:proc_static_vs_dynamic}
+% \end{figure}
 
-Figure \ref{fig:proc_static_vs_dynamic} shows that the dynamic parallelization
-scheme does not permit a significant speed-up comparing to the static one. The
-Wilcoxon signed-rank test cannot reject the null hypothesis that the samples come
-from the same distribution ($p=0.03$).
+% THE FOLLOWING TEXT HAS TO BE CHANGED IN TAKING IN ACCOUNT THE NEW GRAPHICS WHERE THE DYNAMIC SCHEME SEEMS TO BE BETTER IN USING SHARED ALGORITHM:
+% Figure \ref{fig:proc_static_vs_dynamic} shows that the dynamic parallelization
+% scheme does not permit a significant speed-up comparing to the static one. The
+% Wilcoxon signed-rank test cannot reject the null hypothesis that the samples come
+% from the same distribution ($p=0.03$).
 
 \paragraph{Speedup against Population Size} % (CC, JD)
 
-\begin{figure}[htpb]
- \begin{center}
- \subfigure[full scale]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time.pdf}}
- \hfill
- \subfigure[rescaled]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_zoom.pdf}}
- \end{center}
- \caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the sequential \ELEVATORS-12 problem, using 48 processors.}
- \label{fig:elevators_pop}
-\end{figure}
+% \begin{figure}[htpb]
+%  \begin{center}
+%  \subfigure[full scale]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time.pdf}}
+%  \hfill
+%  \subfigure[rescaled]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_zoom.pdf}}
+%  \end{center}
+%  \caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the sequential \ELEVATORS-12 problem, using 48 processors.}
+%  \label{fig:elevators_pop}
+% \end{figure}
 
-Figure \ref{fig:elevators_pop} shows that the median computation time on a multicore machine increases linearly with the size of the population. 
-The dispersion of the distribution is due to the steady-state stopping criterion that may be reached after different times, with a higher probability when the
-population size is small.
+% Figure \ref{fig:elevators_pop} shows that the median computation time on a multicore machine increases linearly with the size of the population. 
+% The dispersion of the distribution is due to the steady-state stopping criterion that may be reached after different times, with a higher probability when the
+% population size is small.\\
 
 % \begin{figure}[htpb]
 %  \begin{center}
@@ -722,11 +770,13 @@ population size is small.
 % \label{fig:efficiency_pop}
 %\end{figure}
 
+% efficiency begins
+
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP1_Efficiency_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}
 \caption{Efficiency distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12, using 48 cores.}
-\label{fig:efficiency_pop_elevator_12}\end{center}
+\label{fig:exp1_efficiency_pop_elevators_12}\end{center}
 \end{figure}
 
 
@@ -735,8 +785,32 @@ population size is small.
 \includegraphics[width=0.5\textwidth]{images/EXP1_Efficiency_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}
 \end{center}
 \caption{Efficiency distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \OPENSTACKS-17, using 48 cores.}
-\label{fig:efficiency_pop_openstacks_17}
+\label{fig:exp1_efficiency_pop_openstacks_17}
 \end{figure}
+
+% efficiency ends
+
+
+% totalcost + makespan begins
+
+\begin{figure}[htpb]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{images/EXP1_Total_cost_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}
+\end{center}
+\caption{Total cost distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12, using 48 cores.}
+\label{fig:exp1_totalcost_pop_elevators_12}
+\end{figure}
+
+
+\begin{figure}[htpb]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{images/EXP1_Makespan_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}
+\end{center}
+\caption{Makespan distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \OPENSTACKS-17, using 48 cores.}
+\label{fig:exp1_makespan_pop_openstacks_17}
+\end{figure}
+
+% totalcost + makespan ends
 
 
 % \begin{figure}[htpb]
@@ -753,9 +827,6 @@ population size is small.
 % Figure \ref{fig:speedup_pop} shows that an average speedup of $40$ is met, and that it decreases with the population size. 
 The speedup is measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
 For instance 3182\% means a speedup of 31.82.
-
-
-
 
 
 \section{Discussion and Conclusion}
