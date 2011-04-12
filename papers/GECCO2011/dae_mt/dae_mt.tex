@@ -569,27 +569,29 @@ best fitness in the population is made during 50 generations, with a maximum of
 
 The \DAEX algorithm being stochastic, each run is repeated 11 times and the resulting distributions are presented as standard boxplots.
 
-% have to describe in this part the 4 experiments done, here are the summaries of these experiments:
+\subsection{Experiments}
 
-% EXP1
-% we are using 48 cores
-% through the sizes of population: 48, 1152, 2304, 3456, 4608, 5760
-% we only make test on the version dae-sm (shared memoization)
-% we use as problems: elevator12 et openstack17
-% we are using the restart mode
-% the stop criteria is the time limit fixed to 30"
-% we repeat tests 11 times
-% and the used parallelization scheme is the static one
+\paragraph{Competition settings, varying cores number}
 
-% EXP2
-% we are using 48 and 96 individuals as population size
-% through the core' sizes: 6, 12, 18, 24, 30, 36, 42, 48
-% we are testing on dae and dae-sm (shared memoization)
-% we use as problems: openstack17 and elevator12
-% we dont use the restart mode
-% no stopping criteria defined
-% we repeat tests 21 times
-% and the used parallelization schemes are the both static and dynamic ones
+This experiment uses the same version of \DAEYAHSP\ than the one  used  for  the
+International Planning Competition, in a similar experimental environment.   The
+algorithm uses the shared memoization and a static parallelization  scheme.   It
+has 30 minutes to achieve its search, and performs a complete restart each  time
+it is stucked during 50 generations without improvement.  Number of  cores  used
+range   from   6   to   48,   11   runs   being   performed   each   6    cores.
+
+
+\paragraph{Alternative version, varying population size}
+
+This experiments test performances of four versions of the algorithm,  combining
+the memoization scheme (separated or on shared memory) and  the  parallelization
+scheme (static or dynamic).  The 48 available cores are used for  the  following
+population sizes: 48, 1152, 2304, 3456, 4608, 5760.  21 runs are  performed  for
+each  parameter  setting,  which  are  stopped  when  the  algorithm  reach   50
+generations without improvement.
+
+
+%\paragraph{}
 
 % EXP3
 % Recording of the elapsed time in evaluation and variation step
