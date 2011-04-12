@@ -486,7 +486,6 @@ void apply< EOT >(eoUF< EOT, void >& proc,
 \vspace{-0.2cm}
 \end{algorithm}
 
-
 When parallelizing the evaluation loop in an evolutionary algorithm, there
 exists a synchronization step at each iteration, this ensure that no race-condition
 may occurs. Indeed, individuals being evaluated are all independent, which is
@@ -521,11 +520,11 @@ decomposition itself, and not as attributes of the evaluation functor.
 
 \paragraph{Static and Dynamic Scheduling}
 
-\OPENMP\  lets  the  choice  between  static  (the  default)  and  dynamic  task
-scheduling.  In the static  scheduling,  a  loop  iterating  through  a  set  of
-tasks will be divided in several tasks  relative  to  the  number  of  available
-processors.  In dynamic  scheduling,  if  one  thread  has  finished  its  tasks
-it   gets   the   next    available    one,    using    a    queue    structure.
+\OPENMP\ lets the choice between static (the default) and dynamic task
+scheduling. In the static scheduling, a loop iterating through a set of
+tasks will be divided in several tasks relative to the number of available
+processors. In dynamic scheduling, if one thread has finished its tasks
+it gets the next available one, using a queue structure.
 
 
 \section{Experimental Study}
@@ -537,6 +536,9 @@ The algorithm is programmed in C++ using GCC and the GNU \OPENMP\ threading
 library (GOMP), both version 4.4.4. It is run on a 48-core DELL PowerEdge R815
 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB
 cache) processors with 192GB of RAM, under Linux x86\_64 2.6.32.
+
+The speedup is measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
+For instance 3182\% means a speedup of 31.82.
 
 \paragraph{Benchmarks}
 Although there are several families of problems, we concentrate here on cost planning and temporal
@@ -583,29 +585,29 @@ The \DAEX algorithm being stochastic, each run is repeated 11 times and the resu
 
 \subsection{Experiments}
 
-Two types of experiments were conducted to analyse the algorithm behaviour  when
-increasing the number of cores on one hand and when increasing the size  of  the
+Two types of experiments were conducted to analyse the algorithm behaviour when
+increasing the number of cores on one hand and when increasing the size of the
 population on the other hand.
 
 
-\paragraph{Competition settings, varying cores number}
+\paragraph{Competition settings, varying the number of cores}
 
-This experiment tests performances of four versions of the algorithm,  combining
-the memoization scheme (separated or on shared memory) and  the  parallelization
-scheme (static or  dynamic),  with  a  population  of  48  and  96  individuals.
-Number of cores used range from 6 to 48, testing each  6  cores.   21  runs  are
-performed  for  each  setting.   parameter  setting,  which  are  stopped   when
-the   algorithm   reached   50 generations without improvement.
+This experiment tests four versions of the algorithm, combining
+the memoization scheme (local or shared) and the parallelization
+scheme (static or dynamic), with a population of 48 and 96 individuals.
+Number of cores used range from 6 to 48, testing each 6 cores. 21 runs are
+performed for each setting which are stopped when
+the algorithm reached 50 generations without improvement.
 
 
-\paragraph{Alternative version, varying population size}
+\paragraph{Alternative version, varying the population size}
 
-This experiment uses the same version of \DAEYAHSP\ as  the  one  used  for  the
-International Planning Competition, in a similar experimental environment.   The
-algorithm uses the shared memoization and a  static  parallelization  scheme  It
-has 30 minutes to achieve its search,  and  performs  a  complete  restart  each
-time  it  is  stucked  after  50  generations  without  improvement.   11   runs
-being  performed  on  the  48  available  cores  are  used,  for  the  following
+This experiment uses the same version of \DAEYAHSP\ as the one used for the
+International Planning Competition, in a similar experimental environment. The
+algorithm uses the shared memoization and a static parallelization scheme. It
+has 30 minutes to achieve its search, and performs a complete restart each
+time it is stucked after 50 generations without improvement. 11 runs
+being performed on the 48 available cores, for the following
 population sizes: 48, 1152, 2304, 3456, 4608, 5760. 
 
 
@@ -624,115 +626,39 @@ population sizes: 48, 1152, 2304, 3456, 4608, 5760.
 
 \subsection{Results}
 \label{section:results}
-%\paragraph{Measures}
 
-%Here is the three equations of measure used: the speedup, the efficiency and
-%the advanced speedup introduced by the Amdahl's law.
-
-% $$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} S_{p_{kl}}$$
-% according to the speedup equation: $S_p = \frac{T^*_1}{T_p}$
-% we get the following equation:
-% $$Speedup\ measure = r \sum^{P,d}_{k=0,l=0} \frac{T^*_{1_{kl}}}{T_{p_{kl}}}$$
-
-%The efficiency measure equation is the following.
-%$$Efficiency\ measure = r \sum^{P,d}_{k=0,l=0} E_{p_{kl}}$$
-
-%And finally the advanced speedup provided by Amdahl's law:
-%$$A_p = \frac{1}{(1-s) + \frac{s}{p}}$$
-%$s$ being the parallelizable part of the program and $p$ the number of cores
-%used.
-%This equation allows to extract the sequential part of the program not
-%parallelized and what ever number of cores we use, this sequential part will
-%still be there.
-%The limit of $A_p$ as $p$ approaches infinity is equal to the sequential part
-%of the program.
-%$$\lim_{p \to \infty} A_p = \frac{1}{(1-s)}$$
-
-%% Results
 \paragraph{Speedup against Number of Processors}
 
-% \begin{figure}[htpb]
-% \begin{center}
-% \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_proc_time.pdf}}
-% \hfill
-% \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
-% \end{center}
-% \caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors used.}
-% \label{fig:proc_elevators_vs_openstacks}
-% \end{figure}
-
-
-% EXP2's results
-
-
-% efficiency elevators 12 begins
-
-% \begin{figure}[htpb]
-% \begin{center}
-% \includegraphics[width=0.5\textwidth]{images/EXP2_Efficiency_IPC6_SEQ_ELEVATORS_12_S48.pdf}
-% \caption{Efficiency distributions of 21 runs of \DAEYAHSP\ relative to the number of cores, on \ELEVATORS-12, along with the population size fixed to 48.}
-% \label{fig:exp2_efficiency_core_elevator_12_pop_48}\end{center}
-% \end{figure}
+A first observation on Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and \ref{fig:exp2_efficiency_core_openstacks_17_pop_96} is that the speedup is linear with the number of processors. 
+For \ELEVATORS-12, there is no much difference between static versus dynamic and between shared and local memorization. 
+On \OPENSTACKS-17, the dynamic scheme performs slightly better. The hypothesis was that since the evaluation times are very much dissimilar by construction a queue-based scheduling should be more efficient. But as the latest experience highlights, the algorithm converges prematurely so that most of the individuals are identical, and thus produce equal evaluation times which favors the static scheme. 
 
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP2_Efficiency_IPC6_SEQ_ELEVATORS_12_S96.pdf}
-\caption{Efficiency distributions of 21 runs of \DAEYAHSP\ relative to the number of processors, on \ELEVATORS-12, along with the population size fixed to 96.}
+\caption{Efficiency of \DAEYAHSP\ relative to the number of processors, on \ELEVATORS-12}
 \label{fig:exp2_efficiency_core_elevators_12_pop_96}\end{center}
 \end{figure}
-
-% efficiency elevators 12 ends
-
-
-
-% efficiency openstacks 17 begins
-
-% \begin{figure}[htpb]
-% \begin{center}
-% \includegraphics[width=0.5\textwidth]{images/EXP2_Efficiency_IPC6_TEMPO_OPENSTACKS_17_S48.pdf}
-% \caption{Efficiency distributions of 21 runs of \DAEYAHSP\ relative to the number of processors, on \OPENSTACKS-17, along with the population size fixed to 48.}
-% \label{fig:exp2_efficiency_core_openstacks_17_pop_48}\end{center}
-% \end{figure}
 
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP2_Efficiency_IPC6_TEMPO_OPENSTACKS_17_S96.pdf}
-\caption{Efficiency distributions of 21 runs of \DAEYAHSP\ relative to the number of processors, on \OPENSTACKS-17, along with the population size fixed to 96.}
+\caption{Efficiency of \DAEYAHSP\ relative to the number of processors, on \OPENSTACKS-17}
 \label{fig:exp2_efficiency_core_openstacks_17_pop_96}\end{center}
 \end{figure}
 
-% efficiency openstacks 17 ends
+An explanation for the poor performance of shared memorization might be that the benefit obtained when memorization is shared among individuals is lost with the bottleneck due to multiple access locking.
 
+The dispersion of the distributions is due to the steady-state stopping criterion that may be reached after different times.
 
-Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and \ref{fig:exp2_efficiency_core_openstacks_17_pop_96}
-%\ref{fig:proc_elevators_vs_openstacks} 
-show that on both problems, the
-computation time decreases with the number of processors used. Comparing to the
-sequential version (running on a single processor), the parallel one permit a
-decrease that is similar on both problems. The dispersions of the distribution
-is due to the steady-state stopping criterion that may be reached after different
-times.
+%show that on both problems, the computation time decreases with the number of processors used. Comparing to the
+%sequential version (running on a single processor), the parallel one permit a decrease that is similar on both problems. 
 
 % some hypotheses
 
 % on a pas teste tout ça en pratique
 %Two hypotheses have driven us to test the dynamic scheduling. The first one consists to say that as long as we are using a problem solved in a variable time, the dynamic scheduling should be faster than the static scheduling does. The second one assumes that we use a population size higher than the number of cores available, the dynamic mode should bring a better efficiency.
 
-% To determine the quality of the dynamicity in front of statical schedule, we
-% are using the following formula:
-% $$D_p = \frac{S^s_p}{S^d_p}$$
-% $S^s_p$ is the speedup for the static scheduling.\\
-% $S^d_p$ is the speedup for the dynamic one.\\
-
-% \begin{figure}[htpb]
-%  \begin{center}
-%  \subfigure[static]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_static.pdf}}
-%  \hfill
-%  \subfigure[dynamic]{\includegraphics[width=0.23\textwidth]{images/openstacks_proc_time_dynamic.pdf}}
-%  \end{center}
-%  \caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the number of processors, on the temporal \OPENSTACKS-17 problem.}
-%  \label{fig:proc_static_vs_dynamic}
-% \end{figure}
 
 % THE FOLLOWING TEXT HAS TO BE CHANGED IN TAKING IN ACCOUNT THE NEW GRAPHICS WHERE THE DYNAMIC SCHEME SEEMS TO BE BETTER IN USING SHARED ALGORITHM:
 % Figure \ref{fig:proc_static_vs_dynamic} shows that the dynamic parallelization
@@ -740,65 +666,25 @@ times.
 % Wilcoxon signed-rank test cannot reject the null hypothesis that the samples come
 % from the same distribution ($p=0.03$).
 
-\paragraph{Speedup against Population Size} % (CC, JD)
+\paragraph{Speedup against Population Size}
 
-% \begin{figure}[htpb]
-%  \begin{center}
-%  \subfigure[full scale]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time.pdf}}
-%  \hfill
-%  \subfigure[rescaled]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_zoom.pdf}}
-%  \end{center}
-%  \caption{Wall clock time distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the sequential \ELEVATORS-12 problem, using 48 processors.}
-%  \label{fig:elevators_pop}
-% \end{figure}
-
-% Figure \ref{fig:elevators_pop} shows that the median computation time on a multicore machine increases linearly with the size of the population. 
-% The dispersion of the distribution is due to the steady-state stopping criterion that may be reached after different times, with a higher probability when the
-% population size is small.\\
-
-% \begin{figure}[htpb]
-%  \begin{center}
-%  \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/elevators_pop_time_speedup.pdf}}
-%  \hfill
-%  \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/openstacks_pop_time_speedup.pdf}}
-%  \end{center}
-%  \caption{Speedup distributions of 11 runs of \DAEYAHSP\ relative to the population size, on the both sequential \ELEVATORS-12 and temporal \OPENSTACKS-17 problems, using 48 processors.}
-%  \label{fig:speedup_pop}
-% \end{figure}
-
-
-% EXP1's results
-
-%\begin{figure}[htpb]
-% \begin{center}
-% \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/EXP1_Efficiency_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}}
-% \hfill
-% \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/EXP1_Efficiency_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}}
-% \end{center}
-% \caption{Efficiency distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12 and \OPENSTACKS-17, using 48 cores.}
-% \label{fig:efficiency_pop}
-%\end{figure}
-
-% efficiency begins
+The idea that a larger population would lead to a greater exploration and thus to a better solution quality was not confirmed by experimentation. It means that the algorithm converges very rapidly, independently of the population size. 
+The efficiency drop with a population over 1000 individuals might be explained by an increasing of time spent on the variation stage of the algorithm which has not been yet parallelized.
 
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP1_Efficiency_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}
-\caption{Efficiency distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12, using 48 cores.}
+\caption{Efficiency of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12}
 \label{fig:exp1_efficiency_pop_elevators_12}\end{center}
 \end{figure}
-
 
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP1_Efficiency_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}
 \end{center}
-\caption{Efficiency distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \OPENSTACKS-17, using 48 cores.}
+\caption{Efficiency of \DAEYAHSP\ relative to the population size, on \OPENSTACKS-17}
 \label{fig:exp1_efficiency_pop_openstacks_17}
 \end{figure}
-
-% efficiency ends
-
 
 % totalcost + makespan begins
 
@@ -806,36 +692,22 @@ times.
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP1_Total_cost_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}
 \end{center}
-\caption{Total cost distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12, using 48 cores.}
+\caption{Total costs for increasing population sizes, on \ELEVATORS-12}
 \label{fig:exp1_totalcost_pop_elevators_12}
 \end{figure}
-
 
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP1_Makespan_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}
 \end{center}
-\caption{Makespan distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \OPENSTACKS-17, using 48 cores.}
+\caption{Makespans for increasing population sizes, on \OPENSTACKS-17}
 \label{fig:exp1_makespan_pop_openstacks_17}
 \end{figure}
 
 % totalcost + makespan ends
 
 
-% \begin{figure}[htpb]
-%  \begin{center}
-%  \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/EXP1_Speedup_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}}
-%  \hfill
-%  \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/EXP1_Speedup_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}}
-%  \end{center}
-%  \caption{Speedup distributions of 11 runs of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12 and \OPENSTACKS-17, using 48 cores.}
-%  \label{fig:speedup_pop}
-% \end{figure}
-
-% to replace by a description of efficiency
 % Figure \ref{fig:speedup_pop} shows that an average speedup of $40$ is met, and that it decreases with the population size. 
-The speedup is measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
-For instance 3182\% means a speedup of 31.82.
 
 
 \section{Discussion and Conclusion}
@@ -872,11 +744,6 @@ well. A further development will consist in parallelizing other steps of the
 evolutionary loop in particular the offspring generation which is also
 intrinsically parallel, as it use independent variation operators.
 
-% FIX ME Further research: adapting the YAHSP memoing feature to the
-% parallelization scheme : 2 modes global vs local memoing
-
-% Impact on the EA design
-% Do you agree below?
 A further research axis deals with the impact on solution quality and in
 particular how to take advantage of the parallelization scheme to escape from
 premature convergence.
