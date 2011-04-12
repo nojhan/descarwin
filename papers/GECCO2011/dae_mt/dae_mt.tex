@@ -583,29 +583,30 @@ The \DAEX algorithm being stochastic, each run is repeated 11 times and the resu
 
 \subsection{Experiments}
 
-Two types of experiments were conducted to analyse the algorithm behaviour when increasing the number of cores on one hand and when increasing the size of the population on the other hand.
+Two types of experiments were conducted to analyse the algorithm behaviour  when
+increasing the number of cores on one hand and when increasing the size  of  the
+population on the other hand.
 
-% TODO : definir STATIC vs DYNAMIC
 
 \paragraph{Competition settings, varying cores number}
 
-This experiment uses the same version of \DAEYAHSP\ as the one  used  for  the
-International Planning Competition, in a similar experimental environment.   The
-algorithm uses the shared memoization and a static parallelization scheme,  with
-a population of 48 and 96  individuals.   It  has  30  minutes  to  achieve  its
-search, and performs a complete restart  each  time  it  is  stucked  after  50
-generations  without  improvement.   Number  of  cores  used  range  from  6  to
-48,   11   runs   being   performed   each   6    cores.
+This experiment tests performances of four versions of the algorithm,  combining
+the memoization scheme (separated or on shared memory) and  the  parallelization
+scheme (static or  dynamic),  with  a  population  of  48  and  96  individuals.
+Number of cores used range from 6 to 48, testing each  6  cores.   21  runs  are
+performed  for  each  setting.   parameter  setting,  which  are  stopped   when
+the   algorithm   reached   50 generations without improvement.
 
 
 \paragraph{Alternative version, varying population size}
 
-This experiment tests performances of four versions of the algorithm,  combining
-the memoization scheme (separated or on shared memory) and  the  parallelization
-scheme (static or dynamic).  The 48 available cores are used for  the  following
-population sizes: 48, 1152, 2304, 3456, 4608, 5760.  21 runs are  performed  for
-each  parameter  setting,  which  are  stopped  when  the  algorithm  reached  50
-generations without improvement.
+This experiment uses the same version of \DAEYAHSP\ as  the  one  used  for  the
+International Planning Competition, in a similar experimental environment.   The
+algorithm uses the shared memoization and a  static  parallelization  scheme  It
+has 30 minutes to achieve its search,  and  performs  a  complete  restart  each
+time  it  is  stucked  after  50  generations  without  improvement.   11   runs
+being  performed  on  the  48  available  cores  are  used,  for  the  following
+population sizes: 48, 1152, 2304, 3456, 4608, 5760. 
 
 
 %\paragraph{}
