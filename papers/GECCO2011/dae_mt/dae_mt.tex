@@ -635,7 +635,7 @@ population sizes: 48, 1152, 2304, 3456, 4608, 5760.
 \paragraph{Speedup against Number of Processors}
 
 A first observation on Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and \ref{fig:exp2_efficiency_core_openstacks_17_pop_96} is that the speedup is linear with the number of processors. 
-For \ELEVATORS-12, there is no much difference between static versus dynamic and between shared and local memorization. 
+For \ELEVATORS-12, there is no much difference between static versus dynamic and between shared and local memoization. 
 On \OPENSTACKS-17, the dynamic scheme performs slightly better. The hypothesis was that since the evaluation times are very much dissimilar by construction a queue-based scheduling should be more efficient. But as the latest experience highlights, the algorithm converges prematurely so that most of the individuals are identical, and thus produce equal evaluation times which favors the static scheme. 
 
 \begin{figure}[htpb]
@@ -652,7 +652,7 @@ On \OPENSTACKS-17, the dynamic scheme performs slightly better. The hypothesis w
 \label{fig:exp2_efficiency_core_openstacks_17_pop_96}\end{center}
 \end{figure}
 
-An explanation for the poor performance of shared memorization might be that the benefit obtained when memorization is shared among individuals is lost with the bottleneck due to multiple access locking.
+An explanation for the poor performance of shared memoization might be that the benefit obtained when memoization is shared among individuals is lost with the bottleneck due to multiple access locking.
 
 The dispersion of the distributions is due to the steady-state stopping criterion that may be reached after different times.
 
