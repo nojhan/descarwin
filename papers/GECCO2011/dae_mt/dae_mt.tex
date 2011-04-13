@@ -227,7 +227,7 @@ Parallel Retracting A* \cite{PRA-star}, was implemented on a Connection Machine
 and had to deal with very severe memory limitations. In that algorithm, a
 distributed hash function is used to allocate generated states to a unique
 processing unit and avoid unnecessary state duplications. PRA* deals with the
-memory limitation through a retraction mechanism which allow a processor to free
+memory limitation through a retraction mechanism which allows a processor to free
 its memory by dropping states. In order to confirm the transfer of a state,
 synchronous communication channels must be used, which seriously slow down the
 search process. Transposition-table driven work scheduling \cite{TDS}, similarly
@@ -243,6 +243,7 @@ HDA* uses a hash function which assigns each generated state to a unique
 processing unit in order to avoid the duplication of the search efforts. This
 mechanism was introduced in PRA*, which unfortunately combined it with
 synchronous communication channels which caused a lot of overhead. This problem
+% overhead is not really the good word I think maybe we have to replace it 'waiting'
 was addressed in HDA* by the use of non-blocking communication (as in
 \cite{TDS}). In \cite{burns:ijcai2009,burns:JAIR2010} the authors present
 Parallel Best-NBlock-First (PBNF). It uses an abstraction to partition the state
@@ -366,17 +367,20 @@ Results are presented in section \ref{section:results}.
 
 \paragraph{Parts that can Theoretically be Parallelized}
 
-As shown in Section \ref{section:previous-work}, heuristic search algorithms
+As shown in section \ref{section:previous-work}, heuristic search algorithms
 used in automated AI planners can be parallelized in many ways, although there
 is no obvious and natural way to do so. However, our goal in this work is not
 to parallelize the underlying planner, but the evolutionary algorithm which
 controls the planner, which can be made in a very efficient way. Indeed, in
 typical population-based algorithms such as evolutionary algorithms, the
 evaluation of individuals can be made independently of each other, a fortiori in
-a parallel way. Applying variation operators can also be performed in parallel;
+a parallel way since there is no data-dependencies.
+Applying variation operators can also be performed in parallel;
 and depending on the application, parallelism on variation operators or
 individual evaluation will have a different impact on the running time and
-utilization of the computational resources. In \DAEX, the running time of
+utilization of the computational resources.
+% is the paragraph below still truth ?
+In \DAEX, the running time of
 applying the variation operators is negligible w.r.t. the running time required
 by the individual evaluations by an embedded planner, which is the reason why we
 only parallelized the latter.
@@ -421,7 +425,7 @@ is \emph{livelocks}, where the threads are still able to continue doing some
 work but cannot go through some portion of the code due to a similar phenomenon.
 
 Another problem that can arise is the concurrent use of a given subroutine by
-several threads, when such a subroutine or some subroutine calledy it modifies
+several threads, when such a subroutine or some subroutine called it modifies
 some global data. This is a typical problem of reentrancy, which must be
 carefully analyzed in order to render thread-safe a parallel implementation. Two
 cases can then occur: either the global data must be shared by some threads, which
@@ -486,8 +490,9 @@ void apply< EOT >(eoUF< EOT, void >& proc,
 \vspace{-0.2cm}
 \end{algorithm}
 
-When parallelizing the evaluation loop in an evolutionary algorithm, there
-exists a synchronization step at each iteration, this ensure that no race-condition
+When parallelizing the evaluation loop in an evolutionary algorithm,
+% the text below doesnot seem to be right
+there exists a synchronization step at each iteration, this ensure that no race-condition
 may occurs. Indeed, individuals being evaluated are all independent, which is
 the case in the majority of evolutionary algorithms, and also in \DAEX.
 
@@ -581,7 +586,7 @@ after at least 10 generations, evolution is stopped if no improvement of the
 best fitness in the population is made during 50 generations, with a maximum of
 1000 generations.
 
-The \DAEX algorithm being stochastic, each run is repeated 11 times and the resulting distributions are presented as standard boxplots.
+The \DAEX\ algorithm being stochastic, each run is repeated 11 times and the resulting distributions are presented as standard boxplots.
 
 \subsection{Experiments}
 
@@ -720,6 +725,7 @@ step of the \DAEX algorithm, based on the \OPENMP\ directive-based API on a comm
 this scheme is immediately available for any evolutionary algorithm as far as
 the context of the evaluation functor is thread-local and reentrant.
 
+% we have to change according to the new results
 As expected, on our 48-core Dell Machine a roughly $\times40$ speed-up was obtained on
 the tested benchmark, this speed-up being the same for all instances.
 
@@ -733,6 +739,7 @@ Our results show that the stopping criterion should be chosen carefully, along
 with the population size, as it has an impact on the dispersion of the
 distribution of computation times.
 
+% Have to be changed regarding the new results
 The dynamic queue mapping management of threads onto cores did not provide a significant
 improvement. Our hypothesis was that the goal sequences shows a diversity in
 length and thus should have shown very diverse times of evaluation computations.
@@ -747,6 +754,16 @@ intrinsically parallel, as it use independent variation operators.
 A further research axis deals with the impact on solution quality and in
 particular how to take advantage of the parallelization scheme to escape from
 premature convergence.
+
+% TO ADD IN CONCLUSION
+% Dans l'etat pour aller plus vite il faut utiliser une petite taille de population
+% car on obtient un meilleur speedup et une meilleur qualité.
+
+% TO ADD IN FURTHER WORK
+% to parallelize variation operators
+% travailler sur convergence prématurée
+% to compare shared/dynamic sheme
+% to hybrid shared and distributed parallelization ?!?
 
 \section{Acknowledgments}
 This work is being partially funded by the French National Research Agency through the COSINUS programme, under the research contract DESCARWIN (ANR-09-COSI-002).
