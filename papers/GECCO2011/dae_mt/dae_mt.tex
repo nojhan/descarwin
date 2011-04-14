@@ -492,7 +492,7 @@ void apply< EOT >(eoUF< EOT, void >& proc,
 
 When parallelizing the evaluation loop in an evolutionary algorithm,
 % the text below doesnot seem to be right
-there exists a synchronization step at each iteration, this ensure that no race-condition
+there exists a synchronization step at each generation, this ensure that no race-condition
 may occurs. Indeed, individuals being evaluated are all independent, which is
 the case in the majority of evolutionary algorithms, and also in \DAEX.
 
