@@ -720,7 +720,7 @@ The efficiency drop with a population over 1000 individuals might be explained b
 %parallelization of the individual evaluation.
 
 We made a proof-of-concept of a shared-memory parallelization of the evaluation
-step of the \DAEX algorithm, based on the \OPENMP\ directive-based API on a common
+step of the \DAEX\ algorithm, based on the \OPENMP\ directive-based API on a common
 48-core machine. Thanks to the abstraction level provided by the EO framework,
 this scheme is immediately available for any evolutionary algorithm as far as
 the context of the evaluation functor is thread-local and reentrant.
