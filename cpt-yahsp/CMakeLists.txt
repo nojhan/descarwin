@@ -3,10 +3,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 ENABLE_LANGUAGE(CXX)
 
 # include the install configuration file where are defined the main variables
-INCLUDE(${CMAKE_SOURCE_DIR}/install.cmake OPTIONAL)
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake OPTIONAL)
 
 # define project name
-PROJECT(yahsp_library)
+PROJECT(cpt_yahsp_library)
 
 # include useful features for cmake
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)

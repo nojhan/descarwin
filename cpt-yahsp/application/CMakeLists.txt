@@ -4,7 +4,7 @@ INCLUDE_DIRECTORIES(
   ${GDSL_INCLUDE_DIR}
   )
 
-LINK_LIBRARIES(${GDSL_LIBRARY} m gmp yahsp_library-common)
+LINK_LIBRARIES(${GDSL_LIBRARY} m gmp cpt_yahsp_library-common)
 
 ADD_SUBDIRECTORY(yahsp)
 #ADD_SUBDIRECTORY(ratp)
