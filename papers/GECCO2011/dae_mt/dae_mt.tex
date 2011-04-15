@@ -668,10 +668,10 @@ Figure \ref{fig:exp2_totalcost_elevators-12_pop_96} shows that on  \ELEVATORS-12
 the total cost remains unaffected by the  number  of  cores  used  (results  are
 similar on \OPENSTACKS-17).
 
-It was expected that the decreasing time needed to  perform  a  run  would  lead
-to more restarts within the 30  minutes  contract  and  thus  to  an  increasing
-probability to reach better solutions. Results show that this does not permit
-significant improvement.  Again, an explanation for those results  is  that  the
+It was expected that the shorter time needed to  perform  a  run  would  lead
+to more restarts within the 30  minutes time contract  and  thus  to  an  increasing
+probability to reach better solutions. Results show that this is not the case.
+Again, an explanation for those results  is  that  the
 algorithm converge prematurely and cannot find  solutions  with  a  sufficiently
 high variance to ensure that the  probability  to  find  better  solutions  will
 increase with restarts.
@@ -688,22 +688,13 @@ increase with restarts.
 \end{figure}
 
 Figure \ref{fig:exp1_efficiency_pop} shows that the efficiency decreases with the
-size of the population, while being close to the optimum for a size equal to the
+size of the population: while being close to the optimum for a size equal to the
 available number of processors, it rapidly decreases and reaches a plateau for
-larger populations.
+big populations.
 
-Using a static parallelization scheme, the decrease in speedup  is  due  to  the
+Using a static parallelization scheme, the decrease in speed\-up  is  due  to  the
 synchronization step at each generation, when cores have finished the evaluation
 of easier decompositions and are waiting  for  the  next  generation  to  occur.
-%
-%The
-%efficiency drop with a population over 1000 individuals might be explained by an
-%increasing of time spent on the variation stage of the algorithm which  has  not
-%been yet parallelized.
-%
-
-
-% totalcost + makespan begins
 
 \begin{figure}[htpb]
 \begin{center}
@@ -721,17 +712,7 @@ The hypothesis that a larger population would lead to a greater exploration  and
 thus to a better solution quality is thus not confirmed by experimentation. The
 algorithm  converges  too  rapidly,  independently  of  the   population   size.
 
-
-% totalcost + makespan ends
-
-
-% Figure \ref{fig:speedup_pop} shows that an average speedup of $40$ is met, and that it decreases with the population size. 
-
-
 \section{Discussion and Conclusion}
-%In order to scale up the capabilities of \DAEYAHSP, this paper investigated the
-%parallelization of the individual evaluation.
-
 We made a proof-of-concept of a shared-memory parallelization of the  evaluation
 step of the \DAEX\ algorithm, based on the \OPENMP\  directive-based  API  on  a
 common 48-core machine.  Thanks to the abstraction  level  provided  by  the  EO
