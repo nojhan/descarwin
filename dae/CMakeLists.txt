@@ -5,7 +5,7 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 # include the install configuration file where are defined the main variables
-INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake)
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake OPTIONAL)
 
 # define project name
 PROJECT(DAEX)

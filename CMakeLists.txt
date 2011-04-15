@@ -13,9 +13,9 @@ FIND_PACKAGE(GDSL REQUIRED)
 # include the sources
 INCLUDE_DIRECTORIES(
   ${GDSL_INCLUDE_DIR}
-  # ${CMAKE_SOURCE_DIR}/cpt-yahsp
-  # ${CMAKE_SOURCE_DIR}/cpt-yahsp/src
-  # ${CMAKE_SOURCE_DIR}/dae/src
+  ${CMAKE_SOURCE_DIR}/cpt-yahsp
+  ${CMAKE_SOURCE_DIR}/cpt-yahsp/src
+  ${CMAKE_SOURCE_DIR}/dae/src
   )
 
 SET(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
