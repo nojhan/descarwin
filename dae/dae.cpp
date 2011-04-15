@@ -41,7 +41,7 @@ inline void LOG_LOCATION( eo::Levels level )
 #endif
 */
 
-void print_results( eoPop<daex::Decomposition> pop, time_t time_start )
+void print_results( eoPop<daex::Decomposition> pop, time_t time_start, int run )
 {
     (void) time_start;
 #ifndef NDEBUG
@@ -85,6 +85,8 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start )
     eo::log << eo::progress << "DAEx user time " << usage.ru_utime.tv_sec << "." << usage.ru_utime.tv_usec << " (seconds of user time in CPU)" << std::endl;
     eo::log << eo::progress << "DAEx wallclock time " << std::difftime( std::time(NULL), time_start )  << " (seconds)" << std::endl;
 #endif
+
+    std::cout << "Number of restarts " << run << std::endl;
 
     // the pop being unsorted, sorting it before getting the first is more efficient
     // than using best_element (that uses std::max_element)
@@ -859,7 +861,7 @@ int main ( int argc, char* argv[] )
 #endif
 
         pop.push_back( empty_decompo );
-        print_results( pop, time_start );
+        print_results( pop, time_start, run );
         return 0;
     }
 
@@ -871,7 +873,7 @@ int main ( int argc, char* argv[] )
     pop.push_back( empty_decompo );
     // push the best result, in case it was not in the last run
     pop.push_back( best );
-    print_results( pop, time_start );
+    print_results( pop, time_start, run );
 
     return 0;
 }
