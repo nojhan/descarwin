@@ -575,7 +575,7 @@ The \DAEX\ algorithm being stochastic, each run is repeated 11 times and the res
 
 \subsection{Experiments}
 
-Two types of experiments were conducted to analyse the algorithm behaviour when
+Two types of experiments were conducted to analyze the algorithm behavior when
 increasing the number of cores on one hand and when increasing the size of the
 population on the other hand.
 
@@ -596,7 +596,7 @@ This experiment uses the same version of \DAEYAHSP\ as the one used for the
 International Planning Competition, in a similar experimental environment. The
 algorithm uses the shared memoization and a static parallelization scheme. It
 has 30 minutes to achieve its search, and performs a complete restart each
-time it is stucked after 50 generations without improvement, 11 runs
+time it is stuck after 50 generations without improvement, 11 runs
 being performed on the 48 available cores, for the following
 population sizes: 48, 1152, 2304, 3456, 4608, 5760. 
 
@@ -619,10 +619,10 @@ every version and every problem tested (see figure
 \ref{fig:exp2_speedup_core_openstack_17_pop_96_nosm-static_vs_sm-dynamic} for an
 example on two versions).
 
-This observation meets the expected behaviour and is classical when  considering
-the  parellelization  of  the  evaluation  step  of  an  evolutionary  algorithm.
-Nevertheless,  the  difference  among  versions  and  problems   can   be   seen
-when  considering efficiency.
+This observation meets the expected behavior and is classical when considering
+the parallelization of the evaluation step of an evolutionary algorithm.
+Nevertheless, the difference among versions and problems can be seen
+when considering efficiency.
 
 \begin{figure}[H]%htpb]
 \begin{center}
@@ -639,23 +639,23 @@ when  considering efficiency.
 \end{figure}
 
 Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and
-\ref{fig:exp2_efficiency_core_openstacks_17_pop_96}   shows   that    for    the
-benchmark \ELEVATORS-12, shared  memoization  may  perform  better  for  larger
-population sizes but that there  is  no  difference  between  static  an  dynamic
-parallelization  schemes.   On  \OPENSTACKS-17,  the  dynamic  scheme   performs
-slightly   better   when   used   along    with    the    shared    memoization.
+\ref{fig:exp2_efficiency_core_openstacks_17_pop_96} shows that for the
+benchmark \ELEVATORS-12, shared memoization may perform better for larger
+population sizes but that there is no difference between static an dynamic
+parallelization schemes. On \OPENSTACKS-17, the dynamic scheme performs
+slightly better when used along with the shared memoization.
 
-Since the evaluation times are varying (given the fact that  decompositions  have
-different lengths and that each subproblem may be more  or  less  difficult),  by
-construction  a   queue-based   scheduling   should   be   more   efficient   in
-average.   But  the  behaviour   is   dependent   of   the   algorithm instance
-and   ability to  avoid  premature  convergence  that  would
-produce an  homogeneous  population.   Hence  the  difference  between  the  two
-schemes may not  be  immediately notable.
+Since the evaluation times are varying (given the fact that decompositions have
+different lengths and that each subproblem may be more or less difficult), by
+construction a queue-based scheduling should be more efficient in
+average. But the behavior is dependent of the algorithm instance
+and ability to avoid premature convergence that would
+produce an homogeneous population. Hence the difference between the two
+schemes may not be immediately notable.
 
-An explanation for the poor performance gain of using shared memoization  might
-be that the benefit obtained when memoization is  shared  among  individuals  is
-lost    with    the    bottleneck    due    to    multiple    access    locking.
+An explanation for the poor performance gain of using shared memoization might
+be that the benefit obtained when memoization is shared among individuals is
+lost with the bottleneck due to multiple access locking.
 
 \begin{figure}[htpb]
 \begin{center}
@@ -664,16 +664,16 @@ lost    with    the    bottleneck    due    to    multiple    access    locking.
 \label{fig:exp2_totalcost_elevators-12_pop_96}\end{center}
 \end{figure}
 
-Figure \ref{fig:exp2_totalcost_elevators-12_pop_96} shows that on  \ELEVATORS-12
-the total cost remains unaffected by the  number  of  cores  used  (results  are
+Figure \ref{fig:exp2_totalcost_elevators-12_pop_96} shows that on \ELEVATORS-12
+the total cost remains unaffected by the number of cores used (results are
 similar on \OPENSTACKS-17).
 
-It was expected that the shorter time needed to  perform  a  run  would  lead
-to more restarts within the 30  minutes time contract  and  thus  to  an  increasing
+It was expected that the shorter time needed to perform a run would lead
+to more restarts within the 30 minutes time contract and thus to an increasing
 probability to reach better solutions. Results show that this is not the case.
-Again, an explanation for those results  is  that  the
-algorithm converge prematurely and cannot find  solutions  with  a  sufficiently
-high variance to ensure that the  probability  to  find  better  solutions  will
+Again, an explanation for those results is that the
+algorithm converge prematurely and cannot find solutions with a sufficiently
+high variance to ensure that the probability to find better solutions will
 increase with restarts.
 
 
@@ -692,9 +692,9 @@ size of the population: while being close to the optimum for a size equal to the
 available number of processors, it rapidly decreases and reaches a plateau for
 big populations.
 
-Using a static parallelization scheme, the decrease in speed\-up  is  due  to  the
+Using a static parallelization scheme, the decrease in speed\-up is due to the
 synchronization step at each generation, when cores have finished the evaluation
-of easier decompositions and are waiting  for  the  next  generation  to  occur.
+of easier decompositions and are waiting for the next generation to occur.
 
 \begin{figure}[htpb]
 \begin{center}
@@ -708,45 +708,45 @@ of easier decompositions and are waiting  for  the  next  generation  to  occur.
 Figure \ref{fig:exp1_totalcost-makespan} shows that no significant difference in
 solution qualities can be observed when the population size increases.
 
-The hypothesis that a larger population would lead to a greater exploration  and
+The hypothesis that a larger population would lead to a greater exploration and
 thus to a better solution quality is thus not confirmed by experimentation. The
-algorithm  converges  too  rapidly,  independently  of  the   population   size.
+algorithm converges too rapidly, independently of the population size.
 
 \section{Discussion and Conclusion}
-We made a proof-of-concept of a shared-memory parallelization of the  evaluation
-step of the \DAEX\ algorithm, based on the \OPENMP\  directive-based  API  on  a
-common 48-core machine.  Thanks to the abstraction  level  provided  by  the  EO
-framework, this scheme is immediately available for any  evolutionary  algorithms
-as far as the context of the evaluation functor is thread-local  and  reentrant.
+We made a proof-of-concept of a shared-memory parallelization of the evaluation
+step of the \DAEX\ algorithm, based on the \OPENMP\ directive-based API on a
+common 48-core machine. Thanks to the abstraction level provided by the EO
+framework, this scheme is immediately available for any evolutionary algorithms
+as far as the context of the evaluation functor is thread-local and reentrant.
 
 % we have to change according to the new results
-As expected, on our 48-core Dell  Machine  a  roughly  $\times45$  speed-up  was
-obtained on  the  tested  benchmark,  this  speed-up  being  the  same  for  all
+As expected, on our 48-core Dell Machine a roughly $\times45$ speed-up was
+obtained on the tested benchmark, this speed-up being the same for all
 instances.
 
-The dispersion of the measured times is mainly due to  the  combination  of  the
-steady-state stopping criterion with the stochastic nature of the search,  which
-may or may not reach a fitness plateau early.   The  relationship  between  this
-dispersion and the hardness of  the  problem  solved  remains  to  be  explored.
+The dispersion of the measured times is mainly due to the combination of the
+steady-state stopping criterion with the stochastic nature of the search, which
+may or may not reach a fitness plateau early. The relationship between this
+dispersion and the hardness of the problem solved remains to be explored.
 
-Our results show that the stopping criterion should be chosen  carefully,  along
-with the population size,  as  it  has  an  impact  on  the  dispersion  of  the
+Our results show that the stopping criterion should be chosen carefully, along
+with the population size, as it has an impact on the dispersion of the
 computation times distribution. Moreover, the population size may seamlessly
-be    chosen    small,    in    order    to    increase    computation    speed.
+be chosen small, in order to increase computation speed.
 
 % Have to be changed regarding the new results
-The  dynamic  queue  mapping  management  of  threads  onto  cores   provides   a
-significant improvement on a single  problem  instance,  when  combined  with  a
-shared memoization.  As it  brings  no  improvement  on  the  other  problem,  it
-may  be  prefered,  but  more  test  on  differents   domains   are   necessary.
+The dynamic queue mapping management of threads onto cores provides a
+significant improvement on a single problem instance, when combined with a
+shared memoization. As it brings no improvement on the other problem, it
+may be preferred, but more tests on different domains are necessary.
 
-The implementation scheme presented here is very  simple,  but  works  extremely
-well.  A further development will consist in parallelizing other  steps  of  the
-evolutionary  loop  in  particular  the  offspring  generation  (which  is   also
-intrinsically   parallel) and the selection/replacement operators.
+The implementation scheme presented here is very simple, but works extremely
+well. A further development will consist in parallelizing other steps of the
+evolutionary loop in particular the offspring generation (which is also
+intrinsically parallel) and the selection/replacement operators.
 
-A further research axis deals  with  the  impact  on  solution  quality  and  in
-particular how to take advantage of the parallelization scheme  to  escape  from
+A further research axis deals with the impact on solution quality and in
+particular how to take advantage of the parallelization scheme to escape from
 premature convergence.
 
 % TO ADD IN CONCLUSION
