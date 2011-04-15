@@ -229,7 +229,7 @@ distributed hash function is used to allocate generated states to a unique
 processing unit and avoid unnecessary state duplications. PRA* deals with the
 memory limitation through a retraction mechanism which allows a processor to free
 its memory by dropping states. In order to confirm the transfer of a state,
-synchronous communication channels must be used, which seriously slow down the
+synchronous communication channels must be used, which seriously slows down the
 search process. Transposition-table driven work scheduling \cite{TDS}, similarly
 to PRA*, uses a hash function to avoid duplication. It is based on IDA* and,
 running on a standard architecture, does not necessitate any retraction
@@ -251,7 +251,7 @@ space. PBNF allows each thread to expand the most promising nodes while
 detecting duplicate states. Rather than sleeping if a lock cannot be acquired, a
 thread can perform ``speculative'' expansions by continuing the expansion of its
 current part of the space. This technique keeps cores busy at the expense of
-duplicate work. \cite{dovetailing} adapts to planning a technique called
+duplicate work. \cite{dovetailing} adapts for planning a technique called
 dovetailing, in which several instances of a search algorithm with different
 parameter settings are run in parallel. Finally, \cite{vidal:socs2010} proposed
 a multicore version of the planner \cite{yahsp:icaps2004} where many concurrent
@@ -301,7 +301,7 @@ We added two novelties to the version described in \cite{dae:icaps2010}.
 One important parameter is the maximum number of expanded nodes allowed to the \YAHSP\ sub-solver which defines empirically what is
 considered as an easy problem for \YAHSP. As a matter of fact, the minimum number of required nodes varies from few nodes to thousands depending of the
 planning task. In the current release this number is estimated during the population initialization stage. An incremental loop is performed until the
-ratio of feasible individuals is over a given threshold or a maximum boundary has been reached. By default this number is doubled at each iteration until at least
+ratio of feasible individuals is over when a given threshold or a maximum boundary has been reached. By default this number is doubled at each iteration until at least
 one feasible individual is produced or 100000 has been reached.
 
 Furthermore we add the capability to perform restarts within a time contract in order to increase solution quality.
@@ -393,10 +393,10 @@ implementations. Indeed, even if individual evaluations are made
 independently of each other, some concurrent accesses to shared memory are still
 required (for example, a basic one is incrementing some global counter),
 especially in \YAHSP\ (detailed below). Furthermore, the original implementations of \DAEX\
-and \YAHSP\ where not designed with parallelism in mind, which implied some
+and \YAHSP\ were not designed with parallelism in mind, which implied some
 modifications to render them thread-safe.
 
-One first problem that can happen in a shared-memory parallel implementation is
+One problem that can happen in a shared-memory parallel implementation is
 \emph{deadlocks}, which are situations where at least two concurrent threads are
 each waiting for the other one to finish, and thus neither ever does. This can
 happen for example when a thread $t_1$ acquires a lock on a shared variable $x$,
@@ -408,7 +408,7 @@ is \emph{livelocks}, where the threads are still able to continue doing some
 work but cannot go through some portion of the code due to a similar phenomenon.
 
 Another problem that can arise is the concurrent use of a given subroutine by
-several threads, when such a subroutine or some subroutine called it modifies
+several threads, when such a subroutine or some subroutines called, it modifies
 some global data. This is a typical problem of reentrancy, which must be
 carefully analyzed in order to render thread-safe a parallel implementation. Two
 cases can then occur: either the global data must be shared by some threads, which
@@ -525,8 +525,10 @@ library (GOMP), both version 4.4.4. It is run on a 48-core DELL PowerEdge R815
 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB
 cache) processors with 192GB of RAM, under Linux x86\_64 2.6.32.
 
-The speedup is measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
+The speedup as well as the efficiency are measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
 For instance 3182\% means a speedup of 31.82.
+The efficiency is the use rate of the whole processors available. It is computed in dividing the speedup by the number of processors used.
+For instance $\frac{31.82}{48} = 66.3\%$.
 
 \paragraph{Benchmarks}
 Although there are several families of problems, we concentrate here on cost planning and temporal
@@ -638,7 +640,7 @@ when  considering efficiency.
 
 Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and
 \ref{fig:exp2_efficiency_core_openstacks_17_pop_96}   shows   that    for    the
-benchmark \ELEVATORS-12, shared  memoization  may  performs  better  for  larger
+benchmark \ELEVATORS-12, shared  memoization  may  perform  better  for  larger
 population size but that there  is  no  difference  between  static  an  dynamic
 parallelization  schemes.   On  \OPENSTACKS-17,  the  dynamic  scheme   performs
 slightly   better   when   used   along    with    the    shared    memoization.
@@ -646,10 +648,10 @@ slightly   better   when   used   along    with    the    shared    memoization.
 Since the evaluation times are varying (given the fact that  decompostions  have
 different length and that each subproblem may be more  or  less  difficult),  by
 construction  a   queue-based   scheduling   should   be   more   efficient   in
-average.   But  the  behaviour   is   dependent   of   the   instance   and   of
-the  ability  of  the  algorithm  to  avoid  premature  convergence  that  would
+average.   But  the  behaviour   is   dependent   of   the   algorithm instance
+and   ability to  avoid  premature  convergence  that  would
 produce an  homogeneous  population.   Hence  the  difference  between  the  two
-scheme may not  be  immediatly notable.
+schemes may not  be  immediatly notable.
 
 An explanation for the small performance gain of using shared memoization  might
 be that the benefit obtained when memoization is  shared  among  individuals  is
