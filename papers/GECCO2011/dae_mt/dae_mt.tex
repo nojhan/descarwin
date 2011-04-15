@@ -257,7 +257,7 @@ parameter settings are run in parallel. Finally, \cite{vidal:socs2010} proposed
 a multicore version of the planner \cite{yahsp:icaps2004} where many concurrent
 threads expand nodes from a common open list, yielding to early exploration of
 branches of the search tree that would have been delayed by a classical search,
-which can speed-up search by several orders of magnitude.
+which can speedup search by several orders of magnitude.
 
 \section{Methods}
 
@@ -713,34 +713,30 @@ thus to a better solution quality is thus not confirmed by experimentation. The
 algorithm converges too rapidly, independently of the population size.
 
 \section{Discussion and Conclusion}
-We made a proof-of-concept of a shared-memory parallelization of the evaluation
+We made a proof-of-concept for a shared-memory parallelization of the evaluation
 step of the \DAEX\ algorithm, based on the \OPENMP\ directive-based API on a
 common 48-core machine. Thanks to the abstraction level provided by the EO
-framework, this scheme is immediately available for any evolutionary algorithms
+framework, this scheme is immediately available for any evolutionary algorithm
 as far as the context of the evaluation functor is thread-local and reentrant.
 
-% we have to change according to the new results
-As expected, on our 48-core Dell Machine a roughly $\times45$ speed-up was
-obtained on the tested benchmark, this speed-up being the same for all
-instances.
+We obtained on our 48-core Dell Machine, a roughly $\times45$ speedup for the two benchmarks tested, this speedup being the same for all instances.
 
 The dispersion of the measured times is mainly due to the combination of the
 steady-state stopping criterion with the stochastic nature of the search, which
 may or may not reach a fitness plateau early. The relationship between this
-dispersion and the hardness of the problem solved remains to be explored.
+dispersion and the difficulty of the problem solved remains to be explored.
 
 Our results show that the stopping criterion should be chosen carefully, along
 with the population size, as it has an impact on the dispersion of the
-computation times distribution. Moreover, the population size may seamlessly
-be chosen small, in order to increase computation speed.
+computation time distribution. Moreover, the population size may indifferently
+be chosen small, in order to decrease the computation time.
 
-% Have to be changed regarding the new results
 The dynamic queue mapping management of threads onto cores provides a
-significant improvement on a single problem instance, when combined with a
-shared memoization. As it brings no improvement on the other problem, it
-may be preferred, but more tests on different domains are necessary.
+significant improvement on a single problem instance, when combined with
+shared memoization. Since it has no special impact on the other problem, it
+may be preferred, but more tests on other domains are necessary.
 
-The implementation scheme presented here is very simple, but works extremely
+The implementation scheme presented here is very simple but works extremely
 well. A further development will consist in parallelizing other steps of the
 evolutionary loop in particular the offspring generation (which is also
 intrinsically parallel) and the selection/replacement operators.
