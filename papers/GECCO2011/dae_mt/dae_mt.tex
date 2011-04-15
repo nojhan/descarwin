@@ -669,18 +669,17 @@ when  considering efficiency.
 \label{fig:exp2_efficiency_core_openstacks_17_pop_96}\end{center}
 \end{figure}
 
- A first observation on figures
-\ref{fig:exp2_efficiency_core_elevators_12_pop_96} and
-\ref{fig:exp2_efficiency_core_openstacks_17_pop_96}  shows that for the benchmark
-\ELEVATORS-12, shared memoization may performs better for larger population  size
-but that there is  no  difference  between  static  an  dynamic  parallelization
-schemes.  On  \OPENSTACKS-17,  the  dynamic  scheme  performs  slightly  better
-when used along with the shared memoization.
+Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and
+\ref{fig:exp2_efficiency_core_openstacks_17_pop_96}   shows   that    for    the
+benchmark \ELEVATORS-12, shared  memoization  may  performs  better  for  larger
+population size but that there  is  no  difference  between  static  an  dynamic
+parallelization  schemes.   On  \OPENSTACKS-17,  the  dynamic  scheme   performs
+slightly   better   when   used   along    with    the    shared    memoization.
 
 Since the evaluation times are varying (given the fact that  decompostions  have
 different length and that each subproblem may be more  or  less  difficult),  by
-construction  a  queue-based   scheduling   should   be   more   efficient   (in
-average).  But the expected behaviour is very dependent of the instance  and  of
+construction  a   queue-based   scheduling   should   be   more   efficient   in
+average.   But  the  behaviour   is   dependent   of   the   instance   and   of
 the  ability  of  the  algorithm  to  avoid  premature  convergence  that  would
 produce an  homogeneous  population.   Hence  the  difference  between  the  two
 scheme may not  be  immediatly notable.
@@ -700,7 +699,7 @@ Figure \ref{fig:exp2_totalcost_elevators-12_pop_96} shows that on  \ELEVATORS-12
 the total cost remains unaffected by the  number  of  cores  used  (results  are
 similar on the other problem).
 
-It wàs expected that the decreasing time needed to  perform  a  run  would  lead
+It was expected that the decreasing time needed to  perform  a  run  would  lead
 to more restarts within the 30  minutes  contract  and  thus  to  an  increasing
 probability to reach better solutions. Results shows that this does not permits
 significant improvement.  Again, an explanation for those results  is  that  the
@@ -783,17 +782,19 @@ dispersion and the hardness of  the  problem  solved  remains  to  be  explored.
 
 Our results show that the stopping criterion should be chosen  carefully,  along
 with the population size,  as  it  has  an  impact  on  the  dispersion  of  the
-distribution of computation times.
+distribution of computation times. Moreover, the population size may seamlessly
+be    chosen    small,    in    order    to    increase    computation    speed.
 
 % Have to be changed regarding the new results
 The  dynamic  queue  mapping  management  of  threads  onto  cores   provide   a
 significant improvement on a single  problem  instance,  when  combined  with  a
-shared memoization. 
+shared memoization.  As it  bring  no  improvement  on  the  other  problem,  it
+may  be  prefered,  but  more  test  on  differents   domains   are   necessary.
 
 The implementation scheme presented here is very  simple,  but  works  extremely
 well.  A further development will consist in parallelizing other  steps  of  the
 evolutionary  loop  in  particular  the  offspring  generation  which  is   also
-intrinsically   parallel,   as   it   use   independent   variation   operators.
+intrinsically   parallel and the selection/replacement operators.
 
 A further research axis deals  with  the  impact  on  solution  quality  and  in
 particular how to take advantage of the parallelization scheme  to  escape  from
