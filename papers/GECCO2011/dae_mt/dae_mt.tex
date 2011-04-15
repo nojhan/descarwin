@@ -670,7 +670,7 @@ similar on the other problem).
 
 It was expected that the decreasing time needed to  perform  a  run  would  lead
 to more restarts within the 30  minutes  contract  and  thus  to  an  increasing
-probability to reach better solutions. Results shows that this does not permits
+probability to reach better solutions. Results show that this does not permit
 significant improvement.  Again, an explanation for those results  is  that  the
 algorithm converge prematurely and cannot find  solutions  with  a  sufficiently
 high variance to ensure that the  probability  to  find  better  solutions  will
@@ -687,9 +687,9 @@ increase with restarts.
 \label{fig:exp1_efficiency_pop}
 \end{figure}
 
-Figure \ref{fig:exp1_efficiency_pop} shows that the effiency decrease with the
+Figure \ref{fig:exp1_efficiency_pop} shows that the efficiency decreases with the
 size of the population, while being close to the optimum for a size equal to the
-available number of processors, it rapidly decrease and reach a plateau for
+available number of processors, it rapidly decreases and reaches a plateau for
 larger populations.
 
 Using a static parallelization scheme, the decrease in speedup  is  due  to  the
@@ -715,7 +715,7 @@ of easier decompositions and are waiting  for  the  next  generation  to  occur.
 \end{figure}
 
 Figure \ref{fig:exp1_totalcost-makespan} shows that no significant difference in
-solution qualities can be observed when the population size increase.
+solution qualities can be observed when the population size increases.
 
 The hypothesis that a larger population would lead to a greater exploration  and
 thus to a better solution quality is thus not confirmed by experimentation. The
@@ -735,7 +735,7 @@ algorithm  converges  too  rapidly,  independently  of  the   population   size.
 We made a proof-of-concept of a shared-memory parallelization of the  evaluation
 step of the \DAEX\ algorithm, based on the \OPENMP\  directive-based  API  on  a
 common 48-core machine.  Thanks to the abstraction  level  provided  by  the  EO
-framework, this scheme is immediately available for any  evolutionary  algorithm
+framework, this scheme is immediately available for any  evolutionary  algorithms
 as far as the context of the evaluation functor is thread-local  and  reentrant.
 
 % we have to change according to the new results
