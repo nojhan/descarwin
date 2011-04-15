@@ -1,60 +1,11 @@
 % This is "sig-alternate.tex" V1.9 April 2009
 % This file should be compiled with V2.4 of "sig-alternate.cls" April 2009
 %
-% This example file demonstrates the use of the 'sig-alternate.cls'
-% V2.4 LaTeX2e document class file. It is for those submitting
-% articles to ACM Conference Proceedings WHO DO NOT WISH TO
-% STRICTLY ADHERE TO THE SIGS (PUBS-BOARD-ENDORSED) STYLE.
-% The 'sig-alternate.cls' file will produce a similar-looking,
-% albeit, 'tighter' paper resulting in, invariably, fewer pages.
-%
-% ----------------------------------------------------------------------------------------------------------------
-% This .tex file (and associated .cls V2.4) produces:
-% 1) The Permission Statement
-% 2) The Conference (location) Info information
-% 3) The Copyright Line with ACM data
-% 4) NO page numbers
-%
-% as against the acm_proc_article-sp.cls file which
-% DOES NOT produce 1) thru' 3) above.
-%
-% Using 'sig-alternate.cls' you have control, however, from within
-% the source .tex file, over both the CopyrightYear
-% (defaulted to 200X) and the ACM Copyright Data
-% (defaulted to X-XXXXX-XX-X/XX/XX).
-% e.g.
-% \CopyrightYear{2007} will cause 2007 to appear in the copyright line.
-% \crdata{0-12345-67-8/90/12} will cause 0-12345-67-8/90/12 to appear in the copyright line.
-%
-% ---------------------------------------------------------------------------------------------------------------
-% This .tex source is an example which *does* use
-% the .bib file (from which the .bbl file % is produced).
-% REMEMBER HOWEVER: After having produced the .bbl file,
-% and prior to final submission, you *NEED* to 'insert'
-% your .bbl file into your source .tex file so as to provide
-% ONE 'self-contained' source file.
-%
-% ================= IF YOU HAVE QUESTIONS =======================
-% Questions regarding the SIGS styles, SIGS policies and
-% procedures, Conferences etc. should be sent to
-% Adrienne Griscti (griscti@acm.org)
-%
-% Technical questions _only_ to
-% Gerald Murray (murray@hq.acm.org)
-% ===============================================================
-%
-% For tracking purposes - this is V1.9 - April 2009
-
 \documentclass{sig-alternate}
 \usepackage{url}
 \usepackage{algorithm}
 \usepackage[noend]{algorithmic}
 \usepackage{subfigure}
-
-%\documentclass{acm_proc_article-sp}
-%\def\BibTeX{Bib\TeX}
-%\parindent=0pt
-%\parskip=\baselineskip
 
 \newcommand{\dae}{{\em Divide-and-Evolve}}
 \newcommand{\DAE}{{\sc DaE}}
@@ -105,9 +56,6 @@ Vincent Vidal\\
 \email{vincent.vidal@onera.fr}
 }
 
-%\numberofauthors{1}
-%\author{This work is submitted to the {\large \em Parallel Evolutionary Systems} track of GECCO'2011}
-
 \maketitle
 \begin{abstract}
 Multicore machines are becoming a standard way to speed up the system performance.
@@ -126,7 +74,6 @@ This preliminary work opens an avenue for parallelizing any evolutionary algorit
 \keywords{Evolutionary Computation, Automated Planning, Parallel Shared-Memory, Multicore.\\\\} % NOT required for Proceedings
 
 \section{Introduction}
-% The Planning Problem
 The classical planning problem in Artificial Intelligence \cite{gnt04} is to find a path in a transition system: a sequence of actions which maps an initial
 state $I$ into a state $G$ satisfying a set of desired goals. Usually, a metric is associated with the solution plan such as length, cost or duration (where
 concurrent actions are allowed). In domain-independent planning, problems are described with the Planning Domain Description Language (PDDL) \cite{pddl:jair2003}. 
@@ -242,8 +189,7 @@ A* (HDA*) which combines successful ideas from previous parallel algorithms.
 HDA* uses a hash function which assigns each generated state to a unique
 processing unit in order to avoid the duplication of the search efforts. This
 mechanism was introduced in PRA*, which unfortunately combined it with
-synchronous communication channels which caused a lot of overhead. This problem
-% overhead is not really the good word I think maybe we have to replace it 'waiting'
+synchronous communication channels which cause a lot of waiting. This problem
 was addressed in HDA* by the use of non-blocking communication (as in
 \cite{TDS}). In \cite{burns:ijcai2009,burns:JAIR2010} the authors present
 Parallel Best-NBlock-First (PBNF). It uses an abstraction to partition the state
@@ -264,7 +210,6 @@ which can speedup search by several orders of magnitude.
 \subsection{Algorithms}
 
 \paragraph{Divide and Evolve}
-
 \DAEX, the concrete implementation of the \dae\ paradigm, is a
 domain-independent satisficing planning system based on Evolutionary Computation
 \cite{dae:evocop2006}. The basic principle is to carry out a {\em
@@ -291,7 +236,6 @@ have been defined: addition (resp. removal) of a goal in a sequence, addition
 (resp. removal) of an atom in a goal. The selection is a comparison-based
 deterministic tournament of size 5.
 
-% Parameter tuning
 For the sequential release, Darwinian-related parameters of \DAEX\ have been
 fixed after some early experiments \cite{dae:evocop2006} whereas parameters
 related to the variation operators have been tuned using the Racing method \cite{dae:gecco2010}.
@@ -307,7 +251,6 @@ one feasible individual is produced or 100000 has been reached.
 Furthermore we add the capability to perform restarts within a time contract in order to increase solution quality.
 
 \paragraph{Yet Another Heuristic Search Planner}
-
 The \YAHSP\ planning system \cite{yahsp:icaps2004} extends a technique introduced in the FF planner
 \cite{ff:jair01} for calculating the heuristic, based on the extraction of
 a solution from a planning graph computed for the relaxed problem obtained by
@@ -354,8 +297,7 @@ Competition) which require a costly analysis for each new initial state.
 In order to speed up the search process, a memoization mechanism has been introduced in
 \YAHSP\ and carefully controlled to leave memory space for \DAE. Indeed, most of
 the time during a run of \YAHSP, and as a consequence during a run of \DAEYAHSP,
-is spent in computing the $h^{add}$ heuristic for each encountered state. During a single run of YAHSP, duplicate states are
-discarded; but during a run of \DAEYAHSP, the same state can be encountered
+is spent in computing the $h^{add}$ heuristic for each encountered state. During a single run of YAHSP, duplicate states are discarded; but during a run of \DAEYAHSP, the same state can be encountered
 multiple times. Therefore, we keep track of the $h^{add}$ costs of all atoms in
 the problem for each state, in order to avoid recomputing these values each time
 a duplicate state is reached. This generally leads to a speedup comprised
@@ -366,7 +308,6 @@ For the parallel scheme, we experimented two strategies: a global memoization sh
 Results are presented in section \ref{section:results}.
 
 \paragraph{Parts that can theoretically be parallelized}
-
 As shown in section \ref{section:previous-work}, heuristic search algorithms
 used in automated AI planners can be parallelized in many ways, although there
 is no obvious and natural way to do so. However, our goal in this work is not
@@ -385,7 +326,6 @@ by the individual evaluations by an embedded planner, which is the reason why we
 \subsection{Implementation}
 
 \paragraph{Locks, thread-Safe \& reentrant subroutines}
-
 Even if being very natural in the context of evolutionary algorithms,
 parallelizing individual evaluations in \DAEX\ requires to be carefully made in
 order to avoid some typical problems that can happen with shared-memory parallel
@@ -419,8 +359,6 @@ necessitating to change the scope of this data.
 In order to guarantee a non-blocking algorithm, we apply the Concurrent Read Exclusive Write (CREW) strategy\footnote{Multiple processors can read a memory cell but only one can write at a time.} of the Parallel Random Access Machine (PRAM).
 In this work, we used \OPENMP\ which defines a set of compiler directives to tell which part of a program should be parallelized and which part of memory can be shared out. 
 The main advantage of \OPENMP\ is that it is designed to make easy to parallelize an existing program \cite{special:parallelComputing2005}. The parallel shared-memory scheme may also be used as a simple approach to program clusters, either with a dedicated method, or through a virtual symmetric multiprocessing machine \cite{Huang:openmpGlobalArrays2005}.
-
-%In order to parallelize a large scope of the framework EO, a profiling was done to identify the most time-consuming steps. 
 
 Considering that the evaluation of the population is the most costly part of the
 algorithm, this step is our first target to parallelize. Moreover, in most cases
@@ -474,7 +412,6 @@ void apply< EOT >(eoUF< EOT, void >& proc,
 \end{algorithm}
 
 When parallelizing the evaluation loop in an evolutionary algorithm,
-% the text below doesnot seem to be right
 there exists a synchronization step at each generation, this ensure that no race-condition
 may occurs. Indeed, individuals being evaluated are all independent, which is
 the case in the majority of evolutionary algorithms, and also in \DAEX.
@@ -494,9 +431,7 @@ relaxed plans and the lookahead plans are made private to each thread, ensuring
 that concurrent executions of \YAHSP\ do not use the same portions of the global
 memory.
 
-
 \paragraph{Specific parallelization issues}
-
 \DAEYAHSP\ evaluation step calls the \YAHSP\ solver several times on the same
 decomposition and thus uses several variables to keep the state of the
 evaluation over the searches between intermediate goals (namely $k$, $B$ and $U$
@@ -505,15 +440,12 @@ must be guaranteed reentrant by not using static variables nor attributes. A way
 to achieve the re-entrancy is to define those variables as attributes of the
 decomposition itself, and not as attributes of the evaluation functor.
 
-
 \paragraph{Static and dynamic scheduling}
-
 \OPENMP\ lets the choice between static (the default) and dynamic task
 scheduling. In the static scheduling, a loop iterating through a set of
 tasks will be divided in several tasks relative to the number of available
 processors. In dynamic scheduling, if one thread has finished its tasks
 it gets the next available one, using a queue structure.
-
 
 \section{Experimental Study}
 
@@ -521,7 +453,7 @@ it gets the next available one, using a queue structure.
 
 \paragraph{Platform}
 The algorithm is programmed in C++ using GCC and the GNU \OPENMP\ threading
-library (GOMP), both version 4.4.4. It is run on a 48-core DELL PowerEdge R815
+library (GOMP), both release 4.4.4. It is run on a 48-core DELL PowerEdge R815
 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB
 cache) processors with 192GB of RAM, under Linux x86\_64 2.6.32.
 
@@ -579,9 +511,7 @@ Two types of experiments were conducted to analyze the algorithm behavior when
 increasing the number of cores on one hand and when increasing the size of the
 population on the other hand.
 
-
 \paragraph{Competition settings, varying the number of cores}
-
 This experiment tests four versions of the algorithm, combining
 the memoization scheme (local or shared) and the parallelization
 scheme (static or dynamic), with a population of 48 and 96 individuals.
@@ -589,9 +519,7 @@ Number of cores used range from 6 to 48, testing each 6 cores. 21 runs are
 performed for each setting which are stopped when
 the algorithm reached 50 generations without improvement.
 
-
 \paragraph{Alternative version, varying the population size}
-
 This experiment uses the same version of \DAEYAHSP\ as the one used for the
 International Planning Competition, in a similar experimental environment. The
 algorithm uses the shared memoization and a static parallelization scheme. It
@@ -604,8 +532,7 @@ population sizes: 48, 1152, 2304, 3456, 4608, 5760.
 \label{section:results}
 
 \paragraph{Speedup against the number of processors}
-
-Results show that the speedup raises linearly with the number of processors, for every version and every problem tested (see figure \ref{fig:exp2_speedup_core_openstack_17_pop_96_nosm-static_vs_sm-dynamic} for an example on two versions).
+Results show that the speedup raises linearly with the number of processors, for every combination and every problem tested (see Figure \ref{fig:exp2_speedup_core_openstack_17_pop_96_nosm-static_vs_sm-dynamic} for an example on two combinations).
 
 \begin{figure}[htpb]
 \begin{center}
@@ -616,7 +543,7 @@ On the left: with local memoization and the static parallelization scheme, on th
 \end{center}
 \end{figure}
 
-This observation meets the expected behavior and is classical when considering the parallelization of the evaluation step of an evolutionary algorithm. Nevertheless, the difference among versions and problems can be seen when considering efficiency.
+This observation meets the expected behavior and is classical when considering the parallelization of the evaluation step of an evolutionary algorithm. Nevertheless, the difference among combinations and problems can be seen when considering efficiency.
 
 Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and
 \ref{fig:exp2_efficiency_core_openstacks_17_pop_96} shows that for the
@@ -637,39 +564,39 @@ An explanation for the poor performance gain of using shared memoization might
 be that the benefit obtained when memoization is shared among individuals is
 lost with the bottleneck due to multiple access locking.
 
-\begin{figure}[H]%htpb]
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.47\textwidth]{images/EXP2_Efficiency_IPC6_SEQ_ELEVATORS_12_S96.pdf}
 \caption{Efficiency of \DAEYAHSP\ relative to the number of processors, on \ELEVATORS-12.}
-\label{fig:exp2_efficiency_core_elevators_12_pop_96}\end{center}
+\label{fig:exp2_efficiency_core_elevators_12_pop_96}
+\end{center}
 \end{figure}
 
-\begin{figure}[H]%htpb]
+\begin{figure}[H]
 \begin{center}
 \includegraphics[width=0.47\textwidth]{images/EXP2_Efficiency_IPC6_TEMPO_OPENSTACKS_17_S96.pdf}
 \caption{Efficiency of \DAEYAHSP\ relative to the number of processors, on \OPENSTACKS-17.}
-\label{fig:exp2_efficiency_core_openstacks_17_pop_96}\end{center}
+\label{fig:exp2_efficiency_core_openstacks_17_pop_96}
+\end{center}
 \end{figure}
 
-%%%
+Figures \ref{fig:exp2_totalcost_elevators-12_pop_96} and \ref{fig:exp2_makespan_openstacks-17_pop_96} show that the solution quality remains unaffected by the number of cores used.
 
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP2_Total_cost_IPC6_SEQ_ELEVATORS_12_S96.pdf}
-\caption{Total costs of the 4 versions of \DAEYAHSP\ on \ELEVATORS-12.}
-\label{fig:exp2_totalcost_elevators-12_pop_96}\end{center}
+\caption{Total costs of the 4 combinations of \DAEYAHSP\ on \ELEVATORS-12.}
+\label{fig:exp2_totalcost_elevators-12_pop_96}
+\end{center}
 \end{figure}
 
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP2_Makespan_IPC6_TEMPO_OPENSTACKS_17_S96.pdf}
-\caption{Makespans of the 4 versions of \DAEYAHSP\ on \OPENSTACKS-17.}
-\label{fig:exp2_makespan_openstacks-17_pop_96}\end{center}
+\caption{Makespans of the 4 combinations of \DAEYAHSP\ on \OPENSTACKS-17.}
+\label{fig:exp2_makespan_openstacks-17_pop_96}
+\end{center}
 \end{figure}
-
-Figure \ref{fig:exp2_totalcost_elevators-12_pop_96} shows that on \ELEVATORS-12
-the total cost remains unaffected by the number of cores used (results are
-similar on \OPENSTACKS-17).
 
 It was expected that the shorter time needed to perform a run would lead
 to more restarts within the 30 minutes time contract and thus to an increasing
@@ -679,21 +606,16 @@ algorithm converge prematurely and cannot find solutions with a sufficiently
 high variance to ensure that the probability to find better solutions will
 increase with restarts.
 
-
 \paragraph{Speedup against the population size}
+Figure \ref{fig:exp1_efficiency_pop} shows that the efficiency decreases with the size of the population: while being close to the optimum for a size equal to the available number of processors, it rapidly decreases and reaches a plateau for big populations.
 
 \begin{figure}[htpb]
 \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/EXP1_Efficiency_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}}
 \hfill
 \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/EXP1_Efficiency_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}}
-\caption{Efficiency of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12.}
+\caption{Efficiency of \DAEYAHSP\ relative to the population size.}
 \label{fig:exp1_efficiency_pop}
 \end{figure}
-
-Figure \ref{fig:exp1_efficiency_pop} shows that the efficiency decreases with the
-size of the population: while being close to the optimum for a size equal to the
-available number of processors, it rapidly decreases and reaches a plateau for
-big populations.
 
 Using a static parallelization scheme, the decrease in speed\-up is due to the
 synchronization step at each generation, when cores have finished the evaluation
@@ -748,16 +670,6 @@ A further research axis deals with the impact on solution quality and in
 particular how to take advantage of the parallelization scheme to escape from
 premature convergence.
 
-% TO ADD IN CONCLUSION
-% Dans l'etat pour aller plus vite il faut utiliser une petite taille de population
-% car on obtient un meilleur speedup et une meilleur qualité.
-
-% TO ADD IN FURTHER WORK
-% to parallelize variation operators
-% travailler sur convergence prématurée
-% to compare shared/dynamic sheme
-% to hybrid shared and distributed parallelization ?!?
-
 \section{Acknowledgments}
 This work is being partially funded by the French National Research Agency through the COSINUS programme, under the research contract DESCARWIN (ANR-09-COSI-002).
 
@@ -781,24 +693,3 @@ This work is being partially funded by the French National Research Agency throu
 %the .tex source file and comment out
 %the command \texttt{{\char'134}thebibliography}.
 \end{document}
-%
-%\DAE\ has been implemented within the Evolving Objects framework (\url{http://eodev.sourceforge.net/}), an Open Source, STL-based, C++ Evolutionary Computation library.
-%The fixed {\em evolution engine} is a (100+700)-ES: 100 individuals generate 700 offsprings without selection. The survival selection is performed among those 800 individuals using a {\em deterministic tournament} of size 5. For all runs, the {\bf stopping criterion} is the following: After at least 10 generations, evolution is stopped if no improvement of the best fitness in the population is made during 50 generations, with a maximum of 1000 generations. Furthermore, all runs were allowed a maximum CPU time of 30mn (running on 3.4 GHz cores).
-%
-%
-%Multicore machines are becoming a standard way to speep up the system performance.
-%
-%This paper describes a multi-threaded release of \DAEYAHSP.
-%
-%This paper describes a parallel shared-memory release of the \DAEYAHSP\ planning system.
-%using the \OPENMP\ directive-based API.
-%
-%to obtain high levels of performance special care has been given to get reentrant procedures.
-%isolate context variables
-%
-% concurrent programming
-%
-%\OPENMP\ primarily consists of a set of compiler directives (pragmas) that are inserted into a Fortran, C or C++ program to convey information to an \OPENMP\ compiler.
-
-%
-%In order to scale up the capabilities of \DAEYAHSP, this paper investigated the parallelization of the individual evaluation.
