@@ -525,10 +525,10 @@ library (GOMP), both version 4.4.4. It is run on a 48-core DELL PowerEdge R815
 Rack Server set up with four 12-core AMD Opteron(tm) 6174, 2.2GHz (12x512 KB
 cache) processors with 192GB of RAM, under Linux x86\_64 2.6.32.
 
-The speedup as well as the efficiency are measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
+The speedup and the efficiency are measured with the operating system {\tt time} command which gives the percentage of the CPU that the process being timed got\footnote{computed as (Total number of CPU-seconds that the process spent in user mode + Total number of CPU-seconds that the process spent in kernel mode) / Wall clock time.}.
 For instance 3182\% means a speedup of 31.82.
-The efficiency is the use rate of the whole processors available. It is computed in dividing the speedup by the number of processors used.
-For instance $\frac{31.82}{48} = 66.3\%$.
+The efficiency, or processor use rate, equals the speedup divided by the number of processors available.
+For instance $31.82/48 = 0.66$ is the efficiency for a speedup of 31.82\% on 48 processors.
 
 \paragraph{Benchmarks}
 Although there are several families of problems, we concentrate here on cost planning and temporal
