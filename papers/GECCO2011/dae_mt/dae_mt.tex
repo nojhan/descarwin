@@ -620,7 +620,7 @@ every version and every problem tested (see figure
 example on two versions).
 
 This observation meets the expected behaviour and is classical when  considering
-the  parellelization  of  the  evaluation  step  of  an  evolutinary  algorithm.
+the  parellelization  of  the  evaluation  step  of  an  evolutionary  algorithm.
 Nevertheless,  the  difference  among  versions  and  problems   can   be   seen
 when  considering efficiency.
 
@@ -641,32 +641,32 @@ when  considering efficiency.
 Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and
 \ref{fig:exp2_efficiency_core_openstacks_17_pop_96}   shows   that    for    the
 benchmark \ELEVATORS-12, shared  memoization  may  perform  better  for  larger
-population size but that there  is  no  difference  between  static  an  dynamic
+population sizes but that there  is  no  difference  between  static  an  dynamic
 parallelization  schemes.   On  \OPENSTACKS-17,  the  dynamic  scheme   performs
 slightly   better   when   used   along    with    the    shared    memoization.
 
-Since the evaluation times are varying (given the fact that  decompostions  have
-different length and that each subproblem may be more  or  less  difficult),  by
+Since the evaluation times are varying (given the fact that  decompositions  have
+different lengths and that each subproblem may be more  or  less  difficult),  by
 construction  a   queue-based   scheduling   should   be   more   efficient   in
 average.   But  the  behaviour   is   dependent   of   the   algorithm instance
 and   ability to  avoid  premature  convergence  that  would
 produce an  homogeneous  population.   Hence  the  difference  between  the  two
-schemes may not  be  immediatly notable.
+schemes may not  be  immediately notable.
 
-An explanation for the small performance gain of using shared memoization  might
+An explanation for the poor performance gain of using shared memoization  might
 be that the benefit obtained when memoization is  shared  among  individuals  is
 lost    with    the    bottleneck    due    to    multiple    access    locking.
 
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.5\textwidth]{images/EXP2_Total_cost_IPC6_SEQ_ELEVATORS_12_S96.pdf}
-\caption{Total costs of the 4 versions of \DAEYAHSP\ on \ELEVATORS-12}
+\caption{Total costs of the 4 versions of \DAEYAHSP\ on \ELEVATORS-12.}
 \label{fig:exp2_totalcost_elevators-12_pop_96}\end{center}
 \end{figure}
 
 Figure \ref{fig:exp2_totalcost_elevators-12_pop_96} shows that on  \ELEVATORS-12
 the total cost remains unaffected by the  number  of  cores  used  (results  are
-similar on the other problem).
+similar on \OPENSTACKS-17).
 
 It was expected that the decreasing time needed to  perform  a  run  would  lead
 to more restarts within the 30  minutes  contract  and  thus  to  an  increasing
@@ -683,7 +683,7 @@ increase with restarts.
 \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/EXP1_Efficiency_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}}
 \hfill
 \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/EXP1_Efficiency_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}}
-\caption{Efficiency of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12}
+\caption{Efficiency of \DAEYAHSP\ relative to the population size, on \ELEVATORS-12.}
 \label{fig:exp1_efficiency_pop}
 \end{figure}
 
@@ -710,7 +710,7 @@ of easier decompositions and are waiting  for  the  next  generation  to  occur.
 \subfigure[\ELEVATORS-12]{\includegraphics[width=0.23\textwidth]{images/EXP1_Total_cost_IPC6_SEQ_ELEVATORS_12_RESTART_dae-sm_STATIC_.pdf}}
 \subfigure[\OPENSTACKS-17]{\includegraphics[width=0.23\textwidth]{images/EXP1_Makespan_IPC6_TEMPO_OPENSTACKS_17_RESTART_dae-sm_STATIC_.pdf}}
 \end{center}
-\caption{Solution plans qualities for increasing population sizes}
+\caption{Solution plans qualities for increasing population sizes.}
 \label{fig:exp1_totalcost-makespan}
 \end{figure}
 
