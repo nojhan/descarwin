@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+IF(COMMAND CMAKE_POLICY)
+  CMAKE_POLICY(SET CMP0003 NEW)
+ENDIF(COMMAND CMAKE_POLICY)
 
 # include the install configuration file where are defined the main variables
 INCLUDE(${CMAKE_SOURCE_DIR}/install.cmake)
@@ -26,7 +26,7 @@ INCLUDE_DIRECTORIES(
   ${EO_SRC_DIR}
   ${CPT_YAHSP_SRC_DIR}
   ${GDSL_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
   )
 
 # where CMake can find the libraries
