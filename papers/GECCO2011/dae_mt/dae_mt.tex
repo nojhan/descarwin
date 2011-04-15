@@ -637,7 +637,7 @@ population sizes: 48, 1152, 2304, 3456, 4608, 5760.
 \begin{figure}[htpb]
 \begin{center}
   \includegraphics[width=0.45\textwidth]{images/EXP2_Speed_up_IPC6_TEMPO_OPENSTACKS_17_S96_nosm-static_sm_vs_dynamic.pdf}
-  \caption{Speedup of \DAEYAHSP\ relative to the number of processors, on
+  \caption{Speedup of \DAEYAHSP\ relatively to the number of processors, on
   \OPENSTACKS-17, on the left version using separated memoization and a static
   parallelization scheme, on the right the version using shared-memoization and
   the dynamic parallelization scheme.}
@@ -749,9 +749,8 @@ Figure \ref{fig:exp1_totalcost-makespan} shows that no significant difference in
 solution qualities can be observed when the population size increase.
 
 The hypothesis that a larger population would lead to a greater exploration  and
-thus to a better solution quality is thus not confirmed by experimentation.   It
-means that the algorithm converges very rapidly, independently of the population
-size. 
+thus to a better solution quality is thus not confirmed by experimentation. The
+algorithm  converges  too  rapidly,  independently  of  the   population   size.
 
 
 % totalcost + makespan ends
@@ -793,8 +792,8 @@ may  be  prefered,  but  more  test  on  differents   domains   are   necessary.
 
 The implementation scheme presented here is very  simple,  but  works  extremely
 well.  A further development will consist in parallelizing other  steps  of  the
-evolutionary  loop  in  particular  the  offspring  generation  which  is   also
-intrinsically   parallel and the selection/replacement operators.
+evolutionary  loop  in  particular  the  offspring  generation  (which  is   also
+intrinsically   parallel) and the selection/replacement operators.
 
 A further research axis deals  with  the  impact  on  solution  quality  and  in
 particular how to take advantage of the parallelization scheme  to  escape  from
