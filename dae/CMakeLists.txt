@@ -24,8 +24,7 @@ ENDIF()
 # include the sources
 INCLUDE_DIRECTORIES(
   ${EO_SRC_DIR}
-  ${CPT_SRC_DIR}
-  ${YAHSP_SRC_DIR}
+  ${CPT_YAHSP_SRC_DIR}
   ${GDSL_INCLUDE_DIR}
   ${CMAKE_SOURCE_DIR}/src
   )
@@ -33,8 +32,7 @@ INCLUDE_DIRECTORIES(
 # where CMake can find the libraries
 LINK_DIRECTORIES(
   ${EO_BIN_DIR}/lib
-  ${CPT_LIB_DIR}
-  ${YAHSP_BIN_DIR}/lib
+  ${CPT_YAHSP_BIN_DIR}/lib
   )
 
 # flags to use with compiler
