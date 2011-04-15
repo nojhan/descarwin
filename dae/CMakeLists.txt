@@ -5,7 +5,7 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 # include the install configuration file where are defined the main variables
-INCLUDE(${CMAKE_SOURCE_DIR}/install.cmake)
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake)
 
 # define project name
 PROJECT(DAEX)
@@ -46,39 +46,39 @@ ELSE()
 ENDIF()
 
 # target + link libraries
-LINK_LIBRARIES(eoutils daex gmp eo gcov ${GDSL_LIBRARY} yahsp_library-common)
+LINK_LIBRARIES(eoutils daex gmp eo gcov ${GDSL_LIBRARY} cpt_yahsp_library-common)
 
 ADD_EXECUTABLE(dae dae.cpp)
 ADD_DEPENDENCIES(dae daex)
-TARGET_LINK_LIBRARIES(dae yahsp_library-dae)
+TARGET_LINK_LIBRARIES(dae cpt_yahsp_library-dae)
 
 ADD_EXECUTABLE(dae-sm dae.cpp)
 ADD_DEPENDENCIES(dae-sm daex)
-TARGET_LINK_LIBRARIES(dae-sm yahsp_library-sm)
+TARGET_LINK_LIBRARIES(dae-sm cpt_yahsp_library-sm)
 
 ADD_EXECUTABLE(dae-mt dae.cpp)
 ADD_DEPENDENCIES(dae-mt daex)
-TARGET_LINK_LIBRARIES(dae-mt yahsp_library-mt)
+TARGET_LINK_LIBRARIES(dae-mt cpt_yahsp_library-mt)
 
 ADD_EXECUTABLE(dae-mt-sm dae.cpp)
 ADD_DEPENDENCIES(dae-mt-sm daex)
-TARGET_LINK_LIBRARIES(dae-mt-sm yahsp_library-mt-sm)
+TARGET_LINK_LIBRARIES(dae-mt-sm cpt_yahsp_library-mt-sm)
 
 ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
 ADD_DEPENDENCIES(test_chronopartition daex)
-TARGET_LINK_LIBRARIES(test_chronopartition yahsp_library-dae)
+TARGET_LINK_LIBRARIES(test_chronopartition cpt_yahsp_library-dae)
 
 ADD_EXECUTABLE(test_b_max test_b_max.cpp)
 ADD_DEPENDENCIES(test_b_max daex)
-TARGET_LINK_LIBRARIES(test_b_max yahsp_library-dae)
+TARGET_LINK_LIBRARIES(test_b_max cpt_yahsp_library-dae)
 
 ADD_EXECUTABLE(test_stats test_stats.cpp)
 ADD_DEPENDENCIES(test_stats daex)
-TARGET_LINK_LIBRARIES(test_stats yahsp_library-dae)
+TARGET_LINK_LIBRARIES(test_stats cpt_yahsp_library-dae)
 
 ADD_EXECUTABLE(featureselector featureselector.cpp)
 ADD_DEPENDENCIES(featureselector daex)
-TARGET_LINK_LIBRARIES(featureselector yahsp_library-dae)
+TARGET_LINK_LIBRARIES(featureselector cpt_yahsp_library-dae)
 
 # process to sources
 ADD_SUBDIRECTORY(src)
