@@ -605,6 +605,8 @@ population sizes: 48, 1152, 2304, 3456, 4608, 5760.
 
 \paragraph{Speedup against the number of processors}
 
+Results show that the speedup raises linearly with the number of processors, for every version and every problem tested (see figure \ref{fig:exp2_speedup_core_openstack_17_pop_96_nosm-static_vs_sm-dynamic} for an example on two versions).
+
 \begin{figure}[htpb]
 \begin{center}
 \includegraphics[width=0.45\textwidth]{images/EXP2_Speed_up_IPC6_TEMPO_OPENSTACKS_17_S96_nosm-static_sm_vs_dynamic.pdf}
@@ -614,29 +616,7 @@ On the left: with local memoization and the static parallelization scheme, on th
 \end{center}
 \end{figure}
 
-Results show that the speedup raises linearly with the number of processors, for
-every version and every problem tested (see figure
-\ref{fig:exp2_speedup_core_openstack_17_pop_96_nosm-static_vs_sm-dynamic} for an
-example on two versions).
-
-This observation meets the expected behavior and is classical when considering
-the parallelization of the evaluation step of an evolutionary algorithm.
-Nevertheless, the difference among versions and problems can be seen
-when considering efficiency.
-
-\begin{figure}[H]%htpb]
-\begin{center}
-\includegraphics[width=0.47\textwidth]{images/EXP2_Efficiency_IPC6_SEQ_ELEVATORS_12_S96.pdf}
-\caption{Efficiency of \DAEYAHSP\ relative to the number of processors, on \ELEVATORS-12.}
-\label{fig:exp2_efficiency_core_elevators_12_pop_96}\end{center}
-\end{figure}
-
-\begin{figure}[H]%htpb]
-\begin{center}
-\includegraphics[width=0.47\textwidth]{images/EXP2_Efficiency_IPC6_TEMPO_OPENSTACKS_17_S96.pdf}
-\caption{Efficiency of \DAEYAHSP\ relative to the number of processors, on \OPENSTACKS-17.}
-\label{fig:exp2_efficiency_core_openstacks_17_pop_96}\end{center}
-\end{figure}
+This observation meets the expected behavior and is classical when considering the parallelization of the evaluation step of an evolutionary algorithm. Nevertheless, the difference among versions and problems can be seen when considering efficiency.
 
 Figures \ref{fig:exp2_efficiency_core_elevators_12_pop_96} and
 \ref{fig:exp2_efficiency_core_openstacks_17_pop_96} shows that for the
@@ -656,6 +636,22 @@ schemes may not be immediately notable.
 An explanation for the poor performance gain of using shared memoization might
 be that the benefit obtained when memoization is shared among individuals is
 lost with the bottleneck due to multiple access locking.
+
+\begin{figure}[H]%htpb]
+\begin{center}
+\includegraphics[width=0.47\textwidth]{images/EXP2_Efficiency_IPC6_SEQ_ELEVATORS_12_S96.pdf}
+\caption{Efficiency of \DAEYAHSP\ relative to the number of processors, on \ELEVATORS-12.}
+\label{fig:exp2_efficiency_core_elevators_12_pop_96}\end{center}
+\end{figure}
+
+\begin{figure}[H]%htpb]
+\begin{center}
+\includegraphics[width=0.47\textwidth]{images/EXP2_Efficiency_IPC6_TEMPO_OPENSTACKS_17_S96.pdf}
+\caption{Efficiency of \DAEYAHSP\ relative to the number of processors, on \OPENSTACKS-17.}
+\label{fig:exp2_efficiency_core_openstacks_17_pop_96}\end{center}
+\end{figure}
+
+%%%
 
 \begin{figure}[htpb]
 \begin{center}
