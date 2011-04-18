@@ -1,13 +1,15 @@
-rm  gecco2011brendelschoenauerworkshop.pdf
+paper=gecco2011brendelschoenauercameraready2pages
 
-pdflatex  gecco2011brendelschoenauerworkshop
+rm  ${paper}.pdf
+
+pdflatex  ${paper}
 #bibtex  gecco2011brendelschoenauerworkshop
-bibtex  gecco2011brendelschoenauerworkshop
+bibtex  ${paper}
 
 
-#pdflatex  gecco2011brendelschoenauerworkshop
+#pdflatex  ${paper}
 
 
 if [ $1 -gt 0 ]; then
-acroread gecco2011brendelschoenauerworkshop.pdf
+acroread ${paper}.pdf
 fi
