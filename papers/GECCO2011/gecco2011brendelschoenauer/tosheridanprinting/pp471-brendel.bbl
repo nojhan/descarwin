@@ -1,0 +1,38 @@
+\begin{thebibliography}{1}
+
+\bibitem{BibGECCO:2010}
+J.~Bibai, P.~Sav{\'e}ant, M.~Schoenauer, and V.~Vidal.
+\newblock On the generality of parameter tuning in evolutionary planning.
+\newblock In J.~B. {et al.}, editor, {\em Genetic and Evolutionary Computation
+  Conference (GECCO)}, pages 241--248. ACM Press, July 2010.
+
+\bibitem{hansen2001ecj}
+N.~Hansen and A.~Ostermeier.
+\newblock Completely derandomized self-adaptation in evolution strategies.
+\newblock {\em Evolutionary Computation}, 9(2):159--195, 2001.
+
+\bibitem{shark08}
+C.~Igel, T.~Glasmachers, and V.~Heidrich-Meisner.
+\newblock Shark.
+\newblock {\em Journal of Machine Learning Research}, 9:993--996, 2008.
+
+\bibitem{BibEvoCop:2010}
+{J}acques {B}ibai, {P}ierre {S}av{\'e}ant, {M}arc {S}choenauer, and {V}incent
+  {V}idal.
+\newblock On the benefit of sub-optimality within the divide-and-evolve scheme.
+\newblock In P.~Cowling and P.~Merz, editors, {\em EvoCOP 2010}, number 6022 in
+  Lecture Notes in Computer Science, pages 23--34. Springer-Verlag, 2010.
+
+\bibitem{Montero:2010}
+E.~Montero, M.-C. Riff, and B.~Neveu.
+\newblock An evaluation of off-line calibration techniques for evolutionary
+  algorithms.
+\newblock In {\em Proc. ACM-GECCO}, pages 299--300. ACM, 2010.
+
+\bibitem{nissen}
+N.~Nissen.
+\newblock {Implementation of a Fast Artificial Neural Network Library (FANN)}.
+\newblock Technical report, Department of Computer Science University of
+  Copenhagen (DIKU), 2003.
+
+\end{thebibliography}
