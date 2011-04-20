@@ -1,4 +1,4 @@
-paper=gecco2011brendelschoenauercameraready2pages
+paper=gecco2011brendelschoenauerworkshopcameraready
 
 rm  ${paper}.pdf
 
