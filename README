@@ -21,8 +21,8 @@ STATIC BUILD
 2) GDSL:
  * download and build the library GDSL
  * edit the file $ROOT/install.cmake and define the following variables:
-  * GDSL_INCLUDE_DIR (cf. $GDSL/src/.libs/libgdsl.a)
-  * GDSL_LIBRARY (cf. $GDSL/src)
+  * GDSL_INCLUDE_DIR (cf. $GDSL/src)
+  * GDSL_LIBRARY (cf. $GDSL/src/.libs/libgdsl.a)
 
 -------------
 DYNAMIC BUILD
