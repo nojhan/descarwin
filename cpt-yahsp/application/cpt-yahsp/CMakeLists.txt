@@ -4,6 +4,8 @@ SET(SOURCES
   main.cpp
   )
 
+LINK_LIBRARIES(${GDSL_LIBRARY})
+
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES})
 ADD_DEPENDENCIES(${PROJECT_NAME} cpt_yahsp_library-common cpt_yahsp_library-dae)
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} cpt_yahsp_library-dae)
