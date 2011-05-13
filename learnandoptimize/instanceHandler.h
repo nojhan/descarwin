@@ -249,6 +249,7 @@ allresults=vector<double>(iterationsperparameter,0);
 ready=true;
 isthisdefaultparameters=true;
 doesthiscontaindefaultparameters=true;
+readyiterations=vector<unsigned int>(iterationsperparameter,0);
 
 };
 
@@ -587,7 +588,7 @@ void instanceHandler::startJob(int numberofiteration) //numberofiteration==itera
 
 if(numberofiteration==iterationsperparameter) //first submission
 	{
-	readyiterations=vector<unsigned 	int>(iterationsperparameter,0);
+	readyiterations=vector<unsigned int>(iterationsperparameter,0);
 	numreadyiterations=0;
 	agregatedresult=0;
 	resubmitted=0;

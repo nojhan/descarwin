@@ -6,7 +6,8 @@
 #include <sstream>
 #include "time.h"
 #include "instanceHandler.h"
-#include "mappingLearner.h"
+#include "mappingLearnerFANN.h"
+#include "mappingLearnerSharkFFNET.h"
 
 using namespace std;
 
@@ -167,6 +168,16 @@ char* ANNfile=argv[3];
 char* resultfile= argv[4];
 char* timelimit=argv[5];
 
+	mappingLearner* mappinglearner;
+
+	checkexitandreadconfig();
+
+	if(learningModelType==SharkFFNET)
+		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerSharkFFNet(num_features,num_parameters)); 
+	else
+		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerFANN(num_features,num_parameters)); 
+
+
 	parameters.clear();
 
 	cout<<"read paramsfile"<<endl;
@@ -193,14 +204,11 @@ char* timelimit=argv[5];
 	readfeatures();
 
 	cout<<endl;
-	cout<<"Load ANN"<<endl;
+	cout<<"Load mappinglearner"<<endl;
 
 	
 
-
-	mappingLearner mappinglearner(num_features,num_parameters);
-
-	bool succes=mappinglearner.load(ANNfile);
+	bool succes=mappinglearner->load(ANNfile);
 	
 	
 
@@ -210,7 +218,7 @@ char* timelimit=argv[5];
 		
 
 	if (succes)
-		mappinglearner.run(features, parameters);
+		mappinglearner->run(features, parameters);
 
 	
 	cout<<"Write paramsfile"<<endl;

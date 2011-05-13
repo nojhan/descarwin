@@ -269,7 +269,7 @@ for (unsigned int i=1;i<numberofinstances;++i) //we can not take itself
 
 	if (loglevel > 2)
 		logfile<<"tried " <<tried<<endl;
-	unsigned int available=(*instanceHandlers)[i].bestparameters.size();
+	unsigned int available=(*instanceHandlers)[candidate].bestparameters.size();
 
 	if (loglevel > 2)
 		logfile<<"available "<<available<<endl;
@@ -279,7 +279,7 @@ for (unsigned int i=1;i<numberofinstances;++i) //we can not take itself
 		{
 		number=tried;
 		++numberTried[forthisinstance][candidate];
-		logfile<<"Accepted "<<candidate<<endl;
+		logfile<<"Accepted "<<candidate<< " "<< number<<endl;
 		return candidate;
 		}
 

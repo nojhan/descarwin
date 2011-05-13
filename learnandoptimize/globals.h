@@ -10,9 +10,12 @@
 
 using namespace std;
 
+enum LearningModelType { FANN, SharkFFNET};
 
-const int num_parameters=12;
-const int num_features=13;
+LearningModelType learningModelType;
+
+int num_parameters=12;
+int num_features=13;
 int numberofiterations=1000;
 
 
@@ -78,6 +81,29 @@ if(configfile.is_open())
 		cout<<"loglevel changed to "<<loglevel<<endl;
 		}
 	configfile.getline(temp,1000); //comments
+
+
+	unsigned int new_num_parameters=num_parameters;	
+	configfile>>new_num_parameters;
+	if (new_num_parameters!=num_parameters)
+		{
+		num_parameters=new_num_parameters;
+		cout<<"num_parameters changed to "<<loglevel<<endl;
+		}
+	configfile.getline(temp,1000); //comments
+
+	unsigned int new_num_features=num_features;	
+	configfile>>new_num_features;
+	if (new_num_features!=num_features)
+		{
+		num_features=new_num_features;
+		cout<<"num_features changed to "<<loglevel<<endl;
+		}
+	configfile.getline(temp,1000); //comments
+
+
+
+
 	int newnmbit=0;
 	//cout<<newnmbit;
 	configfile>>newnmbit;
@@ -97,6 +123,19 @@ if(configfile.is_open())
 		{
 		numepochsperiteration=p_numepochsperiteration;
 		cout<<"numepochsperiteration changed to "<<numepochsperiteration<<endl;
+		}
+	configfile.getline(temp,1000); //comments
+	cout<<endl;
+
+
+	string learningModelTypeString;
+	
+	configfile>>learningModelTypeString;
+	//cout<<learningModelTypeString.c_str()<<endl;
+	if ((learningModelTypeString.compare("SharkFFNET")==0) && (learningModelType!=SharkFFNET))
+		{
+		learningModelType=SharkFFNET;
+		cout<<"learningModelType "<<learningModelTypeString<<endl;
 		}
 	configfile.getline(temp,1000); //comments
 	cout<<endl;

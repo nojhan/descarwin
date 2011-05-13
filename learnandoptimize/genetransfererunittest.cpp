@@ -1,6 +1,5 @@
+#include "globals.h"
 #include <stdio.h>
-#include <vector>
-#include <string>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -8,16 +7,44 @@
 #include "instanceHandler.h"
 #include "mappingLearnerFANN.h"
 #include "mappingLearnerSharkFFNET.h"
-#include "globals.h"
+#include "genetransferer.h"
+
 
 using namespace std;
 
-bool testdefaultparameters=false;
-
-
-
 
 vector<instanceHandler> instanceHandlers;
+
+geneTransferer genetransferer;
+
+
+void logtoiterationsfile(unsigned int iteration,char* typeofiterationphase, double annerror)
+{
+
+		double averageobjective=0;
+		unsigned int s=instanceHandlers.size();
+
+		for(unsigned int i=0;i<s;++i)
+			averageobjective+=instanceHandlers[i].bestobjective;
+
+		averageobjective/=s;
+
+		cout<<" average objective: " <<averageobjective<<endl;
+
+
+		stringstream logfilename;
+
+		logfilename<<"iterations"<<".log";
+
+		ofstream logfile;
+
+
+		logfile.open(logfilename.str().c_str(),ios_base::app);
+
+		logfile<<" iteration: "<<iteration<<" "<<typeofiterationphase<<" average objective: " <<averageobjective<<" annerror "<<annerror<<endl;
+		
+		logfile.close();
+}
 
 
 
@@ -27,6 +54,9 @@ void readparamnamesfile()
 ifstream paramnamesfile;
 
 paramnamesfile.open("paramnames.txt");
+
+if (!paramnamesfile.is_open())
+	exit(-1);
 
 for (unsigned int i=0;i<num_parameters;++i)
 	{
@@ -76,11 +106,13 @@ unsigned int numberofreadyinstance=0;
 unsigned int numinstances=instanceHandlers.size();
 
 
-/* we start when the file is taken away seems better
-for( unsigned int i=0;i<numinstances;++i)
-	time(&(instanceHandlers[i].start));*/
+/* this is not really gathering anything, just simulating*/
+
+
 
 ofstream statefile;
+
+cout<<"gatherInstanceResults"<<endl;
 
 
 do
@@ -95,16 +127,35 @@ do
 		{
 		
 
-		if(!instanceHandlers[i].ready)
+		//if(!instanceHandlers[i].ready)
 			{
 			checkexitandreadconfig(); //before doing something time consuming
-			instanceHandlers[i].readResult();
-			if (instanceHandlers[i].ready)
-				numberofreadyinstance++;
+			
+			unsigned int r= rand() % 4 ;
+
+			//cout<<r<<endl;
+
+			if (r == 3) //new best value
+				{
+				genetransferer.instanceBestParameterChanged(i);
+				instanceHandlers[i].bestparameters.clear();
+				instanceHandlers[i].bestparameters.push_back(instanceHandlers[i].tryparameters);
+				instanceHandlers[i].isthisdefaultparameters=false; //this is at least second improvement, cannot be the default parameters
+				instanceHandlers[i].doesthiscontaindefaultparameters=false; //this is at least second improvement, cannot be the default parameters
+				}
+			if ( r== 2) //add best value
+				{
+				instanceHandlers[i].isthisdefaultparameters=false; 
+				instanceHandlers[i].bestparameters.push_back(instanceHandlers[i].tryparameters);
+				}
+
+
+			numberofreadyinstance++;
+			instanceHandlers[i].ready=1;
 				
 			}
-		else
-			numberofreadyinstance++;
+		/*else
+			numberofreadyinstance++;*/
 
 		
 		statefile.open("state.txt",ios_base::app);
@@ -112,9 +163,12 @@ do
 		statefile<<instanceHandlers[i].numreadyiterations<<" ";
 		
 		statefile<<i;
+
 		
 		for(unsigned int j=0;j<iterationsperparameter;++j)
 				statefile<<" "<<instanceHandlers[i].readyiterations[j];
+
+
 
 		statefile<<endl;
 		
@@ -134,8 +188,12 @@ do
 
 	}
 	while(numberofreadyinstance<numinstances);
-}
 
+	system("cp state.txt state_backup.txt");
+
+cout<<"gatherInstanceResults end"<<endl;
+
+}
 
 
 
@@ -266,8 +324,7 @@ for(unsigned int j=0;j<instancehandlersfrominstancesfile.size();++j)
 		instance->tryparameters=defaultvalues;
 		instance->bestobjective=-1; //invalid
 		whatislasttry="initialize_with_default";
-		if(testdefaultparameters)
-			instance->startJob(iterationsperparameter);
+//		instance->startJob(iterationsperparameter);
 		instanceHandlers.push_back(*instance);
 		unsigned int s=instanceHandlers.size()-1;
 		
@@ -279,8 +336,8 @@ for(unsigned int j=0;j<instancehandlersfrominstancesfile.size();++j)
 		}
 }//for
 
-if(testdefaultparameters)
-	gatherInstanceResults();	
+
+gatherInstanceResults();	
 
 
 
@@ -291,18 +348,11 @@ system("./cleanupafteriteration.sh > /dev/null");
 
 
 
-
-
-
-int main ( int argc, char* argv[] )
+int main()
 {
 
-	resubmittime=100*60; //we can wait longer here, since there is no iteration
 
-	if (argc>1)
-		testdefaultparameters=atoi(argv[1]);
 
-	cout<<"testdefaultparameters="<<testdefaultparameters<<endl;
 
 	mappingLearner* mappinglearner;
 
@@ -314,21 +364,11 @@ int main ( int argc, char* argv[] )
 		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerFANN(num_features,num_parameters)); 
 
 	
-	cout<<"Load mappinglearner"<<endl;
-
-
-	double averageobjective=0;
-
-
-
-	mappinglearner->load("ANN.saved");
-	
-	
 	stringstream command;
 
 	command<<"hostname > iterations.log"<<endl;
 
-	cout<<command.str().c_str();
+	cout<<command;
 
 	system(command.str().c_str());
 
@@ -339,89 +379,77 @@ int main ( int argc, char* argv[] )
 
 	initialize();
 
+	logtoiterationsfile(0,"initialize", 0);
+	
+
+
 	unsigned int s=instanceHandlers.size();
 
 	if( !s )
 		return(-1);
 
-
-	for(unsigned int i=0;i<s;++i)
-			averageobjective+=instanceHandlers[i].bestobjective;
-
-		averageobjective/=s;
-
-		cout<<" default average objective: " <<averageobjective<<endl;
-
-
-
-		stringstream logfilename;
-
-		logfilename<<"iterations"<<".log";
-
-		ofstream logfile;
-
-
-		logfile.open(logfilename.str().c_str(),ios_base::app);
-
-		logfile<<"test default average objective: " <<averageobjective<<endl;
-		
-		logfile.close();
-
-
+	genetransferer.init(s,&instanceHandlers);
 	
 
-		printf("Use ANN\n");
-		
-		averageobjective=0;
+	for (unsigned iteration=0;iteration<numberofiterations;iteration++)
+		{
+		printf("Epoch %d.\n",iteration);
 
+
+		printf("Use geneTransferer;\n");
+		
 		system("./cleanupafteriteration.sh > /dev/null");
 
-		stringstream text2;
+		stringstream text3;
 
-		text2<<"Epoch "<<" test_of_ANN";
+		text3<<"Epoch "<<iteration<<" geneTransferer;";
 
-		whatislasttry=text2.str();
+		whatislasttry=text3.str();
 		
 		s=instanceHandlers.size();
 
 		for(unsigned int i=0;i<s;++i)
 			{
 			checkexitandreadconfig();
-
-
-			vector<double> parameters;
-
-			mappinglearner->run(instanceHandlers[i].features, parameters);
-
 			
-			instanceHandlers[i].addHint(parameters);	
+			unsigned int number=0;
+			int source=genetransferer.getNextInstance(i,number);
+
+			if (source >= 0) //fail to get is indicated by -1
+				{
+				
+
+				vector<double>& parameters=instanceHandlers[source].bestparameters[number];
+				
+				instanceHandlers[i].addHint(parameters);	
+				//instanceHandlers[i].startJob(iterationsperparameter);
+				}
+			//no else, if failed we can just do nothing.
 			
 			
-			instanceHandlers[i].startJob(iterationsperparameter);
+
 			}
 
 
-		gatherInstanceResults();
+		gatherInstanceResults(); //this is prepared that not all jobs are started
 
-		for(unsigned int i=0;i<s;++i)
-			averageobjective+=instanceHandlers[i].bestobjective;
-
-		averageobjective/=s;
-
-		cout<<" ANN average objective: " <<averageobjective<<endl;
+		logtoiterationsfile(iteration,"genetransfer", 0);
 
 
 
 
 
-		logfile.open(logfilename.str().c_str(),ios_base::app);
+		}
+	
+	stringstream command2;
+	
+	command2<<"hostname > iterations.log"<<endl;
 
-		logfile<<"test ANN average objective: " <<averageobjective<<endl;
-		
-		logfile.close();
+	cout<<command2;
+
+	system(command2.str().c_str());
 
 	system("./cleanupafteriteration.sh > /dev/null");
-
 
 	return 0;
 }
