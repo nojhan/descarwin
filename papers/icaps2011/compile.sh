@@ -1,13 +1,15 @@
-rm  icaps2011.pdf
+paper=icaps2011_cameraready
 
-#pdflatex  icaps2011
-bibtex  icaps2011
-#bibtex  icaps2011r
+rm  ${paper}.pdf
+
+pdflatex  ${paper}
+#bibtex  gecco2011brendelschoenauerworkshop
+bibtex  ${paper}
 
 
-pdflatex  icaps2011
+#pdflatex  ${paper}
 
 
 if [ $1 -gt 0 ]; then
-acroread icaps2011.pdf
+acroread ${paper}.pdf
 fi
