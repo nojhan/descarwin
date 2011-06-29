@@ -13,8 +13,6 @@
 //#include <do/make_pop.h>
 //#include <do/make_checkpoint.h>
 #include <ga.h>
-#include <utils/eoParserLogger.h>
-#include <utils/eoLogger.h>
 #include <utils/eoFeasibleRatioStat.h>
 
 #include "daex.h"
@@ -762,22 +760,24 @@ int main ( int argc, char* argv[] )
     // Use the eoMergeReduce construct
     
     // Merge: either merge (Plus strategy, parents + offspring) or only keep offspring (Comma)
-    eoMerge<daex::Decomposition> * pt_merge;
-    if (plusOrComma == "Comma") {
-      pt_merge = (eoMerge<daex::Decomposition> *) (new eoNoElitism<daex::Decomposition>);
-    } else { // Plus
-      pt_merge = (eoMerge<daex::Decomposition> *) (new eoPlus<daex::Decomposition>);
-    }
-    // Reduce: either truncate (deterministic) or tournament
-    eoReduce<daex::Decomposition> * pt_reduce;
-    if (replaceTourSize == 1) {
-      pt_reduce = (eoReduce<daex::Decomposition> *) (new eoTruncate<daex::Decomposition>);
-    } else {
-      pt_reduce = (eoReduce<daex::Decomposition> *) (new eoDetTournamentTruncate<daex::Decomposition> ( replaceTourSize ));
-    }
-    // the full MergeReduce object
-    eoMergeReduce<daex::Decomposition> mergeReduce (*pt_merge, *pt_reduce);
-    
+    // eoMerge<daex::Decomposition> * pt_merge;
+    // if (plusOrComma == "Comma") {
+    //   pt_merge = (eoMerge<daex::Decomposition> *) (new eoNoElitism<daex::Decomposition>);
+    // } else { // Plus
+    //   pt_merge = (eoMerge<daex::Decomposition> *) (new eoPlus<daex::Decomposition>);
+    // }
+    // // Reduce: either truncate (deterministic) or tournament
+    // eoReduce<daex::Decomposition> * pt_reduce;
+    // if (replaceTourSize == 1) {
+    //   pt_reduce = (eoReduce<daex::Decomposition> *) (new eoTruncate<daex::Decomposition>);
+    // } else {
+    //   pt_reduce = (eoReduce<daex::Decomposition> *) (new eoDetTournamentTruncate<daex::Decomposition> ( replaceTourSize ));
+    // }
+    // // the full MergeReduce object
+    // eoMergeReduce<daex::Decomposition> mergeReduce (*pt_merge, *pt_reduce);
+
+    eoEPReplacement<daex::Decomposition> mergeReduce(replaceTourSize);
+
     // Now the weak elitism
     if (weakElitism) {
 	pt_replace = (eoReplacement<daex::Decomposition> *) (new eoWeakElitistReplacement<daex::Decomposition> ( mergeReduce ) );
