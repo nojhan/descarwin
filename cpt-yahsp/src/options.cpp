@@ -14,7 +14,10 @@
 #include "structs.h"
 #include "plan.h"
 #include "globs.h"
-
+#include "yahsp.h"
+#ifdef YAHSP_MPI
+#include "yahsp-mpi.h"
+#endif
 
 /*---------------------------------------------------------------------------*/
 /* Local Macros                                                              */
@@ -208,7 +211,11 @@ void cmd_line(int argc, const char **argv)
   opt.timer = 0;
   opt.unique_supports = true;
   opt.verbose_preprocessing = false;
+#ifdef YAHSP_MPI
+  opt.verbosity = mpi_is_master();
+#else
   opt.verbosity = 1;
+#endif
   opt.wdeg = false;
   opt.yahsp = false;
 
@@ -240,7 +247,9 @@ void cmd_line(int argc, const char **argv)
     case 's': opt.random = true; opt.seed = atol(optarg); trace(options, "randomized, seed : %ld\n", opt.seed); break;
     case 't': opt.timer = atol(optarg); trace(options, "timer : %ld\n", opt.timer); break;
     case 'u': opt.give_suboptimal = true; trace(options, "give suboptimal solution for dichotomic search and limiting backtracks\n"); break;
-    case 'v': opt.verbosity = atol(optarg); trace(options, "verbosity level : %ld\n", opt.verbosity); break;
+    case 'v': 
+      opt.verbosity = atol(optarg); 
+      trace(options, "verbosity level : %ld\n", opt.verbosity); break;
 #ifdef RATP
     case 'w': opt.ratp = true; opt.ratp_input = strtok(optarg,","); opt.ratp_output = strtok(NULL,","), opt.branching_strategy = SUPPORTS_FIRST; 
       opt.task_intervals = false; 

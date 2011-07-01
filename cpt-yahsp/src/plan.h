@@ -25,14 +25,16 @@
 #define TIMER(x) static clock_t x##_start
 #define start_timer(x) NEST( x##_start = clock(); )
 #define get_timer(x) ((clock() - x##_start) / (double) CLOCKS_PER_SEC)
+#define get_wtimer(x) ((clock() - x##_start) / (double) CLOCKS_PER_SEC)
 
 #else
 
 #include <sys/time.h>
 #include <sys/times.h>
-#define TIMER(x) struct tms x##_start, x##_end
-#define start_timer(x) (void) times(&x##_start)
+#define TIMER(x) struct tms x##_start, x##_end; struct timeval x##_wstart, x##_wend
+#define start_timer(x) NEST((void) times(&x##_start); gettimeofday(&x##_wstart, NULL);)
 #define get_timer(x) ({ (void) times(&x##_end); ((double) (x##_end.tms_utime - x##_start.tms_utime) / sysconf(_SC_CLK_TCK)); })
+#define get_wtimer(x) ({ (void) gettimeofday(&x##_wend, NULL); ((double) (x##_wend.tv_sec - x##_wstart.tv_sec + (x##_wend.tv_usec - x##_wstart.tv_usec) / (double) 1000000)); })
 
 #endif
 
@@ -46,7 +48,7 @@ struct SolutionPlan {
   TimeVal makespan;
   double search_time;
   double total_time;
-  double backtracks;
+  long backtracks;
 };
 
 struct Step {
@@ -72,12 +74,19 @@ struct Statistics {
   long computed_nodes;
   long evaluated_nodes;
   long expanded_nodes;
+  long page_faults;
+  long vol_context_switch;
+  long inv_context_switch;
+  long no_work_counter;
+  long sends;
+  long sends_per_proc;
+
+  double nodes_by_sec;
+  double nodes_by_sec_proc;
   TIMER(monitor);
   TIMER(search);
   TIMER(total);
   TIMER(iteration);
-  double wctime;
-  double wcsearch;
 };
 
 

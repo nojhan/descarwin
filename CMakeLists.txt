@@ -8,11 +8,8 @@ PROJECT(DESCARWIN)
 # include useful features for cmake
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-FIND_PACKAGE(GDSL REQUIRED)
-
 # include the sources
 INCLUDE_DIRECTORIES(
-  ${GDSL_INCLUDE_DIR}
   ${CMAKE_SOURCE_DIR}/cpt-yahsp
   ${CMAKE_SOURCE_DIR}/cpt-yahsp/src
   ${CMAKE_SOURCE_DIR}/dae/src

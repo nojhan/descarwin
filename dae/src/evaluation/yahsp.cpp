@@ -11,7 +11,7 @@
 
 std::ostream & operator<<( std::ostream & out, BitArray bitarray )
 {
-    for( unsigned int i = 1; i < fluents_nb; ++i ) {
+  for( unsigned int i = 1; i < (unsigned int) fluents_nb; ++i ) {
         unsigned long bit = bitarray_get( bitarray, fluents[i] );
         if( bit != 0 ) {
             out << " " << fluent_name(fluents[i]);
@@ -86,7 +86,7 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
         plans_nb++;
 
 	// if k != plans_nb => the same decomposition is evaluated simultaneously by several threads !!!
-	assert (decompo.get_number_evaluated_goals() == plans_nb);
+	assert (decompo.get_number_evaluated_goals() == (unsigned int) plans_nb);
 	
         decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mais on garde la structure notamment pour last_reached.
         decompo.last_subplan().search_steps( decompo.get_number_evaluated_nodes() );
@@ -270,7 +270,7 @@ void daeYahspEval::free_yahsp_structures()
                                      eo::log.flush();
                                  #endif
     // libère la variable globale "plans", utilisée par yahsp lors de la compression
-    for( unsigned int p=0; p < plans_nb; ++p ) {
+    for( unsigned int p=0; p < (unsigned int) plans_nb; ++p ) {
       plan_free( plans[p] );
     }
     plans_nb = 0;

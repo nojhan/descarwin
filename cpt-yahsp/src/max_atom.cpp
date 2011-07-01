@@ -272,7 +272,7 @@ void compute_init_h2_cost(void)
   
   set_ainit(start_action, 0);
   FOR(f, fluents) { f->init = MAXCOST; } EFOR;
-  FORMIN(a, actions, 0) { 
+  FOR(a, actions) { 
     a->init = get_ainit(a); 
     FOR(f, a->add) { 
       if (a->init < MAXCOST) minimize(f->init, a->init + duration(a)); 

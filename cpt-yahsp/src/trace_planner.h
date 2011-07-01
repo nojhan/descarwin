@@ -24,7 +24,7 @@ DECLARE(restart, long nodes, long backtracks, double time, TimeVal bound);
 DECLARE(problem_stats, long actions_nb, long fluents_nb, long causals_nb);
 DECLARE(solution_plan, SolutionPlan *plan);
 DECLARE(plan_stats, SolutionPlan *plan);
-DECLARE(search_stats, double search_time, double total_time);
+DECLARE(search_stats, double search, double total, double wsearch, double wtotal);
 DECLARE(yahsp_anytime_search_stats, TimeVal makespan, double search_time, double total_time);
 DECLARE(conflict_choice, Causal *c, Action *a, bool direction, bool first);
 DECLARE(support_choice, Causal *c, Action *a, bool direction, bool first);

@@ -78,14 +78,12 @@ void print_plan_ipc(FILE *out, SolutionPlan *plan, double total_time)
 
 void print_plan_ipc_anytime(SolutionPlan *plan)
 {
-  if (opt.output_file != NULL) {
-    char filename[strlen(opt.output_file) + 10];
-    static int number = 1;
-    sprintf(filename, "%s.%d", opt.output_file, number++);
-    FILE *file = fopen(filename, "w");
-    print_plan_ipc(file, solution_plan, get_timer(stats.total));
-    fclose(file);
-  }
+  char filename[strlen(opt.output_file) + 10];
+  static int number = 1;
+  sprintf(filename, "%s.%d", opt.output_file, number++);
+  FILE *file = fopen(filename, "w");
+  print_plan_ipc(file, plan, get_timer(stats.total));
+  fclose(file);
 }
 
 Comparison precedes_in_plan(Step **s1, Step **s2)

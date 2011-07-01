@@ -14,7 +14,6 @@ PROJECT(DAEX)
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 FIND_PACKAGE(OpenMP REQUIRED)
-FIND_PACKAGE(GDSL REQUIRED)
 
 IF(OPENMP_FOUND)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
@@ -25,7 +24,6 @@ ENDIF()
 INCLUDE_DIRECTORIES(
   ${EO_SRC_DIR}
   ${CPT_YAHSP_SRC_DIR}
-  ${GDSL_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   )
 
@@ -36,7 +34,8 @@ LINK_DIRECTORIES(
   )
 
 # flags to use with compiler
-ADD_DEFINITIONS(-W -Wall)
+# VV : -DDAE pour les headers de YAHSP
+ADD_DEFINITIONS(-W -Wall -DDAE) 
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
   #ADD_DEFINITIONS(-DPAPERVERSION)
@@ -46,39 +45,39 @@ ELSE()
 ENDIF()
 
 # target + link libraries
-LINK_LIBRARIES(eoutils daex gmp eo gcov ${GDSL_LIBRARY} cpt_yahsp_library-common)
+LINK_LIBRARIES(eoutils gmp eo gcov gdsl)
+
+# VV  : cpt_yahsp_library-common-dae-omp and  cpt_yahsp_library-dae are  no more
+# factorized because dae + yahsp-mt need  to be completely recompiled due to TLS
+# global references that differ from the ones needed by dae-mt + yahsp.
 
 ADD_EXECUTABLE(dae dae.cpp)
 ADD_DEPENDENCIES(dae daex)
-TARGET_LINK_LIBRARIES(dae cpt_yahsp_library-dae)
+TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 
 ADD_EXECUTABLE(dae-sm dae.cpp)
 ADD_DEPENDENCIES(dae-sm daex)
-TARGET_LINK_LIBRARIES(dae-sm cpt_yahsp_library-sm)
+TARGET_LINK_LIBRARIES(dae-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae-sm)
 
 ADD_EXECUTABLE(dae-mt dae.cpp)
-ADD_DEPENDENCIES(dae-mt daex)
-TARGET_LINK_LIBRARIES(dae-mt cpt_yahsp_library-mt)
-
-ADD_EXECUTABLE(dae-mt-sm dae.cpp)
-ADD_DEPENDENCIES(dae-mt-sm daex)
-TARGET_LINK_LIBRARIES(dae-mt-sm cpt_yahsp_library-mt-sm)
+ADD_DEPENDENCIES(dae-mt daex-yahsp-mt)
+TARGET_LINK_LIBRARIES(dae-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
 
 ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
 ADD_DEPENDENCIES(test_chronopartition daex)
-TARGET_LINK_LIBRARIES(test_chronopartition cpt_yahsp_library-dae)
+TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 
 ADD_EXECUTABLE(test_b_max test_b_max.cpp)
 ADD_DEPENDENCIES(test_b_max daex)
-TARGET_LINK_LIBRARIES(test_b_max cpt_yahsp_library-dae)
+TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 
 ADD_EXECUTABLE(test_stats test_stats.cpp)
 ADD_DEPENDENCIES(test_stats daex)
-TARGET_LINK_LIBRARIES(test_stats cpt_yahsp_library-dae)
+TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 
 ADD_EXECUTABLE(featureselector featureselector.cpp)
 ADD_DEPENDENCIES(featureselector daex)
-TARGET_LINK_LIBRARIES(featureselector cpt_yahsp_library-dae)
+TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 
 # process to sources
 ADD_SUBDIRECTORY(src)

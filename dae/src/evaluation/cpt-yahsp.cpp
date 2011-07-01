@@ -95,7 +95,7 @@ unsigned int daeCptYahspEval::distance_to_goal_Hamming( BitArray state )
 {
     unsigned int nb = goal_state_nb;
 
-    for( unsigned int i = 0; i < goal_state_nb; ++i ) {
+    for( unsigned int i = 0; i < (unsigned int) goal_state_nb; ++i ) {
         if ( bitarray_get( state, goal_state[i] ) != 0 ) {
             nb--;
         }

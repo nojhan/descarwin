@@ -2,6 +2,6 @@
 
 mkdir -p release
 cd release
-cmake ..
-make
+cmake -D SCC=OFF ..
+make $*
 cd ..

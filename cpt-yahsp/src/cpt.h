@@ -24,7 +24,13 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <gmp.h>
+#ifndef __WIN32__
+#define WITHOUT_GDSL_TYPES
+#endif
+#include "../gdsl/src/gdsl.h"
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 #ifndef __WORDSIZE
 #define __WORDSIZE 32
@@ -171,6 +177,7 @@ typedef enum {Better = -1, Equal = 0, Worse = 1} Comparison;
 
 
 #define mpz_get_timeval(n) ({ char *s = mpz_get_str(NULL, 10, n); TimeVal res = atoll(s); free(s); res; })
+
 
 #endif /* CPT_H */
 

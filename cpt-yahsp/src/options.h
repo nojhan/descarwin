@@ -90,5 +90,4 @@ extern Option opt;
 
 extern void cmd_line(int argc, const char **argv);
 
-
 #endif /* #define OPTIONS_H */

@@ -46,6 +46,7 @@
 #define TR_update_sup_c 128
 #define TR_update_inf_c 128
 #define TR_ratp 256
+#define TR_mpi 512
 
 
 #ifdef NOTRACE

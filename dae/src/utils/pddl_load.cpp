@@ -155,7 +155,7 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     // puis modifiées pour ne garder que les fluents atteignables
 
     // pour chaque Atom
-    for( unsigned int i=0; i < fluents_nb; ++i) {
+    for( unsigned int i=0; i < (unsigned int) fluents_nb; ++i) {
 
         // prédicat, objet, date au plus tot, pointeur vers le fluent CPT
         daex::Atom * atom = new daex::Atom( fluents[i]->init, fluents[i] );

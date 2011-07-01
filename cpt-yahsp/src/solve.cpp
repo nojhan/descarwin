@@ -129,7 +129,8 @@ static void partial_statistics_request(int n)
   trace(normal, "\n----- Partial statistics at bound ");
   print_time(cptout, last_start(end_action));
   trace(normal, " -----\n");
-  trace_proc(search_stats, get_timer(stats.search), get_timer(stats.total));
+  trace_proc(search_stats, get_timer(stats.search), get_timer(stats.total), 
+	     get_wtimer(stats.search), get_wtimer(stats.total));
   opt.verbosity = v;
 }
 
@@ -157,8 +158,6 @@ int cpt_main(int argc, const char **argv)
 
   start_timer(stats.total);
 
-  stats.wctime = omp_get_wtime();
-
 #ifndef WALLCLOCK_TIME
   init_system(opt.timer);
 #endif
@@ -167,11 +166,13 @@ int cpt_main(int argc, const char **argv)
 
   fesetround(FE_UPWARD);
 
-  stats.wcsearch = omp_get_wtime();
-  
   if (opt.yahsp) {
     // DIRTY
+#ifdef DAE
+#ifndef YAHSP_MT
 #pragma omp parallel num_threads(opt.dae_threads)
+#endif
+#endif
     {
       yend_action = *end_action;
       yahsp_init();
@@ -202,8 +203,8 @@ int cpt_main(int argc, const char **argv)
     }
     break;
   }
-  trace_proc(search_stats, get_timer(stats.search), get_timer(stats.total));
-
+  trace_proc(search_stats, get_timer(stats.search), get_timer(stats.total),
+	     get_wtimer(stats.search), get_wtimer(stats.total));
   return PLAN_FOUND;
 }
 
@@ -313,7 +314,7 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
     if (mind == MAXTIME) mind = maxd = 1;
     switch (opt.dichotomy) {
     case 1: dic_increment = mind; break;
-    case 2: dic_increment = mean; break;
+    case 2: dic_increment = (TimeVal) mean; break;
     case 3: dic_increment = (maxd - mind); break;
     case 4: dic_increment = maxd; break;
     }

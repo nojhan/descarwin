@@ -14,32 +14,11 @@ COMMON STEPS
 1) EO:
  * edit the file $ROOT/install.cmake and define the variable EO_DIR
 
-------------
-STATIC BUILD
-------------
+2) use one of the scripts available to build the project (cf. build_gcc_linux_*)
 
-2) GDSL:
- * download and build the library GDSL
- * edit the file $ROOT/install.cmake and define the following variables:
-  * GDSL_INCLUDE_DIR (cf. $GDSL/src)
-  * GDSL_LIBRARY (cf. $GDSL/src/.libs/libgdsl.a)
+3) go to the new directory created (cf. release, debug, ...)
 
--------------
-DYNAMIC BUILD
--------------
-
-2) GDSL:
- * download, build and install the library GDSL
-
------------------
-COMMON FINAL STEP
------------------
-
-3) use one of the scripts available to build the project (cf. build_gcc_linux_*)
-
-4) go to the new directory created (cf. release, debug, ...)
-
-5) Location of the generated binaries and libraries:
+4) Location of the generated binaries and libraries:
  * dae binaries are available in the directory dae,
  * cpt-yahsp binaries in cpt-yahsp directory,
  * all the libraries are in lib directory.

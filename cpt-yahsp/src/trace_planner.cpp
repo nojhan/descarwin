@@ -81,14 +81,25 @@ void trace_plan_stats(SolutionPlan *plan)
   }
 }
 
-void trace_search_stats(double search_time, double total_time)
+void trace_search_stats(double search, double total, double wsearch, double wtotal)
 {
   if (opt.verbosity > 0) {
     if (opt.yahsp) {
       fprintf(cptout, "Computed nodes : %ld\n", stats.computed_nodes);
       fprintf(cptout, "Evaluated nodes : %ld\n", stats.evaluated_nodes);
       fprintf(cptout, "Expanded nodes : %ld\n", stats.expanded_nodes);
-      fprintf(cptout, "Evaluated nodes/sec : %.2f\n", stats.evaluated_nodes / search_time);
+      fprintf(cptout, "Evaluated nodes/sec : %.2f\n", stats.nodes_by_sec);
+#ifdef YAHSP_MPI
+      fprintf(cptout, "Evaluated nodes/sec/proc : %.2f\n", stats.nodes_by_sec_proc);
+      fprintf(cptout, "Page faults : %ld\n", stats.page_faults);
+      fprintf(cptout, "Vol. context sw. : %ld\n", stats.vol_context_switch);
+      fprintf(cptout, "Inv. context sw. : %ld\n", stats.inv_context_switch);
+      fprintf(cptout, "Inv. context sw./ev. node : %.3f\n", stats.inv_context_switch / (double) stats.evaluated_nodes);
+      fprintf(cptout, "No work : %ld\n", stats.no_work_counter);
+      fprintf(cptout, "No work/ev. node : %.2f\n", stats.no_work_counter / (double) stats.evaluated_nodes);
+      fprintf(cptout, "Nodes sent: %ld\n", stats.sends);
+      fprintf(cptout, "Nodes sent/ev. node : %.2f\n", stats.sends / (double) stats.evaluated_nodes);
+#endif
     } else {
       fprintf(cptout, "Nodes : %ld\n", nb_nodes());
       fprintf(cptout, "Backtracks : %ld\n", nb_backtracks());
@@ -97,26 +108,27 @@ void trace_search_stats(double search_time, double total_time)
       fprintf(cptout, "Mutex choices : %ld\n", stats.mutex_choices);
       fprintf(cptout, "Start time choices : %ld\n", stats.start_time_choices);
       fprintf(cptout, "World size : %ldK\n", world_size() / 1000);
-      fprintf(cptout, "Nodes/sec : %.2f\n", nb_nodes() / search_time);
+      fprintf(cptout, "Nodes/sec : %.2f\n", nb_nodes() / search);
     }
-    double wctime = omp_get_wtime() - stats.wcsearch;
-    fprintf(cptout, "Search us time : %.2f\n", search_time);
-    fprintf(cptout, "Search wc time : %.2f\n", wctime);
-    fprintf(cptout, "Core utility : %.2f\n", mini(100, search_time * 100 / (wctime * mini(opt.yahsp_threads, omp_get_num_procs()))));
-    fprintf(cptout, "Total us time : %.2f\n", total_time);
-    fprintf(cptout, "Total wc time : %.2f\n", omp_get_wtime() - stats.wctime);
+#ifdef YAHSP_MT
+    fprintf(cptout, "Core utility : %.2f\n", mini(100, search * 100 / (wsearch * mini(opt.yahsp_threads, omp_get_num_procs()))));
+#endif
+    fprintf(cptout, "Search us time : %.2f\n", search);
+    fprintf(cptout, "Search wc time : %.2f\n", wsearch);
+    fprintf(cptout, "Total us time : %.2f\n", total);
+    fprintf(cptout, "Total wc time : %.2f\n", wtotal);
     fprintf(cptout, "\n");
   }
 }
 
-void trace_yahsp_anytime_search_stats(TimeVal makespan, double search_time, double total_time)
+void trace_yahsp_anytime_search_stats(TimeVal makespan, double search, double total)
 {
   fprintf(cptout, "plan found : ");
   if (pddl_domain->action_costs) fprintf(cptout, "cost ");
   else if (opt.sequential) fprintf(cptout, "length ");
   else fprintf(cptout, "makespan ");
   print_time(cptout, makespan);
-  fprintf(cptout, " -- search time %.2f -- total time %.2f\n", search_time, total_time);
+  fprintf(cptout, " -- search time %.2f -- total time %.2f\n", search, total);
 }
 
 

@@ -60,7 +60,7 @@ public:
     //! Loop over the goal states and put the latest date in the _goal_max_date member
     void compute_goal_max_date()
     {
-        for( unsigned int i=0; i < goal_state_nb; ++i ) {
+      for( unsigned int i=0; i < (unsigned int) goal_state_nb; ++i ) {
             _goal_max_date = std::max( _goal_max_date, goal_state[i]->init );
         } // for i in goal_state
     }

@@ -10,12 +10,6 @@
 #define PDDL_H 
 
 
-#ifndef __WIN32__
-#define WITHOUT_GDSL_TYPES
-#endif
-#include <gdsl.h>
-
-
 typedef enum {POS_MOD, NEG_MOD} SignModality;
 typedef enum {NO_EQUAL_MOD, EQUAL_MOD} EqualityModality;
 typedef enum {NO_TEMP_MOD, ATSTART_MOD, OVERALL_MOD, ATEND_MOD} TemporalModality;
