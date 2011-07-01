@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 2.6)
+
+PROJECT(gdsl)
+
+INCLUDE_DIRECTORIES(
+  ${CMAKE_CURRENT_SOURCE_DIR}/src
+  )
+
+ADD_SUBDIRECTORY(src)
