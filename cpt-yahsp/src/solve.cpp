@@ -391,6 +391,8 @@ static void solve2(void)
   long tries = opt.restarts_max_tries;
   TIMER(iteration);
 
+  (void)iteration_wend; // to avoid warning message at compile time as the variable is not used.
+
   if (opt.limit_backtracks) set_backtrack_limit(opt.max_backtracks);
   else if (opt.restarts) set_backtrack_limit(opt.restarts_init);
   while (true) {
