@@ -13,7 +13,7 @@
 
 extern int cpt_main(int argc, const char **argv);
 extern int cpt_basic_search(void);
-extern int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb, bool compress, bool compress_causals, bool compress_orderings);
+extern int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb, bool compress, bool compress_causals, bool compress_orderings, long max_evaluated_nodes);
 
 
 #endif /* SOLVE_H */

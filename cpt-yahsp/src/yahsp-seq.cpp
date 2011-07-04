@@ -21,9 +21,10 @@
 #include "yahsp-dae.h"
 #endif
 
+long yahsp_max_evaluated_nodes;
 
-long state_size;
-long node_id_counter;
+static long yahsp_state_size;
+static long node_id_counter;
 
 static TimeVal *ainit;
 static TimeVal *aused;
@@ -91,11 +92,11 @@ static Node *open_list_insert(Node *node)
 static Node *closed_list_insert(Node *node)
 {
   int gdsl_return;
-  ulong i;
-  for (i = 0; i < (ulong) (fluents_nb -1) / __WORDSIZE + 1; i++) 
+  long i;
+  for (i = 0; i < yahsp_state_size; i++) 
     node->key ^= node->state[i] * (i + 1);
   gdsl_rbtree_insert(closed_list, node, &gdsl_return);
-   return gdsl_return == GDSL_INSERTED ? node : ({ node_free(node); (Node *) NULL; });
+  return gdsl_return == GDSL_INSERTED ? node : ({ node_free(node); (Node *) NULL; });
 }
 
 static void update_cost_h1(Fluent *f, TimeVal cost)
@@ -349,7 +350,8 @@ void yahsp_trace_anytime(Node *node)
 
 static Node *compute_node(Node *node)
 {
-  if (node == NULL || closed_list_insert(node) == NULL || stats.evaluated_nodes >= opt.max_backtracks) return NULL;
+  if (node == NULL || closed_list_insert(node) == NULL 
+      || stats.evaluated_nodes >= yahsp_max_evaluated_nodes) return NULL;
   if (node->makespan >= best_makespan) return NULL;
   stats.evaluated_nodes++;
   compute_h1(node);
@@ -397,7 +399,7 @@ static Node *yahsp_plan()
       cpt_malloc(son->steps, 1);
       node_apply_action(son, a);
       if ((son = compute_node(son))) return son;
-      if (stats.evaluated_nodes >= opt.max_backtracks) return NULL;
+      if (stats.evaluated_nodes >= yahsp_max_evaluated_nodes) return NULL;
     } EFOR;
     cpt_free(node->applicable);
   }
@@ -432,7 +434,7 @@ void yahsp_init()
 
 int yahsp_main() 
 {
-  state_size = (fluents_nb - 1) / __WORDSIZE + 1;
+  yahsp_state_size = (fluents_nb - 1) / __WORDSIZE + 1;
 
   stats.computed_nodes = 0;
   stats.evaluated_nodes = 0;

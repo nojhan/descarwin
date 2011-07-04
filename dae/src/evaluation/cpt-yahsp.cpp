@@ -49,7 +49,7 @@ double daeCptYahspEval::fitness_feasible( daex::Decomposition & decompo )
     // soit ne jamais l'être. Pour avoir des valeurs plus sympas, j'ai modifié Q au départ.
     //if (this->_sequential == true) return (double)Q + ( (double)decompo.size() - (double)_u + 1.0 ) / (double)Q + (double)_B / (double)_l_max * (double)_b_max ;
     //else return (double)Q * pddl_domain->time_gcd / pddl_domain->time_lcm + ( (double)decompo.size() - (double)_u + 1.0 ) / (double)Q + (double)_B / (double)_l_max * (double)_b_max ;
-    return Q + ( (double)decompo.size() - (double)decompo.get_number_useful_goals() + 1.0 ) / Q + (double)decompo.get_number_evaluated_nodes() / ( (double)_l_max * (double)_b_max );
+    return Q + ( (double)decompo.size() - (double)decompo.get_number_useful_goals() + 1.0 ) / Q + (double)decompo.get_number_evaluated_nodes() / ( (double)_l_max * (double)decompo.b_max() );
 }
 
 //! Fitness des décompositions dont on arrive pas à construire le plan

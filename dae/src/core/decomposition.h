@@ -110,7 +110,10 @@ public:
 
     Decomposition::iterator iter_at( unsigned int i );
 
-    // VV : getters/setters for 3 fields taken from daeCptYahspEval
+    // VV : getters/setters for 4 fields taken from daeCptYahspEval
+    void b_max( unsigned int b ) { _b_max = b; }
+    unsigned int b_max() { return _b_max; }
+
     unsigned int get_number_evaluated_goals() { return _k; }
     void reset_number_evaluated_goals() { _k = 0; }
     void incr_number_evaluated_goals(unsigned int k) { _k += k; }
@@ -131,7 +134,11 @@ protected:
     //! Vecteur des sous-plans
     std::vector< Plan > _plans_sub;
 
-    // VV : 3 fields made local to decomposition
+    // VV : 4 fields made local to decomposition instead of daeCptYahspEval
+
+    //! Current number of backtracks/nodes allowed
+    unsigned int _b_max;
+
     //! compteur de goals
     unsigned int _k;
 

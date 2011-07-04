@@ -34,6 +34,13 @@ struct Node {
 #endif
 };
 
+extern long yahsp_max_evaluated_nodes;
+
+#ifdef DAE
+#pragma omp threadprivate(yahsp_max_evaluated_nodes)
+#endif
+
+
 #define state_create() bitarray_create(fluents_nb)
 #define state_cmp(s1, s2) bitarray_cmp(s1, s2, fluents_nb)
 #define state_clone(dest, src) bitarray_clone(dest, src, fluents_nb)

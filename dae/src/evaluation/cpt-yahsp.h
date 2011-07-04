@@ -13,6 +13,7 @@
 //extern "C" {
 #include <src/structs.h>
 #include <src/plan.h>
+#include <src/yahsp.h>
 //}
 
 //! Convertit un TimeVal en string, en utilisant print_time de CPT/YAHSP
@@ -43,24 +44,13 @@ bool operator!=( const PDDLTerm & term, const daex::pddlObject & object );
 class daeCptYahspEval : public eoEvalFunc<daex::Decomposition>
 {
 public:
-  daeCptYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e60, bool sequential = false ) : _l_max( l_max_ ), _b_max_in(b_max_in),_b_max_last( b_max_last),_unknown_parameter(fitness_weight),_fitness_penalty( fitness_penalty ),_sequential( sequential )
-    {
-        // hors ligne, car l'accesseur en profite pour modifier opt.max_backtracks
-        b_max( b_max_in );
-    }
+  daeCptYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e60, bool sequential = false ) : _l_max( l_max_ ), _b_max_in(b_max_in),_b_max_last( b_max_last),_unknown_parameter(fitness_weight),_fitness_penalty( fitness_penalty ),_sequential( sequential ) { }
 
     virtual ~daeCptYahspEval() {}
 
 public:
     unsigned int l_max() const { return _l_max; }
     void l_max( unsigned int l ) { _l_max = l; }
-
-    unsigned int b_max() const { return _b_max; }
-    void b_max( unsigned int b ) 
-    { 
-        _b_max = b;
-        opt.max_backtracks = b;
-    }
 
 public:
     //! Proxy EO avec appels aux timers
@@ -109,9 +99,6 @@ protected:
 
     //! Taille maximum d'une décomposition
     unsigned int _l_max;
-
-    //! Current number of backtracks/nodes allowed
-    unsigned int _b_max;
 
     //! b_max for searchs within the decomposition
     unsigned int _b_max_in;

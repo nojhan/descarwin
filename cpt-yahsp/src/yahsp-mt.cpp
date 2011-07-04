@@ -25,8 +25,11 @@
 #endif
 
 
-long yahsp_state_size;
+long yahsp_max_evaluated_nodes;
+
+static long yahsp_state_size;
 static long node_id_counter;
+
 
 static TimeVal *ainit;
 static TimeVal *aused;
@@ -64,10 +67,8 @@ struct NodeLimit {
 };
 
 #ifdef YAHSP_MT
-// static NodeLimit node_limits[] = { {1, 50}, {4, 400}, {8, 3000}, {16, 20000}, {32, 100000}, {64, LONG_MAX} };
-// static long node_limits_nb = 6;
-static NodeLimit node_limits[] = { {64, LONG_MAX} };
-static long node_limits_nb = 1;
+static NodeLimit node_limits[] = { {1, 50}, {4, 400}, {8, 3000}, {16, 20000}, {32, 100000}, {64, LONG_MAX} };
+static long node_limits_nb = 6;
 #else
 static NodeLimit node_limits[] = { {1, LONG_MAX} };
 static long node_limits_nb = 1;
@@ -560,6 +561,7 @@ static Node *yahsp_plan()
 #endif
   son = compute_initial_node();
 #endif
+  son = compute_initial_node();
 
 #ifdef YAHSP_MT
 #pragma omp barrier
@@ -689,7 +691,8 @@ int yahsp_main()
 
   FOR(node_limit, node_limits) {
     long num_threads = mini(opt.yahsp_threads, node_limit.nb_threads);
-    nodes_limit = mini(opt.max_backtracks, (num_threads == opt.yahsp_threads ? LONG_MAX : node_limit.max_nodes));    //trace(normal, "#threads : %ld -- already evaluated nodes : %ld\n", num_threads, stats.evaluated_nodes);
+    nodes_limit = mini(yahsp_max_evaluated_nodes, (num_threads == opt.yahsp_threads ? LONG_MAX : node_limit.max_nodes));    
+    //trace(normal, "#threads : %ld -- already evaluated nodes : %ld\n", num_threads, stats.evaluated_nodes);
     if (test_stop_search()) break;
 #ifdef YAHSP_MT
 #pragma omp parallel num_threads(num_threads * opt.yahsp_teams)

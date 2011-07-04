@@ -235,11 +235,12 @@ int cpt_basic_search(void)
 
   /* return cpt_search(init_state, init_state_nb, goal_state, goal_state_nb, false, false, false); */
 
-  return cpt_search(NULL, -1, NULL, -1, false, false, false);
+  return cpt_search(NULL, -1, NULL, -1, false, false, false, opt.max_backtracks);
 }
 
 int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb, 
-	       bool compress, bool compress_causals, bool compress_orderings)
+	       bool compress, bool compress_causals, bool compress_orderings, 
+	       long max_evaluated_nodes)
 {
   FORPAIR(f1, f2, goals) { if (fmutex(f1, f2)) return GOALS_MUTEX; } EFORPAIR;
 
@@ -255,6 +256,7 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
   solution_plan = NULL;
 
   if (opt.yahsp) {
+    yahsp_max_evaluated_nodes = max_evaluated_nodes;
     if (!compress) return yahsp_main();
     else return yahsp_compress_plans();
   }

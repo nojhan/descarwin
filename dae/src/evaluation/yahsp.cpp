@@ -54,14 +54,14 @@ daeYahspEval::~daeYahspEval()
 /**************************************************************************************************************
  * SOLVE NEXT
  **************************************************************************************************************/
-unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb )
+unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes )
 {
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "ok" << std::endl;
                                      eo::log << eo::xdebug << "\t\tcall the solver...";
                                      eo::log.flush();
                                  #endif
-    unsigned int return_code = cpt_search( init_state, init_state_nb, next_state, next_state_nb, false, false, false );
+    unsigned int return_code = cpt_search( init_state, init_state_nb, next_state, next_state_nb, false, false, false, max_evaluated_nodes );
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "ok" << std::endl;
                                      eo::log << eo::xdebug << "\t\treturn code: " << return_code << " ";
@@ -196,7 +196,8 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                                          eo::log << eo::xdebug << "for each goal:" << std::endl;
                                  #endif
         unsigned int code = 0; // return code of cpt_search
-        b_max( _b_max_in ); // set the generic b_max 
+        //b_max( _b_max_in ); // set the generic b_max 
+	decompo.b_max( _b_max_in ); // VV : set b_max for the decomposition
 
         // parcourt les goals de la décomposition
         for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
@@ -218,7 +219,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                                              assert( i ==  igoal->size());
             // search a plan towards the current goal
 	    bitarray_copy( previous_state, *get_current_state(), fluents_nb );
-            code = solve_next( decompo, intermediate_goal_state, igoal->size() );
+            code = solve_next( decompo, intermediate_goal_state, igoal->size(), _b_max_in );
 	    free(intermediate_goal_state);
 
             if( code != PLAN_FOUND ) {
@@ -233,10 +234,11 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         // here we have reached the last goal of the decomposition, it remains searching towards the ultimate goal
         if((decompo.size() == 0) || (code == PLAN_FOUND)) {
             // set the b_max specific to this step
-            b_max( _b_max_last );
+            //b_max( _b_max_last );
+	    decompo.b_max( _b_max_last ); // VV : set b_max for the decomposition
 
 	    bitarray_copy( previous_state, *get_current_state(), fluents_nb );
-            unsigned int code = solve_next( decompo, goal_state, goal_state_nb  );
+            unsigned int code = solve_next( decompo, goal_state, goal_state_nb, _b_max_last );
             if( code == PLAN_FOUND ) {
                 compress( decompo );
 		if (solution_plan->makespan < 6)

@@ -346,7 +346,7 @@ CPTSolutionPlan cptSolveNext(CPTFluentArray goal)
 {
   if (last_station_failed) error(station, "Last station failed : please reset search");
   start_timer(search_time);
-  return_code = cpt_search(state, state_nb, goal.elems, goal.nb, false, false, false);
+  return_code = cpt_search(state, state_nb, goal.elems, goal.nb, false, false, false, opt.max_backtracks);
   if (solution_plan) {
     solution_plan->search_time = get_timer(search_time);
     solution_plan->total_time = solution_plan->search_time;
@@ -365,7 +365,7 @@ CPTSolutionPlan cptCompressSolution(bool compress_causals, bool compress_orderin
   start_timer(search_time);
   bool cqp = opt.complete_qualprec;
   opt.complete_qualprec = true;
-  return_code = cpt_search(init_state, init_state_nb, goal_state, goal_state_nb, true, compress_causals, compress_orderings);
+  return_code = cpt_search(init_state, init_state_nb, goal_state, goal_state_nb, true, compress_causals, compress_orderings, opt.max_backtracks);
   opt.complete_qualprec = cqp;
   if (solution_plan) {
     solution_plan->search_time = get_timer(search_time);

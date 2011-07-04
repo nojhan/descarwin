@@ -52,7 +52,7 @@ public:
     
 protected:
 
-    unsigned int solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb );
+    unsigned int solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes );
 
     void compress( daex::Decomposition & decompo );
 
