@@ -77,17 +77,17 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
     } else if( return_code == PLAN_FOUND ) { assert( solution_plan != NULL );
 
         if( solution_plan->steps_nb > 0 )  {
-	    decompo.incr_number_useful_goals(1); // un goal utile supplémentaire
-	    decompo.incr_number_evaluated_nodes(static_cast<unsigned int>( solution_plan->backtracks ));
+            decompo.incr_number_useful_goals(1); // un goal utile supplémentaire
+            decompo.incr_number_evaluated_nodes(static_cast<unsigned int>( solution_plan->backtracks ));
         }
         decompo.incr_number_evaluated_goals(1); // incrémente le compteur de plan
 
         plans[plans_nb] = solution_plan;
         plans_nb++;
 
-	// if k != plans_nb => the same decomposition is evaluated simultaneously by several threads !!!
-	assert (decompo.get_number_evaluated_goals() == (unsigned int) plans_nb);
-	
+        // if k != plans_nb => the same decomposition is evaluated simultaneously by several threads !!!
+        assert (decompo.get_number_evaluated_goals() == (unsigned int) plans_nb);
+
         decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mais on garde la structure notamment pour last_reached.
         decompo.last_subplan().search_steps( decompo.get_number_evaluated_nodes() );
 
@@ -124,7 +124,6 @@ void daeYahspEval::compress( daex::Decomposition & decompo )
         yahsp_compress_plans();
                                          assert(solution_plan != NULL);
         // TODO pendant les tests, le plan ne peut pas etre vide, mais en compétition, cela peut arriver, auquel cas il faudra virer l'assert (penser à compiler en NDEBUG)
-	//		std::cout << "MAKESPAAAAN =" << solution_plan->makespan;
 
                                          assert(solution_plan->makespan > 0);
 
@@ -166,13 +165,13 @@ void daeYahspEval::call( daex::Decomposition & decompo )
 
 #ifndef PAPERVERSION
                // JACK the code does not even try to evaluate decompositions that are too long 
-                                         // FIXME what is the effect on variation operators that relies on last_reached?
+               // FIXME what is the effect on variation operators that relies on last_reached?
         if( decompo.size() > _l_max ) {
            decompo.fitness( std::make_pair( fitness_unfeasible_too_long(), false ) );
         } else 
                                  #endif
-	  {
-	BitArray previous_state = bitarray_create( fluents_nb );  
+        {
+        BitArray previous_state = bitarray_create( fluents_nb );  
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "malloc plans...";
                                          eo::log.flush();
@@ -197,7 +196,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                                  #endif
         unsigned int code = 0; // return code of cpt_search
         //b_max( _b_max_in ); // set the generic b_max 
-	decompo.b_max( _b_max_in ); // VV : set b_max for the decomposition
+        decompo.b_max( _b_max_in ); // VV : set b_max for the decomposition
 
         // parcourt les goals de la décomposition
         for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
@@ -205,22 +204,22 @@ void daeYahspEval::call( daex::Decomposition & decompo )
                                              eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
                                              eo::log.flush();
                                  #endif
-            // copie des goals daex dans leur equivant YAHSP
+           // copie des goals daex dans leur equivant YAHSP
            // nouvelle allocation de tableau de goal
                                              assert( igoal->size() > 0 );
             Fluent **intermediate_goal_state = (Fluent **) malloc(igoal->size() * sizeof(Fluent *));
             unsigned int i = 0;
             for( daex::Goal::iterator iatom = igoal->begin(); iatom != igoal->end(); ++iatom ) {
-                              // le compilateur demande à expliciter le template pour fluents, 
-                              // car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
+                // le compilateur demande à expliciter le template pour fluents, 
+                // car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
                 intermediate_goal_state[i] =  (*iatom)->fluent();
                 i++;
             }
                                              assert( i ==  igoal->size());
             // search a plan towards the current goal
-	    bitarray_copy( previous_state, *get_current_state(), fluents_nb );
+            bitarray_copy( previous_state, *get_current_state(), fluents_nb );
             code = solve_next( decompo, intermediate_goal_state, igoal->size(), _b_max_in );
-	    free(intermediate_goal_state);
+            free(intermediate_goal_state);
 
             if( code != PLAN_FOUND ) {
 #ifdef PAPERVERSION
@@ -235,15 +234,20 @@ void daeYahspEval::call( daex::Decomposition & decompo )
         if((decompo.size() == 0) || (code == PLAN_FOUND)) {
             // set the b_max specific to this step
             //b_max( _b_max_last );
-	    decompo.b_max( _b_max_last ); // VV : set b_max for the decomposition
+            decompo.b_max( _b_max_last ); // VV : set b_max for the decomposition
 
-	    bitarray_copy( previous_state, *get_current_state(), fluents_nb );
+            bitarray_copy( previous_state, *get_current_state(), fluents_nb );
             unsigned int code = solve_next( decompo, goal_state, goal_state_nb, _b_max_last );
+
             if( code == PLAN_FOUND ) {
                 compress( decompo );
-		if (solution_plan->makespan < 6)
-		  std::cout << decompo.size() << " " << plans_nb << std::endl;
+                /*
+                if (solution_plan->makespan < 6)
+                    std::cout << decompo.size() << " " << plans_nb << std::endl;
+                */
+
                 decompo.fitness( std::make_pair( fitness_feasible( decompo ), true ) );
+
                                  #ifndef NDEBUG
                                                  eo::log << eo::debug << "*";
                                                  eo::log.flush();
@@ -256,7 +260,7 @@ void daeYahspEval::call( daex::Decomposition & decompo )
 #endif 
             } // if PLAN_FOUND for last goal
         } // if PLAN_FOUND
-	cpt_free(previous_state);
+        cpt_free(previous_state);
       } // if size > _l_max
     } // if !decompo.invalid
     free_yahsp_structures();
@@ -281,7 +285,7 @@ void daeYahspEval::free_yahsp_structures()
 
     if( solution_plan != NULL ) {
         plan_free( solution_plan );
-	solution_plan = NULL;
+        solution_plan = NULL;
     }
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "ok" << std::endl;
