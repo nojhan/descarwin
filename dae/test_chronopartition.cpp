@@ -1,21 +1,19 @@
 #include<iostream>
 
 #include <eo>
-#include <utils/eoParserLogger.h>
-#include <utils/eoLogger.h>
 
 #include "daex.h"
 #include "evaluation/yahsp.h"
 
 int main ( int argc, char* argv[] )
 {
-    eoParserLogger parser(argc, argv);
+    eoParser parser(argc, argv);
     make_verbose(parser);
 
     std::string domain = parser.createParam( (std::string)"domain-zeno-time.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
 
     std::string instance = parser.createParam( (std::string)"zeno10.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
-    
+
     //bool is_sequential = parser.createParam( (bool)false, "sequential", "Is the problem a sequential one?", 'q', "Problem", true ).value();
 
 

@@ -1,12 +1,10 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#include<iostream>
+#include <iostream>
 #include <iomanip>
 
 #include <eo>
-#include <utils/eoParserLogger.h>
-#include <utils/eoLogger.h>
 #include <do/make_pop.h>
 #include <utils/eoFeasibleRatioStat.h>
 
@@ -19,7 +17,7 @@
 
 int main ( int argc, char* argv[] )
 {
-    eoParserLogger parser(argc, argv);
+    eoParser parser(argc, argv);
     make_verbose(parser);
 
     std::string domain = parser.createParam( (std::string)"domain-zeno-time.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
