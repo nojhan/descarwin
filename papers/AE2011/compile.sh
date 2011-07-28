@@ -1,4 +1,4 @@
-papername=ae2011
+papername=ae2011cameraready
 
 rm  ${papername}.pdf
 
