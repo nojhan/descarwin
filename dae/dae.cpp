@@ -16,9 +16,10 @@
 #include <utils/eoFeasibleRatioStat.h>
 
 #include "daex.h"
-#include "evaluation/yahsp.h"
-#include "utils/evalBestPlanDump.h"
 #include "evaluation/cpt-yahsp.h"
+#include "evaluation/yahsp.h"
+#include "evaluation/portfolio.h"
+#include "utils/evalBestPlanDump.h"
 
 #define LOG_FILL ' '
 #define FORMAT_LEFT_FILL_WIDTH(width) "\t" << std::left << std::setfill(LOG_FILL) << std::setw(width) 
@@ -407,7 +408,8 @@ int main ( int argc, char* argv[] )
 	    goodguys=0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-            daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+            //daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+            daePortfolioEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
 
 // in non multi-threaded version, use the plan dumper
 //#ifndef SINGLE_EVAL_ITER_DUMP
@@ -492,7 +494,8 @@ int main ( int argc, char* argv[] )
     b_max_in = b_max_fixed;
     b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    //daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    daePortfolioEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
     eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
     eval_y( pop, pop );
 

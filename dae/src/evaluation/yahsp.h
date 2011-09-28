@@ -38,7 +38,8 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray );
 //! Évaluateur principal, à utiliser pour les itérations normales
 class daeYahspEval : public daeCptYahspEval
 {
- public: daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e6 );
+ public: 
+     daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e6 );
 
 
     virtual ~daeYahspEval();
@@ -52,7 +53,7 @@ public:
     
 protected:
 
-    unsigned int solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes );
+    virtual unsigned int solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes );
 
     void compress( daex::Decomposition & decompo );
 
