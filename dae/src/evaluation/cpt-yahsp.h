@@ -66,10 +66,10 @@ public:
 
 protected:
 
-    /*virtual*/ void pre_call( daex::Decomposition & /*decompo*/ ) 
+    virtual void pre_call( daex::Decomposition & /*decompo*/ ) 
     {}
 
-    /*virtual*/ void post_call( daex::Decomposition & decompo )
+    virtual void post_call( daex::Decomposition & decompo )
     {
         decompo.plan().search_steps( decompo.get_number_evaluated_nodes() );
     }

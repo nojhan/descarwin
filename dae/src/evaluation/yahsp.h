@@ -94,8 +94,8 @@ public:
     void call( daex::Decomposition & decompo );
 
     //! Récupère le nombre de noeuds utilisés par une résolution avec yahsp
-    void step_recorder();
-    void step_recorder_fail();
+    virtual void step_recorder();
+    virtual void step_recorder_fail();
 
     //! Le b_max est calculé comme la médiane du nombre total de noeuds parcourus sur l'ensemble de tous les appels à yahsp 
     //lors d'une première phase d'initialisation
