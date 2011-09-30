@@ -1,0 +1,2113 @@
+\section{Parser}
+
+######                 General    ######
+# --help=0                                 # -h : Prints this message
+# --stopOnUnknownParam=1                   # Stop if unkown param entered
+# --seed=1129130130                        # -S : Random number seed
+
+######    Evolution Engine        ######
+--popSize=50                             # -P : Population Size
+# --selCrit=NSGA-II                        # -S : Pareto Selection Criterion: NSGA, NSGA-II, ParetoRanking
+# --nicheSize=1                            # Size of niche for NSGA-I
+# --selection=DetTour(2)                   # -S : Selection: Roulette, DetTour(T), StochTour(t) or Random
+# --nbOffspring=100%                       # -O : Nb of offspring (percentage or absolute)
+
+######    Output                  ######
+# --useEval=1                              # Use nb of eval. as counter (vs nb of gen.)
+# --printPop=0                             # Print sorted pop. every gen.
+
+######    Output - Disk           ######
+--resCPT=resCPTMulti                     # Directory where to store CPT intermediate files
+--resDir=ResMulti                        # Directory to store DISK outputs
+# --eraseDir=1                             # erase files in dirName if any
+# --frontFileFrequency=1(0,1)              # File save frequency in objective spaces (std::pairs of comma-separated objectives in 1 single parentheses std::pair)
+
+######    Output - Graphical      ######
+# --plotFront=0                            # Objective plots (requires corresponding files - see frontFileFrequency
+
+######    Persistence             ######
+# --Load=                                  # -L : A save file to restart from
+# --recomputeFitness=0                     # -r : Recompute the fitness after re-loading the pop.?
+--saveFrequency=1                        # Save every F generation (0 = only final state, absent = never)
+# --saveTimeInterval=0                     # Save every T seconds (0 or absent = never)
+# --status=multiTGV.status                 # Status file
+
+######    Stopping criterion      ######
+--maxGen=50                              # -G : Maximum number of generations () = none)
+--CtrlC=1                                # -C : Terminate current generation upon Ctrl C
+
+######    TGV                     ######
+--typeRisk=2                             # Risk computation from partial values (0=risk after compression, 1=max of partial risks, 2=avg of partial risks)
+--typeMakespan=1                         # Makespan computation from partial values: 0=global only, 1=sum(partial), 2=0+1
+# --factRisk=10                            # Multiplcative factor for the risk (w.r.t. penalty for failures)
+# --factMakespan=1                         # Multiplcative factor for the makespan (w.r.t. penalty for failures)
+# --useGlobalGoal=1                        # Use Global goal to define the intermediate stations (1) or not (0)
+
+######    TGV - Variation Operators    ######
+# --mutAtMutRate=1                         # Relative rate for AT mutation
+# --mutFailMutRate=1                       # Relative rate for Fail mutation
+# --weightModifyPredicateMutation=3        # Relative weight of 'modify' mutation inside eoTGVAtMutation
+# --weightAddPredicateMutation=1           # Relative weight of 'add' mutation inside eoTGVAtMutation
+# --weightRemovePredicateMutation=1        # Relative weight of 'remove' mutation inside eoTGVAtMutation
+# --weightModifyPredicateMutation=3        # Relative weight of 'modify' mutation inside eoTGVAtMutation
+# --weightAddPredicateMutation=1           # Relative weight of 'add' mutation inside eoTGVAtMutation
+# --weightRemovePredicateMutation=1        # Relative weight of 'remove' mutation inside eoTGVAtMutation
+
+######    TGV - general           ######
+# --debug=0                                # Level of output (0 = nothing)
+
+######    TGV - init              ######
+# --minSize=2                              # -m : Minimal size at init
+# --maxSize=10                             # -M : Maximal size at init
+# --maxDist=3                              # -d : Maximal distance between stations
+# --avgNbAtChange=1.5                      # Avg number of changes fir each predicates in atInit (>1)
+# --pAddRemovePredicate=0.2                # Probability to change the 'present' state in init and mutation
+
+######    TGV - problem           ######
+--csFile=commonSenseZeno.tgv             # Name of the 'CommonSense' file
+--attFile=DataMulti/attributeSpacesZenoMiniMulti.tgv # Name of the attributeSpaces file
+# --reachableFile=                         # Name of the reachableValue file (empty string if none)
+--instanceName=DataMulti/zenoMiniMulti.pddl # Name of the instance (PDDL file)
+--domain=DataMulti/domain-zeno-time-miniRISK-Sym.pddl # Name of the domain PDDL file
+--nbBackTrackMax=1000                    # Max Nb of BackTtracks (CPT option -bk)
+--boundSub=0                             # Bound for suboptimal search (CPT option -sub)
+# --maxRisk=3                              # Max level of Risk (in case of failure)
+# --useCausals=1                           # Use causals during final compression?
+# --useActions=0                           # Use all actions of intermediate solution when compressing?
+
+######    Variation Operators     ######
+# --typeAppliOp=PropGA                     # Apply cross and mut Proportionally (PropGA) or sequentially (the standard SGA)
+# --wCross=1                               # -C : Weight of Crossover
+# --wMut=1                                 # -M : Weight of Mutation
+# --wClone=1                               # -L : Weight of Clone operator
+
+\section{eoPop}
+50
+12 550   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city2)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 8 100 5
+Goal      -> 4 10 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person3) [2] [100]
+2: (fly plane1 city1 city4 person1) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+4: (fly plane2 city0 city2 person2) [4] [10]
+6: (fly plane1 city1 city4 person3) [2] [100]
+8: (fly plane2 city2 city4 person2) [4] [10]
+
+=======================================
+ENDTGV
+8 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 8 100 6
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+8 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Goal      -> 8 100 6
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+20 550   9 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city2)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 0 0 0
+Station 5 -> 8 100 1
+Station 6 -> 4 10 0
+Station 7 -> 4 10 0
+Station 8 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+16 700   3 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city2)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 8 100 0
+Goal      -> 4 10 0
+Et au total  16 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+8: (fly plane1 city0 city2 person2) [4] [10]
+10: (fly plane2 city1 city4 person1) [2] [100]
+12: (fly plane1 city2 city4 person2) [4] [10]
+
+=======================================
+ENDTGV
+18 673.333   9 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city3)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 4 100 0
+Station 3 -> 0 0 0
+Station 4 -> 0 0 0
+Station 5 -> 0 0 0
+Station 6 -> 0 0 0
+Station 7 -> 0 0 0
+Station 8 -> 8 101 2
+Goal      -> 6 1 0
+Et au total  17 101 13
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane2 city1 city4 person2) [2] [100]
+2: (flyvide plane1 city1 city0) [2] [100]
+4: (flyvide plane2 city4 city1) [2] [100]
+4: (fly plane1 city0 city1 person1) [2] [100]
+6: (fly plane1 city1 city4 person1) [2] [100]
+6: (fly plane2 city1 city3 person3) [5] [101]
+11: (fly plane2 city3 city4 person3) [6] [1]
+
+=======================================
+ENDTGV
+8 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 8 100 6
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+8 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 8 100 6
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+8 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 8 100 6
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+8 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 8 100 6
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+8 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 8 100 6
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+8 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Goal      -> 8 100 6
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+10 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+; 	(at person1 city4 absent)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Goal      -> 6 100 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   4 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person2) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person3) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   2 (:goal (and 
+	(at person1 city0)
+; 	(at person2 city4 absent)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 8 100 1
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person3) [2] [100]
+2: (fly plane1 city1 city4 person1) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person2) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person2) [2] [100]
+6: (fly plane2 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city2)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 8 100 1
+Goal      -> 0 0 0
+Et au total  12 100 3
+====
+=======================================
+0: (fly plane1 city0 city1 person2) [2] [100]
+0: (fly plane2 city0 city2 person3) [4] [10]
+2: (flyvide plane1 city1 city0) [2] [100]
+4: (fly plane1 city0 city1 person1) [2] [100]
+4: (fly plane2 city2 city4 person3) [4] [10]
+6: (fly plane1 city1 city4 person1) [2] [100]
+8: (flyvide plane2 city4 city1) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   6 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 0 0 0
+Station 5 -> 0 0 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   3 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 4 100 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person2) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person3) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   2 (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person2) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person3) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   8 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 8 100 0
+Station 5 -> 0 0 0
+Station 6 -> 0 0 0
+Station 7 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person2) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   3 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person2) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   3 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person2) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   3 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 4 100 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person2) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person3) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 4 100 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person2) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   1 (:goal (and 
+	(at person1 city4)
+	(at person2 city2)
+	(at person3 city0)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Goal      -> 8 100 1
+Et au total  12 100 3
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city2 person2) [4] [10]
+2: (flyvide plane1 city1 city0) [2] [100]
+4: (fly plane1 city0 city1 person3) [2] [100]
+4: (fly plane2 city2 city4 person2) [4] [10]
+6: (fly plane1 city1 city4 person3) [2] [100]
+8: (flyvide plane2 city4 city1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 0 0 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 4 100 0
+Station 3 -> 8 100 0
+Station 4 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   3 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person2) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   3 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 8 100 1
+Station 2 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person3) [2] [100]
+2: (fly plane1 city1 city4 person1) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person2) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person2) [2] [100]
+6: (fly plane2 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   8 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 8 100 0
+Station 5 -> 0 0 0
+Station 6 -> 0 0 0
+Station 7 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person2) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   4 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person2) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person3) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   1 (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 4 100 0
+Station 3 -> 8 100 0
+Station 4 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   4 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city1)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 6 100 0
+Goal      -> 2 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person2) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (fly plane2 city1 city4 person1) [2] [100]
+4: (fly plane1 city4 city1 person1) [2] [100]
+4: (flyvide plane2 city4 city1) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+6: (flyvide plane1 city1 city0) [2] [100]
+8: (fly plane1 city0 city1 person3) [2] [100]
+10: (fly plane1 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 4 100 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   2 (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   4 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 4 100 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 0 0 0
+Station 3 -> 4 100 0
+Station 4 -> 0 0 0
+Goal      -> 8 100 1
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person3) [2] [100]
+2: (fly plane1 city1 city4 person1) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person2) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person2) [2] [100]
+6: (fly plane2 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   7 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 0 0 0
+Station 5 -> 8 100 0
+Station 6 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   3 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 8 100 1
+Station 2 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person3) [2] [100]
+2: (fly plane1 city1 city4 person1) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person2) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person2) [2] [100]
+6: (fly plane2 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 4 100 0
+Station 3 -> 8 100 0
+Station 4 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   1 (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Goal      -> 8 100 1
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   4 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 4 100 0
+Station 3 -> 8 100 1
+Goal      -> 0 0 0
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person3) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person3) [2] [100]
+6: (fly plane2 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   3 (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 0 0 0
+Station 2 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person2) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   1 (:goal (and 
+	(at person1 city0)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Goal      -> 8 100 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person2) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person2) [2] [100]
+8: (fly plane1 city0 city1 person1) [2] [100]
+8: (fly plane2 city0 city1 person2) [2] [100]
+10: (fly plane2 city1 city4 person2) [2] [100]
+10: (fly plane1 city1 city4 person1) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   2 (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 4 100 0
+Station 1 -> 8 100 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person2) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person2) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person3) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   5 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 0 0 0
+Station 2 -> 0 0 0
+Station 3 -> 4 100 0
+Station 4 -> 0 0 0
+Goal      -> 8 100 1
+Et au total  8 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person1) [2] [100]
+0: (fly plane2 city0 city1 person3) [2] [100]
+2: (fly plane1 city1 city4 person1) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (fly plane2 city0 city1 person2) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city4 person2) [2] [100]
+6: (fly plane2 city1 city4 person3) [2] [100]
+
+=======================================
+ENDTGV
+12 1000   8 (:goal (and 
+	(at person1 city0)
+	(at person2 city0)
+	(at person3 city0)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city0)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ (:goal (and 
+	(at person1 city4)
+	(at person2 city4)
+	(at person3 city4)
+)	)))
+ 
+TOUTES LES FITNESSES (makespan, risk, backtracks)
+Station 0 -> 0 0 0
+Station 1 -> 4 100 0
+Station 2 -> 0 0 0
+Station 3 -> 0 0 0
+Station 4 -> 8 100 0
+Station 5 -> 0 0 0
+Station 6 -> 0 0 0
+Station 7 -> 0 0 0
+Goal      -> 0 0 0
+Et au total  12 100 0
+====
+=======================================
+0: (fly plane1 city0 city1 person3) [2] [100]
+0: (fly plane2 city0 city1 person1) [2] [100]
+2: (fly plane1 city1 city4 person3) [2] [100]
+2: (flyvide plane2 city1 city0) [2] [100]
+4: (flyvide plane1 city4 city1) [2] [100]
+6: (fly plane1 city1 city0 person1) [2] [100]
+8: (fly plane1 city0 city1 person2) [2] [100]
+8: (fly plane2 city0 city1 person1) [2] [100]
+10: (fly plane2 city1 city4 person1) [2] [100]
+10: (fly plane1 city1 city4 person2) [2] [100]
+
+=======================================
+ENDTGV
+
+\section{Mersenne-Twister}
+1078699870 1553119604 2646797634 1026654016 3059660070 683976940 1847632186 2362337800 1487226958 3681930724 4115247666 2882080144 2058663670 625650172 99277194 4196997688 3493173182 301972436 4294699362 3119808480 3706366150 2447854604 826753946 2583018024 2726692206 597751172 1415888530 3626036336 3378282710 2432727388 1088081450 764005400 1402956830 3933947700 67662338 2184775424 4138887910 2567944492 341100154 2365005384 2542614798 764848292 855604594 1108262608 4177402422 6172860 2565953482 478219512 201084414 4068383252 3261115298 3528632096 1887329286 2601362380 1304554842 1474386408 3980547246 3268640452 4059159634 3104735280 1580127382 2203652252 677419242 2818102360 625677790 4101533940 320934082 2977771456 3716148902 3036344172 1791554490 4257363080 3489253582 2843450468 389902002 2337914896 1814929270 1345194364 293407754 1147605944 1902036286 1737647700 1535939554 3129225056 2329366854 3752080012 1044732954 2640279720 2221696238 286200068 3316357906 3739683568 2762590550 472197596 819862186 1735407256 793140638 20511668 2777387650 2176972928 2433876838 4206811820 770670074 1113552840 2491226254 2051695140 3177705714 1595702352 2932482998 3219792700 4206383434 3197106040 3752383102 1002407828 829235490 3546285984 847119750 1743259468 1154900698 2128664936 3389991726 1315171140 252740050 4167723952 1026972694 4243472924 3719457898 3842210264 346636894 2653530740 3067720770 409042496 1576568358 4263963628 635739706 2813072136 49925966 285070052 1025748274 2521075344 2917025270 94002940 299475082 1799381816 2067368638 1975093460 1482462818 1295931616 675569606 3460837644 3413760154 3306194216 2687421550 3727239300 2801698194 3597734768 2055549910 1642468956 3927958826 1601839384 1711000350 3119840820 3089022722 936474112 2673458662 2508911660 168584058 116133704 2719217678 3658079652 3915054194 4069375952 1799375158 2470533052 750179018 1342980088 190505726 674067220 856689826 5830176 955796230 2267521228 2301687386 2963541224 3173092782 3768993732 1437415250 1136184112 3933874070 2846068124 4203242474 2802596184 2263413470 3623907316 723945922 3470639296 2727131558 3691492460 90973882 4237030280 3567929806 809183076 1939280818 76140304 385936502 2759797884 4128275722 4152980152 1683880510 838512980 3836778210 563908192 597870150 3231887756 2421025562 3623710120 142142958 2353061380 2390405138 3732130800 3797498454 2695890140 4241895338 3733706136 3454007966 4199119028 222113154 2977237819 2317283443 1825492291 4091019571 179029851 3765798035 2350842595 1608436323 3749639067 870621907 1144953155 1980217971 2341624795 2577076883 4243897219 1324585123 1370457147 2347101427 890288579 10714867 1066883931 259801107 2800459747 2133393187 170430491 3976730451 3975713027 239162099 727941787 2050303571 3376766595 3802202019 2775649595 1426696691 4192066243 206957363 515387867 1362423059 2203212003 1912900707 1766875547 2684310611 2449950531 3164459891 511346139 2844744595 191443203 2742593699 2473088443 1290499827 159526083 159107059 3586543707 228132371 2529626723 3106959651 709277339 1495597139 1278489091 618022003 2723395483 348090451 3568688003 891455779 2816311867 1638736499 4272725827 977245235 2004872027 1773933203 2323557091 1032442211 1837243803 1835660499 2379269187 145335155 3130757083 2736289171 2561525123 2847321507 3456317499 2877761267 3693874627 1703121395 1070281819 2011172627 2381582307 1323143715 1288827931 2295384915 1540527619 2104049907 1309797531 4096149843 2576141443 3371037091 3001217339 3482308083 2018387139 283873587 1782951387 447659795 2784922083 2782355555 1905142427 3197392467 1782712643 4135069043 1322722011 1693798291 470637827 1302163107 1923936699 2249430003 4035467203 1172298739 4186389083 3226833427 2460605539 2609927459 1358370459 3142679891 2471070723 1199471219 3188267675 1765933651 879142531 1894968099 3787539259 1661882483 1146448195 3239512371 2577797467 579675795 4060180195 1055373923 3964616603 3310432979 3971089731 247733875 2000132059 2900877971 3301019523 3540824227 3793961531 3689955571 2329861059 2661024499 2463762267 1185242131 1298444771 103484195 757655067 790010707 1036740867 1247331571 2530636955 2770638419 1663268995 2348776867 3237518651 2009162227 1198357187 2754876211 745332187 192676115 3306031331 3506312291 1678824859 328552531 984271683 73365875 3526970843 2133834643 2803843331 3051565731 3588534203 2267131635 3260508355 3005861875 2577668699 314680851 1616773731 1374149923 1836481179 1718814803 3332447235 2274702963 2048790427 404794451 2091996035 15163171 1528692283 1559358579 2846631235 685077555 1289884507 1664494227 2904981731 1175723363 59859867 4052082387 3213112387 3111293811 3911121371 629952915 1999080323 1226175907 2367645755 3104801011 1957981635 3525802483 3922791515 7712531 192744419 1034255907 2185414683 1400337747 1191541251 2093164787 2045268123 21079379 863693955 1745454499 340884283 238198771 2354970307 339274120 134824910 4221717500 967983146 2917812208 838534022 151898004 2281979090 1410515384 4073465022 4134761708 3870556986 21182720 1200114262 1640021732 4167779138 3327070568 1303898158 2261831580 3807393098 3377262096 3735843494 1770617076 2537928178 3846855384 26418398 1456640076 2148853018 2222471520 2898841654 1391883652 1767245218 1446280520 3753481614 1448752316 2187343594 3765478320 2976852166 1133128148 2900404498 2179262584 489259902 257751596 510726010 3141187904 1912317462 3753084964 1071383042 1757988520 4221651822 3912458972 3134337418 1454139216 3174087014 480251572 278452402 3649422872 2657586206 3592745740 3623210714 1247236640 4046273398 794782532 2235165666 1182563336 3207014222 2070841724 3700862122 3741020016 3277844486 194982932 3703301458 4026638904 4139810110 1357687148 4197082042 14899584 1185650646 912788324 1838247106 780716776 1208783022 1307044380 4199747786 3243028112 2989785894 1554222964 2921396850 2880791128 1895114334 3190846668 2612985242 3491750880 1525262518 443742212 1906161698 890092744 1380581902 3865090876 4273758826 2188409392 2956705862 1418036052 1129563282 4243038200 589581566 2712696748 1391494906 3292459712 2211776662 3594190756 4219451010 3299721512 964115694 1215572060 2986857994 1936156368 679946470 1139384372 1672466994 2535721624 1758778014 1995009676 2940095066 26469280 3934319862 2909224644 3473382242 1682978952 3152939214 2666286844 1230579498 181213424 2688514694 1955182740 2187217362 1200198840 506280382 1427008492 2841573434 3457440768 1190817622 1694497252 1437139010 501296232 1052059950 1149766812 1859017290 674068752 3225918374 4199582196 4246179058 4119463384 3097996254 3533810508 2892488730 165687392 450886966 3573687428 1082518178 1623102536 4092403854 4128830908 890976746 2448115376 2783321030 1092192980 1401730578 3296343928 1940947964 479 145 0 0
