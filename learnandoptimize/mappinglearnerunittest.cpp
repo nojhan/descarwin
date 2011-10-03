@@ -7,6 +7,7 @@
 #include "mappingLearnerFANN.h"
 #include "mappingLearnerSVM.h"
 #include "mappingLearnerSharkFFNET.h"
+#include "mappingLearnerSharkGauss.h"
 
 
 
@@ -34,7 +35,7 @@ mappingLearner* mappinglearner;
 		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerFANN(4,4)); 
 */
 
-mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerSVM(4,4)); // 4 dimensional input and output
+mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerSharkGauss(4,4)); // 4 dimensional input and output
 
 
 int s=20;
@@ -76,7 +77,7 @@ vector<vector<double> > outputs;
 		outputs.push_back(output);
 		}	
 
-
+		cout<<"start train "<<endl;
 
 		double annerror=mappinglearner->train(inputs,outputs);
 
@@ -84,8 +85,8 @@ vector<vector<double> > outputs;
 
 
 
-inputs.clear();
-outputs.clear();
+		inputs.clear();
+		outputs.clear();
 
 		for(unsigned int i=1;i<s;i+=2)
 		for(unsigned int j=1;j<s;j+=2)
@@ -118,7 +119,7 @@ outputs.clear();
 		outputs.push_back(output);
 		}	
 
-double testerror=0;
+		double testerror=0;
 
 		cout<< "testing"<<endl;
 
@@ -159,7 +160,6 @@ mappingLearner* mappinglearner2;
 		mappinglearner2= dynamic_cast<mappingLearner*>(new mappingLearnerFANN(4,4)); 
 */
 
-mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerSVM(4,4)); // 4 dimensional input and output
 
 mappinglearner2->load("unittest.mappinglearner");
 

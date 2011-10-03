@@ -1,0 +1,13 @@
+1 //fluents 
+10 //goals 
+5 // predicates
+1 //objects 32 
+10 // types 
+100 // mutexdensity 
+0.1 //lines
+0.05 // words
+0.01 // bytes
+0.1 //lines
+0.05 // words
+0.01 // bytes
+1 // durative

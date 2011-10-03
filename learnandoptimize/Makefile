@@ -2,30 +2,39 @@
 # The make file requires that the fann library is installed (see ../README)
 
 
-SOURCES = learnoptimize.cpp mappinglearnertest.cpp planner.cpp retrain.cpp mappinglearnerunittest.cpp optimizerunittest.cpp genetransfererunittest.cpp
+SOURCES = learnoptimize.cpp mappinglearnertest.cpp planner.cpp retrain.cpp mappinglearnerunittest.cpp optimizerunittest.cpp genetransfererunittest.cpp  indirectmappinglearnerunittest.cpp randomevaluates.cpp
 
-all: learnoptimize mappinglearnertest planner.exe retrain mappinglearnerunittest optimizerunittest genetransfererunittest
+INCLUDEPATH = ./include/svm-rank/
 
-
-learnoptimize: learnoptimize.cpp optimizer.h instanceHandler.h mappingLearner.h globals.h genetransferer.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h genetransferer.h
-
-	g++ learnoptimize.cpp   -lm libfloatfann.a libshark.a -o learnoptimize
+all: learnoptimize mappinglearnertest planner.exe retrain mappinglearnerunittest optimizerunittest genetransfererunittest indirectmappinglearnerunittest randomevaluates
 
 
-mappinglearnertest: mappinglearnertest.cpp optimizer.h instanceHandler.h mappingLearner.h globals.h genetransferer.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h genetransferer.h
+learnoptimize: learnoptimize.cpp optimizer.h instanceHandler.h mappingLearner.h globals.h genetransferer.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h genetransferer.h mappingLearnerRankSVMIndirect.h
 
-	g++ mappinglearnertest.cpp -lm libfloatfann.a libshark.a -o mappinglearnertest
+	g++ learnoptimize.cpp   -lm libfloatfann.a libshark.a libsvm_rank.a  -o learnoptimize
+
+randomevaluates: randomevaluates.cpp instanceHandler.h globals.h 
+	g++ randomevaluates.cpp   -lm libfloatfann.a libshark.a -o randomevaluates
 
 
-planner.exe: planner.cpp optimizer.h instanceHandler.h mappingLearner.h globals.h genetransferer.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h genetransferer.h
+mappinglearnertest: mappinglearnertest.cpp optimizer.h instanceHandler.h mappingLearner.h globals.h genetransferer.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h genetransferer.h mappingLearnerRankSVMIndirect.h
 
-	g++ planner.cpp -lm libfloatfann.a libshark.a -o planner.exe
+	g++ mappinglearnertest.cpp -lm libfloatfann.a libshark.a libsvm_rank.a  -o mappinglearnertest
 
-retrain: retrain.cpp optimizer.h instanceHandler.h mappingLearner.h globals.h genetransferer.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h    genetransferer.h
 
-	g++ retrain.cpp -lm libfloatfann.a libshark.a -o retrain
+planner.exe: planner.cpp optimizer.h instanceHandler.h mappingLearner.h globals.h genetransferer.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h genetransferer.h mappingLearnerRankSVMIndirect.h
 
-mappinglearnerunittest: mappinglearnerunittest.cpp mappingLearnerFANN.h globals.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h genetransferer.h
+	g++ planner.cpp -lm libfloatfann.a libshark.a libsvm_rank.a  -o planner.exe
+
+retrain: retrain.cpp optimizer.h instanceHandler.h mappingLearner.h globals.h genetransferer.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h    genetransferer.h mappingLearnerRankSVMIndirect.h
+
+	g++ retrain.cpp -lm libfloatfann.a libshark.a libsvm_rank.a -o retrain
+
+
+indirectmappinglearnerunittest: indirectmappinglearnerunittest.cpp mappingLearnerFANNIndirect.h globals.h mappingLearnerFANNIndirect.h mappingLearnerRankSVMIndirect.h
+	g++ -I ${INCLUDEPATH} indirectmappinglearnerunittest.cpp -lm libfloatfann.a libshark.a libsvm_rank.a -o indirectmappinglearnerunittest
+
+mappinglearnerunittest: mappinglearnerunittest.cpp mappingLearnerFANN.h globals.h mappingLearnerFANN.h mappingLearnerSharkFFNET.h genetransferer.h 
 	g++ mappinglearnerunittest.cpp -lm libfloatfann.a libshark.a -o mappinglearnerunittest
 
 optimizerunittest: optimizerunittest.cpp optimizer.h globals.h instanceHandler.h

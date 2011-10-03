@@ -194,7 +194,8 @@ if ((fitness<=bestfitness)||(bestfitness==0))
 	bestfitness=fitness;
         bestparameters=tryparameters;
 	
-	logfile<<"new best result "<<bestfitness<<endl;
+         if (loglevel>1)
+		logfile<<"new best result "<<bestfitness<<endl;
 	
 	
 
@@ -206,8 +207,8 @@ if ((fitness<=bestfitness)||(bestfitness==0))
 	
          bestparameters.updateGlobalStepsize(true);
 	
-
-	cout<<"new best result "<<bestfitness<<endl;
+         if (loglevel>1)
+		cout<<"new best result "<<bestfitness<<endl;
 	
 
 	}

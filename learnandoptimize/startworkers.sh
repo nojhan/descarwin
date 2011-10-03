@@ -1,5 +1,5 @@
 first=0
-llast=64
+llast=50
 
 
 if(( $# > 0 )); then

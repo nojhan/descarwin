@@ -177,7 +177,7 @@ for (unsigned int i=0;i<numberofinstances;++i)
 	{
 
 
-	for (unsigned int j=0;j<i;++j)
+	for (unsigned int j=0;j<=i;++j)
 		{
 		double d=euclideandistance((*instanceHandlers)[i].features,(*instanceHandlers)[j].features);
 		distances[i][j]=d;

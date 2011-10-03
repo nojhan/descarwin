@@ -21,9 +21,11 @@ public:
  mappingLearner(){};
 virtual ~mappingLearner(){};
 virtual double train(vector<vector<double> >& inputs, vector<vector<double> >& outputs)=0;
-virtual void run(vector<double>& input, vector<double>& output)=0;
+virtual double train(vector<vector<double> >& inputs, vector<vector<double> >& outputs, vector<double>& fitnesses, vector<int>& instances)=0;
+virtual double run(vector<double>& input, vector<double>& output)=0;
 virtual void save(char *filename)=0;
 virtual bool load(char *filename)=0;
+virtual bool areYouDirectMapping()=0;
 
 
 private:

@@ -1,0 +1,14 @@
+1 //loglevel
+12 //number of parameters
+13 //number of features
+1000 //numberofiterations
+1000 //numepochsperiteration
+11 //iterationsperparameter
+0 //useGeneTransferer
+0 //useLearner
+5 //ratioOptimizerversusLearner
+RankSVMIndirect //learning model. Possible values: SharkFFNET, FANN
+1 //normalize fitness values in indirect learning
+ANN.saved //model filename
+3 //numrestarts
+100 //indirectlearneroptimizelength

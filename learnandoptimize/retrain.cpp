@@ -8,18 +8,105 @@
 #include "genetransferer.h"
 #include "mappingLearnerFANN.h"
 #include "mappingLearnerSharkFFNET.h"
+#include "mappingLearnerFANNIndirect.h"
+#include "mappingLearnerRankSVMIndirect.h"
 
 using namespace std;
 
 
 vector<instanceHandler> instanceHandlers;
 
+
+
 const int oversamplingrate=5;
 
 
+void normalize()
+{
+
+cout<<"normalize"<<endl;
+unsigned int s=instanceHandlers.size();
+
+double bestobjective=instanceHandlers[0].bestobjective;
+unsigned int startposition=0;
+unsigned int instancenumber=instanceHandlers[0].instancenumber;
+
+for(unsigned int i=1;i<s;++i)
+		{
+		unsigned int newinstancenumber=instanceHandlers[i].instancenumber;
+		if (instancenumber!=newinstancenumber)
+			{
+			cout<<"instance "<< instancenumber<<endl;
+			for(unsigned int j=startposition;j<i;++j)
+				{
+				instanceHandlers[j].bestobjective=instanceHandlers[j].bestobjective/bestobjective-1;
+				cout<<instanceHandlers[j].bestobjective<<endl;
+				}
+			startposition=i;
+			instancenumber=newinstancenumber;
+			bestobjective=instanceHandlers[i].bestobjective;
+			}
+		else
+			{
+			double o=instanceHandlers[i].bestobjective;
+			if (bestobjective>o)
+				bestobjective=o;
+			}
+
+		}	//for i
+
+for(unsigned int j=startposition;j<s;++j) //last instance
+				instanceHandlers[j].bestobjective=instanceHandlers[j].bestobjective/bestobjective-1;
+
+}
+
+void initialize(char* inputfile)
+{
 
 
-void initialize()
+	ifstream instancesfile;
+
+
+	int numinstances=0;
+	
+	
+
+  	instancesfile.open (inputfile);
+
+	if (instancesfile.is_open())
+		{
+		if (loglevel>2)
+			cout<<inputfile<<endl;
+		while (!instancesfile.eof())
+			{	
+
+					instanceHandler newinstance(0);
+					newinstance.instancenumber=-1;
+					newinstance.readfromStream(instancesfile);
+					
+			
+					if ((newinstance.directory.size()) && (newinstance.instancenumber>0))
+						{
+						cout<<newinstance.instancenumber<<" add new"<<endl;
+						instanceHandlers.push_back(newinstance);
+							
+							
+						}
+					
+					
+			} //while
+		} //if
+	else
+	{
+	cerr<<"Could not open "<<inputfile<<endl;
+	exit(-1);
+	}
+
+}
+
+
+
+void initializewithmerge(char* inputfile)
 {
 
 
@@ -31,12 +118,12 @@ void initialize()
 
 	
 
-  	instancesfile.open ("bestlogs.txt");
+  	instancesfile.open (inputfile);
 
 	if (instancesfile.is_open())
 		{
 		if (loglevel>2)
-			cout<<"bestlogs.txt"<<endl;
+			cout<<inputfile<<endl;
 		while (!instancesfile.eof())
 			{	
 
@@ -74,7 +161,7 @@ void initialize()
 		} //if
 	else
 	{
-	cerr<<"Could not open bestlogs.txt"<<endl;
+	cerr<<"Could not open "<<inputfile<<endl;
 	exit(-1);
 	}
 
@@ -83,9 +170,11 @@ void initialize()
 
 
 
-void simplesample(vector<vector<double> >& inputs , vector<vector<double> > & outputs)
+void simplesample(vector<vector<double> >& inputs , vector<vector<double> > & outputs, vector<double> & fitnesses, vector<int>&  instances)
 	{
 		unsigned int s=instanceHandlers.size();
+
+		
 
 		for(unsigned int i=0;i<s;++i)
 		{
@@ -93,7 +182,10 @@ void simplesample(vector<vector<double> >& inputs , vector<vector<double> > & ou
 			{
 			inputs.push_back((vector<double>) instanceHandlers[i].features);
 			outputs.push_back((vector<double>) instanceHandlers[i].bestparameters[j]);
+			fitnesses.push_back(instanceHandlers[i].bestobjective);
+			instances.push_back(instanceHandlers[i].id);
 			}
+		
 		}	
 
 	}
@@ -147,8 +239,11 @@ int main ( int argc, char* argv[] )
 
 	char savefilename[1000];
 
-
-
+if (argc<2)
+    {
+    cout<<"Usage: "<<argv[0]<<" <input file> [number of epochs, default is 1000] [output file, default is AN.retrained] "<<endl;
+    exit(-1);
+    }
 
 
 
@@ -156,15 +251,22 @@ int main ( int argc, char* argv[] )
 
 	checkexitandreadconfig();
 
-	if(learningModelType==SharkFFNET)
+if(learningModelType==SharkFFNET)
 		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerSharkFFNet(num_features,num_parameters)); 
-	else
+	else if (learningModelType==FANNIndirect)
+		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerFANNIndirect(num_features,num_parameters));
+
+	else if (learningModelType==RankSVMIndirect)
+		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerRankSVMIndirect(num_features,num_parameters));
+ 
+	else  //default FANN
 		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerFANN(num_features,num_parameters)); 
 
+
 	
-	if (argc>1)
+	if (argc>2)
 		{
-		numepochsperiteration=atoi(argv[1]);
+		numepochsperiteration=atoi(argv[2]);
 		cout<<"numepochsperiteration changed to "<<numepochsperiteration<<endl;
 		}
 
@@ -172,39 +274,58 @@ int main ( int argc, char* argv[] )
 	stringstream command;
 
 
-	cout<<"Initialize instances"<<endl;
 
+		cout<<"Initialize instances"<<endl;
 
-
-	initialize();
-
-
-
-			
-
-
+	if (mappinglearner->areYouDirectMapping()) //train directmapping learner
+		{
+		cout<<"Direct"<<endl;
+		initializewithmerge(argv[1]);
+		}	
+	else
+		{
+		cout<<"Indirect"<<endl;
+		initialize(argv[1]);
+		if(normalizeindirect)		
+			normalize();
+		}
 
 
 		cout<<"Training network."<<endl;
 
 
-
 		vector<vector<double> > inputs;		
 		vector<vector<double> > outputs;
-
-		oversample(inputs , outputs);
-
-
+		vector<double>  fitnesses;
+		vector<int>  instances;
 
 
-		double annerror=mappinglearner->train(inputs,outputs);
+//		oversample(inputs , outputs,, fitnesses);
+		simplesample(inputs , outputs, fitnesses, instances);
 
-		if (argc>2)
+	double annerror=-1;
+
+	if (mappinglearner->areYouDirectMapping()) //train directmapping learner
+		{
+		cout<<"Direct"<<endl;
+		annerror=mappinglearner->train(inputs,outputs);
+		}	
+	else
+		{
+		cout<<"Indirect"<<endl;
+		annerror=mappinglearner->train(inputs,outputs,fitnesses,instances);
+		}
+
+
+cout<<"Saving network."<<endl;
+
+
+		if (argc>3)
 			{
-			mappinglearner->save(argv[2]);		
+			mappinglearner->save(argv[3]);		
 			}
 		else
-			mappinglearner->save("ANN.retrained");		
+			mappinglearner->save(const_cast<char*>(modelfile.c_str()));		
 
 		
 

@@ -25,9 +25,11 @@ public:
 mappingLearnerSVM(unsigned int numinput, unsigned int numoutput);
 ~mappingLearnerSVM();
 double train(vector<vector<double> >& inputs, vector<vector<double> >& outputs);
-void run(vector<double>& input, vector<double>& output);
+double train(vector<vector<double> >& inputs, vector<vector<double> >& outputs, vector<double>& fitnesses);
+double run(vector<double>& input, vector<double>& output);
 void save(char *filename);
 bool load(char *filename);
+bool areYouDirectMapping();
 
 
 private:
@@ -48,6 +50,16 @@ SVM_Optimizer svmopt;
 
 
 };
+
+bool mappingLearnerSVM::areYouDirectMapping()
+{
+return true;
+};
+
+double mappingLearnerSVM::train(vector<vector<double> >& inputs, vector<vector<double> >& outputs, vector<double>& fitnesses)
+{
+return 0;
+}
 
 
 mappingLearnerSVM::mappingLearnerSVM(unsigned int numinput, unsigned int numoutput):num_input(numinput),num_output(numoutput)
@@ -184,10 +196,10 @@ double mappingLearnerSVM::train(vector<vector<double> >& inputs, vector<vector<d
 
 
 
-void mappingLearnerSVM::run(vector<double>& input, vector<double>& output)
+double mappingLearnerSVM::run(vector<double>& input, vector<double>& output)
 {
 	if(input.size() != num_input)
-		return;
+		return 0;
 
 
 	Array<double> x(num_input);
@@ -233,7 +245,7 @@ if(loglevel>2)
 		logfile.close();
 		}
 
-
+return 0; //for direct learner we can not return fitness value
 
 }
 

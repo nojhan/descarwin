@@ -7,7 +7,9 @@
 #include "time.h"
 #include "instanceHandler.h"
 #include "mappingLearnerFANN.h"
+#include "mappingLearnerFANNIndirect.h"
 #include "mappingLearnerSharkFFNET.h"
+#include "mappingLearnerRankSVMIndirect.h"
 #include "globals.h"
 
 using namespace std;
@@ -308,9 +310,13 @@ int main ( int argc, char* argv[] )
 
 	checkexitandreadconfig();
 
-	if(learningModelType==SharkFFNET)
+if(learningModelType==SharkFFNET)
 		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerSharkFFNet(num_features,num_parameters)); 
-	else
+	else if (learningModelType==FANNIndirect)
+		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerFANNIndirect(num_features,num_parameters)); 
+	else if (learningModelType==RankSVMIndirect)
+		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerRankSVMIndirect(num_features,num_parameters));
+	else  //default FANN
 		mappinglearner= dynamic_cast<mappingLearner*>(new mappingLearnerFANN(num_features,num_parameters)); 
 
 	
@@ -321,7 +327,7 @@ int main ( int argc, char* argv[] )
 
 
 
-	mappinglearner->load("ANN.saved");
+	mappinglearner->load(const_cast<char*>(modelfile.c_str()));
 	
 	
 	stringstream command;
@@ -370,7 +376,7 @@ int main ( int argc, char* argv[] )
 
 	
 
-		printf("Use ANN\n");
+		printf("Use model\n");
 		
 		averageobjective=0;
 
@@ -378,7 +384,7 @@ int main ( int argc, char* argv[] )
 
 		stringstream text2;
 
-		text2<<"Epoch "<<" test_of_ANN";
+		text2<<"Epoch "<<" test_of_model";
 
 		whatislasttry=text2.str();
 		
@@ -388,10 +394,32 @@ int main ( int argc, char* argv[] )
 			{
 			checkexitandreadconfig();
 
-
+		
 			vector<double> parameters;
 
-			mappinglearner->run(instanceHandlers[i].features, parameters);
+				if (mappinglearner->areYouDirectMapping()) //train directmapping learner
+					{
+					mappinglearner->run(instanceHandlers[i].features, parameters);
+					}
+				else
+					{
+					double bestfitness=invalidresult;
+
+					for(unsigned int x=0;x<numrestarts;++x) //restart optimizer many times
+						{
+						vector<double> thisoutput;
+						double fitness=mappinglearner->run(instanceHandlers[i].features, thisoutput);
+						cout<<x<<" restart fitness "<<fitness<<endl;
+						if(fitness<bestfitness)
+							{
+							parameters=thisoutput;
+							bestfitness=fitness;
+							}
+						} //for x
+						
+					} //else
+
+		
 
 			
 			instanceHandlers[i].addHint(parameters);	
@@ -408,7 +436,7 @@ int main ( int argc, char* argv[] )
 
 		averageobjective/=s;
 
-		cout<<" ANN average objective: " <<averageobjective<<endl;
+		cout<<" Model average objective: " <<averageobjective<<endl;
 
 
 
@@ -416,7 +444,7 @@ int main ( int argc, char* argv[] )
 
 		logfile.open(logfilename.str().c_str(),ios_base::app);
 
-		logfile<<"test ANN average objective: " <<averageobjective<<endl;
+		logfile<<"test Model average objective: " <<averageobjective<<endl;
 		
 		logfile.close();
 

@@ -1,59 +1,60 @@
 BEGIN{
-	averagequalityratio=0;default=0;tuned=0; instance=-1; number=0;
+	averagequalityratio=0;ddefault=0;tuned=0; instance=-1; number=0; solvedbytuned=0;solvedbydefault=0;solvedbytuningandnotbydefault=0;
 	print "instancenumber referencemakespan makespan qualityratio"
 	}
 
 { 
 
-#print $54 " " $4 " " instance;
+#print $(NF-1) " " $4 " " instance;
 
-if ($54!="source_of_parameters" && $4!=instance && instance!=-1 && default && $2 < 100000)
+if ($(NF-1)!="source_of_parameters" && $4!=instance && instance!=-1 && $2 < 100000) #new instance
 		{
 
-		#printf default " " tuned " "
+		#printf ddefault " " tuned " "
 
-		
-
-
-		if(tuned)
-			ratio=qualitydefault/qualitytuned;
+		if (ddefault) #there is a default solution
+			{
+			solvedbydefault++;
+			if(tuned)
+				ratio=qualityddefault/qualitytuned;
+			else
+				{ratio=0; qualitytuned=-1;}
+			averagequalityratio+=ratio;
+			number++;
+			}
 		else
-			{ratio=0; qualitytuned=-1;}
+			{
+			qualityddefault=-1;
+			ratio=-1;
+			if (tuned)
+				solvedbytuningandnotbydefault++;
+			}
+		if(tuned) #there is solution with tuned
+			solvedbytuned++;
 
-
-		default=0;
+		ddefault=0;
 		tuned=0;
 		
-		printf instance " " qualitydefault " " qualitytuned " ";
+		printf instance " " qualityddefault " " qualitytuned " ";
 		print ratio " ";
-		averagequalityratio=averagequalityratio+ratio;
-		number=number+1;
 		#printf averagequalityratio " ";
 
 		instance= $4;
 
-		} # $4
+		} 
 
-if ($54!="source_of_parameters" && $4!=instance && instance!=-1 &&  tuned && default == 0 && $2 < 100000) #drop
 
-	{
-	default=0;
-	tuned=0;
-	instance= $4;
-	
-	}
-
-if ( instance == -1 && $54!="source_of_parameters")
+if ( instance == -1 && $(NF-1)!="source_of_parameters")
 	instance = $4;
 
-if( $54 == "initialize_with_default" && $2 < 100000)
+if( $(NF-1) == "initialize_with_default" && $2 < 100000)
 	{
-	default=1;
-	qualitydefault=$2;
+	ddefault=1;
+	qualityddefault=$2;
 	}
 
-#printf $54 " " $4 " "
-if( $54 == "Epoch" && $2 < 100000)
+
+if( $(NF-2) == "Epoch" && $2 < 100000)
 	{
 	tuned=1;
 	qualitytuned=$2;
@@ -65,21 +66,39 @@ if( $54 == "Epoch" && $2 < 100000)
 
 END { 
 
-if(tuned)
-	ratio=qualitydefault/qualitytuned;
-else
-	{ratio=0; qualitytuned=-1;}
+#printf ddefault " " tuned " "
+
+		if (ddefault) #there is a default solution
+			{
+			solvedbydefault++;
+			if(tuned)
+				ratio=qualityddefault/qualitytuned;
+			else
+				{ratio=0; qualitytuned=-1;}
+			averagequalityratio+=ratio;
+			number++;
+			}
+		else
+			{
+			qualityddefault=-1;
+			ratio=-1;
+			}
+		if(tuned) #there is solution with tuned
+			solvedbytuned++;
+
 		
-if(default)
-{
-	printf instance " " qualitydefault " " qualitytuned " ";
-	print ratio " ";
-	averagequalityratio=averagequalityratio+ratio;
-	number=number+1;
-	}
+		printf instance " " qualityddefault " " qualitytuned " ";
+		print ratio " ";
 
-printf number " ";
+print "number of comparable instances " number;
 
-print averagequalityratio/number;
+print "average quality ratio " averagequalityratio/number;
+
+print "instances solved by default " solvedbydefault;
+
+print "instances solved by tuning " solvedbytuned;
+
+print "instances solved by tuning but not by default " solvedbytuningandnotbydefault;
+
          
 }

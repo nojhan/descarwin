@@ -1,3 +1,4 @@
+cat log_*.txt  > alllogs.txt
 cat log_*.txt | grep ANN  > alllogs.tmp
 cat defaultlogs.txt alllogs.tmp > alllogs.txt
 rm alllogs.tmp

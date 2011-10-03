@@ -1,6 +1,7 @@
 echo -n >bestlogs.txt
 echo -n >bestlogs_unique.txt
 
+cat log_*.txt | grep -v runningtime > alllogs.txt
 
 for f in `ls ./log_*.txt`
     do

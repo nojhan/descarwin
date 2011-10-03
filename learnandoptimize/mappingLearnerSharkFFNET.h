@@ -36,9 +36,11 @@ public:
 mappingLearnerSharkFFNet(unsigned int numinput, unsigned int numoutput);
 ~mappingLearnerSharkFFNet();
 double train(vector<vector<double> >& inputs, vector<vector<double> >& outputs);
-void run(vector<double>& input, vector<double>& output);
+virtual double train(vector<vector<double> >& inputs, vector<vector<double> >& outputs, vector<double>& fitnesses, vector<int>& instances);
+double run(vector<double>& input, vector<double>& output);
 void save(char *filename);
 bool load(char *filename);
+bool areYouDirectMapping();
 
 
 private:
@@ -52,6 +54,17 @@ CG optimizer;
 
 
 };
+
+bool mappingLearnerSharkFFNet::areYouDirectMapping()
+{
+return true;
+};
+
+double mappingLearnerSharkFFNet::train(vector<vector<double> >& inputs, vector<vector<double> >& outputs, vector<double>& fitnesses, vector<int>& instances)
+{
+return 0;
+}
+
 
 
 mappingLearnerSharkFFNet::mappingLearnerSharkFFNet(unsigned int numinput, unsigned int numoutput):num_input(numinput),num_output(numoutput)
@@ -186,10 +199,10 @@ double mappingLearnerSharkFFNet::train(vector<vector<double> >& inputs, vector<v
 
 
 
-void mappingLearnerSharkFFNet::run(vector<double>& input, vector<double>& output)
+double mappingLearnerSharkFFNet::run(vector<double>& input, vector<double>& output)
 {
 	if(input.size() != num_input)
-		return;
+		return 0;
 
 
 	Array<double> x(num_input);
@@ -236,7 +249,7 @@ if(loglevel>2)
 		}
 
 
-
+return 0; //for direct learner we can not return fitness value
 }
 
 void mappingLearnerSharkFFNet::save(char *filename)

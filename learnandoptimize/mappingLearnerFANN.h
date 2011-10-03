@@ -27,9 +27,11 @@ public:
 mappingLearnerFANN(unsigned int numinput, unsigned int numoutput);
 ~mappingLearnerFANN();
 double train(vector<vector<double> >& inputs, vector<vector<double> >& outputs);
-void run(vector<double>& input, vector<double>& output);
+virtual double train(vector<vector<double> >& inputs, vector<vector<double> >& outputs, vector<double>& fitnesses, vector<int>& instances);
+double run(vector<double>& input, vector<double>& output);
 void save(char *filename);
 bool load(char *filename);
+bool areYouDirectMapping();
 
 double annerror;
 
@@ -43,6 +45,16 @@ struct fann *ann;
 
 
 };
+
+bool mappingLearnerFANN::areYouDirectMapping()
+{
+return true;
+};
+
+double mappingLearnerFANN::train(vector<vector<double> >& inputs, vector<vector<double> >& outputs, vector<double>& fitnesses, vector<int>& instances)
+{
+return 0;
+}
 
 
 mappingLearnerFANN::mappingLearnerFANN(unsigned int numinput, unsigned int numoutput):num_input(numinput),num_output(numoutput)
@@ -218,7 +230,7 @@ logfile.close();
 
 
 
-void mappingLearnerFANN::run(vector<double>& input, vector<double>& output)
+double mappingLearnerFANN::run(vector<double>& input, vector<double>& output)
 {
 
 if (ann)
@@ -266,6 +278,8 @@ if(loglevel>2)
 		}
 
 }
+
+return 0; //for direct learner we can not return fitness value
 
 }
 

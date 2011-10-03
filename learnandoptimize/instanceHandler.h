@@ -77,6 +77,7 @@ unsigned int instancenumber;
 unsigned int runningtime;
 string directory;
 double bestobjective;
+double defaultobjective; //this could be used for normalization
 
 vector<vector<double> > bestparameters;
 
@@ -102,6 +103,7 @@ void instanceHandler::readfromStream(ifstream& instancesfile)
 	instancesfile>>id;
 	cout<<id<<" ";
 	instancesfile>>agregatedresult; 
+	bestobjective=agregatedresult;
 	instancesfile>>runningtime; 
 					
 	instancesfile>>instancenumber;
@@ -244,6 +246,7 @@ logfile.close();
 instanceHandler::instanceHandler(unsigned int pid): id(pid), tryparameters(num_parameters,0.5), myoptimizer(num_parameters,pid), features(num_features,0.0),isthisoptimizerhint(false)
 {
 bestobjective=-1;
+defaultobjective=-1;
 bestparameters.push_back(tryparameters);
 allresults=vector<double>(iterationsperparameter,0);
 ready=true;
@@ -458,7 +461,6 @@ for(unsigned int i=0;i<iterationsperparameter;++i)
 				{
 				cout<<"accepted for "<<id<<" iteration "<<i<<"result "<<result <<endl;
 				++numreadyiterations;
-				agregatedresult+=result;
 				allresults[i]=result;
 				readyiterations[i]=1;
 				time(&start); //there is progress, reset timeout
@@ -526,6 +528,9 @@ if (numreadyiterations>=iterationsperparameter)
 	loglasttry();
 
 	cout<<"agregatedresult for "<<id<<"	 "<<agregatedresult<<endl;
+
+	if(defaultobjective<0)
+		defaultobjective=agregatedresult;
 
 	if (agregatedresult == bestobjective) //we store multiple best parameters, since that is useful for the learner
 		{

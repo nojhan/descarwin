@@ -389,6 +389,53 @@ int main()
 		return(-1);
 
 	genetransferer.init(s,&instanceHandlers);
+
+	cout<< " testing distances "<<endl;
+
+	unsigned int numberoffails=0;
+
+	for (unsigned int k=0;k<s;++k)
+			{
+			if (distances[k][k]>0.0001) // numerical errors
+				{
+				cout<< k<< " " << k<< " fail"<<endl;
+				++numberoffails;
+				}
+			else
+				cout<< k<< " " << k<< " OK"<<endl;
+			}
+
+	for (unsigned int k=0;k<s;++k)
+	for (unsigned int j=0;j<s;++j)
+			{
+			if (distances[k][j]<-0.0001) // numerical errors
+				{
+				cout<< k<< " " << j<< " fail"<<endl;
+				++numberoffails;
+				}
+			else
+				cout<< k<< " " << j<< " OK"<<endl;
+			}
+
+	
+
+	for (unsigned int i=0;i<s;++i)
+	for (unsigned int j=0;j<s;++j)
+	for (unsigned int k=0;k<s;++k)
+		if((i!=j) && (j!=k))
+			{
+			if (distances[i][j]+distances[j][k]+0.00001<distances[i][k]) // numerical errors
+				{
+				cout<< i<< " "<< j<< " " << k<< " fail ";
+				cout<<distances[i][j]<<" "<<distances[j][k]<<" "<<distances[i][j]+distances[j][k]<<" "<<distances[i][k]<<endl;
+				++numberoffails;
+				}
+			else
+				cout<< i<< " "<< j<< " " << k<< " OK"<<endl;
+			}
+
+	cout<< " total errors in distances "<< numberoffails<<endl;
+
 	
 
 	for (unsigned iteration=0;iteration<numberofiterations;iteration++)
