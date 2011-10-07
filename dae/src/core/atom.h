@@ -18,6 +18,7 @@
 #include <src/branching.h>
 #include <src/structs.h>
 #include <src/problem.h>
+#include <src/globs.h>
 //}
 
 #include "utils/pddl.h"
@@ -29,15 +30,25 @@ class Atom
 {
 public:
     //! Constructeur prédicats + objets + date au plus tot + pointeur vers structure interne YAHSP
-    Atom( TimeVal start_time, Fluent* fluent ) : _fluent(fluent), _earliest_start_time(start_time)
+   // Atom( TimeVal start_time, Fluent* fluent ) : _fluent(fluent), _earliest_start_time(start_time)
+    //{}
+
+   Atom( TimeVal start_time, unsigned fluent ) : _fluent(fluent), _earliest_start_time(start_time)
     {}
  
     //! Accesseurs
     TimeVal                     earliest_start_time() const { return _earliest_start_time; }
-    Fluent *                    fluent()              const { return _fluent; }
+    Fluent*                     fluent()              const { return fluents[_fluent]; }
+    unsigned fluentIndex() { return _fluent;}
+    //!Mutateurs	
+
+    void earliest_start_time (TimeVal earliest_start_time) {_earliest_start_time = earliest_start_time;}
+
+    void fluentIndex(unsigned fluent) { _fluent = fluent;}
+
 
 protected:
-    Fluent *                    _fluent;
+    unsigned                    _fluent;
     TimeVal                     _earliest_start_time;
 
 public:
@@ -47,6 +58,9 @@ public:
         out.flush();
         return out;
     }
+
+
+
 };
 
 } // namespace daex
