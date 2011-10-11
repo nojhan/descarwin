@@ -16,10 +16,9 @@
 #include <utils/eoFeasibleRatioStat.h>
 
 #include "daex.h"
-#include "evaluation/cpt-yahsp.h"
 #include "evaluation/yahsp.h"
-#include "evaluation/portfolio.h"
 #include "utils/evalBestPlanDump.h"
+#include "evaluation/cpt-yahsp.h"
 
 #define LOG_FILL ' '
 #define FORMAT_LEFT_FILL_WIDTH(width) "\t" << std::left << std::setfill(LOG_FILL) << std::setw(width) 
@@ -155,7 +154,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "is_sequential" << is_sequential << std::endl;
     */
 
-    // un total de 20 paramètres
+    // un total de 20 paramÃ¨tres
 
     // Initialization
     unsigned int pop_size = parser.createParam( (unsigned int)100, "popSize", "Population Size", 'P', "Evolution Engine").value();
@@ -338,7 +337,7 @@ int main ( int argc, char* argv[] )
     // PDDL
 
     // parse les pddl
-    // FIXME ATTENTION : il y a une option cachée dans l'init qui précise à yahsp si on est en temporel ou en séquentiel, il faut la régler correctement en fonction du problème visé
+    // FIXME ATTENTION : il y a une option cachÃ©e dans l'init qui prÃ©cise Ã  yahsp si on est en temporel ou en sÃ©quentiel, il faut la rÃ©gler correctement en fonction du problÃ¨me visÃ©
 #ifndef NDEBUG
     eo::log << eo::progress << "Load the instance..." << std::endl;
     eo::log.flush();
@@ -357,7 +356,7 @@ int main ( int argc, char* argv[] )
      ******************/
 
     // l'initialisation se fait en fonction de la liste des dates au plus tot possibles (start time set)
-    // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
+    // Note : dans le init, l_max est rÃ©glÃ© au double du nombre de dates dans la partition
     daex::Init init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
     
 #ifndef NDEBUG
@@ -408,8 +407,7 @@ int main ( int argc, char* argv[] )
 	    goodguys=0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-            //daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
-            daePortfolioEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+            daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
 
 // in non multi-threaded version, use the plan dumper
 //#ifndef SINGLE_EVAL_ITER_DUMP
@@ -494,8 +492,7 @@ int main ( int argc, char* argv[] )
     b_max_in = b_max_fixed;
     b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-    //daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
-    daePortfolioEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
     eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
     eval_y( pop, pop );
 
@@ -677,8 +674,8 @@ int main ( int argc, char* argv[] )
     
 
     // MODIFS MS START 
-    // pour plus d'output (recopiés de do/make_checkpoint)
-    // un state, pour sauver l'état courant
+    // pour plus d'output (recopiÃ©s de do/make_checkpoint)
+    // un state, pour sauver l'Ã©tat courant
     eoState state;
     state.registerObject(parser);
     state.registerObject(pop);
@@ -702,17 +699,17 @@ int main ( int argc, char* argv[] )
 #endif // NDEBUG
 
     // SELECTION
-    // TODO cet opérateur, fait soit un tri de la pop (true), soit un shuffle (false), idéalement, on ne voudrait ni l'un ni l'autre, car on parcours tout, peu importe l'ordre
+    // TODO cet opÃ©rateur, fait soit un tri de la pop (true), soit un shuffle (false), idÃ©alement, on ne voudrait ni l'un ni l'autre, car on parcours tout, peu importe l'ordre
     
     // JACK the article indicate that tere is no selection, but the article use a deterministic tournament
 
     eoSelectOne<daex::Decomposition> * p_selectone;
     if ( toursize == 1 ) {
-    // L'article indique qu'il n'y a pas de sélection, on aurait alors ça :
+    // L'article indique qu'il n'y a pas de sÃ©lection, on aurait alors Ã§a :
       p_selectone = (eoSelectOne<daex::Decomposition> *) ( new eoSequentialSelect<daex::Decomposition> ( true ) );
     }
     else {
-    /// MAIS le code utilise un tournoi déterministe, on a donc ça :
+    /// MAIS le code utilise un tournoi dÃ©terministe, on a donc Ã§a :
       p_selectone = (eoSelectOne<daex::Decomposition> *) ( new eoDetTournamentSelect<daex::Decomposition> ( toursize ) );
     }
     
@@ -725,7 +722,7 @@ int main ( int argc, char* argv[] )
     // partition, radius, l_max
     daex::MutationAddGoal addgoal( pddl.chronoPartitionAtom(), radius /*, init.l_max()*/ );
     // partition, proba_change, proba_add, maxtry_search_candidate, maxtry_search_mutex 
-    // (maxtry à 0 pour essayer tous les atomes)
+    // (maxtry Ã  0 pour essayer tous les atomes)
     //    daex::MutationAddAtom addatom( pddl.chronoPartitionAtom(), 0.8, 0.5, 11, 11 );
     //    daex::MutationAddAtom addatom( pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
     daex::MutationChangeAddAtom addatom( pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
@@ -751,14 +748,14 @@ int main ( int argc, char* argv[] )
 
     // REPLACEMENT
     
-    // JACK : L'article indique qu'on fait un remplacement en tournoi déterministe et qu'il n'y a pas d'élistisme, on aurait alors ça :
+    // JACK : L'article indique qu'on fait un remplacement en tournoi dÃ©terministe et qu'il n'y a pas d'Ã©listisme, on aurait alors Ã§a :
     //eoSSGADetTournamentReplacement<daex::Decomposition> replace(5);
     
     // MODIFS MS START
-    // plus de paramétrage du remplacement
+    // plus de paramÃ©trage du remplacement
     eoReplacement<daex::Decomposition> * pt_replace;
-    // MAIS le code utilise un remplacement intégral des parents par le meilleur des parents+enfants, avec élitisme faible, on a donc 
-    // Note MS: le commentaire était incohérent entre Plus et Comma ???
+    // MAIS le code utilise un remplacement intÃ©gral des parents par le meilleur des parents+enfants, avec Ã©litisme faible, on a donc 
+    // Note MS: le commentaire Ã©tait incohÃ©rent entre Plus et Comma ???
     
     // Use the eoMergeReduce construct
     

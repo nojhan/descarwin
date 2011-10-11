@@ -8,6 +8,8 @@
 namespace daex
 {
 
+std::vector< daex::Atom*> globalAtoms;
+
 void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/, 
                           unsigned int heuristic_start_times /*= HEURISTIC_H1*/,
                           unsigned int nthreads /* = 1 */,
@@ -163,6 +165,8 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
         //std::cout << *atom << std::endl;
 
         _atoms.push_back( atom );
+        
+         globalAtoms.push_back( atom );
 
     } // for i atom
 }

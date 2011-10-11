@@ -5,6 +5,8 @@
 
 # target the dae lib
 
+SET (CMAKE_CXX_COMPILER mpicxx)
+
 SET(DAEX_LIB_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 SET(LIBRARY_OUTPUT_PATH ${DAEX_LIB_OUTPUT_PATH})
 
@@ -65,9 +67,14 @@ INCLUDE_DIRECTORIES(${PARADISEO_EO_SRC_DIR}/src
                     ${PARADISEO_MOEO_SRC_DIR}/src
                     ${PARADISEO_PEO_SRC_DIR}/src
 		    ${DAEX_SRC_DIR}/src
+		    ${DAEX_SRC_DIR}/src/core
+ 		    ${DAEX_SRC_DIR}/src/utils
+		    ${DAEX_SRC_DIR}/src/pack
+	  	    ${DAEX_SRC_DIR}/initialization
+    		    ${DAEX_SRC_DIR}/evaluation
+ 		    ${DAEX_SRC_DIR}/variation		    
+		    ${DAE_SRC_DIR})
 #		    ${EO_SRC_DIR}/src
-		    ${DAE_SRC_DIR} )
-
 ######################################################################################
 
 
@@ -84,6 +91,8 @@ LINK_DIRECTORIES(${PARADISEO_MOEO_BIN_DIR}/lib)
 # Link with the PEO library directory, only if you need it
 LINK_DIRECTORIES(${PARADISEO_PEO_BIN_DIR}/lib)
 
+LINK_DIRECTORIES(${PARADISEO_DIR}/libxml2/lib)
+
 LINK_DIRECTORIES(${DAEX_BIN_DIR}/lib
 		 #${EO_BIN_DIR}/lib
 		${DAE_BIN_DIR})
@@ -92,13 +101,10 @@ LINK_DIRECTORIES(${DAEX_BIN_DIR}/lib
 
 ADD_LIBRARY(daex STATIC ${DAEX_SOURCES})
 
-ADD_LIBRARY(daex-yahsp-mt STATIC ${DAEX_SOURCES})
+ ADD_LIBRARY(daex-yahsp-mt STATIC ${DAEX_SOURCES})
 
-#ADD_LIBRARY(daex-pack STATIC ${DAEX_PACK})
 
-#TARGET_LINK_LIBRARIES( daex-pack  eo eoutils  daex daex-yahsp-mt )
-
-TARGET_LINK_LIBRARIES( daex   eo eoutils )
+TARGET_LINK_LIBRARIES( daex xml2 peo rmc_mpi eo eoutils )
 SET_TARGET_PROPERTIES(
   daex-yahsp-mt
   PROPERTIES 

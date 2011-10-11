@@ -1,4 +1,7 @@
 #CMAKE DAE
+
+SET (CMAKE_CXX_COMPILER mpicxx)
+
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 IF(COMMAND CMAKE_POLICY)
@@ -9,7 +12,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake OPTIONAL)
 
 # define project name
-PROJECT(DAEPEO)
+PROJECT(DAEX)
 
 # include useful features for cmake
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules) 
@@ -26,22 +29,22 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 
 
-ADD_CUSTOM_TARGET(install DEPENDS ${DAEPEO_SOURCE_DIR}/param ${DAEPEO_SOURCE_DIR}/schema.xml)
+ADD_CUSTOM_TARGET(install DEPENDS ${DAEX_SOURCE_DIR}/param ${DAEX_SOURCE_DIR}/schema.xml)
 
 ADD_CUSTOM_COMMAND(
     TARGET install
     POST_BUILD
     COMMAND ${CMAKE_COMMAND}
     ARGS -E copy_if_different
-      ${DAEPEO_SOURCE_DIR}/param
-      ${DAEPEO_BINARY_DIR})
+      ${DAEX_SOURCE_DIR}/param
+      ${DAEX_BINARY_DIR})
 ADD_CUSTOM_COMMAND(
     TARGET install
     POST_BUILD
     COMMAND ${CMAKE_COMMAND}
     ARGS -E copy_if_different
-      ${DAEPEO_SOURCE_DIR}/schema.xml
-      ${DAEPEO_BINARY_DIR} )
+      ${DAEX_SOURCE_DIR}/schema.xml
+      ${DAEX_BINARY_DIR} )
 
 
 
@@ -50,8 +53,14 @@ ADD_CUSTOM_COMMAND(
 # include the sources
 INCLUDE_DIRECTORIES(
  # ${EO_SRC_DIR}
-  ${DAEPEO_SOURCE_DIR}/src
-  ${DAEPEO_SOURCE_DIR}/src_cpt
+  ${DAEX_SOURCE_DIR}/src
+  ${DAEX_SOURCE_DIR}/src_cpt
+  ${DAEX_SRC_DIR}/src/core
+  ${DAEX_SRC_DIR}/src/utils
+  ${DAEX_SRC_DIR}/src/pack
+  ${DAEX_SRC_DIR}/initialization
+  ${DAEX_SRC_DIR}/evaluation
+  ${DAEX_SRC_DIR}/variation	
   ${PARADISEO_EO_SRC_DIR}/src 
   ${PARADISEO_MO_SRC_DIR}/src  
   ${PARADISEO_MOEO_SRC_DIR}/src 
@@ -71,7 +80,7 @@ LINK_DIRECTORIES(
   #${EO_BIN_DIR}/lib
   ${GDSL_LIBRARY}
   ${CPT_YAHSP_DIR}/lib
-  ${DAEPEO_BINARY_DIR}/lib}
+  ${DAEX_BINARY_DIR}/lib}
 
   )
 
@@ -85,6 +94,8 @@ LINK_DIRECTORIES(${PARADISEO_MOEO_BIN_DIR}/lib)
 
 # Link with the PEO library directory, only if you need it
 LINK_DIRECTORIES(${PARADISEO_PEO_BIN_DIR}/lib)
+
+LINK_DIRECTORIES(${PARADISEO_DIR}/libxml2/lib)
 
 
 # flags to use with compiler
@@ -107,19 +118,24 @@ LINK_LIBRARIES(eoutils gmp eo gcov gdsl)
 
 ADD_EXECUTABLE(dae dae.cpp)
 ADD_DEPENDENCIES(dae daex)
-TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library   cpt_yahsp_library-dae)
 
-
+#cpt_yahsp_library-common-dae-omp
 ######################################################################################
 ### 4) Define your target: just an executable here
 ######################################################################################
 #ADD_EXECUTABLE(daePeo daePeo.cpp) 
 #ADD_DEPENDENCIES(daePeo daex peo rmc_mpi)
 
-
-
 #TARGET_LINK_LIBRARIES(daePeo daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae 
-#			  ${XML2_LIBS} peo rmc_mpi  eo  ga es eoutils peo)
+			 # ${XML2_LIBS} peo rmc_mpi  eo  ga es eoutils peo)
+
+ADD_EXECUTABLE(daePeos daePeos.cpp) 
+ADD_DEPENDENCIES(daePeos daex peo rmc_mpi)
+
+TARGET_LINK_LIBRARIES(daePeos  daex cpt_yahsp_library-common-dae-omp  cpt_yahsp_library-dae xml2 peo rmc_mpi eo eoutils) 
+		#eo ga es ${XML2_LIBS}   # )
+	
 
 
 

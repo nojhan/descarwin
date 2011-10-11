@@ -76,7 +76,7 @@ public:
             // don't forget to call the embedded evaluator
             _func( eo );
 
-            if( eo.fitness().is_feasible() ) {
+            if( eo.fitnessReference().is_feasible() ) {
 //#pragma omp critical
                 call( eo );
             } // if feasible
