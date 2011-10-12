@@ -346,8 +346,19 @@ int main ( int argc, char* argv[] )
 
     bool weakElitism = parser.createParam(true, "weakElitism", "Weak Elitism in replacement", '\0', "Evolution Engine").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "weakElitism" << weakElitism << std::endl;
+    
     // MODIFS MS END
+    eoValueParam <std :: string> schema_param ("schema.xml", "schema", "ParallelSchema");
 
+    parser.processParam (schema_param);
+
+//  eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "schema_param" << schema_param << std::endl;
+    
+    eoValueParam <std :: string> debug_param ("false", "debug", "?");
+
+    parser.processParam (debug_param);
+    
+    
     make_help( parser );
 
     /***********
@@ -822,7 +833,7 @@ int main ( int argc, char* argv[] )
     daex::Decomposition best = pop.best_element();
     unsigned int run = 1;
     
-     peoPopEval<daex::Decomposition> pop_eval ( eval_yahsp );
+     peoPopEval<daex::Decomposition> pop_eval (eval_yahsp ); //*p_eval);//eval_yahsp );
     
     // PEO ADD
   peo :: init( argc, argv );
@@ -841,18 +852,20 @@ int main ( int argc, char* argv[] )
   peo :: run();
   peo :: finalize();
 
-//   if (getNodeRank()==1)
-//     {
-// 	  cout << "Instance size = " << n << endl;
-// 	  cout << "Best known value in the litterature = " << bkv << endl;
-//       pop.sort();
-//       std::cout << "Final population :\n" << pop << std::endl;
-//  
-//       cout << "Best solution found" << endl;
-//       pop[0].printSolution();
-//       cout << pop[0] << endl;
-//       // GENERAL
-//     }
+    if (getNodeRank()==1)
+      {
+ 	
+  	
+         pop.sort();
+      //   print_results( pop, time_start, run );
+         
+//      std::cout << "Final population :\n" << pop << std::endl;
+//    
+//        cout << "Best solution found" << endl;
+//         //pop[0].printSolution();
+//        cout << pop[0] << endl;
+//        // GENERAL
+      }
 
 
 
