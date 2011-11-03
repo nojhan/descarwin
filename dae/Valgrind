@@ -1,0 +1,139 @@
+==1208== Memcheck, a memory error detector
+==1208== Copyright (C) 2002-2009, and GNU GPL'd, by Julian Seward et al.
+==1208== Using Valgrind-3.5.0-Debian and LibVEX; rerun with -h for copyright info
+==1208== Command: ./daePeos @para_param
+==1208== Parent PID: 1207
+==1208== 
+--1208-- 
+--1208-- Valgrind options:
+--1208--    --suppressions=/usr/lib/valgrind/debian-libc6-dbg.supp
+--1208--    -v
+--1208--    --log-file=Valgrind
+--1208-- Contents of /proc/version:
+--1208--   Linux version 2.6.27-9-generic (buildd@rothera) (gcc version 4.3.2 (Ubuntu 4.3.2-1ubuntu11) ) #1 SMP Thu Nov 20 21:57:00 UTC 2008
+--1208-- Arch and hwcaps: X86, x86-sse1-sse2
+--1208-- Page sizes: currently 4096, max supported 4096
+--1208-- Valgrind library directory: /usr/lib/valgrind
+--1208-- Reading syms from /lib/ld-2.9.so (0x4000000)
+--1208-- Reading debug info from /lib/ld-2.9.so ..
+--1208-- .. CRC mismatch (computed 50f238dc wanted 15237d25)
+--1208-- Reading debug info from /usr/lib/debug/lib/ld-2.9.so ..
+--1208-- Reading syms from /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos (0x8048000)
+--1208-- Reading syms from /usr/lib/valgrind/memcheck-x86-linux (0x38000000)
+--1208--    object doesn't have a dynamic symbol table
+--1208-- Reading suppressions file: /usr/lib/valgrind/debian-libc6-dbg.supp
+--1208-- Reading suppressions file: /usr/lib/valgrind/default.supp
+--1208-- REDIR: 0x4016660 (index) redirected to 0x3803e013 (vgPlain_x86_linux_REDIR_FOR_index)
+--1208-- Reading syms from /usr/lib/valgrind/vgpreload_core-x86-linux.so (0x4020000)
+--1208-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so (0x4024000)
+==1208== WARNING: new redirection conflicts with existing -- ignoring it
+--1208--     new: 0x04016660 (index               ) R-> 0x040278c0 index
+--1208-- REDIR: 0x4016850 (strlen) redirected to 0x4027bb0 (strlen)
+--1208-- Reading syms from /usr/lib/libgmp.so.3.5.0 (0x4048000)
+--1208-- Reading debug info from /usr/lib/libgmp.so.3.5.0 ..
+--1208-- .. CRC mismatch (computed 28349d74 wanted 4322cb60)
+--1208--    object doesn't have a symbol table
+--1208-- Reading syms from /home/mustapha/framework/paradiseo-1.2.1/libxml2/lib/libxml2.so.2.7.3 (0x40a9000)
+--1208-- Reading syms from /lib/tls/i686/cmov/libpthread-2.9.so (0x41e6000)
+--1208-- Reading debug info from /lib/tls/i686/cmov/libpthread-2.9.so ..
+--1208-- .. CRC mismatch (computed 9ac0972d wanted d9a43d27)
+--1208-- Reading debug info from /usr/lib/debug/lib/tls/i686/cmov/libpthread-2.9.so ..
+--1208-- Reading syms from /lib/tls/i686/cmov/librt-2.9.so (0x41ff000)
+--1208-- Reading debug info from /lib/tls/i686/cmov/librt-2.9.so ..
+--1208-- .. CRC mismatch (computed bce95628 wanted 77dfef11)
+--1208-- Reading debug info from /usr/lib/debug/lib/tls/i686/cmov/librt-2.9.so ..
+--1208-- Reading syms from /usr/lib/debug/libstdc++.so.6.0.9 (0x4209000)
+--1208-- Reading syms from /lib/tls/i686/cmov/libm-2.9.so (0x4304000)
+--1208-- Reading debug info from /lib/tls/i686/cmov/libm-2.9.so ..
+--1208-- .. CRC mismatch (computed f6239602 wanted fa4ec4dd)
+--1208-- Reading debug info from /usr/lib/debug/lib/tls/i686/cmov/libm-2.9.so ..
+--1208-- Reading syms from /usr/lib/libgomp.so.1.0.0 (0x432a000)
+--1208-- Reading debug info from /usr/lib/libgomp.so.1.0.0 ..
+--1208-- .. CRC mismatch (computed 1378a4e0 wanted 47d2cd55)
+--1208--    object doesn't have a symbol table
+--1208-- Reading syms from /lib/libgcc_s.so.1 (0x4338000)
+--1208-- Reading debug info from /lib/libgcc_s.so.1 ..
+--1208-- .. CRC mismatch (computed 790ab395 wanted aab00a11)
+--1208-- Reading debug info from /usr/lib/debug/lib/libgcc_s.so.1 ..
+--1208-- Reading syms from /lib/tls/i686/cmov/libc-2.9.so (0x4356000)
+--1208-- Reading debug info from /lib/tls/i686/cmov/libc-2.9.so ..
+--1208-- .. CRC mismatch (computed 05b74a1d wanted c1b2d3f3)
+--1208-- Reading debug info from /usr/lib/debug/lib/tls/i686/cmov/libc-2.9.so ..
+--1208-- Reading syms from /lib/tls/i686/cmov/libdl-2.9.so (0x44ba000)
+--1208-- Reading debug info from /lib/tls/i686/cmov/libdl-2.9.so ..
+--1208-- .. CRC mismatch (computed 13ccd373 wanted 8d90ac21)
+--1208-- Reading debug info from /usr/lib/debug/lib/tls/i686/cmov/libdl-2.9.so ..
+--1208-- Reading syms from /lib/libz.so.1.2.3.3 (0x44be000)
+--1208-- Reading debug info from /lib/libz.so.1.2.3.3 ..
+--1208-- .. CRC mismatch (computed 6f997343 wanted 90f70a2f)
+--1208--    object doesn't have a symbol table
+--1208-- REDIR: 0x43cd000 (index) redirected to 0x4027860 (index)
+--1208-- REDIR: 0x43cef40 (memchr) redirected to 0x4027fd0 (memchr)
+--1208-- REDIR: 0x43cdb60 (rindex) redirected to 0x40277d0 (rindex)
+--1208-- REDIR: 0x43cd6e0 (strlen) redirected to 0x4027b90 (strlen)
+--1208-- REDIR: 0x43cf440 (memset) redirected to 0x4028b60 (memset)
+--1208-- REDIR: 0x43cf950 (memcpy) redirected to 0x4028010 (memcpy)
+--1208-- REDIR: 0x42c94a0 (operator new(unsigned int)) redirected to 0x402730b (operator new(unsigned int))
+--1208-- REDIR: 0x42c7b70 (operator delete(void*)) redirected to 0x40264c8 (operator delete(void*))
+--1208-- REDIR: 0x43c9700 (calloc) redirected to 0x4025ea7 (calloc)
+--1208-- REDIR: 0x43cf0e0 (bcmp) redirected to 0x4028820 (bcmp)
+--1208-- REDIR: 0x42c95e0 (operator new[](unsigned int)) redirected to 0x4026f9f (operator new[](unsigned int))
+--1208-- REDIR: 0x43c9a30 (malloc) redirected to 0x4026b97 (malloc)
+--1208-- REDIR: 0x42c7bd0 (operator delete[](void*)) redirected to 0x402614a (operator delete[](void*))
+--1208-- REDIR: 0x43c7620 (free) redirected to 0x40267b1 (free)
+--1208-- REDIR: 0x43cf3d0 (memmove) redirected to 0x4028bd0 (memmove)
+--1208-- REDIR: 0x43d2490 (strchrnul) redirected to 0x4028c50 (strchrnul)
+--1208-- REDIR: 0x43cf4a0 (mempcpy) redirected to 0x4028ca0 (mempcpy)
+--1208-- REDIR: 0x43cd900 (strncmp) redirected to 0x4027e40 (strncmp)
+--1208-- REDIR: 0x43cd170 (strcmp) redirected to 0x4027eb0 (strcmp)
+--1208-- REDIR: 0x43c9ee0 (realloc) redirected to 0x4026c46 (realloc)
+--1208-- REDIR: 0x43cd1e0 (strcpy) redirected to 0x4027bf0 (strcpy)
+--1208-- REDIR: 0x43cda10 (strncpy) redirected to 0x4027cd0 (strncpy)
+--1208-- REDIR: 0x43cf940 (__memcpy_chk) redirected to 0x4029050 (__memcpy_chk)
+==1208== Source and destination overlap in memcpy(0xbefe7f40, 0xbefe7f40, 128)
+==1208==    at 0x4028085: memcpy (mc_replace_strmem.c:482)
+==1208==    by 0x8176DDD: MPIR_Localcopy (in /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos)
+==1208==    by 0x8175228: MPIR_Allgather (in /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos)
+==1208==    by 0x81761CA: PMPI_Allgather (in /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos)
+==1208==    by 0x815854C: initNode(int*, char***) (node.cpp:148)
+==1208==    by 0x8159A41: Communicator::Communicator(int*, char***) (comm.cpp:59)
+==1208==    by 0x815BB3F: initRMC(int&, char**&) (rmc.cpp:67)
+==1208==    by 0x8155566: peo::init(int&, char**&) (in /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos)
+==1208==    by 0x80D8789: main (daePeos.cpp:847)
+==1208== 
+--1208-- REDIR: 0x43cd790 (strnlen) redirected to 0x4027b50 (strnlen)
+--1208-- REDIR: 0x4451290 (__strcpy_chk) redirected to 0x40291d0 (__strcpy_chk)
+==1208== 
+==1208== HEAP SUMMARY:
+==1208==     in use at exit: 441,785 bytes in 2,356 blocks
+==1208==   total heap usage: 9,837 allocs, 7,481 frees, 850,721 bytes allocated
+==1208== 
+==1208== Searching for pointers to 2,356 not-freed blocks
+==1208== Checked 1,018,456 bytes
+==1208== 
+==1208== LEAK SUMMARY:
+==1208==    definitely lost: 212 bytes in 26 blocks
+==1208==    indirectly lost: 0 bytes in 0 blocks
+==1208==      possibly lost: 0 bytes in 0 blocks
+==1208==    still reachable: 441,573 bytes in 2,330 blocks
+==1208==         suppressed: 0 bytes in 0 blocks
+==1208== Rerun with --leak-check=full to see details of leaked memory
+==1208== 
+==1208== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 33 from 8)
+==1208== 
+==1208== 1 errors in context 1 of 1:
+==1208== Source and destination overlap in memcpy(0xbefe7f40, 0xbefe7f40, 128)
+==1208==    at 0x4028085: memcpy (mc_replace_strmem.c:482)
+==1208==    by 0x8176DDD: MPIR_Localcopy (in /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos)
+==1208==    by 0x8175228: MPIR_Allgather (in /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos)
+==1208==    by 0x81761CA: PMPI_Allgather (in /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos)
+==1208==    by 0x815854C: initNode(int*, char***) (node.cpp:148)
+==1208==    by 0x8159A41: Communicator::Communicator(int*, char***) (comm.cpp:59)
+==1208==    by 0x815BB3F: initRMC(int&, char**&) (rmc.cpp:67)
+==1208==    by 0x8155566: peo::init(int&, char**&) (in /home/mustapha/framework/dae/descarwin/trunk/dae/daePeos)
+==1208==    by 0x80D8789: main (daePeos.cpp:847)
+==1208== 
+--1208-- 
+--1208-- used_suppression:     33 Debian libc6 (2.9.x) stripped dynamic linker
+==1208== 
+==1208== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 33 from 8)

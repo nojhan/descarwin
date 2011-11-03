@@ -1,0 +1,62 @@
+//
+// C++ Interface: packUnpackeoScalarFitness
+//
+// Description: 
+//
+//
+// Author:  <>, (C) 2011
+//
+// Copyright: See COPYING file that comes with this distribution
+//
+//
+
+
+
+#include <core/messaging.h>
+
+template <class ScalarType >
+void pack( const  eoScalarFitness  < class ScalarType, std::less<ScalarType> >   & __fit ) {
+
+	ScalarType  value  = __fit;  // pack the scalar type of the fitness ( see  operator ScalarType () )
+	
+	pack( value ); 
+	
+	}
+	
+	
+	
+	
+template <class ScalarType >
+void pack( const  eoScalarFitness  <class ScalarType, std::greater<ScalarType> >   & __fit ) {
+
+	ScalarType  value  = __fit;
+	
+	pack( value ); 
+	
+	}
+	
+	
+template <class ScalarType >
+void unpack(  eoScalarFitness  <class ScalarType, std::less<ScalarType> > & __fit ) {
+
+	ScalarType  value ;
+	
+	unpack( value ); 
+	
+	}
+	
+	
+	
+		
+template <class ScalarType >
+void unpack(  eoScalarFitness  <class ScalarType, std::greater<ScalarType> > & __fit ) {
+
+	ScalarType  value ;
+	
+	unpack( value ); 
+	
+	}
+	
+	
+	
+	

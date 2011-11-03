@@ -1,0 +1,6 @@
+mpiexec -n 4 ./daePeos @param_file  -D=../openstacks-strips/p01-domain.pddl -I=../openstacks-strips/p01.pddl 
+## For debuging 
+mpirun -n 4 xterm -e gdb ./daePeos
+../../../../paradiseo-1.2.1/mpich2/bin/mpiexec -n 4 xterm -e gdb ./daePeos
+../../../../paradiseo-1.2.1/mpich2/bin/mpiexec -gdb -n 4 ./daePeos
+mpiexec -n 4 valgrind -v --log-file=valgrindLog --leak-check=full --show-reachable=yes   ./daePeos @para_param

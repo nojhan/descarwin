@@ -98,7 +98,7 @@ public:
 	return out;
     }
 
-	 std::string & plan_rep(){
+      std::string & plan_rep(){
 
 		return _plan_rep ;
 	}

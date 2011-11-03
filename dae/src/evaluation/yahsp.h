@@ -48,18 +48,25 @@ public:
     virtual void step_recorder_fail() {}
 
 public:
-    void call( daex::Decomposition & decompo ); 
+    void  call( daex::Decomposition & decompo ); 
     
+    void post_call( daex::Decomposition & decompo ) ;
+    
+     void pre_call( daex::Decomposition & decompo ) ;   
+     
+     void operator() ( daex::Decomposition & decompo ) ;
+     
+
 protected:
 
     unsigned int solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes );
 
-    void compress( daex::Decomposition & decompo );
+     void compress( daex::Decomposition & decompo );
 
 
     //! Free all necessary pointers to global variables
     // that have been used during call
-    void free_yahsp_structures();
+      void free_yahsp_structures();
 
     // VV : moved to Decomposition
     //! État à chaque itération

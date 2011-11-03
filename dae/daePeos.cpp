@@ -120,6 +120,7 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start, int run )
 int main ( int argc, char* argv[] )
 {
 
+	
     // WALLOCK TIME COUNTER
     time_t time_start = std::time(NULL);
 
@@ -347,18 +348,17 @@ int main ( int argc, char* argv[] )
     bool weakElitism = parser.createParam(true, "weakElitism", "Weak Elitism in replacement", '\0', "Evolution Engine").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "weakElitism" << weakElitism << std::endl;
     
-    // MODIFS MS END
-    eoValueParam <std :: string> schema_param ("schema.xml", "schema", "ParallelSchema");
 
-    parser.processParam (schema_param);
+  // MODIFS MS END
+    eoValueParam <std :: string> schema_param ("schema.xml", "schema", "ParallelSchema");
+ 
+     parser.processParam (schema_param);
 
 //  eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "schema_param" << schema_param << std::endl;
-    
-    eoValueParam <std :: string> debug_param ("false", "debug", "?");
-
+     
+     eoValueParam <std :: string> debug_param ("false", "debug", "?");
+ 
     parser.processParam (debug_param);
-    
-    
     make_help( parser );
 
     /***********
@@ -385,7 +385,7 @@ int main ( int argc, char* argv[] )
     /******************
      * INITIALIZATION *
      ******************/
-
+    peo :: init( argc, argv );
     // l'initialisation se fait en fonction de la liste des dates au plus tot possibles (start time set)
     // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
     daex::Init init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
@@ -441,7 +441,7 @@ int main ( int argc, char* argv[] )
             daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
 
 // in non multi-threaded version, use the plan dumper
-//#ifndef SINGLE_EVAL_ITER_DUMP
+ //#ifndef SINGLE_EVAL_ITER_DUMP
                 daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 
 // if we do not want MT, but we want debug, add more eval wrappers
@@ -456,9 +456,9 @@ int main ( int argc, char* argv[] )
 #endif
 
 // if we want to compile a multi-threaded version with OpenMP, we only want the basic evaluator, not the other wrappers, even the one that dump plans
-//#else // ifdef SINGLE_EVAL_ITER_DUMP
-//                eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
-//#endif
+//#else   //ifdef SINGLE_EVAL_ITER_DUMP
+ //               eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+// #endif
             eval_y( pop, pop );
 
 #ifndef NDEBUG
@@ -541,7 +541,7 @@ int main ( int argc, char* argv[] )
     
     
 
-//#ifndef SINGLE_EVAL_ITER_DUMP
+// #ifndef SINGLE_EVAL_ITER_DUMP
     // dump the best solution found so far in a file
     daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 
@@ -550,12 +550,12 @@ int main ( int argc, char* argv[] )
     eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
     eval_counter.value( eval_count );
 #endif
-//#endif
+// #endif
 
     // if we do not want to add a time limit, do not add an EvalTime
-//#ifdef SINGLE_EVAL_ITER_DUMP
-//        p_eval = & eval_yahsp;
-//#else // ifndef SINGLE_EVAL_ITER_DUMP
+// #ifdef SINGLE_EVAL_ITER_DUMP
+ //       p_eval = & eval_yahsp;
+// #else // ifndef SINGLE_EVAL_ITER_DUMP
         if( max_seconds == 0 ) {
 #ifndef NDEBUG
         p_eval = & eval_counter;
@@ -574,7 +574,7 @@ int main ( int argc, char* argv[] )
 #endif
         p_eval = p_eval_maxtime;
     }
-//#endif // SINGLE_EVAL_ITER_DUMP
+ //#endif // SINGLE_EVAL_ITER_DUMP
 
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
@@ -819,44 +819,93 @@ int main ( int argc, char* argv[] )
       }
 
     // ALGORITHM
-    eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, (*pt_replace), offsprings );
+    
+   //peoEvalFunc<daex::Decomposition, eoMinimizingDualFitness> eval(eval_yahsp);
+    
+   
+// #ifndef NDEBUG
+//     eo::log << eo::progress << "OK" << std::endl;
+//     eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
+//     eo::log.flush();
+//     eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
+// #endif
 
-#ifndef NDEBUG
-    eo::log << eo::progress << "OK" << std::endl;
-    eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
-    eo::log.flush();
-    eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
-#endif
+
+// eoPopLoopEval<daex::Decomposition> pop_eval( *p_eval );
+           
+          
+ // evaluate
+           // eoPopLoopEval<daex::Decomposition> pop_eval( *p_eval );
+           
+             //eoPopLoopEval<daex::Decomposition> eval( eval_yahsp); 
+             
+            //eval( pop, pop );
+ 
+	
+	//eoEvalFuncCounter <daex::Decomposition> count_eval (eval_yahsp);
+
+	//peoEvalFunc<daex::Decomposition>  plainEval(eval_yahsp); 
+	
+	peoPopEval<daex::Decomposition> pop_eval (eval_yahsp); //*
+	
+	eoEasyEA<daex::Decomposition> dae( checkpoint, pop_eval, breed, (*pt_replace) );
 
     // best decomposition of all the runs, in case of multi-start
     // start at the best element of the init
     daex::Decomposition best = pop.best_element();
     unsigned int run = 1;
     
-     peoPopEval<daex::Decomposition> pop_eval (eval_yahsp ); //*p_eval);//eval_yahsp );
+  
+  // try { 
+  
     
-    // PEO ADD
-  peo :: init( argc, argv );
-  peoWrapper parallelEA( dae, pop);
+     
+    
+//     
+//     // PEO ADD
+//  
+
+   peoWrapper parallelEA( dae, pop);
   pop_eval.setOwner(parallelEA);
   
-//   if (getNodeRank()==1)
-//     {
-//       for (int i=0;i<pop.size();i++)
-//         problem_eval(pop[i]);
-//       pop.sort();
-//       std::cout << "Initial population :\n" << pop << std::endl;
-//       // GENERAL
-//     }
-
+;
+  
+  if (getNodeRank()==1)
+     {
+ 	std::cout << ">>>>>>>>>>>>>>>>>>>>>>< Initial best :\n" <<  std::endl;
+ 	 print_results( pop, time_start, run );
+ 	   
+       //GENERAL
+     }
+// std::cout << "start run:\n" << std::endl;
   peo :: run();
-  peo :: finalize();
-
-    if (getNodeRank()==1)
-      {
- 	
-  	
-         pop.sort();
+ 
+ peo :: finalize();
+ 
+ 
+ if (getNodeRank()==1)
+     {
+ 	std::cout <<   ">>>>>>>>>>>>>>>>>>>>>>>>>>Final best :\n" <<  std::endl;
+ 	 print_results( pop, time_start, run );
+ 	   
+       //GENERAL
+     }
+ 
+ 
+// std::cout << "end finalize:\n" <<  std::endl;
+//    if (getNodeRank()==1)
+//      {
+//      daex::Decomposition best_of_run = pop.best_element();
+//      
+//      best_of_run.printOn(std::cout);
+//      }
+//  	
+//   	} catch( std::exception& e ) {
+//  
+//         eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
+//         eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
+//         }
+        // pop.sort();
       //   print_results( pop, time_start, run );
          
 //      std::cout << "Final population :\n" << pop << std::endl;
@@ -865,7 +914,7 @@ int main ( int argc, char* argv[] )
 //         //pop[0].printSolution();
 //        cout << pop[0] << endl;
 //        // GENERAL
-      }
+      //}
 
 
 
@@ -949,4 +998,3 @@ int main ( int argc, char* argv[] )
 
     return 0;
 }
-

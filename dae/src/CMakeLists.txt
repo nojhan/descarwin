@@ -42,7 +42,11 @@ SET (DAEX_SOURCES
   variation/addgoal.cpp
   variation/delgoal.cpp
   variation/delatom.cpp
-  pack/daePackUnpack.cpp ) 
+  pack/daePackUnpack.cpp 
+  pack/eoDummyEval.h
+  evaluation/peoDaeYahspEval.h 
+   pack/daeMessaging.h
+  pack/peoDaePopEval.h) 
 #  pack/eoDualFitness.h)
 
 
@@ -70,9 +74,9 @@ INCLUDE_DIRECTORIES(${PARADISEO_EO_SRC_DIR}/src
 		    ${DAEX_SRC_DIR}/src/core
  		    ${DAEX_SRC_DIR}/src/utils
 		    ${DAEX_SRC_DIR}/src/pack
-	  	    ${DAEX_SRC_DIR}/initialization
-    		    ${DAEX_SRC_DIR}/evaluation
- 		    ${DAEX_SRC_DIR}/variation		    
+	  	    ${DAEX_SRC_DIR}/src/initialization
+    		    ${DAEX_SRC_DIR}/src/evaluation
+ 		    ${DAEX_SRC_DIR}/src/variation		    
 		    ${DAE_SRC_DIR})
 #		    ${EO_SRC_DIR}/src
 ######################################################################################

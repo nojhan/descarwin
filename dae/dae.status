@@ -1,0 +1,58 @@
+
+######                 General    ######
+--help=0                                 # -h : Prints this message
+--stopOnUnknownParam=1                   # Stop if unkown param entered
+--seed=1318604045                        # -S : Random number seed
+
+######    Evaluation              ######
+--fitness-weight=10                      # -W : Unknown weight in the feasible and unfeasible fitness computation
+--fitness-penalty=2                      # -w : Penalty in the unfeasible fitnesses computation
+--bmax-init=10000                        # -B : Number of allowed expanded nodes for the initial computation of b_max
+# --bmax-quantile=0.5                      # -Q : Quantile to use for estimating b_max (in [0,1], 0.5=median)
+--bmax-fixed=0                           # -b : Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0
+--bmax-last-weight=3                     # -T : Weighting for the b_max used during the last search towards the end goal (must be strictly positive)
+
+######    Evolution Engine        ######
+--popSize=10                             # -P : Population Size
+
+######    Initialization          ######
+--lmax-initcoef=2                        # -C : l_max will be set to the size of the chrono partition * this coefficient
+--lmin=1                                 # -l : Minimum number of goals in a decomposition
+
+######    Logger                  ######
+--verbose=quiet                          # -v : Set the verbose level
+--print-verbose-levels=0                 # -l : Print verbose levels
+--output=                                # -o : Redirect a standard output to a file
+
+######    Misc                    ######
+--plan-file=plan.soln                    # -F : Plan file backup
+
+######    Persistence             ######
+--status=./dae.status                    # Status file
+
+######    Problem                 ######
+--domain=../openstacks-strips/p01-domain.pddl # -D : PDDL domain file REQUIRED 
+--instance=../openstacks-strips/p01.pddl # -I : PDDL instance file REQUIRED 
+# --sequential=0                           # -q : Is the problem a sequential one? REQUIRED 
+
+######    Selection               ######
+--tournament=5                           # -t : Size of the deterministic tournament for the selection
+--offsprings=700                         # -f : Number of offsprings to produces
+
+######    Stopping criterions     ######
+--max-seconds=0                          # -i : Maximum number of seconds for the whole search
+--gen-min=1                              # -n : Minimum number of iterations
+--gen-steady=1                           # -s : Number of iterations without improvement
+--gen-max=10                             # -x : Maximum number of iterations
+--runs-max=1                             # -r : Maximum number of runs, if x==0: no limit, if x>1: will do multi-start
+
+######    Variation               ######
+--radius=2                               # -R : Number of neighbour goals to consider for the addGoal mutation
+--proba-change=0.8                       # -c : Probability to change an atom for the changeAtom mutation
+--proba-del-atom=0.8                     # -d : Average probability to delete an atom for the delAtom mutation
+--w-delgoal=1                            # -a : Relative weight defining the probability to call the delGoal mutation
+--w-addgoal=3                            # -A : Relative weight defining the probability to call the addGoal mutation
+--w-delatom=1                            # -g : Relative weight defining the probability to call the delAtom mutation
+--w-addatom=1                            # -G : Relative weight defining the probability to call the addAtom mutation
+--proba-cross=0.2                        # -c : Probability to apply a cross-over
+--proba-mut=0.8                          # -m : Probability to apply one of the mutation

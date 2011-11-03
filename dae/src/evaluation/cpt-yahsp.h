@@ -50,29 +50,27 @@ public:
 
 public:
     unsigned int l_max() const { return _l_max; }
-    void l_max( unsigned int l ) { _l_max = l; }
+     void l_max( unsigned int l ) { _l_max = l; }
 
 public:
     //! Proxy EO avec appels aux timers
-    /*virtual*/ void operator() ( daex::Decomposition & decompo ) 
-    {
-        pre_call( decompo );
-        call( decompo );
-        post_call( decompo );
-    }
+    virtual void operator() ( daex::Decomposition & decompo )=0; 
+//      {
+//          pre_call( decompo );
+//          call( decompo );
+//          post_call( decompo );
+//      }
 
     //! Code de l'évaluation proprement dite de la décomposition
-    virtual void call( daex::Decomposition & decompo ) = 0;
+    virtual void call( daex::Decomposition & decompo )  = 0;
 
 protected:
 
-    /*virtual*/ void pre_call( daex::Decomposition & /*decompo*/ ) 
-    {}
+    virtual void pre_call( daex::Decomposition & decompo ) =0;  // /*decompo*/ ) 
+    
 
-    /*virtual*/ void post_call( daex::Decomposition & decompo )
-    {
-        decompo.plan().search_steps( decompo.get_number_evaluated_nodes() );
-    }
+    virtual  void post_call( daex::Decomposition & decompo ) =0;
+     
 
 protected:
 
@@ -81,19 +79,19 @@ protected:
      * dans CPT et dans YAHSP, du fait des structures de données différentes
      * utilisées pour maintenir l'état courant.
      */
-    unsigned int distance_to_goal_Hamming( BitArray state );
+     unsigned int distance_to_goal_Hamming( BitArray state );
 
     //! Fitness des décompositions dont on arrive à construire le plan
-    //! Note: the call to decomposition.fitness(...) automatically validate the fitness
-    double fitness_feasible( daex::Decomposition & decompo );
+     //! Note: the call to decomposition.fitness(...) automatically validate the fitness
+      double fitness_feasible( daex::Decomposition & decompo );
 
     //! Fitness des décompositions dont on arrive pas à construire le plan
     //! Note: the call to decomposition.fitness(...) automatically validate the fitness
-    double fitness_unfeasible( daex::Decomposition & decompo, BitArray state );
+      double fitness_unfeasible( daex::Decomposition & decompo, BitArray state );
 
-    double fitness_unfeasible_too_long( );
-    double fitness_unfeasible_intermediate( daex::Decomposition & decompo );
-    double fitness_unfeasible_final( daex::Decomposition & decompo );
+      double fitness_unfeasible_too_long( );
+      double fitness_unfeasible_intermediate( daex::Decomposition & decompo );
+      double fitness_unfeasible_final( daex::Decomposition & decompo );
 
 protected:
 

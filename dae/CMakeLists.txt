@@ -9,7 +9,7 @@ IF(COMMAND CMAKE_POLICY)
 ENDIF(COMMAND CMAKE_POLICY)
 
 # include the install configuration file where are defined the main variables
-INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake OPTIONAL)
+INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake)
 
 # define project name
 PROJECT(DAEX)
@@ -21,9 +21,9 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
  FIND_PACKAGE(OpenMP REQUIRED)
 
  IF(OPENMP_FOUND)
-   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
- ENDIF()
+  ENDIF()
 #ENDIF()
 
 
@@ -59,8 +59,8 @@ INCLUDE_DIRECTORIES(
   ${DAEX_SRC_DIR}/src/utils
   ${DAEX_SRC_DIR}/src/pack
   ${DAEX_SRC_DIR}/initialization
-  ${DAEX_SRC_DIR}/evaluation
-  ${DAEX_SRC_DIR}/variation	
+  ${DAEX_SRC_DIR}/src/evaluation
+  ${DAEX_SRC_DIR}/src/variation	
   ${PARADISEO_EO_SRC_DIR}/src 
   ${PARADISEO_MO_SRC_DIR}/src  
   ${PARADISEO_MOEO_SRC_DIR}/src 
@@ -117,9 +117,20 @@ LINK_LIBRARIES(eoutils gmp eo gcov gdsl)
 # global references that differ from the ones needed by dae-mt + yahsp.
 
 ADD_EXECUTABLE(dae dae.cpp)
-ADD_DEPENDENCIES(dae daex)
-TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library   cpt_yahsp_library-dae)
 
+
+ADD_EXECUTABLE(dae_base dae_base.cpp)
+
+
+ADD_DEPENDENCIES(dae daex)
+
+ADD_DEPENDENCIES(dae_base daex)
+
+TARGET_LINK_LIBRARIES(dae daex    cpt_yahsp_library-common-dae-noomp  cpt_yahsp_library-dae-noomp)
+ 
+
+TARGET_LINK_LIBRARIES(dae_base daex    cpt_yahsp_library-common-dae-noomp  cpt_yahsp_library-dae-noomp)
+#TARGET_LINK_LIBRARIES(dae daex    cpt_yahsp_library-common-dae-omp  cpt_yahsp_library-dae)
 #cpt_yahsp_library-common-dae-omp
 ######################################################################################
 ### 4) Define your target: just an executable here
@@ -130,39 +141,20 @@ TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library   cpt_yahsp_library-dae)
 #TARGET_LINK_LIBRARIES(daePeo daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae 
 			 # ${XML2_LIBS} peo rmc_mpi  eo  ga es eoutils peo)
 
-ADD_EXECUTABLE(daePeos daePeos.cpp) 
-ADD_DEPENDENCIES(daePeos daex peo rmc_mpi)
 
-TARGET_LINK_LIBRARIES(daePeos  daex cpt_yahsp_library-common-dae-omp  cpt_yahsp_library-dae xml2 peo rmc_mpi eo eoutils) 
-		#eo ga es ${XML2_LIBS}   # )
-	
+ADD_EXECUTABLE(daePeoParaEval daePeoParaEval.cpp) 
+ADD_DEPENDENCIES(daePeoParaEval daex peo rmc_mpi)
 
 
 
-#ADD_EXECUTABLE(dae-sm dae.cpp)
-#ADD_DEPENDENCIES(dae-sm daex)
-#TARGET_LINK_LIBRARIES(dae-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae-sm)
+ADD_EXECUTABLE(daePeoInsular daePeo_insular.cpp) 
+ADD_DEPENDENCIES(daePeoInsular daex peo rmc_mpi)
+ 
+TARGET_LINK_LIBRARIES(daePeoParaEval  daex cpt_yahsp_library-common-dae-noomp  cpt_yahsp_library-dae-noomp xml2 peo rmc_mpi eo eoutils) 
 
-#ADD_EXECUTABLE(dae-mt dae.cpp)
-#ADD_DEPENDENCIES(dae-mt daex-yahsp-mt)
-#TARGET_LINK_LIBRARIES(dae-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
+TARGET_LINK_LIBRARIES(daePeoInsular  daex cpt_yahsp_library-common-dae-noomp  cpt_yahsp_library-dae-noomp xml2 peo rmc_mpi eo eoutils) 
 
-#ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
-#ADD_DEPENDENCIES(test_chronopartition daex)
-#TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-
-#ADD_EXECUTABLE(test_b_max test_b_max.cpp)
-#ADD_DEPENDENCIES(test_b_max daex)
-#TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-
-#ADD_EXECUTABLE(test_stats test_stats.cpp)
-#ADD_DEPENDENCIES(test_stats daex)
-#TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-
-#ADD_EXECUTABLE(featureselector featureselector.cpp)
-#ADD_DEPENDENCIES(featureselector daex)
-#TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-
+ 
 
 
 #PEO Part

@@ -1,0 +1,67 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<!DOCTYPE KDevPrjSession>
+<KDevPrjSession>
+ <DocsAndViews NumberOfDocuments="13" >
+  <Doc0 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/daePeo_insular.cpp" >
+   <View0 Encoding="" line="792" Type="Source" />
+  </Doc0>
+  <Doc1 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/evaluation/yahsp.cpp" >
+   <View0 Encoding="" line="204" Type="Source" />
+  </Doc1>
+  <Doc2 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/dae_base.cpp" >
+   <View0 Encoding="" line="0" Type="Source" />
+  </Doc2>
+  <Doc3 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/daePeos_base.cpp" >
+   <View0 Encoding="" line="606" Type="Source" />
+  </Doc3>
+  <Doc4 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/pack/daeMessaging.h" >
+   <View0 Encoding="" line="129" Type="Source" />
+  </Doc4>
+  <Doc5 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/core/goal.h" >
+   <View0 Encoding="" line="13" Type="Source" />
+  </Doc5>
+  <Doc6 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/core/atom.h" >
+   <View0 Encoding="" line="35" Type="Source" />
+  </Doc6>
+  <Doc7 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/pack/daePackUnpack.cpp" >
+   <View0 Encoding="" line="113" Type="Source" />
+  </Doc7>
+  <Doc8 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/variation/addatom.h" >
+   <View0 Encoding="" line="59" Type="Source" />
+  </Doc8>
+  <Doc9 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/pack/daePackUnpack.h" >
+   <View0 Encoding="" line="0" Type="Source" />
+  </Doc9>
+  <Doc10 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/pack/packUnpackeoScalarFitness.h" >
+   <View0 Encoding="" line="0" Type="Source" />
+  </Doc10>
+  <Doc11 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/core/decomposition.cpp" >
+   <View0 Encoding="" line="0" Type="Source" />
+  </Doc11>
+  <Doc12 NumberOfViews="1" URL="file:///home/mustapha/framework/dae/descarwin/trunk/dae/src/core/decomposition.h" >
+   <View0 Encoding="" line="0" Type="Source" />
+  </Doc12>
+ </DocsAndViews>
+ <pluginList>
+  <kdevdebugger>
+   <breakpointList/>
+   <showInternalCommands value="0" />
+  </kdevdebugger>
+  <kdevastyle>
+   <Extensions ext="*.cpp *.h *.hpp,*.c *.h,*.cxx *.hxx,*.c++ *.h++,*.cc *.hh,*.C *.H,*.diff ,*.inl,*.java,*.moc,*.patch,*.tlh,*.xpm" />
+   <AStyle IndentPreprocessors="0" FillCount="4" PadParenthesesOut="0" IndentNamespaces="0" IndentLabels="0" Fill="Tabs" MaxStatement="40" Brackets="None" MinConditional="-1" IndentBrackets="0" PadParenthesesUn="0" BlockBreak="1" KeepStatements="0" KeepBlocks="0" BlockIfElse="0" IndentSwitches="0" PadOperators="0" FStyle="UserDefined" IndentCases="0" FillEmptyLines="0" BracketsCloseHeaders="0" BlockBreakAll="0" PadParenthesesIn="0" IndentClasses="0" IndentBlocks="0" FillForce="0" />
+  </kdevastyle>
+  <kdevbookmarks>
+   <bookmarks/>
+  </kdevbookmarks>
+  <kdevsubversion>
+   <subversion base="" />
+  </kdevsubversion>
+  <kdevvalgrind>
+   <executable path="" params="" />
+   <valgrind path="" params="" />
+   <calltree path="" params="" />
+   <kcachegrind path="" />
+  </kdevvalgrind>
+ </pluginList>
+</KDevPrjSession>

@@ -8,7 +8,7 @@ void bindDaeCpt( daex::pddlLoad & pddl )
 }
 
 //void daeCptEval::operator() ( daex::Decomposition & decompo ) 
-void daeCptEval::call( daex::Decomposition & decompo )
+virtual void daeCptEval::call( daex::Decomposition & decompo )
 {
     
     // COMMUN <
