@@ -1,6 +1,5 @@
 	
 #include "daePackUnpack.h"
-// std::vector< daex::Atom*> globalAtoms;
 
 using namespace daex; 
 
@@ -8,85 +7,136 @@ using namespace daex;
  	
 	void pack( daex::Decomposition  & _eo)
 		{	
+		
+				
 		  if ( _eo.invalid() ) 
-    			pack( (unsigned int)0 );
-		  else
-		    {
+    		  	pack( (unsigned int)0 );
+		    else
+		      {
 		      	pack( (unsigned int)1 );
-      			
-			  pack(_eo.fitness());
-		    }
+  
+ 		      pack(_eo.fitness().value());
+ 		       
+ 		      pack(_eo.fitness().is_feasible());
+ 
+         	   //  pack( _eo.fitness());
+// 		       
+		     //  std::cout <<"pack"<<_eo.fitness().value()<<_eo.fitness().is_feasible()<<std::endl;
+			
+		     }
 		 
    		unsigned len = _eo.size();
 
-		pack(len);
-	
+		pack(len); 
+ 
   		std::list<Goal>::iterator it;
 
-		for ( it=_eo.begin() ; it != _eo.end(); it++ )
+		for ( it=_eo.begin() ; it != _eo.end(); it++ ){
 		    
-    			pack (*it); ///pack each goal
-				
+    			pack (*it); ///pack each goal (liste de pointeur d'atomes)
+    				
+    		    		
+    		}
+    		
+    		// std::cout<<"packeo"<<_eo<<std::endl;
+ 
 		pack(_eo. plan());
-		
+ 	
 		pack(_eo.subplans());
-
+ 
 		pack(_eo. b_max());
-
+				 
 		pack(_eo.get_number_evaluated_goals());
-		
+		 
+		 		
 		pack(_eo.get_number_useful_goals());
-
+		
+		 
 		pack(_eo.get_number_evaluated_nodes());
  
 	 }
 
 	void unpack (daex::Decomposition  & _eo)
 	{
-
+						
 		unsigned valid, len, _b_max, _k, _u, _B; 
-
-		 eoMinimizingDualFitness fit;
-
-		unpack(valid);
 		
-  		if (! valid)
+ 
+		 unpack(valid);
+		
+  		 if (! valid) 
+ 
+      		 	 _eo.invalidate();
+ 
+  		 else
+    		 {
+    			 eoDualFitness<double, std::greater<double> > fit; 
+     			 
+    		//	 unpack(fit);
+ 
+  			double value ;
+  			 
+ 			bool is_feasible;
+  					
+ 			unpack(value);
+   			
+   			unpack(is_feasible);
+  			 
+   			 fit.setValue(value);
+ 		 
+ 			 fit.setFeasible(is_feasible);
+ 
+		 	 _eo.fitness (fit);
+			 
+			// std::cout <<"unpack"<<_eo.fitness().value()<<_eo.fitness().is_feasible()<<std::endl;
+			
+		 }
 
-    
-      			_eo.invalidate();
-    
-  		else
-    		{
-    			      			
-			  unpack (fit);
-      		
-			_eo.fitness (fit);
-     			
-		}
-
-  		unpack (len);
-
- 		_eo.clear();
-  
-   		//std::list<Goal>::iterator it;
-
-		daex::Goal _goal(0) ; ///voir le constructeur par défaut ?
-
+       		unpack (len);
+  		
+  		_eo.clear();
+  		
+  		 daex::Goal _goal(0);
+  		                       
 		for (unsigned i =0; i < len; i++){
 
-			unpack(_goal);
-		
+			unpack(_goal); ///attention liste de pointeurs
+				
 			_eo.push_back(_goal);
 		}
+		
+		// std::cout<<"unpackeo"<<_eo<<std::endl;
+		
+// 		std::list<Goal>::iterator it;
+// 		
+// 		for ( it=_eo.begin() ; it != _eo.end(); it++ ){
+// 		
+// 		  unpack(_goal);
+// 		
+// 		 *it= _goal ;
+// 		
 
-		Plan _plan_global;
-
-    
-    		std::vector< Plan > _plans_sub;
+		Plan _plan_global ;		
 		
 		unpack(_plan_global);
 		
-		unpack(_plans_sub);
+		_eo.plan_global(_plan_global); 
+		
+	 	//std::cout<<_eo.plan()<<std::endl;
+						
+		std::vector< Plan > _plans_sub  ;
+		           
+		unpack(_plans_sub); 
+		
+		_eo.subplans()=_plans_sub;
+		
+// 		for (size_t i= 0; i< _plans_sub.size(); i++)
+// 		
+// 			std::cout<<"sub_plan"<<_plans_sub[i]<<std::endl;
+// 		
+//  	for (size_t i= 0; i< _eo.subplans_size(); i++)
+//  		
+//  			std::cout<<"sub_plan"<<_eo.subplans()[i]<<std::endl;
 
 		unpack(_b_max);
 		
@@ -109,11 +159,13 @@ using namespace daex;
 		_eo.reset_number_evaluated_nodes();
 
 		_eo.incr_number_evaluated_nodes(_B);	
+		
+		
 	}
 
 
 
-	void pack(    Plan   &  _plan_global )
+	void pack(    daex::Plan   &  _plan_global )
 	{
 
 		pack( _plan_global.makespan());
@@ -122,14 +174,18 @@ using namespace daex;
 
 		pack(_plan_global.isValid());///il falait un accesseur sur _is_valid
 
-// 		unsigned len = _plan_global.plan_rep().size();
-// 
-// 		for ( unsigned i =0; i < len ; i++)
-// 			pack(_plan_global.plan_rep()[i]);
+   	        unsigned len = _plan_global.plan_rep().size();
+   	        
+   	        pack(len);
+ 
+ 		for ( unsigned i =0; i < len ; i++)
+ 		
+ 			pack(_plan_global.plan_rep()[i]);
+
 			
 	}
 
-	void unpack(  Plan &  _plan_global )
+	void unpack(  daex::Plan &  _plan_global )
 	{
 
 		TimeVal _makespan;
@@ -153,15 +209,20 @@ using namespace daex;
 		unsigned len;
 
 		unpack(len);
+		
+		_plan_global.plan_rep().clear();
 
 		_plan_global.plan_rep().resize(len);
 
 		char ch;
 
 		for ( unsigned i =0; i < len ; i++){
+		
 			unpack(ch);
+			
 			_plan_global.plan_rep()[i]= ch;
-			}
+		}
+			
 	}
 
 
@@ -174,6 +235,7 @@ using namespace daex;
 		for(size_t i =0; i<len; i++)
 
 			pack(_plans_sub[i]);
+			
 
 	}
 	
@@ -183,95 +245,103 @@ using namespace daex;
 		unsigned len;
 
 		unpack(len);
+		
+		_plans_sub.clear();
 
 		_plans_sub.resize(len);
+		
+		
 
 		for( size_t i =0; i < len ; i++)
 
 			unpack(_plans_sub[i]);
+			
 	
 	}
 
-	void pack(    Goal  & _goal){
+	void pack(    daex::Goal  & _goal){
 
-		 
+		pack(_goal.earliest_start_time());
+		
 		unsigned len = _goal.size();
 
 		pack(len);
 
 		std::list<Atom*>::iterator it;   
 
-		for ( it=_goal.begin() ; it != _goal.end(); it++ )
+		for ( it=_goal.begin() ; it != _goal.end(); it++ ) {
 		    
-    			//pack (*it); ///pack the atom not the pointer
-    			pack( (*it) ->  fluentIndex());
+    			pack( (*it) ->  fluentIndex());  
+    			
+    			//pack(*(*it));
+    			
+    			//std::cout << "pack "<<(*(*it))<<std::endl;
+    			
+    			}
+ 		
 
-
-		// pack(_goal.earliest_start_time());
 
 	}
 
 
-	void unpack(Goal &_goal){ // il falait voir comment faire pour la structure goal etant donné qu'elle est une structure list de pointeurs d'atomes !!!! ( à revoir)
-
+	void unpack(daex::Goal &_goal){ 
 		 
-		//std::list<Atom*>::iterator it;   
+		TimeVal _ptime; 
 
-		//Atom * patom = new Atom (0,0);
+		unpack(_ptime);
 
-		Atom  _atom(0,0);  ///constructeur par défaut ?
-				
+		_goal.earliest_start_time(_ptime);
+  		 			
 		unsigned len;
 
 		unpack(len);
 
-// 		for (std::list<Atom*> patom = _goal.begin(); patom != _goal.end();  patom++)
-//   		
-// 			delete *patom;
-
 		_goal.clear();
-		
+				
 		unsigned index_atom;
-
+		
 		for ( size_t i = 0; i < len ; i++) {
 
 			unpack(index_atom);
 			
 			_goal.push_back(daex::globalAtoms[index_atom]); 
-
-// 			 unpack (*patom);
-		
-// 			_goal.push_back(new 
-// 			Atom(patom -> earliest_start_time(),patom -> fluentIndex())); 
-
-
-			//_goal.push_back(new 
-			//Atom(_atom.earliest_start_time(),_atom.fluentIndex()))
+ 			
+			}						
 			
-		}
-
-		//delete patom;
-
-/*
-		TimeVal d;  /// c quoi ce type ?
-
-		unpack(d);
-
-		_goal.earliest_start_time(d);*/
-
 	}
-	
+			
+			
+		 //_goal.resize(len);	
+ 
+		 //Atom  _atom(0,0); 
+		
+		 //std::list<Atom*>::iterator it;   
+		 
+		 //for ( it=_goal.begin() ; it != _goal.end(); it++ ) {
+		
+ 
+ 			// unpack (_atom);
+ 	
+		//	*it =  new Atom (_atom.earliest_start_time(),_atom.fluentIndex());
+					//_goal.push_back(new 
+		//Atom(_atom.earliest_start_time(),_atom.fluentIndex())) ///other possibility
 
-	void pack(    Atom  & _atom){
+			 
+		//}	 
+
+		
+
+	void pack(    daex::Atom  & _atom){
 
 		pack(_atom.earliest_start_time());
 
 		pack(_atom.fluentIndex());  
-
+		
+		
 	}
 
 
-	void unpack(Atom & _atom){
+	void unpack(daex::Atom & _atom){
 
 		
 		TimeVal  _earliest_start_time;
@@ -285,19 +355,20 @@ using namespace daex;
 		unpack(_fluent);
 
 		_atom.fluentIndex(_fluent);
-
+	
+	
 
 	}
 
-/*
 
-	void pack (  const eoMinimizingDualFitness  &  fit)  {   //eoMinimizingDualFitness
+/*
+	void pack (  const eoMinimizingDualFitness  &  fit)  {    
 
 		pack(fit.value());
 
 		pack(fit.is_feasible());
 
-	};
+	}
 
 
 
@@ -319,9 +390,9 @@ using namespace daex;
 	}	
 
 
- 
+ */
 	
-	void pack (   std::pair<double,bool> & v) {
+	void pack ( const   std::pair<double,bool> & v) {
 
 		 
  		pack(v.first);
@@ -341,50 +412,37 @@ using namespace daex;
 		unpack(v.second);
 
 
-	}*/
+	}
+/*
+	void pack( const  eoDualFitness<double, std::greater<double> >  &  fit)  {
 
-// 	void pack(  eoMinimizingDualFitness &   fit)  {
-// 
-// 		pack(fit.value());
-// 
-// 		pack(fit.is_feasible());
-// 
-// 	}
-// 
-// 	void unpack(eoMinimizingDualFitness  & fito) { 
-// 
-// 		
-// 
-// 		double value ;
-// 
-// 		bool is_feasible;
-// 
-// 		unpack(value);
-// 
-// 		unpack(is_feasible);
-// 
-// 		//eoMinimizingDualFitness  * pfitness  = new eoMinimizingDualFitness (value,is_feasible); 
-// 
-// 		// eoMinimizingDualFitness fitness (value,is_feasible); 
-// 
-// 		//std::pair < double, bool> fitness;
-// 
-// 
-//                 //fitness = std::make_pair (value,is_feasible);
-// 
-// 		//eoDualFitness< double, std::less<double> > fitness (value,is_feasible);
-// 
-// 		
-// 		fito.setValue(value);
-// 
-// 		fito.setFeasible(is_feasible);
-// 
-// 		//fit = * pfitness;
-// 
-// 	//delete pfitness;
-// 
-// 	}
+		pack(fit.value()); 
+		
+		 std::cout<<"packfit"<<fit.value()<<std::endl;
+		
 
+		pack(fit.is_feasible());
+		
+		 std::cout<<"packfit"<<fit.is_feasible()<<std::endl;
 
+	}
 
+	void unpack(eoDualFitness<double, std::greater<double> >  & fit) { 
+ 
+		double value ;
 
+		bool is_feasible;
+
+		unpack(value);
+		
+		unpack(is_feasible);
+			 		
+		fit.setValue(value);
+		
+		//std::cout<<"packfit"<<fit.value()<<std::endl;
+ 
+ 		fit.setFeasible(is_feasible);
+ 		
+ 		 //std::cout<<"packfit"<<fit.is_feasible()<<std::endl;
+}*/
+ 

@@ -1,4 +1,4 @@
-# Install script for directory: /home/mustapha/framework/dae/descarwin/trunk/dae/src/pack
+# Install script for directory: /home/mustapha/framework/DescarwinCommit/descarwin/branches/dae/src/pack
 
 # Set the install prefix
 IF(NOT DEFINED CMAKE_INSTALL_PREFIX)
