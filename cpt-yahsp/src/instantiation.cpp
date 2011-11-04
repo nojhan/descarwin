@@ -318,7 +318,7 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
       mpq_init(ac_values[i * 2 + 1]);
       if (!evaluate_expression(domain, ac_values[i * 2], ac->min, params) ||
 	  !evaluate_expression(domain, ac_values[i * 2 + 1], ac->max, params) ||
-	  (ac->inter != NULL && (ac_inter[i] = evaluate_function(domain, ac->inter->litteral, params))))
+	  (ac->inter != NULL && !(ac_inter[i] = evaluate_function(domain, ac->inter->litteral, params))))
 	{
 	  while (i >= 0) {
 	    mpq_clear(ac_values[i * 2]);
