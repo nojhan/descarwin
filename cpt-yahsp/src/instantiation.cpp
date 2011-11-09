@@ -275,6 +275,7 @@ static bool compute_resource(PDDLDomain *domain, PDDLLitteral *litteral, Action 
   case DEC_MOD: rl->decreased = qty; break;
   case EQ_MOD:
   case ASS_MOD: rl->assigned = qty; break;
+  default: break;
   }
   mpq_clear(val_tmp);
   return true;
@@ -309,6 +310,27 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
       mpq_init(dur_tmp2);
       if (!evaluate_expression(domain, dur_tmp2, ope->real_duration, params)) { mpq_clear(dur_tmp); mpq_clear(dur_tmp2); return; }
     }
+
+    mpq_t ac_values[ope->ac_constraints_nb * 2];
+    PDDLExpression *ac_inter[ope->ac_constraints_nb];
+    FORi(ac, i, ope->ac_constraints) {
+      mpq_init(ac_values[i * 2]);
+      mpq_init(ac_values[i * 2 + 1]);
+      if (!evaluate_expression(domain, ac_values[i * 2], ac->min, params) ||
+	  !evaluate_expression(domain, ac_values[i * 2 + 1], ac->max, params) ||
+	  (ac->inter != NULL && !(ac_inter[i] = evaluate_function(domain, ac->inter->litteral, params))))
+	{
+	  while (i >= 0) {
+	    mpq_clear(ac_values[i * 2]);
+	    mpq_clear(ac_values[i * 2 + 1]);
+	    i--;
+	  }
+	  mpq_clear(dur_tmp);
+	  if (ope->real_duration) 
+	    mpq_clear(dur_tmp2);
+	  return;
+	}
+    } EFOR;
 
     Action *action = cpt_calloc(action, 1);
     action->ope = ope;
@@ -373,33 +395,35 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
 	error(parser, "Activity constraint %s of action %s unsupported by action effects", 
 	      fluent_name(aci->fluent), strdup(action_name(action)));
       good:
-	mpq_init(aci->min.q);
-	evaluate_expression(domain, aci->min.q, ac->min, params);
+	mpq_set(aci->min.q, ac_values[i * 2]);
+	mpq_clear(ac_values[i * 2]);
+	mpq_set(aci->max.q, ac_values[i * 2 + 1]);
+	mpq_clear(ac_values[i * 2 + 1]);
+	// mpq_init(aci->min.q);
+	// evaluate_expression(domain, aci->min.q, ac->min, params);
+	// mpq_init(aci->max.q);
+	// evaluate_expression(domain, aci->max.q, ac->max, params);
 	gdsl_queue_insert(domain->durations_queue, &aci->min);
-	mpq_init(aci->max.q);
-	evaluate_expression(domain, aci->max.q, ac->max, params);
 	gdsl_queue_insert(domain->durations_queue, &aci->max);
 	if (ac->inter) {
-	  PDDLExpression *expr = evaluate_function(domain, ac->inter->litteral, params);
-	  if (expr) { // sinon : il faudrait détruire l'action !!!!!
-	    if (expr->time == NULL) {
-	      cpt_malloc(expr->time, (expr->time_nb = expr->terms_nb / 2));
-	      cpt_malloc(expr->dur, (expr->dur_nb = expr->terms_nb / 2));
-	      FORi(term, i, expr->terms) {
-		TimeStruct *ts = &((i % 2 == 0 ? expr->time : expr->dur)[i / 2]);
-		mpq_init(ts->q);
-		evaluate_expression(domain, ts->q, term, params);
-		gdsl_queue_insert(domain->durations_queue, ts);
-	      } EFOR;
-	    }
-	    aci->time = expr->time;
-	    aci->time_nb = expr->time_nb;
-	    aci->dur = expr->dur;
-	    aci->dur_nb = expr->dur_nb;
-#ifdef RATP
-	    if (opt.ratp) expr->time = NULL;
-#endif
+	  PDDLExpression *expr = ac_inter[i];
+	  if (expr->time == NULL) {
+	    cpt_malloc(expr->time, (expr->time_nb = expr->terms_nb / 2));
+	    cpt_malloc(expr->dur, (expr->dur_nb = expr->terms_nb / 2));
+	    FORi(term, i, expr->terms) {
+	      TimeStruct *ts = &((i % 2 == 0 ? expr->time : expr->dur)[i / 2]);
+	      mpq_init(ts->q);
+	      evaluate_expression(domain, ts->q, term, params);
+	      gdsl_queue_insert(domain->durations_queue, ts);
+	    } EFOR;
 	  }
+	  aci->time = expr->time;
+	  aci->time_nb = expr->time_nb;
+	  aci->dur = expr->dur;
+	  aci->dur_nb = expr->dur_nb;
+#ifdef RATP
+	  if (opt.ratp) expr->time = NULL;
+#endif
 	}
       } EFOR;
     }
@@ -442,6 +466,7 @@ static void compute_nb_resources(PDDLOperator *ope, PDDLLitteral *litteral)
   case DEC_MOD: ope->decreased_nb++; break;
   case EQ_MOD:
   case ASS_MOD: ope->assigned_nb++; break;
+  default: break;
   }
 }
 
