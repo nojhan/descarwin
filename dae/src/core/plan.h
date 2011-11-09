@@ -55,12 +55,6 @@ public:
 
     TimeVal makespan() const { return _makespan; }
 
-    void makespan(TimeVal makespan){ _makespan = makespan;} // mutateur nouvellement introduit
-
-    bool isValid(){return _is_valid;}
-
-    void isValid(bool is_valid){_is_valid = is_valid;}
-
     //! Print a SolutionPlan in a string using YAHSP's print_plan_ipc function
     std::string plan_to_str( SolutionPlan * p_plan )
     {        
@@ -97,12 +91,6 @@ public:
         out << plan._plan_rep;
 	return out;
     }
-
-      std::string & plan_rep(){
-
-		return _plan_rep ;
-	}
-
 };
 
 } // namespace daex

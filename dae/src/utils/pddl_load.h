@@ -43,7 +43,6 @@
 namespace daex
 {
 
-extern  std::vector< daex::Atom*> globalAtoms;
 
 //! Dictionary associating existing earliest start dates with their corresponding atoms
 /** Note: std::map garanty that keys remains ordered according to their value (GNU implementation use a red-black tree).

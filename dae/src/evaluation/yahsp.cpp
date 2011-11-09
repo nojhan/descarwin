@@ -51,25 +51,6 @@ daeYahspEval::~daeYahspEval()
     //free( _intermediate_goal_state );
 }
 
-
-
-  void daeYahspEval::operator() ( daex::Decomposition & decompo ) 
-    {
-        pre_call( decompo );
-        call( decompo );
-        post_call( decompo );
-    }
-    
-    
-    void daeYahspEval::post_call( daex::Decomposition & decompo )  {
-        decompo.plan().search_steps( decompo.get_number_evaluated_nodes() );
-        
-        }
-    
-    
-   void daeYahspEval::pre_call( daex::Decomposition &) {}  
-    
-    
 /**************************************************************************************************************
  * SOLVE NEXT
  **************************************************************************************************************/
@@ -133,7 +114,7 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
 /**************************************************************************************************************
  * COMPRESS
  **************************************************************************************************************/
- void daeYahspEval::compress( daex::Decomposition & decompo )
+void daeYahspEval::compress( daex::Decomposition & decompo )
 {
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "\t\tcompression...";
@@ -162,7 +143,7 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
 /**************************************************************************************************************
  * CALL
  **************************************************************************************************************/
-  void daeYahspEval::call( daex::Decomposition & decompo ) 
+void daeYahspEval::call( daex::Decomposition & decompo ) 
 {
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "decompo.size=" << decompo.size() << std::endl;
@@ -288,7 +269,7 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
 /**************************************************************************************************************
  * FREE YAHSP STRUCTURES
  **************************************************************************************************************/
-  void daeYahspEval::free_yahsp_structures()
+void daeYahspEval::free_yahsp_structures()
 {
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "\t\tfree plans...";
@@ -315,7 +296,7 @@ unsigned int daeYahspEval::solve_next( daex::Decomposition & decompo, Fluent** n
  * YAHSP EVAL INIT
  **************************************************************************************************************/
 
-  void daeYahspEvalInit::call( daex::Decomposition & decompo ) 
+void daeYahspEvalInit::call( daex::Decomposition & decompo ) 
 {
 #ifndef NDEBUG
     eo::log << eo::logging << std::endl << "init decompo nodes nb: ";

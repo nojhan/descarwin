@@ -38,7 +38,8 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray );
 //! Évaluateur principal, à utiliser pour les itérations normales
 class daeYahspEval : public daeCptYahspEval
 {
- public: daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e6 );
+ public: 
+     daeYahspEval( unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e6 );
 
 
     virtual ~daeYahspEval();
@@ -48,25 +49,18 @@ public:
     virtual void step_recorder_fail() {}
 
 public:
-    void  call( daex::Decomposition & decompo ); 
+    void call( daex::Decomposition & decompo ); 
     
-    void post_call( daex::Decomposition & decompo ) ;
-    
-     void pre_call( daex::Decomposition & decompo ) ;   
-     
-     void operator() ( daex::Decomposition & decompo ) ;
-     
-
 protected:
 
-    unsigned int solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes );
+    virtual unsigned int solve_next( daex::Decomposition & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes );
 
-     void compress( daex::Decomposition & decompo );
+    void compress( daex::Decomposition & decompo );
 
 
     //! Free all necessary pointers to global variables
     // that have been used during call
-      void free_yahsp_structures();
+    void free_yahsp_structures();
 
     // VV : moved to Decomposition
     //! État à chaque itération
@@ -101,8 +95,8 @@ public:
     void call( daex::Decomposition & decompo );
 
     //! Récupère le nombre de noeuds utilisés par une résolution avec yahsp
-    void step_recorder();
-    void step_recorder_fail();
+    virtual void step_recorder();
+    virtual void step_recorder_fail();
 
     //! Le b_max est calculé comme la médiane du nombre total de noeuds parcourus sur l'ensemble de tous les appels à yahsp 
     //lors d'une première phase d'initialisation
