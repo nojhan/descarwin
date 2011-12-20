@@ -119,7 +119,7 @@ SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
     }
   } EFOR;
   if (opt.sequential && pddl_domain->action_costs) plan->makespan = total_plan_cost;
-  //plan->makespan = first_start(end_action) - (opt.pddl21 ? pddl_domain->precision.t : 0);
+  else plan->makespan = first_start(end_action) - (opt.pddl21 ? pddl_domain->precision.t : 0);
   vector_sort(plan->steps, precedes_in_plan);
 
   FOR(s, plan->steps) { 

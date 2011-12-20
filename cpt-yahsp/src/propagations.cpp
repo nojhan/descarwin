@@ -121,7 +121,7 @@ static void synchronize_causal(Causal *c)
     update_inf_c(c, min_prod_init);
     update_sup_c(c, max_prod_init);
     update_sup_a(c->consumer, max_cons_init);
-    if (nb == 1) {
+    if (nb == 1 && c->required) {
       update_inf_a(prod, first_start(c));
       update_sup_a(prod, last_start(c));
     }
