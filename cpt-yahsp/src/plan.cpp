@@ -47,6 +47,10 @@ void print_plan(FILE *out, SolutionPlan *plan, bool print_synchro)
       print_time(out, opt.pddl21 ? step->action->rdur.t : duration(step->action));
       fprintf(out, "]");
     }
+#ifdef DAE
+    if (pddl_domain->durative_actions && pddl_domain->action_costs)
+      fprintf(out, " [%" TIMEP "]", step->action->cost);
+#endif
 #ifdef RESOURCES
     if (step->action->synchro) fprintf(out, " [%" TIMEP ",%" TIMEP "]", step->min_level, step->max_level);
 #endif
@@ -70,10 +74,13 @@ void print_plan_ipc(FILE *out, SolutionPlan *plan, double total_time)
   fprintf(out, "; Time %.3f\n", total_time);
   fprintf(out, "; Length %lu\n", plan->length);
   if (pddl_domain->action_costs) {
-    fprintf(out, "\n; TotalCost ");
+    fprintf(out, "; TotalCost ");
 #ifdef DAE
-    if (pddl_domain->action_costs && pddl_domain->durative_actions)
-      print_time(out, plan->cost);
+    if (pddl_domain->action_costs && pddl_domain->durative_actions) {
+      fprintf(out, "%" TIMEP, plan->cost_add);
+      fprintf(out, "\n; MaxCost ");
+      fprintf(out, "%" TIMEP, plan->cost_max);
+    }
     else
       print_time(out, plan->makespan);
 #else

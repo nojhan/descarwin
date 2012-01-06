@@ -48,8 +48,8 @@ struct SolutionPlan {
   ulong length;
   TimeVal makespan;
 #ifdef DAE
-  TimeVal cost;
-  TimeVal risk;
+  TimeVal cost_add;
+  TimeVal cost_max;
 #endif
   double search_time;
   double total_time;
