@@ -28,7 +28,7 @@
 
 (:action move-up-slow
   :parameters (?lift - slow-elevator ?f1 - count ?f2 - count )
-  :duration (= ?duration (travel-slow-temp ?f2 ?f1))
+  :duration (= ?duration (travel-slow-temp ?f1 ?f2))
   :precondition (and (lift-at ?lift ?f1) (above ?f1 ?f2 ) (reachable-floor ?lift ?f2) )
   :effect (and (lift-at ?lift ?f2) (not (lift-at ?lift ?f1)) (increase (total-cost) (travel-slow-cost ?f1 ?f2))))
 
