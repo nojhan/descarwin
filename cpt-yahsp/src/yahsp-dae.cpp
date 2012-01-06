@@ -7,17 +7,19 @@
  */
 
 #include "cpt.h"
+#include "options.h"
 #include "trace.h"
 #include "globs.h"
 #include "yahsp.h"
 #include "yahsp-dae.h"
+#include "yahsp-common.h"
 
 #define end_action (&yend_action)
 
 typedef struct Heuristic Heuristic;
 
 struct Heuristic {
-  unsigned long key;
+  ulong key;
   BitArray state;
   TimeVal *inits;
 };
@@ -69,7 +71,7 @@ void heuristic_insert(Node *node, TimeVal *finit)
 #endif
 }
 
-bool heuristic_search(Node *node, TimeVal *ainit, TimeVal *finit, Action **applicable, long *applicable_nb)
+bool heuristic_search(Node *node, TimeVal *finit)
 {
   Heuristic tmp;
   tmp.key = node->key;
@@ -83,13 +85,6 @@ bool heuristic_search(Node *node, TimeVal *ainit, TimeVal *finit, Action **appli
 #endif
   if (h == NULL) return false;
   memcpy(finit, h->inits, fluents_nb * sizeof(TimeVal));
-  set_ainit(end_action, COST(end_action));
-  if (get_ainit(end_action) != MAXTIME) {
-    FORMIN(a, actions, 2) {
-      set_ainit(a, COST(a));
-      if (get_ainit(a) == 0) applicable[(*applicable_nb)++] = a;
-    } EFOR;
-  }
   return true;
 }
 
@@ -97,3 +92,4 @@ void heuristic_flush()
 {
   gdsl_rbtree_flush(heuristics);
 }
+

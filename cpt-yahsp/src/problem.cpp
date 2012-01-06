@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "trace.h"
 #include "structs.h"
 #include "instantiation.h"
@@ -40,7 +41,7 @@
 /* 	if (i == 0) { if (tab) cpt_free(tab); tab = NULL; } else if (tab##_nb != i) { cpt_realloc(tab, i); tab##_nb = i; } ) */
 
 #define keep_reachable_tab(tab) \
-  NEST( long i = 0; if (tab) FOR(x, tab) { if (reachable[x->id]) tab[i++] = x; } EFOR; \
+  NEST( size_t i = 0; if (tab) FOR(x, tab) { if (reachable[x->id]) tab[i++] = x; } EFOR; \
 	if (i == 0) { if (tab) cpt_free(tab); } else if (tab##_nb != i) cpt_realloc(tab, i); tab##_nb = i; )
 
 
@@ -103,7 +104,7 @@ char *fluent_name(Fluent *f)
 
 void print_fluent(Fluent *f)
 {
-  trace(normal, "FLUENT %ld : %s\n  INIT -> ", f->id, fluent_name(f));
+  trace(normal, "FLUENT %lu : %s\n  INIT -> ", f->id, fluent_name(f));
   print_time(cptout, f->init);
   trace(normal, "\n  PRODUCERS -> ");
   FOR(a, f->producers) { trace(normal, " %s", action_name(a)); } EFOR;
@@ -133,7 +134,7 @@ void print_resources_local(ResourceLocal **resources, long resources_nb, bool pr
 
 void print_complete_action(Action *a)
 {
-  trace(normal, "ACTION %ld : %s\n", a->id, action_name(a));
+  trace(normal, "ACTION %lu : %s\n", a->id, action_name(a));
   trace(normal, "  INIT -> ");
   print_time(cptout, a->init);
   trace(normal, "\n  DURATION -> ");
@@ -185,7 +186,7 @@ char *action_name(Action *a)
 
 void print_action(Action *a)
 {
-  trace(normal, "%s%s%ld[", (a->used ? "*" : (a->excluded ? "!" : "")), action_name(a), a->id);
+  trace(normal, "%s%s%lu[", (a->used ? "*" : (a->excluded ? "!" : "")), action_name(a), a->id);
   print_time(cptout, first_start(a));
   trace(normal, ",");
   print_time(cptout, last_start(a));
@@ -207,7 +208,7 @@ void free_ac_constraint(ActivityConstraint *ac)
 void free_action(Action *a)
 {
   cpt_free(a->parameters);
-  mpq_clear(duration_rat(a));
+  mpq_clear(a->dur.q);
   if (opt.pddl21 && a->ope->real_duration) mpq_clear(a->rdur.q);
   cpt_free(a->precedences);
   cpt_free(a->prec);
@@ -299,10 +300,7 @@ static void create_structures(void)
   FORi(f, i, fluents) {
     f->id = i;
     bitarray_set_index(f);
-    if (f->pair_cost) cpt_free(f->pair_cost);
     if (pass == 2 && opt.fluent_mutexes) f->mutex = bitarray_create(f->id + 1);
-    if (pass == 2 && opt.initial_heuristic == 2) cpt_calloc(f->pair_cost, fluents_nb);
-    if (pass == 3 && opt.distances == 2) cpt_calloc(f->pair_cost, fluents_nb);
   } EFOR;
 
   init_state = start_action->add;
@@ -386,12 +384,11 @@ static void create_edeletes(void)
 
 static void finalize_structures(void)
 {
-  long i;
+  size_t i;
 
   if (!opt.yahsp) {
     FOR(f, fluents) {
       cpt_malloc(f->indac, total_actions_nb);
-      if (opt.distances == 2) cpt_free(f->pair_cost);
       for (i = 0; i < total_actions_nb; i++)
 	f->indac[i] = VAL_UNKNOWN;
       FORi(a, i, f->producers) { f->indac[a->id] = i; } EFOR;
@@ -606,7 +603,7 @@ static void increase_pddl21_distances()
 /*     FOR(a2, actions) { */
 /*       printf("%s ", action_name(a1)); */
 /*       printf("%s ", action_name(a2)); */
-/*       printf("%ld\n", distance(a1, a2)); */
+/*       printf("%lu\n", distance(a1, a2)); */
 /*     } EFOR; */
 /*   } EFOR; */
 
@@ -614,11 +611,12 @@ static void increase_pddl21_distances()
 
 void create_problem(void)
 {
-  long causals_more = 0, max_prec = 0, max_prods = 0, nbc = 0, i;
+  size_t causals_more = 0, max_prec = 0, max_prods = 0, nbc = 0, i;
   
   pddl_domain = parse_domain(opt.ops_file, opt.facts_file);
 
   begin_monitor("Instantiating operators");
+
   instantiate_operators(pddl_domain);
 
   actions = pddl_domain->actions;

@@ -23,7 +23,7 @@ EVECTOR(Causal *, active_causals);
 #ifdef RESOURCES
 EVECTOR(Resource *, resources);
 #endif
-extern long total_actions_nb;
+extern size_t total_actions_nb;
 extern TimeVal total_plan_cost;
 
 extern Action *start_action;
@@ -45,8 +45,11 @@ EVECTOR(Causal *, last_conflicts);
 
 extern FILE *cptout;
 
+extern struct drand48_data random_buffer;
+
+#ifdef YAHSP_MT
+#pragma omp threadprivate(random_buffer)
 #ifdef DAE
-#ifndef YAHSP_MT
 #pragma omp threadprivate(stats, yend_action, solution_plan, plans, plans_nb)
 #endif
 #endif

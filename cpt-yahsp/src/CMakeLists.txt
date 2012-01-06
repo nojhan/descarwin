@@ -26,8 +26,8 @@ SET(SOURCES
   solve.cpp
   )
 
-SET(SEQ_SOURCES yahsp-seq.cpp)
-SET(MT_SOURCES yahsp-mt.cpp)
+SET(SEQ_SOURCES yahsp-common.cpp yahsp-seq.cpp)
+SET(MT_SOURCES yahsp-common.cpp yahsp-mt.cpp)
 SET(MPI_SOURCES yahsp-mpi.cpp)
 SET(DAE_SOURCES yahsp-dae.cpp)
 
@@ -36,22 +36,35 @@ LINK_LIBRARIES(gdsl gmp)
 ADD_LIBRARY(${PROJECT_NAME}-common STATIC ${SOURCES})
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${SEQ_SOURCES})
 
-SET_TARGET_PROPERTIES(
-  ${PROJECT_NAME}-common
-  ${PROJECT_NAME}
-  PROPERTIES
-  COMPILE_FLAGS ""
-  )
 
-ADD_LIBRARY(${PROJECT_NAME}-common-dae-noomp STATIC ${SOURCES})
-ADD_LIBRARY(${PROJECT_NAME}-dae-noomp STATIC ${SEQ_SOURCES} ${DAE_SOURCES})
+if (SCC)
 
-SET_TARGET_PROPERTIES(
-  ${PROJECT_NAME}-common-dae-noomp
-  ${PROJECT_NAME}-dae-noomp
-  PROPERTIES 
-  COMPILE_FLAGS "-DDAE -Wno-unknown-pragmas"
-  )
+  ADD_LIBRARY(${PROJECT_NAME}-common-mpi STATIC ${SOURCES})
+  ADD_LIBRARY(${PROJECT_NAME}-mpi STATIC ${MT_SOURCES} ${MPI_SOURCES})
+
+  SET_TARGET_PROPERTIES(
+    ${PROJECT_NAME}-common
+    ${PROJECT_NAME}
+    PROPERTIES
+    COMPILE_FLAGS "-DSCC"
+    )
+
+  SET_TARGET_PROPERTIES(
+    ${PROJECT_NAME}-common-mpi
+    ${PROJECT_NAME}-mpi
+    PROPERTIES
+    COMPILE_FLAGS "-DYAHSP_MPI -DSCC"
+    )
+
+else()
+
+  SET_TARGET_PROPERTIES(
+    ${PROJECT_NAME}-common
+    ${PROJECT_NAME}
+    PROPERTIES
+    COMPILE_FLAGS ""
+    )
+
 
 if (MPI)
 
@@ -62,7 +75,7 @@ if (MPI)
     ${PROJECT_NAME}-common-mpi
     ${PROJECT_NAME}-mpi
     PROPERTIES
-    COMPILE_FLAGS "-DYAHSP_MPI"
+    COMPILE_FLAGS "-DYAHSP_MPI -DYAHSP_MT ${OpenMP_C_FLAGS} "
     )
 
 endif()
@@ -102,5 +115,7 @@ if (OPENMP_FOUND)
     PROPERTIES
     COMPILE_FLAGS "${OpenMP_C_FLAGS} -DDAE -DSHARED_MEMOIZATION"
     )
+
+endif()
 
 endif()

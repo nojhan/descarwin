@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "structs.h"
 #include "problem.h"
 #include "propagations.h"
@@ -40,7 +41,7 @@ void propagate_action(Action *a)
 {
   if (a->excluded) return;
   //if (a->excluded || (opt.limit_initial_propagation && first_start(a) > first_start(end_action))) return;
-  //if (a == end_action) trace(normal, "%ld ", first_start(end_action));
+  //if (a == end_action) trace(normal, "% " TIMEP, first_start(end_action));
   trace_proc(propagate_action, a);
   //if (opt.bound > 0 && last_start(end_action) < MAXTIME && first_end(a) > opt.bound) { exclude_action(a); return; }
   protect_against(a);
@@ -98,8 +99,8 @@ static void synchronize_causal(Causal *c)
       else {
 	ActivityConstraint *ac = find_ac_constraint(a, c->fluent);
 	if (ac != NULL) {
-	nb++;
-	prod = a;
+	  nb++;
+	  prod = a;
 	  TimeVal acmin, acmax;
 	  evaluate_ac_forward(ac, maxi(first_start(a), first_start(c)) + duration(a), 
 				 mini(last_start(a), last_start(c)) + duration(a),&acmin, &acmax);
@@ -370,7 +371,7 @@ void evaluate_ac_forward(ActivityConstraint *ac, TimeVal fs, TimeVal ls, TimeVal
 {
   if (ac->time) {
     TimeVal xa, ya, xb, yb, tmp, dur;
-    long i;
+    size_t i;
     *acmin = MAXTIME;
     *acmax = 0;
     dur = ac->dur[0].t;
@@ -405,7 +406,7 @@ void evaluate_ac_backward(ActivityConstraint *ac, TimeVal fs, TimeVal ls, TimeVa
 {
   if (ac->time) {
     TimeVal xa, ya, xb, yb, dur;
-    long i;
+    size_t i;
     *acmin = -1;
     fs -= ac->max.t;
     ls -= ac->min.t;

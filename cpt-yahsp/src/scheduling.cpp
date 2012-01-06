@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "structs.h"
 #include "propagations.h"
 #include "plan.h"
@@ -44,7 +45,7 @@ SVECTOR(Action *, others);
 /*---------------------------------------------------------------------------*/
 
 
-static void add_mutex_set(Action **list, long *nb, Action *a);
+static void add_mutex_set(Action **list, size_t *nb, Action *a);
 static void makespan_mutex_set(Action **list, long nb);
 static void task_interval(Fluent *f, Action *a, Action *b);
 static void makespan_after(Causal *c);
@@ -74,9 +75,9 @@ void init_mutex_sets(long nb)
     cpt_malloc(others, nb);
 }
 
-static void add_mutex_set(Action **list, long *nb, Action *a)
+static void add_mutex_set(Action **list, size_t *nb, Action *a)
 {
-  long i;
+  size_t i;
 
   if (a->id < 2) return;
   if (!opt.sequential) 

@@ -28,7 +28,7 @@ struct EnumVariable {
   Value max;
   Value card;
   Value value;
-  long bucket_nb;
+  ulong bucket_nb;
 
   /* static fields */
   Value *bucket;
@@ -65,7 +65,7 @@ struct BoundVariable {
 	memcpy(clone, v, offsetof(BoundVariable, hook)); )
 
 
-extern void create_enum_variable(EnumVariable *v, long n, long sup, void *hook, PropagationProc propagate, EmptyProc empty);
+extern void create_enum_variable(EnumVariable *v, ulong n, ulong sup, void *hook, PropagationProc propagate, EmptyProc empty);
 extern void create_bound_variable(BoundVariable *v, TimeVal min, TimeVal max, void *hook, PropagationProc propagate, EmptyProc empty);
 extern void remove_val_variable(EnumVariable *v, Value i);
 extern void add_val_variable(EnumVariable *v, Value i);
@@ -83,18 +83,18 @@ extern void more_propagations(void);
 typedef struct WorldStack WorldStack;
 
 struct WorldStack {
-  char *data;
-  long world;
-  long initial_world; 
-  long size;
-  long max_size;
-  long nodes;
-  long nodes_run;
-  long backtracks;
-  long backtracks_run;
-  long backtrack_limit;
-  long propagations;
-  long propagations_limit;
+  uint8_t *data;
+  ulong world;
+  ulong initial_world; 
+  ulong size;
+  ulong max_size;
+  ulong nodes;
+  ulong nodes_run;
+  ulong backtracks;
+  ulong backtracks_run;
+  ulong backtrack_limit;
+  ulong propagations;
+  ulong propagations_limit;
   bool limit_initial_propagation;
   jmp_buf *env;
 };
@@ -123,7 +123,7 @@ extern WorldStack wstack;
 #define pop_stack(type) (*((type *) (wstack.data + (wstack.size -= sizeof(type)))))
 #define pop_var(var) (var = pop_stack(typeof(var)))
 
-#define save(v) NEST( if (wstack.world > 0) { push_stack(v); push_stack((char) sizeof(v)); push_stack(&(v)); } )
+#define save(v) NEST( if (wstack.world > 0) { push_stack(v); push_stack((uint8_t) sizeof(v)); push_stack(&(v)); } )
 #define store(v, i) NEST( save(v); v = i; )
 #define vstore(t, i) NEST( save(t##_nb); t[t##_nb++] = i; )
 
@@ -139,11 +139,11 @@ extern WorldStack wstack;
   NEST(									\
        void *_ptr; jmp_buf *_env = wstack.env;				\
        while (pop_var(_ptr)) {						\
-	 switch (pop_stack(char)) {					\
-	 case 4: pop_var(*(long *) _ptr); break;			\
-	 case 2: pop_var(*(short *) _ptr); break;			\
-	 case 1: pop_var(*(char *) _ptr); break;			\
-	 case 8: pop_var(*(long long *) _ptr); break;			\
+	 switch (pop_stack(uint8_t)) {					\
+	 case 4: pop_var(*(uint32_t *) _ptr); break;			\
+	 case 2: pop_var(*(uint16_t *) _ptr); break;			\
+	 case 1: pop_var(*(uint8_t *) _ptr); break;			\
+	 case 8: pop_var(*(uint64_t *) _ptr); break;			\
 	 }}								\
        pop_var(wstack.env);						\
        wstack.world--;							\
@@ -162,7 +162,7 @@ extern WorldStack wstack;
 
 /* Event queues management */
 
-#define EVENT_QUEUE_TYPE(type)			\
+#define EVENT_QUEUE_TYPE(type)				\
   typedef struct  {					\
     type##Variable **elt, **first, **last, **end;	\
   } type##EventQueue;
@@ -178,14 +178,14 @@ extern VarEvent actual_event;
 #define init_event_queues(ne, nb) NEST( init_queue(ne, removal); init_queue(ne, instantiate); init_queue(nb, bound); )
 #define raz_event_queues() NEST( actual_event = NoEvent; raz_queue(removal); raz_queue(instantiate); raz_queue(bound); )
 
-#define init_queue(n, q) _init_queue(n, queue_##q, idx_##q)
+#define init_queue(n, q) _init_queue(n, queue_##q)
 #define register_var(v, q) _register_var(v, queue_##q, idx_##q)
 #define pop_event(v, q) _pop_event(v, queue_##q)
 #define rem_event(v, q)  _rem_event(v, queue_##q, idx_##q)
 #define raz_queue(q)  _raz_queue(queue_##q) 
 #define post_event(v, q) _post_event(v, queue_##q, idx_##q)
 
-#define _init_queue(n, q, idx) NEST( cpt_malloc(q.elt, n + 1); *q.elt = NULL; q.first = q.last = q.end = q.elt; )
+#define _init_queue(n, q) NEST( cpt_malloc(q.elt, n + 1); *q.elt = NULL; q.first = q.last = q.end = q.elt; )
 #define _register_var(v, q, idx) NEST( *++q.end = v; (v)->idx = q.end; )
 #define _shift(ptr, q) NEST( q.ptr = (q.ptr == q.end ? q.elt : q.ptr + 1); )
 #define _pop_event(v, q) NEST( if (q.first != q.last) { v = *q.first; _shift(first, q); } else v = NULL; )
@@ -193,7 +193,7 @@ extern VarEvent actual_event;
 #define _raz_queue(q) NEST( while (q.first != q.last) { (*q.first)->event = NoEvent; _shift(first, q); } )
 #define _post_event(v, q, idx) NEST( *(v)->idx = *q.last; if (*q.last) (*q.last)->idx = (v)->idx; *q.last = v; (v)->idx = q.last; _shift(last, q); )
 
-#define post_instantiate_event(v)						\
+#define post_instantiate_event(v)					\
   NEST( if ((v)->event == NoEvent) { (v)->event = InstantiateEvent; post_event(v, instantiate); } \
 	else if ((v)->event == RemovalEvent) { (v)->event = InstantiateEvent; rem_event(v, removal);  post_event(v, instantiate); } )
 #define post_removal_event(v) NEST( if ((v)->event == NoEvent) { (v)->event = RemovalEvent; post_event(v, removal); } )

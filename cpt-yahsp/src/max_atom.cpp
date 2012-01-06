@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "structs.h"
 #include "problem.h"
 #include "plan.h"
@@ -15,6 +16,14 @@
 #include "propagations.h"
 #include "trace_planner.h"
 #include "max_atom.h"
+
+
+/*---------------------------------------------------------------------------*/
+/* Local Variables                                                           */
+/*---------------------------------------------------------------------------*/
+
+
+static TimeVal **pair_cost;
 
 
 /*---------------------------------------------------------------------------*/
@@ -66,13 +75,9 @@ void compute_init_rh1_cost(void)
   } EFOR;
   FOR(f, fluents) { set_finit(f, MAXCOST); } EFOR;
   FOR(f, goal_state) { update_cost_rh1(f, 0, finit, areachable); } EFOR;
-  //FOR(f, end_action->prec) { printf("ICI : %s\n", fluent_name(f)); update_cost_rh1(f, 0, finit, areachable); } EFOR;
   compute_rh1_cost(ainit, finit, areachable);
   set_ainit(end_action, 0);
   FORMIN(a, actions, 1) { 
-    //a->end = get_ainit(a);
-    //trace(normal, "%s %d\n", action_name(a), get_ainit(a));
-    //if (get_ainit(a) == MAXCOST) a->init = MAXCOST;
     if (get_ainit(a) != MAXCOST) {
       FOR(f, a->add) { set_finit(f, get_ainit(a) + duration(a)); } EFOR;
       FOR(f, a->del) { set_finit(f, get_ainit(a) + duration(a)); } EFOR;
@@ -80,8 +85,6 @@ void compute_init_rh1_cost(void)
   } EFOR;
   FOR(f, fluents) { 
     f->end = get_finit(f); 
-    //trace(normal, "%s %d\n", fluent_name(f), get_finit(f));
-    //if (get_finit(f) == MAXCOST) f->init = MAXCOST;
   } EFOR;
 }
 
@@ -239,6 +242,11 @@ static void compute_h1_cost(TimeVal ainit[], TimeVal finit[], bool areachable[])
   }
 }
 
+#undef set_pair_cost
+#undef pair_cost
+#define set_pair_cost(a1, a2, d) NEST( pair_cost[(a1)->id][(a2)->id] = d; pair_cost[(a2)->id][(a1)->id] = d; )
+#define pair_cost(a1, a2) pair_cost[(a1)->id][(a2)->id]
+
 static void update_cost_h2(Fluent *f1, Fluent *f2, TimeVal cost, bool areachable[])
 {
   if ((!opt.computing_distances || !fmutex(f1, f2)) && pair_cost(f1, f2) > cost) {
@@ -253,6 +261,9 @@ void compute_init_h2_cost(void)
 {
   TimeVal ainit[actions_nb];
   bool areachable[actions_nb];
+
+  cpt_malloc(pair_cost, fluents_nb);
+  FOR(f, fluents) { cpt_malloc(pair_cost[f->id], fluents_nb); } EFOR;
 
   FORPAIR(f1, f2, fluents) {
     set_pair_cost(f1, f2, MAXCOST);
@@ -278,6 +289,9 @@ void compute_init_h2_cost(void)
       if (a->init < MAXCOST) minimize(f->init, a->init + duration(a)); 
     } EFOR; 
   } EFOR;
+
+  FOR(f, fluents) { cpt_free(pair_cost[f->id]); } EFOR;
+  cpt_free(pair_cost);
 }
 
 void compute_h2_distances(void)
@@ -285,8 +299,11 @@ void compute_h2_distances(void)
   TimeVal ainit[actions_nb];
   bool areachable[actions_nb];
 
+  cpt_malloc(pair_cost, fluents_nb);
+  FOR(f, fluents) { cpt_malloc(pair_cost[f->id], fluents_nb); } EFOR;
+
   FORMIN(a, actions, 2) {
-    trace(monitor, " %ld/%ld\r", a->id, actions_nb);
+    trace(monitor, " %lu/%zu\r", a->id, actions_nb);
     FOR(a, actions) {     
       set_ainit(a, MAXCOST);
       set_areachable(a, (a->id > 0 && a->prec_nb == 0)); 
@@ -301,12 +318,13 @@ void compute_h2_distances(void)
     compute_h2_cost(ainit, areachable);
     set_distance(a, start_action, 0);
     FORMIN(a2, actions, 0) {
-/*       printf("%s", action_name(a)); */
-/*       printf(" %s %d\n", action_name(a2), get_ainit(a2)); */
       set_distance(a, a2, get_ainit(a2));
     } EFOR;
     trace(monitor, "Computing distances...............");
   } EFOR;
+
+  FOR(f, fluents) { cpt_free(pair_cost[f->id]); } EFOR;
+  cpt_free(pair_cost);
 }
 
 static void compute_h2_cost(TimeVal ainit[], bool areachable[])

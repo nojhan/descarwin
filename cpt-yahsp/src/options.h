@@ -36,11 +36,11 @@ struct Option {
   bool global_mutex_sets;
   long initial_heuristic;
   bool landmarks;
-  long last_conflicts;
+  ulong last_conflicts;
   bool limit_backtracks;
   bool limit_backtracks_all;
   bool limit_initial_propagation;
-  long max_backtracks;
+  ulong max_backtracks;
   long max_plan_length;
   long max_propagations;
   bool local_mutex_sets;
@@ -81,9 +81,10 @@ struct Option {
   long verbosity;
   bool wdeg;
   bool yahsp;
-  long yahsp_threads;
-  long yahsp_teams;
-  long yahsp_strategy;
+  int yahsp_threads;
+  int yahsp_teams;
+  ulong yahsp_strategy;
+  bool yahsp_duplicate_search;
 };
 
 extern Option opt;

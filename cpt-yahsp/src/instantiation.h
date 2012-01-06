@@ -10,8 +10,8 @@
 #define INSTANTIATION_H 
 
 
-void instantiate_operators(PDDLDomain *domain);
-Fluent *search_fluent(PDDLDomain *domain, PDDLPredicate *predicate, PDDLTerm **params);
+extern void instantiate_operators(PDDLDomain *domain);
+extern Fluent *search_fluent(PDDLDomain *domain, PDDLPredicate *predicate, PDDLTerm **params);
 
 
 #endif /* INSTANTIATION_H */

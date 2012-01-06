@@ -17,7 +17,9 @@
 
 extern void heuristic_create();
 extern void heuristic_insert(Node *node, TimeVal *finit);
-extern bool heuristic_search(Node *node, TimeVal *ainit, TimeVal *finit, Action **applicable, long *applicable_nb);
+extern bool heuristic_search(Node *node, TimeVal *finit);
 extern void heuristic_flush();
+extern int yahsp_compress_plans();
+
 
 #endif /* YAHSP_DAE_H */

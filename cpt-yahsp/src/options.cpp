@@ -121,7 +121,8 @@ static CPTOption long_options[] = {
 #endif
   {"dae", NULL, "<x>", 'E', "Divide-and-Evolve approach with <x> threads."},
   {"read-actions", NULL, "<f>", 'z', "Limit to actions in file."},
-  {"yahsp", "yahsp", "<x>", 'y', "Suboptimal Yahsp search, with <x> threads."}
+  {"yahsp", "yahsp", "<x>", 'y', "Suboptimal Yahsp search, with <x> threads."},
+  {"yahsp-options", "yahsp-options", NULL, 'Y', "Options for Yahsp."}
 };
 
 
@@ -182,7 +183,7 @@ void cmd_line(int argc, const char **argv)
   opt.limit_backtracks = false;
   opt.limit_backtracks_all = false;
   opt.local_mutex_sets = false;
-  opt.max_backtracks = LONG_MAX;
+  opt.max_backtracks = ULONG_MAX;
   opt.max_makespan = NULL;
   opt.max_plan_length = 500;
   opt.optimal = true;
@@ -204,8 +205,8 @@ void cmd_line(int argc, const char **argv)
   opt.read_actions = false;
   opt.relevance = true;
   opt.restarts = false;
-  opt.restarts_init = LONG_MAX;
-  opt.restarts_max_tries = LONG_MAX;
+  opt.restarts_init = ULONG_MAX;
+  opt.restarts_max_tries = ULONG_MAX;
   opt.sequential = false;
   opt.task_intervals = false;
   opt.timer = 0;
@@ -218,6 +219,7 @@ void cmd_line(int argc, const char **argv)
 #endif
   opt.wdeg = false;
   opt.yahsp = false;
+  opt.yahsp_duplicate_search = false;
 
   while ((c = GETOPT(argc, (char * const *) argv, arg_string, options, NULL)) != EOF) {
     switch ((char) c) {
@@ -241,7 +243,7 @@ void cmd_line(int argc, const char **argv)
     case 'q' : opt.print_actions = true; trace(options, "print actions\n"); break;
     case 'r': opt.restarts = true; opt.random = true; opt.restarts_init = atol(strtok(optarg,",")); opt.restarts_factor = atof(strtok(NULL,",")); 
       opt.restarts_min_increment = atol(strtok(NULL,",")); { char *tries = strtok(NULL,","); if (tries) opt.restarts_max_tries = atol(tries); }
-      trace(options, "restarts : init : %ld, factor : %.2f, min increment : %ld, max tries : %ld\n", 
+      trace(options, "restarts : init : %ld, factor : %.3f, min increment : %ld, max tries : %ld\n", 
 	    opt.restarts_init, opt.restarts_factor, opt.restarts_min_increment, opt.restarts_max_tries); 
 	break;
     case 's': opt.random = true; opt.seed = atol(optarg); trace(options, "randomized, seed : %ld\n", opt.seed); break;
@@ -258,10 +260,11 @@ void cmd_line(int argc, const char **argv)
 #endif
     case 'x': opt.limit_backtracks = true; opt.max_backtracks = atol(optarg); trace(options, "maximum backtracks/bound : %ld\n", opt.max_backtracks); break;
     case 'X': opt.limit_backtracks_all = true; opt.max_backtracks = atol(optarg); trace(options, "maximum backtracks/all : %ld\n", opt.max_backtracks); break;
-    case 'y': { opt.yahsp = true; opt.pb_restrict = true; opt.yahsp_threads = atol(strtok(optarg, ",")); 
+    case 'y': { opt.yahsp = true; opt.pb_restrict = true; opt.yahsp_threads = atol(strtok(optarg, ","));
+	opt.max_plan_length = 0;
       char *teams = strtok(NULL, ","); opt.yahsp_teams = teams ? atol(teams) : 1;
       if (teams) { char *strategy = strtok(NULL, ","); opt.yahsp_strategy = strategy ? atol(strategy) : 0; }
-      trace(options, "suboptimal yahsp search, threads : %ld, teams : %ld, strategy : %ld\n", 
+      trace(options, "suboptimal yahsp search, threads : %d, teams : %d, strategy : %ld\n", 
 	    opt.yahsp_threads, opt.yahsp_teams, opt.yahsp_strategy); break; }
     case 'z': opt.read_actions = true; opt.read_actions_input = (char *) optarg; trace(options, "action file : %s\n", opt.read_actions_input); break;
     case 'A': opt.landmarks = true; trace(options, "enable landmarks\n"); break;
@@ -301,6 +304,7 @@ void cmd_line(int argc, const char **argv)
     case 'T': opt.task_intervals = true; trace(options, "enable task intervals\n"); break;
     case 'U': opt.unique_supports = false; trace(options, "disable unique supports\n"); break;
     case 'W': opt.wdeg = true; trace(options, "enable wdeg\n"); break;
+    case 'Y': opt.yahsp_duplicate_search = true; trace(options, "duplicate search in yahsp\n"); break;
     }
   }
   

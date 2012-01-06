@@ -10,77 +10,77 @@
 #ifndef CPT_H
 #define CPT_H 
 
-
 #include <ctype.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <math.h>
 #include <fenv.h>
-#include <signal.h>
-#include <stdbool.h>
 #include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <gmp.h>
-#ifndef __WIN32__
-#define WITHOUT_GDSL_TYPES
-#endif
 #include "../gdsl/src/gdsl.h"
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-#ifndef __WORDSIZE
-#define __WORDSIZE 32
+#define WORDSIZE (sizeof(long) * CHAR_BIT)
+
+#ifndef BITS_VALUE
+#define BITS_VALUE 16
+#endif
+#ifndef BITS_TIME
+#define BITS_TIME 32
 #endif
 
-#define VALUE_SHORT
-#define TIME_LONG
 //#define NOTRACE
 #define RESOURCES
 
-#ifdef VALUE_SHORT
-typedef unsigned short Value;
-#define VALUEP "d"
-#define MAXVAL (USHRT_MAX - 1)
-#define VAL_UNKNOWN USHRT_MAX
+
+#if (BITS_VALUE == 8)
+typedef uint8_t Value;
+#define VALUEP PRIu8
+#define MAXVAL (UINT8_MAX - 1)
+#define VAL_UNKNOWN UINT8_MAX
 #endif
-#ifdef VALUE_LONG
-typedef unsigned long Value;
-#define VALUEP "ld"
-#define MAXVAL (ULONG_MAX - 1)
-#define VAL_UNKNOWN ULONG_MAX
+#if (BITS_VALUE == 16)
+typedef uint16_t Value;
+#define VALUEP PRIu16
+#define MAXVAL (UINT16_MAX - 1)
+#define VAL_UNKNOWN UINT16_MAX
+#endif
+#if (BITS_VALUE == 32)
+typedef uint32_t Value;
+#define VALUEP PRIu32
+#define MAXVAL (UINT32_MAX - 1)
+#define VAL_UNKNOWN UINT32_MAX
 #endif
 
 #define val_known(e) ((e) != VAL_UNKNOWN)
 #define val_unknown(e) ((e) == VAL_UNKNOWN)
 
-#ifdef TIME_SHORT
-typedef short int TimeVal;
-#define TIMEP "d"
-#define MAXTIME 10000
+#if (BITS_TIME == 16)
+typedef int16_t TimeVal;
+#define TIMEP PRId16
+#define MAXTIME INT16_C(10000)
 #define MAXCOST MAXTIME
-#define time_round __builtin_lrintl
+#define time_round lrintl
 #endif
-#ifdef TIME_LONG
-typedef long int TimeVal;
-#define TIMEP "ld"
-#if (__WORDSIZE == 32)
-#define MAXTIME 1000000000
-#else
-#define MAXTIME 1000000000000000000LL
-#endif
+#if (BITS_TIME == 32)
+typedef int32_t TimeVal;
+#define TIMEP PRId32
+#define MAXTIME INT32_C(1000000000)
 #define MAXCOST MAXTIME
-#define time_round __builtin_lrintl
+#define time_round lrintl
 #endif
-#ifdef TIME_LLONG
-typedef long long int TimeVal;
-#define TIMEP "lld"
-#define MAXTIME 1000000000000000000LL
+#if (BITS_TIME == 64)
+typedef int64_t TimeVal;
+#define TIMEP PRId64
+#define MAXTIME INT64_C(1000000000000000000)
 #define MAXCOST MAXTIME
-#define time_round __builtin_llrintl
+#define time_round llrintl
 #endif
 
 struct TimeStruct {
@@ -90,19 +90,15 @@ struct TimeStruct {
 
 #define STRING_MAX 10000
 
-#include "options.h"
-
-
 #define NEST(body...) do { body } while (0)
 
 #define maxi(a, b) ({ typeof(a) _x = (a); typeof(b) _y = (b); (_x > _y ? _x : _y); })
 #define mini(a, b) ({ typeof(a) _x = (a); typeof(b) _y = (b); (_x < _y ? _x : _y); })
 #define maximize(a, b) NEST( typeof(&a) _x = (&a); typeof(b) _y = (b); if (*_x < _y) *_x = _y; )
 #define minimize(a, b) NEST( typeof(&a) _x = (&a); typeof(b) _y = (b); if (*_x > _y) *_x = _y; )
-
-
 #define exchange(a, b) NEST( typeof(a) _tmp = a; a = b ; b = _tmp; )
 
+/* Allocation helpers */
 
 #define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res)) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
 
@@ -111,35 +107,33 @@ struct TimeStruct {
 #define cpt_realloc(ptr, n) ({ size_t _x = n; typeof(&(ptr)) _p = &(ptr); check_allocation(*_p, _x, realloc(*_p, _x * sizeof (*ptr))); })
 #define cpt_free(ptr) NEST( free(ptr); ptr = NULL; )
 
-
 /* Vector facilities */
 
 #define VECTOR(args...) _mkvector(args)
 #define EVECTOR(args...) _mkvector(args, extern)
 #define SVECTOR(args...) _mkvector(args, static)
-#define _mkvector(type, name, kw...) kw type *name; kw long name##_nb
+#define _mkvector(type, name, kw...) kw type *name; kw size_t name##_nb
 #define vector_copy(dest, source) NEST( cpt_malloc(dest, (dest##_nb = source##_nb)); memcpy(dest, source, dest##_nb * sizeof(typeof(*dest))); )
 #define vector_sort(name, cmp_func) qsort(name, name##_nb, sizeof(typeof(*name)), (int (*) (const void *, const void *)) cmp_func)
 
 /* Bit arrays */
 
-typedef unsigned long *BitArray;
+typedef ulong *BitArray;
 
-#define bitarray_create(n) ((unsigned long *) calloc(((n) - 1) / __WORDSIZE + 1, sizeof(unsigned long)))
-#define bitarray_copy(dest, source, n) memcpy(dest, source, (((n) - 1) / __WORDSIZE + 1) * sizeof(unsigned long))
+#define bitarray_create(n) ((ulong *) calloc(((n) - 1) / WORDSIZE + 1, sizeof(ulong)))
+#define bitarray_copy(dest, source, n) memcpy(dest, source, (((n) - 1) / WORDSIZE + 1) * sizeof(ulong))
 #define bitarray_clone(dest, source, n) NEST( dest = bitarray_create(n); bitarray_copy(dest, source, n); )
-#define bitarray_cmp(dest, source, n) memcmp(dest, source, (((n) - 1) / __WORDSIZE + 1) * sizeof(unsigned long))
-#define bitarray_set_index(x) NEST( (x)->bit_index = (x)->id / __WORDSIZE; (x)->bit_mask = 1L << ((x)->id % __WORDSIZE); )
+#define bitarray_cmp(dest, source, n) memcmp(dest, source, (((n) - 1) / WORDSIZE + 1) * sizeof(ulong))
+#define bitarray_set_index(x) NEST( (x)->bit_index = (x)->id / WORDSIZE; (x)->bit_mask = 1UL << ((x)->id % WORDSIZE); )
 #define bitarray_set(tab, x) NEST( tab[(x)->bit_index] |= (x)->bit_mask; )
-#define bitarray_unset(tab, x) NEST( tab[(x)->bit_index] &= ~ (x)->bit_mask; )
+#define bitarray_unset(tab, x) NEST( tab[(x)->bit_index] &= ~(x)->bit_mask; )
+#define bitarray_get(tab, x) (tab[(x)->bit_index] & (x)->bit_mask)
 #define bitarray_save_and_set(tab, x) NEST( save(tab[(x)->bit_index]); tab[(x)->bit_index] |= (x)->bit_mask; )
-#define bitarray_get(tab, x) ( tab[(x)->bit_index] & (x)->bit_mask )
-
 
 /* Loop facilities */
 
-#define _for(x, i, tab, min, max) do { typeof(max) i; for (i = min; i < max; i++) { typeof(*(tab)) x = (tab)[i];
-#define _rfor(x, i, tab, max, min) do { typeof(max) i; for (i = max; i >= min; i--) { typeof(*(tab)) x = (tab)[i];
+#define _for(x, i, tab, min, max) do { typeof(max) i; typeof(*(tab)) x; for (i = min; i < max; i++) { x = (tab)[i];
+#define _rfor(x, i, tab, max, min) do { typeof(max) i, _j; typeof(*(tab)) x; for (_j = min, i = max - 1; _j < max; i--, _j++) { x = (tab)[i];
 
 #define FOR(x, tab) _for(x, _i, tab, 0, tab##_nb)
 #define FORi(x, i, tab) _for(x, i, tab, 0, tab##_nb)
@@ -149,32 +143,35 @@ typedef unsigned long *BitArray;
 #define FORMAXi(x, i, tab, max) _for(x, i, tab, 0, max)
 #define FORMINMAX(x, tab, min, max) _for(x, _i, tab, min, max)
 
-#define RFOR(x, tab) _rfor(x, _i, tab, tab##_nb - 1, 0)
-#define RFORi(x, i, tab) _rfor(x, i, tab, tab##_nb - 1, 0)
-#define RFORMIN(x, tab, min) _rfor(x, _i, tab, tab##_nb - 1, min)
-#define RFORMINi(x, i, tab, min) _rfor(x, i, tab, tab##_nb - 1, min)
+#define RFOR(x, tab) _rfor(x, _i, tab, tab##_nb, 0)
+#define RFORi(x, i, tab) _rfor(x, i, tab, tab##_nb, 0)
+#define RFORMIN(x, tab, min) _rfor(x, _i, tab, tab##_nb, min)
+#define RFORMINi(x, i, tab, min) _rfor(x, i, tab, tab##_nb, min)
 #define RFORMAX(x, tab, max) _rfor(x, _i, tab, max, 0)
 #define RFORMAXi(x, i, tab, max) _rfor(x, i, tab, max, 0)
 
-#define EFOR }} while (0)
+#define FOR2(x, tab1, y, tab2) do { typeof(*(tab1)) x; typeof(*(tab2)) y; typeof(tab1##_nb) _i; for(_i = 0; _i < tab1##_nb; _i++) { x = tab1[_i]; y = tab2[_i];
+#define FORPAIR(x1, x2, tab) FORi(x1, __i, tab) FORMIN(x2, tab, __i) 
+#define FORCOUPLE(x1, tab1, x2, tab2) FOR(x1, tab1) FOR(x2, tab2) 
 
-#define FOR2(x, tab, y, tab2) do { typeof(*(tab)) x; typeof(*(tab2)) y; typeof(tab##_nb) _i; for(_i = 0; _i < tab##_nb; _i++) { x = tab[_i]; y = tab2[_i];
-#define FORPAIR(x1, x2, t) FORi(x1, __i, t) FORMIN(x2, t, __i) 
-#define FORCOUPLE(x1, t1, x2, t2) FOR(x1, t1) FOR(x2, t2) 
+#define EFOR }} while (0)
 #define EFORPAIR EFOR; EFOR
 #define EFORCOUPLE EFOR; EFOR
 
+/* Random numbers */
+
+#define cpt_srand(seed) srand48_r(seed, &random_buffer)
+#define cpt_rand() ({ long x; lrand48_r(&random_buffer, &x); x; })
 
 /* Comparisons */
 
 typedef enum {Better = -1, Equal = 0, Worse = 1} Comparison;
 
-#define LESS(x, y) NEST( typeof(x) _a = x; typeof(y) _b = y; if (_a < _b) return Better; if (_a > _b) return Worse; )
-#define GREATER(x, y) NEST( typeof(x) _a = x; typeof(y) _b = y; if (_a > _b) return Better; if (_a < _b) return Worse; )
-#define PREFER(exp1, exp2) NEST( bool _e1 = exp1, _e2 = exp2; if (_e1 && _e2) return Better; if (!_e1 && !_e2) return Worse; )
+#define LESS(x, y) NEST( typeof(x) _x = x; typeof(y) _y = y; if (_x < _y) return Better; if (_x > _y) return Worse; )
+#define GREATER(x, y) NEST( typeof(x) _x = x; typeof(y) _y = y; if (_x > _y) return Better; if (_x < _y) return Worse; )
+#define PREFER(x, y) NEST( bool _x = x, _y = y; if (_x && _y) return Better; if (!_x && !_y) return Worse; )
 
-#define preferred(comp, ties) ({ Comparison test = comp; test == Worse ? false : !opt.random ? test == Better : test == Better ? (ties = 1) : rand() % ++ties == 0; })
-
+#define preferred(comp, rand, ties) ({ Comparison test = comp; test == Worse ? false : !rand ? test == Better : test == Better ? (ties = 1) : cpt_rand() % ++ties == 0; })
 
 #define mpz_get_timeval(n) ({ char *s = mpz_get_str(NULL, 10, n); TimeVal res = atoll(s); free(s); res; })
 

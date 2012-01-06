@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "structs.h"
 #include "problem.h"
 #include "plan.h"
@@ -17,6 +18,12 @@
 #include "preprocess.h"
 #include "scheduling.h"
 #include "yahsp.h"
+#ifdef DAE
+#include "yahsp-dae.h"
+#endif
+#ifdef YAHSP_MPI
+#include "yahsp-mpi.h"
+#endif
 #ifdef RATP
 #include "ratp.h"
 #endif
@@ -43,7 +50,7 @@ VECTOR(Causal *, active_causals);
 #ifdef RESOURCES
 VECTOR(Resource *, resources);
 #endif
-long total_actions_nb;
+size_t total_actions_nb;
 TimeVal total_plan_cost;
 
 Action *start_action;
@@ -67,6 +74,8 @@ FILE *cptout = stderr;
 #else
 FILE *cptout = stdout;
 #endif
+
+struct drand48_data random_buffer;
 
 
 /*---------------------------------------------------------------------------*/
@@ -102,7 +111,7 @@ void _begin_monitor(const char *s)
 
 void _end_monitor(void) 
 {
-  trace(monitor, " done : %.2f          \n", get_timer(stats.monitor)); 
+  trace(monitor, " done : %.3f          \n", get_timer(stats.monitor)); 
 }
 
 #ifndef WALLCLOCK_TIME
@@ -112,12 +121,12 @@ static void init_system(long time_limit)
   struct itimerval timer;
   signal(SIGTSTP, partial_statistics_request);
   signal(SIGINT, user_interruption);
-  signal(SIGVTALRM, timer_interruption);
-  if (opt.timer > 0) {
-    timer.it_interval.tv_sec = 0;
-    timer.it_interval.tv_usec = 0;
-    timer.it_value.tv_sec = time_limit;
-    timer.it_value.tv_usec = 0;
+  timer.it_interval.tv_sec = 0;
+  timer.it_interval.tv_usec = 0;
+  timer.it_value.tv_usec = 0;
+  timer.it_value.tv_sec = abs(time_limit);
+  if (time_limit > 0) {
+    signal(SIGVTALRM, timer_interruption);
     setitimer(ITIMER_VIRTUAL, &timer, NULL);
   }
 }
@@ -129,8 +138,16 @@ static void partial_statistics_request(int n)
   trace(normal, "\n----- Partial statistics at bound ");
   print_time(cptout, last_start(end_action));
   trace(normal, " -----\n");
-  trace_proc(search_stats, get_timer(stats.search), get_timer(stats.total), 
-	     get_wtimer(stats.search), get_wtimer(stats.total));
+  stats.usearch = get_timer(stats.search);
+  stats.utotal = get_timer(stats.total);
+  stats.wsearch = get_wtimer(stats.search);
+  stats.wtotal = get_wtimer(stats.total);
+#ifdef YAHSP_MT 
+  stats.nodes_by_sec = stats.evaluated_nodes / get_wtimer(stats.search);
+#else
+  stats.nodes_by_sec = stats.evaluated_nodes / get_timer(stats.search);
+#endif
+  trace_proc(search_stats);
   opt.verbosity = v;
 }
 
@@ -138,6 +155,8 @@ static void user_interruption(int n)
 {
   error(user_interruption, "User interruption");
 }
+
+extern bool stop_search;
 
 static void timer_interruption(int n)
 {
@@ -148,6 +167,8 @@ static void timer_interruption(int n)
 
 int cpt_main(int argc, const char **argv)
 {
+  start_timer(stats.total);
+
   cmd_line(argc, argv);
   
 #ifdef RATP
@@ -155,8 +176,6 @@ int cpt_main(int argc, const char **argv)
 #endif
 
   init_heuristics();
-
-  start_timer(stats.total);
 
 #ifndef WALLCLOCK_TIME
   init_system(opt.timer);
@@ -169,7 +188,7 @@ int cpt_main(int argc, const char **argv)
   if (opt.yahsp) {
     // DIRTY
 #ifdef DAE
-#ifndef YAHSP_MT
+#ifdef YAHSP_MT
 #pragma omp parallel num_threads(opt.dae_threads)
 #endif
 #endif
@@ -203,38 +222,19 @@ int cpt_main(int argc, const char **argv)
     }
     break;
   }
-  trace_proc(search_stats, get_timer(stats.search), get_timer(stats.total),
-	     get_wtimer(stats.search), get_wtimer(stats.total));
+#ifndef YAHSP_MPI
+  stats.usearch = get_timer(stats.search);
+  stats.utotal = get_timer(stats.total);
+  stats.wsearch = get_wtimer(stats.search);
+#endif
+  stats.wtotal = get_wtimer(stats.total);
+  trace_proc(search_stats);
   return PLAN_FOUND;
 }
 
 
 int cpt_basic_search(void)
 {
-  /* char *goals[]={ */
-  /*   "(fuel-level plane2 fl4)",  */
-  /*   "(fuel-level plane1 fl1)",  */
-  /*   "(at plane3 city4)",  */
-  /*   "(at plane1 city3)",  */
-  /*   "(fuel-level plane3 fl0)"}; */
-
-  /* goal_state_nb = 0; */
-
-  /* int i; */
-  /* for (i=0; i < 5; i++) { */
-  /*   FOR(f, fluents) { */
-  /*     char *n = fluent_name(f); */
-  /*     if (strcmp(n, goals[i]) == 0)  */
-  /* 	  goal_state[goal_state_nb++] = f; */
-  /*   } EFOR; */
-  /* } */
-
-  /* FOR(f, goal_state) { */
-  /*   printf("%s %d\n", fluent_name(f), f->id); */
-  /* } EFOR; */
-
-  /* return cpt_search(init_state, init_state_nb, goal_state, goal_state_nb, false, false, false); */
-
   return cpt_search(NULL, -1, NULL, -1, false, false, false, opt.max_backtracks);
 }
 
@@ -256,9 +256,10 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
   solution_plan = NULL;
 
   if (opt.yahsp) {
-    yahsp_max_evaluated_nodes = max_evaluated_nodes;
-    if (!compress) return yahsp_main();
+    if (!compress) return yahsp_main(max_evaluated_nodes);
+#ifdef DAE
     else return yahsp_compress_plans();
+#endif
   }
 
   TimeVal bound, dic_increment = 2, dic_lower = 0, dic_upper = 0, maxmsp = pddl_domain->max_makespan.t;
@@ -401,7 +402,7 @@ static void solve2(void)
       search();
       print_trace(first_run);
       break;
-    } else { 
+    } else {
       if (!backtrack_limit_reached() || (opt.limit_backtracks_all && backtrack_limit_reached()) || opt.limit_backtracks) {
 	print_trace(first_run);
 	contradiction();
@@ -409,8 +410,8 @@ static void solve2(void)
       first_run = false;
       print_trace(first_run);
       if (opt.restarts) {
-	if (--tries == 0) set_backtrack_limit(LONG_MAX);
-	else set_backtrack_limit(maxi((long) ((double) backtrack_limit() * opt.restarts_factor), backtrack_limit() + opt.restarts_min_increment));
+	if (--tries == 0) set_backtrack_limit(ULONG_MAX);
+	else set_backtrack_limit(maxi((ulong) ((double) backtrack_limit() * opt.restarts_factor), backtrack_limit() + opt.restarts_min_increment));
       }
     }
   }

@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "structs.h"
 #include "problem.h"
 #include "propagations.h"
@@ -33,7 +34,11 @@ void print_plan(FILE *out, SolutionPlan *plan, bool print_synchro)
 #ifdef RESOURCES
     if (!print_synchro && step->action->synchro) continue;
 #endif
-    if (pddl_domain->action_costs) fprintf(out, "%ld", i);
+#ifdef DAE
+    if (pddl_domain->action_costs && !pddl_domain->action_costs) fprintf(out, "%zu", i);
+#else
+    if (pddl_domain->action_costs) fprintf(out, "%zu", i);
+#endif
     else if (opt.sequential) print_time(out, step->init);
     else print_time_incr(out, step->init, i);
     fprintf(out, ": %s", action_name(step->action));
@@ -62,11 +67,18 @@ void print_plan(FILE *out, SolutionPlan *plan, bool print_synchro)
 
 void print_plan_ipc(FILE *out, SolutionPlan *plan, double total_time)
 {
-  fprintf(out, "; Time %.2f\n", total_time);
-  fprintf(out, "; Length %ld\n", plan->steps_nb);
+  fprintf(out, "; Time %.3f\n", total_time);
+  fprintf(out, "; Length %lu\n", plan->length);
   if (pddl_domain->action_costs) {
     fprintf(out, "\n; TotalCost ");
+#ifdef DAE
+    if (pddl_domain->action_costs && pddl_domain->durative_actions)
+      print_time(out, plan->cost);
+    else
+      print_time(out, plan->makespan);
+#else
     print_time(out, plan->makespan);
+#endif
   } else {
   fprintf(out, "; Makespan ");
   print_time(out, plan->makespan);
@@ -96,16 +108,15 @@ Comparison precedes_in_plan(Step **s1, Step **s2)
   return Equal;
 }
 
-SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
+SolutionPlan *plan_save(Action **actions, size_t actions_nb, double search_time)
 {
-  SolutionPlan *plan = cpt_malloc(plan, 1);
-  plan->steps_nb = 0;
+  SolutionPlan *plan = cpt_calloc(plan, 1);
   plan->search_time = search_time;
-  plan->makespan = 0;
   cpt_malloc(plan->steps, actions_nb - 2);
   FOR(a, actions) {
     if (a->id > 1) {
       Step *step = cpt_malloc(plan->steps[plan->steps_nb++], 1);
+      if (!opt.pddl21 || a->ope->real_duration) plan->length++;
       step->action = a;
 #ifdef RESOURCES
       if (a->synchro) {
@@ -119,6 +130,7 @@ SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
     }
   } EFOR;
   if (opt.sequential && pddl_domain->action_costs) plan->makespan = total_plan_cost;
+  //plan->makespan = first_start(end_action);
   else plan->makespan = first_start(end_action) - (opt.pddl21 ? pddl_domain->precision.t : 0);
   vector_sort(plan->steps, precedes_in_plan);
 
@@ -149,28 +161,6 @@ SolutionPlan *plan_save(Action **actions, long actions_nb, double search_time)
 
   FOR(s, plan->steps) { s->action = s->action->origin; } EFOR;
   return plan;
-}
-
-
-SolutionPlan plan_copy_static(SolutionPlan plan)
-{
-  SolutionPlan copy = plan;
-  cpt_malloc(copy.steps, copy.steps_nb);
-  FORi(s, i, plan.steps) {
-    cpt_malloc(copy.steps[i], 1);
-    copy.steps[i] = s;
-  } EFOR;
-  return copy;
-}
-
-void plan_free_static(SolutionPlan *plan)
-{
-  FOR(s, plan->steps) {
-    cpt_free(s->causals);
-    cpt_free(s->before);
-    cpt_free(s);
-  } EFOR;
-  cpt_free(plan->steps);
 }
 
 void plan_free(SolutionPlan *plan)

@@ -8,6 +8,7 @@
 
 %{
 #include "cpt.h"
+#include "options.h"
 #include "trace.h"
 #include "pddl.h"
 #include "structs.h"
@@ -37,7 +38,7 @@ extern FILE *pddl_in;
 %token <string> NAME_TOK NUMBER_TOK
 
 %type <ope> action action_body
-%type <list> formula constraint_list atom basic_atom simplest_atom typed_token_list type token_list expression expression_list atom_list typed_atom_list
+%type <list> formula constraint_list atom basic_atom simplest_atom typed_token_list type token_list expression expression_list atom_list typed_atom_list typed_token_list_aux
 %type <number> function operation
 
 %start domain
@@ -72,6 +73,9 @@ problem_definition:
 | problem_definition LP GOAL_TOK formula RP { domain->token_goal = $4; }
 | problem_definition LP CONSTRAINTS_TOK LP AND_TOK constraint_list RP RP { domain->token_ac_constraints = $6; }
 | problem_definition LP METRIC_TOK NAME_TOK expression RP { domain->token_metric = $5; domain->metric_function = $4; }
+//ifdef DAE
+| problem_definition LP METRIC_TOK LP AND_TOK LP NAME_TOK expression RP LP NAME_TOK expression RP RP RP { domain->token_metric = $8; domain->metric_function = $7; }
+//endif
 ;
 
 action:
@@ -130,10 +134,23 @@ LP NAME_TOK typed_token_list RP { $$ = token_add_head($3, $2, NULL); }
 | LP EQ_TOK typed_token_list RP { $$ = token_set_equality_mod(token_add_head($3, "=", NULL), EQUAL_MOD); }
 ;
 
+/* typed_token_list:  */
+/* { $$ = NULL; } */
+/* | NAME_TOK typed_token_list { $$ = token_add_head($2, $1, NULL); } */
+/* | NAME_TOK SUB_TOK type typed_token_list { $$ = token_add_head($4, $1, $3); } */
+/* | SUB_TOK type typed_token_list { $$ = $3; } */
+/* ; */
+
 typed_token_list: 
+SUB_TOK type typed_token_list_aux { $$ = $3; }
+| typed_token_list_aux { $$ = $1; }
+;
+
+typed_token_list_aux: 
 { $$ = NULL; }
-| NAME_TOK typed_token_list { $$ = token_add_head($2, $1, NULL); }
-| NAME_TOK SUB_TOK type typed_token_list { $$ = token_add_head($4, $1, $3); }
+| NAME_TOK typed_token_list_aux { $$ = token_add_head($2, $1, NULL); }
+| NAME_TOK SUB_TOK type typed_token_list_aux { $$ = token_add_head($4, $1, $3); }
+| NAME_TOK SUB_TOK type SUB_TOK type typed_token_list_aux { $$ = token_add_head($6, $1, $3); }
 ;
 
 type: 
@@ -183,7 +200,7 @@ void parser_read_pddl_file(PDDLDomain *domain, char *file, int pipefd)
   if (!(pddl_in = fopen(file, "r"))) error(no_file, "File '%s' does not exist", file);
 #else
   char cmd[file ? strlen(file) : 0 + 12];
-  if (file != NULL) sprintf(cmd, "bzip2 -dfc %s", file);
+  if (file != NULL) sprintf(cmd, "bzcat -f %s", file);
   if (!(pddl_in = file == NULL ? fdopen(pipefd, "r") : popen(cmd, "r"))) error(no_file, "File '%s' does not exist", file);
 #endif
   parser_reset_lineno();

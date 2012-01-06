@@ -5,30 +5,16 @@ SET(SOURCES
   )
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} cpt_yahsp_library-common cpt_yahsp_library)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} cpt_yahsp_library-common cpt_yahsp_library rt)
 
-SET_TARGET_PROPERTIES(
-  ${PROJECT_NAME}
-  PROPERTIES
-  COMPILE_FLAGS ""
-  LINK_FLAGS "-static"
-  )
-
-if(OPENMP_FOUND)
-
-  ADD_EXECUTABLE(${PROJECT_NAME}-mt ${SOURCES})
-  TARGET_LINK_LIBRARIES(${PROJECT_NAME}-mt cpt_yahsp_library-common-omp cpt_yahsp_library-mt)
+if (SCC)
 
   SET_TARGET_PROPERTIES(
-    ${PROJECT_NAME}-mt
+    ${PROJECT_NAME}
     PROPERTIES
-    COMPILE_FLAGS "${OpenMP_C_FLAGS}"
-    LINK_FLAGS "${OpenMP_C_FLAGS} -static"
+    COMPILE_FLAGS ""
+    LINK_FLAGS "-static"
     )
-
-endif()
-
-if(MPI)
 
   ADD_EXECUTABLE(${PROJECT_NAME}-mpi ${SOURCES})
   TARGET_LINK_LIBRARIES(${PROJECT_NAME}-mpi cpt_yahsp_library-common-mpi cpt_yahsp_library-mpi)
@@ -40,6 +26,43 @@ if(MPI)
     LINK_FLAGS "-static"
     )
 
+else()
+
+  SET_TARGET_PROPERTIES(
+    ${PROJECT_NAME}
+    PROPERTIES
+    COMPILE_FLAGS ""
+    LINK_FLAGS ""
+    )
+
+  if(MPI)
+
+    ADD_EXECUTABLE(${PROJECT_NAME}-mpi ${SOURCES})
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}-mpi cpt_yahsp_library-common-mpi cpt_yahsp_library-mpi)
+
+    SET_TARGET_PROPERTIES(
+      ${PROJECT_NAME}-mpi
+      PROPERTIES
+      COMPILE_FLAGS "-DYAHSP_MPI ${OpenMP_C_FLAGS}"
+      LINK_FLAGS " ${OpenMP_C_FLAGS}"
+      )
+
+  endif()
+  
+  if(OPENMP_FOUND)
+
+    ADD_EXECUTABLE(${PROJECT_NAME}-mt ${SOURCES})
+    TARGET_LINK_LIBRARIES(${PROJECT_NAME}-mt cpt_yahsp_library-common-omp cpt_yahsp_library-mt)
+    
+    SET_TARGET_PROPERTIES(
+      ${PROJECT_NAME}-mt
+      PROPERTIES
+      COMPILE_FLAGS "${OpenMP_C_FLAGS}"
+      LINK_FLAGS "${OpenMP_C_FLAGS}"
+      )
+    
+  endif()
+  
 endif()
 
 # ADD_EXECUTABLE(${PROJECT_NAME}-wct ${SOURCES})

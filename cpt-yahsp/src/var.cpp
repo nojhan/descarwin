@@ -8,10 +8,9 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "trace.h"
 #include "var.h"
-#include "structs.h"
-#include "plan.h"
 #include "globs.h"
 
 
@@ -29,9 +28,9 @@ VarEvent actual_event;
 /*****************************************************************************/
 
 
-void create_enum_variable(EnumVariable *v, long n, long sup, void *hook, PropagationProc propagate, EmptyProc empty)
+void create_enum_variable(EnumVariable *v, ulong n, ulong sup, void *hook, PropagationProc propagate, EmptyProc empty)
 {
-  long i;
+  ulong i;
   
   if (n + sup > MAXVAL) 
     error(bucket, "Too many values in bucket");

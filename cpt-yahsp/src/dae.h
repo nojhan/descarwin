@@ -43,7 +43,7 @@ struct CPTTermArray {
 
 struct CPTCostArray {
   long *elems;
-  int nb;
+  size_t nb;
 };
 
 

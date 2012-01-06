@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "structs.h"
 #include "problem.h"
 #include "propagations.h"
@@ -62,13 +63,13 @@ static bool (*make_choice) (Choice *c);
 #define set_choice(type, c, c0, a0, dir)				\
   (c0 == NULL ? false :							\
    (c->choice1 = c0, c->choice2 = a0,					\
-    c->direction = ({ Comparison test = dir; test == Better || (opt.random && test == Equal && rand() % 2 == 0); }), \
+    c->direction = ({ Comparison test = dir; test == Better || (opt.random && test == Equal && cpt_rand() % 2 == 0); }), \
     c->propagate = propagate_##type##_choice, stats.type##_choices++, true))
 
 #define _inith(h, o) h = h##_##o
 #define _init_heuristic(o)						\
   NEST(									\
-       cpt_calloc(last_conflicts, opt.last_conflicts); \
+       cpt_calloc(last_conflicts, opt.last_conflicts);			\
        _inith(is_best_action, o);					\
        _inith(is_best_support, o);					\
        _inith(is_best_conflict, o);					\
@@ -101,7 +102,7 @@ static bool mutex_first(Choice *c);
 
 void init_heuristics(void)
 {
-  if (opt.random) srand(opt.seed);
+  if (opt.random) cpt_srand(opt.seed);
   if (opt.optimal) _init_heuristic(optimal); 
   else _init_heuristic(suboptimal);
 #ifdef RATP
@@ -137,7 +138,7 @@ static bool choose_support(Choice *choice)
     if (!is_produced(c) && !c->fluent->no_branching) {
 #endif
       a = c->best_producer;
-      if (!c0 || preferred(is_best_support(c, a, c0, a0), ties)) 
+      if (!c0 || preferred(is_best_support(c, a, c0, a0), opt.random, ties)) 
 	{ c0 = c; a0 = a; }
     }
   } EFOR;
@@ -152,7 +153,7 @@ Action *best_action(Causal *c)
   long ties = 1;
 
   FORPROD2(a, c) {
-    if (!a0 || preferred(is_best_action(a, a0, c), ties)) a0 = a; } EFOR;
+    if (!a0 || preferred(is_best_action(a, a0, c), opt.random, ties)) a0 = a; } EFOR;
   return a0;
 }
 
@@ -165,7 +166,7 @@ static bool choose_conflict(Choice *choice)
   RFOR(c, active_causals) {
     FOR(a, c->fluent->edeleters) {
       if (support_threat(c, a)) 
-	if (!c0 || preferred(is_best_conflict(c, a, c0, a0), ties)) 
+	if (!c0 || preferred(is_best_conflict(c, a, c0, a0), opt.random, ties)) 
 	  { c0 = c; a0 = a; }
     } EFOR;
   } EFOR;  
@@ -182,7 +183,7 @@ static bool choose_mutex(Choice *choice)
 
   FORPAIR(a, b, active_actions) {
     if (mutex_threat(a, b))
-      if (!a0 || preferred(is_best_mutex(a, b, a0, b0), ties))
+      if (!a0 || preferred(is_best_mutex(a, b, a0, b0), opt.random, ties))
 	{ a0 = a ; b0 = b; }
   } EFORPAIR;
   lc1 = a0;
@@ -197,7 +198,7 @@ static bool choose_start_time(Choice *choice)
 
   FOR(a, active_actions) {
     if (first_start(a) < last_start(a))
-      if (!a0 || preferred(is_best_start_time(a, a0), ties)) a0 = a ;
+      if (!a0 || preferred(is_best_start_time(a, a0), opt.random, ties)) a0 = a ;
   } EFOR;
   return set_choice(start_time, choice, a0, NULL, Better);
 }
@@ -278,8 +279,6 @@ static bool mutex_first(Choice *c)
 {
   return (choose_mutex(c) || choose_conflict(c) || choose_support(c));
 }
-
-TimeVal best_total_plan_cost = MAXTIME;
 
 void search(void)
 {

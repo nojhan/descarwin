@@ -9,8 +9,19 @@
 #include "cpt.h"
 #include "structs.h"
 #include "solve.h"
-
+#ifdef YAHSP_MPI
+#include "plan.h"
+#include "yahsp.h"
+#include "yahsp-mpi.h"
+#endif
 int main(int argc, const char **argv)
 {
-  return cpt_main(argc, argv);
+#ifdef YAHSP_MPI
+  mpi_init(argc, argv);
+#endif
+  int return_code = cpt_main(argc, argv);
+#ifdef YAHSP_MPI
+  mpi_finalize();
+#endif
+  return return_code;
 }

@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "trace.h"
 #include "structs.h"
 #include "problem.h"
@@ -300,17 +301,16 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
     if (opt.read_actions && ope != domain->operators[0] && ope != domain->operators[1]) {
       char *name = make_name(ope->name, params, params_nb);
       if (!gdsl_rbtree_search(domain->action_names, (gdsl_compare_func_t) strcmp, (void *) name)) return;
+      printf("%lu %s\n", gdsl_rbtree_get_size(domain->action_names), name);
     }
     mpq_t dur_tmp, dur_tmp2;
     mpq_init(dur_tmp);
     if (ope->duration) { if (!evaluate_expression(domain, dur_tmp, ope->duration, params)) { mpq_clear(dur_tmp); return; } }
     else if (gdsl_queue_get_size(domain->actions_queue) >= 2) mpq_set_si(dur_tmp, (domain->action_costs ? 0 : 1), 1);
-
     if (ope->real_duration) {
       mpq_init(dur_tmp2);
       if (!evaluate_expression(domain, dur_tmp2, ope->real_duration, params)) { mpq_clear(dur_tmp); mpq_clear(dur_tmp2); return; }
     }
-
     mpq_t ac_values[ope->ac_constraints_nb * 2];
     PDDLExpression *ac_inter[ope->ac_constraints_nb];
     FORi(ac, i, ope->ac_constraints) {
@@ -344,13 +344,23 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
       return;
     }
     if (domain->action_costs && action->resources) {
-      if (val_known(action->resources[0]->increased)) mpq_set_si(dur_tmp, action->resources[0]->increased, 1);
+      if (val_known(action->resources[0]->increased)) 
+#ifdef DAE
+	{
+	  if (domain->durative_actions)
+	    action->cost = action->resources[0]->increased;
+	  else
+	    mpq_set_si(dur_tmp, action->resources[0]->increased, 1);
+	}
+#else
+      mpq_set_si(dur_tmp, action->resources[0]->increased, 1);
+#endif
       cpt_free(action->resources[0]);
       cpt_free(action->resources);
       action->resources_nb = 0;
     }
 #endif
-    mpq_set(duration_rat(action), dur_tmp);
+    mpq_set(action->dur.q, dur_tmp);
     gdsl_queue_insert(domain->durations_queue, &action->dur);
     mpq_clear(dur_tmp);
 
@@ -361,7 +371,6 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
     }
 
     vector_copy(action->parameters, params);
-    //gdsl_queue_insert(domain->actions_queue, action);
 #ifndef RESOURCES
     cpt_malloc(action->prec, ope->prec_nb);
     cpt_malloc(action->add, ope->add_nb);  
@@ -399,10 +408,6 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
 	mpq_clear(ac_values[i * 2]);
 	mpq_set(aci->max.q, ac_values[i * 2 + 1]);
 	mpq_clear(ac_values[i * 2 + 1]);
-	// mpq_init(aci->min.q);
-	// evaluate_expression(domain, aci->min.q, ac->min, params);
-	// mpq_init(aci->max.q);
-	// evaluate_expression(domain, aci->max.q, ac->max, params);
 	gdsl_queue_insert(domain->durations_queue, &aci->min);
 	gdsl_queue_insert(domain->durations_queue, &aci->max);
 	if (ac->inter) {
@@ -566,7 +571,7 @@ static void normalize_durations(PDDLDomain *domain)
 
 void instantiate_operators(PDDLDomain *domain)
 {
-  long i;
+  size_t i;
 
   domain->fluents_table = gdsl_rbtree_alloc(NULL, (gdsl_alloc_func_t) fluent_allocate, NULL, (gdsl_compare_func_t) fluent_atom_cmp);
   domain->constraints_table = gdsl_rbtree_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) atoms_cmp);
@@ -620,7 +625,7 @@ void instantiate_operators(PDDLDomain *domain)
   if (opt.read_actions) read_actions_from_file(domain);
 
   FOR(ope, domain->operators) {
-    cpt_calloc(ope->constraints_nb, maxi(1, ope->parameters_nb));
+    cpt_calloc(ope->constraints_nb, maxi((size_t) 1, ope->parameters_nb));
     FOR(litteral, ope->precondition) {
       if (atomic(litteral)) ope->prec_nb++;
       if (is_constraint(litteral)) {
@@ -639,8 +644,8 @@ void instantiate_operators(PDDLDomain *domain)
       }
       if (function(litteral)) compute_nb_resources(ope, litteral);
     } EFOR;
-    cpt_malloc(ope->constraints, maxi(1, ope->parameters_nb));
-    for (i = 0; i < maxi(1, ope->parameters_nb); i++) {
+    cpt_malloc(ope->constraints, maxi((size_t) 1, ope->parameters_nb));
+    for (i = 0; i < maxi((size_t) 1, ope->parameters_nb); i++) {
       cpt_malloc(ope->constraints[i], ope->constraints_nb[i]);
       ope->constraints_nb[i] = 0;
     }
@@ -671,7 +676,7 @@ void instantiate_operators(PDDLDomain *domain)
     //fluent_synchro->no_branching = true;
     fluent_available->no_branching = true;
     Action *action = (Action *) gdsl_queue_insert(domain->actions_queue, cpt_calloc(action, 1));
-    mpq_init(duration_rat(action));
+    mpq_init(action->dur.q);
     action->synchro = true;
     cpt_calloc(action->ope, 1);
     char name [strlen(resource->atom->predicate->name) + 9];
@@ -699,7 +704,7 @@ void instantiate_operators(PDDLDomain *domain)
   }
   gdsl_queue_free(domain->actions_queue);
 
-  //trace(normal, "ac : %ld\n", domain->actions_nb);
+  //trace(normal, "ac : %zu\n", domain->actions_nb);
 
   for (i = domain->actions_nb; i < domain->actions_nb + opt.max_plan_length; i++)
     cpt_calloc(domain->actions[i], 1);

@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "structs.h"
 #include "problem.h"
 #include "propagations.h"
@@ -36,14 +37,14 @@
 /*---------------------------------------------------------------------------*/
 
 
-static void compute_reachability_a(Action *a, bool areachable[], bool freachable[], long reached_prec[]);
-static void compute_reachability_f(Fluent *f, bool areachable[], bool freachable[], long reached_prec[]);
+static void compute_reachability_a(Action *a, bool areachable[], bool freachable[], size_t reached_prec[]);
+static void compute_reachability_f(Fluent *f, bool areachable[], bool freachable[], size_t reached_prec[]);
 
 
 /*****************************************************************************/
 
 
-static void compute_reachability_a(Action *a, bool areachable[], bool freachable[], long reached_prec[])
+static void compute_reachability_a(Action *a, bool areachable[], bool freachable[], size_t reached_prec[])
 {
   if (!get_areachable(a)) {
     set_areachable(a, true);
@@ -54,7 +55,7 @@ static void compute_reachability_a(Action *a, bool areachable[], bool freachable
   }
 }
 
-static void compute_reachability_f(Fluent *f, bool areachable[], bool freachable[], long reached_prec[])
+static void compute_reachability_f(Fluent *f, bool areachable[], bool freachable[], size_t reached_prec[])
 {
   if (!get_freachable(f)) {
     set_freachable(f, true);
@@ -68,7 +69,7 @@ static void compute_reachability_f(Fluent *f, bool areachable[], bool freachable
 
 void compute_bad_supporters(void)
 {
-  long reached_prec[actions_nb];
+  size_t reached_prec[actions_nb];
   bool areachable[actions_nb], freachable[fluents_nb];
 
   FORCOUPLE(a, actions, f, a->add) {
@@ -93,7 +94,7 @@ void compute_bad_supporters(void)
 void compute_distance_boosting(void)
 {
   Action *inter[actions_nb];
-  long inter_nb = 0, i;
+  size_t inter_nb = 0, i;
   bool inter_used[actions_nb];
 
   for (i = 0; i < actions_nb; i++) inter_used[i] = false;
@@ -144,11 +145,11 @@ void compute_distance_boosting(void)
 
 void compute_landmarks(void)
 {
-  long reached_prec[actions_nb + opt.max_plan_length];
+  size_t reached_prec[actions_nb + opt.max_plan_length];
   bool areachable[actions_nb + opt.max_plan_length];
   bool freachable[fluents_nb];
   Action *lands[actions_nb + opt.max_plan_length];
-  long lands_nb = 0;
+  size_t lands_nb = 0;
   
   FORMIN(a2, actions, 2) {
     FOR(f, fluents) { set_freachable(f, false); } EFOR;
@@ -164,8 +165,7 @@ void compute_landmarks(void)
     
   FOR(a, lands) {
     if (opt.verbose_preprocessing) { print_action(a); printf("\n"); }
-    Action *cl = NULL;
-    if (!a->used && a->origin->nb_instances > 0) { clone_action(a, NULL); cl = actions[actions_nb - 1]; }
+    if (!a->used && a->origin->nb_instances > 0) clone_action(a, NULL);
     use_action(a);
     propagate();
   } EFOR;

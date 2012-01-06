@@ -29,12 +29,11 @@ typedef struct ResourceLocal ResourceLocal;
 
 
 struct Fluent {
-  long id;
-  long bit_index;
-  long bit_mask;
+  ulong id;
+  ulong bit_index;
+  ulong bit_mask;
   PDDLAtom *atom;
   Value *indac;
-  TimeVal *pair_cost;
   BitArray mutex;
 #ifdef RESOURCES
   Resource *resource;
@@ -58,6 +57,9 @@ struct Action {
   Action *origin;
   TimeStruct dur;
   TimeStruct rdur;
+#ifdef DAE
+  TimeVal cost;
+#endif
   Action *pddl21_next;
   Action *pddl21_prev;
   TimeVal init;
@@ -68,9 +70,9 @@ struct Action {
   VECTOR(Fluent *, del);
   VECTOR(Fluent *, edel);
   VECTOR(ActivityConstraint *, ac_constraints);
-  long causals_nb;
+  size_t causals_nb;
   TimeVal *distances;
-  long weight;
+  ulong weight;
 #ifdef RESOURCES
   VECTOR(ResourceLocal *, resources);
   bool synchro;
@@ -83,12 +85,12 @@ struct Action {
   BitArray deletes_included;
 
   /* static fields */
-  long id;
-  long bit_index;
-  long bit_mask;
+  ulong id;
+  ulong bit_index;
+  ulong bit_mask;
   BoundVariable start;
   Causal **causals;
-  long nb_instances;
+  size_t nb_instances;
   BitArray precedences;
 #ifdef RESOURCES
   BoundVariable reslevel;
@@ -101,7 +103,7 @@ struct Causal {
   /* clonable fields */
   Fluent *fluent;
   Causal *origin;
-  long weight;
+  ulong weight;
 
   /* static fields */
   bool required;
@@ -126,7 +128,7 @@ struct ActivityConstraint {
 
 #ifdef RESOURCES
 struct Resource {
-  long id;
+  ulong id;
   PDDLAtom *atom;
   Fluent *fluent_available;
   Fluent *fluent_modified;
@@ -137,7 +139,7 @@ struct Resource {
 struct ResourceLocal {
   Resource *resource;
   Action *action;
-  long index_causal;
+  ulong index_causal;
   TimeVal min_level;
   TimeVal max_level;
   TimeVal increased;
@@ -160,7 +162,6 @@ struct ResourceLocal {
 #define deletes(a, f) bitarray_get((a)->deletes, f)
 
 #define set_edeletes(a, f) bitarray_set((a)->edeletes, f)
-#define set_temp_edeletes(a, f) bitarray_save_and_set((a)->edeletes, f)
 #define edeletes(a, f) bitarray_get((a)->edeletes, f)
 
 #define set_amutex(a1, a2) NEST( if ((a1)->id < (a2)->id) bitarray_set((a2)->mutex, a1); else bitarray_set((a1)->mutex, a2); )
@@ -179,15 +180,10 @@ struct ResourceLocal {
 
 #define distance_ca(c, a) distance((c)->consumer, a)
 #define distance_ac(a, c) ({TimeVal _d = MAXCOST; FORPROD(_a2, c) { minimize(_d, distance(a, _a2)); } EFOR; _d; })
-
-#define set_pair_cost(a1, a2, d) NEST( (a1)->pair_cost[(a2)->id] = d; (a2)->pair_cost[(a1)->id] = d; )
-#define pair_cost(a1, a2) (a1)->pair_cost[(a2)->id]
-
 #define set_deletes_included(a1, a2) bitarray_set((a1)->deletes_included, a2)
 #define deletes_included(a1, a2) bitarray_get((a1)->deletes_included, a2)
 
 #define duration(a) ((a)->dur.t)
-#define duration_rat(a) ((a)->dur.q)
 #define first_start(a) ((a)->start.inf)
 #define last_start(a) ((a)->start.sup)
 #define first_end(a) (first_start(a) + duration(a))

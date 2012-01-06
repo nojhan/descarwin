@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "trace.h"
 #include "pddl.h"
 #include "structs.h"
@@ -62,27 +63,27 @@ static void add_constant_to_types(PDDLTerm *constant, PDDLType **types, int type
 
 static void parse_domain_requirements(PDDLDomain *domain);
 static void parse_domain_types(PDDLDomain *domain); 
-static void parse_domain_constants(PDDLDomain *domain, gdsl_list_t tokens, PDDLTerm ***terms, long *terms_nb); 
-static void parse_domain_predicates(PDDLDomain *domain, gdsl_list_t tokens, PDDLPredicate ***predicates, long *predicates_nb);
+static void parse_domain_constants(PDDLDomain *domain, gdsl_list_t tokens, PDDLTerm ***terms, size_t *terms_nb); 
+static void parse_domain_predicates(PDDLDomain *domain, gdsl_list_t tokens, PDDLPredicate ***predicates, size_t *predicates_nb);
 static void parse_domain_operators(PDDLDomain *domain); 
-static void parse_atom_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLLitteral ***litterals, long *litterals_nb); 
+static void parse_atom_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLLitteral ***litterals, size_t *litterals_nb); 
 static void parse_expression(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLExpression **exp);
 static void parse_number(mpq_t number, const char *src);
 static void parse_atom(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLLitteral **litteral);
-static void parse_term_list(PDDLDomain *domain, gdsl_list_t list, PDDLTerm ***terms, long *terms_nb);
-static void parse_ac_constraints(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLActivityConstraint ***aconstraints, long *aconstraints_nb);
+static void parse_term_list(PDDLDomain *domain, gdsl_list_t list, PDDLTerm ***terms, size_t *terms_nb);
+static void parse_ac_constraints(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLActivityConstraint ***aconstraints, size_t *aconstraints_nb);
 static void print_pddl_domain(FILE *out, PDDLDomain *domain); 
 static void print_pddl_problem(FILE *out, PDDLDomain *domain); 
 static void print_operator(FILE *out, PDDLOperator *ope);
-static void print_types(FILE *out, PDDLType **types, long types_nb);
-static void print_term_list(FILE *out, PDDLTerm **terms, long terms_nb, bool printtypes);
+static void print_types(FILE *out, PDDLType **types, size_t types_nb);
+static void print_term_list(FILE *out, PDDLTerm **terms, size_t terms_nb, bool printtypes);
 static void print_predicate(FILE *out, PDDLPredicate *predicate);
 static void print_atom(FILE *out, PDDLAtom *atom);
 static void print_expression(FILE *out, PDDLExpression *expr);
 static void print_litteral(FILE *out, PDDLLitteral *litteral);
-static void print_litteral_list(FILE *out, PDDLLitteral **litterals, long litterals_nb);
+static void print_litteral_list(FILE *out, PDDLLitteral **litterals, size_t litterals_nb);
 static void print_timed_operator(FILE *out, PDDLOperator *ope, TemporalModality mod, bool has_atend, bool has_overall);
-static void print_timed_litteral_list(FILE *out, PDDLLitteral **litterals, long litterals_nb, TemporalModality mod);
+static void print_timed_litteral_list(FILE *out, PDDLLitteral **litterals, size_t litterals_nb, TemporalModality mod);
 static void print_ac_constraint(FILE *out, PDDLActivityConstraint *ac);
 
 
@@ -392,7 +393,7 @@ static void parse_domain_types(PDDLDomain *domain)
   }
 }
 	
-static void parse_domain_constants(PDDLDomain *domain, gdsl_list_t tokens, PDDLTerm ***terms, long *terms_nb) 
+static void parse_domain_constants(PDDLDomain *domain, gdsl_list_t tokens, PDDLTerm ***terms, size_t *terms_nb) 
 {
   if (!tokens) return;
   parse_term_list(domain, tokens, terms, terms_nb);
@@ -402,7 +403,7 @@ static void parse_domain_constants(PDDLDomain *domain, gdsl_list_t tokens, PDDLT
   } EFOR;
 }
 
-static void parse_domain_predicates(PDDLDomain *domain, gdsl_list_t tokens, PDDLPredicate ***predicates, long *predicates_nb) 
+static void parse_domain_predicates(PDDLDomain *domain, gdsl_list_t tokens, PDDLPredicate ***predicates, size_t *predicates_nb) 
 {
   Token *token_init;
   if (!tokens) return;
@@ -419,7 +420,7 @@ static void parse_domain_predicates(PDDLDomain *domain, gdsl_list_t tokens, PDDL
   gdsl_list_free(tokens);
 }
 
-static void parse_ac_constraints(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLActivityConstraint ***aconstraints, long *aconstraints_nb) 
+static void parse_ac_constraints(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLActivityConstraint ***aconstraints, size_t *aconstraints_nb) 
 {
   Token *token;
   if (!tokens) return;
@@ -528,7 +529,7 @@ static void parse_atom(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope
   gdsl_list_free(tokens);
 }
 
-static void parse_atom_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLLitteral ***litterals, long *litterals_nb) 
+static void parse_atom_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLLitteral ***litterals, size_t *litterals_nb) 
 {
   Token *token;
   if (!tokens) return;
@@ -540,7 +541,7 @@ static void parse_atom_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator
   gdsl_list_free(tokens);
 }
 
-static void parse_term_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLTerm ***terms, long *terms_nb)
+static void parse_term_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLTerm ***terms, size_t *terms_nb)
 {
   long i;
   Token *token;
@@ -577,7 +578,7 @@ static void parse_term_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLTerm ***
 /*  ********************************* */
 
 
-char *make_name(const char *name, PDDLTerm **terms, long terms_nb)
+char *make_name(const char *name, PDDLTerm **terms, size_t terms_nb)
 {
   static char buffer[STRING_MAX];
   long i = 1;
@@ -738,7 +739,7 @@ void print_pddl_types(FILE *out, PDDLDomain *domain)
   } EFOR;
 }
 
-static void print_types(FILE *out, PDDLType **types, long types_nb)
+static void print_types(FILE *out, PDDLType **types, size_t types_nb)
 {
   if (types) {
     fprintf(out, " -");
@@ -750,7 +751,7 @@ static void print_types(FILE *out, PDDLType **types, long types_nb)
   }
 }
 
-static void print_term_list(FILE *out, PDDLTerm **terms, long terms_nb, bool printtypes)
+static void print_term_list(FILE *out, PDDLTerm **terms, size_t terms_nb, bool printtypes)
 {
   FORi(term, i, terms) {
     fprintf(out, "%s", term->name);
@@ -816,7 +817,7 @@ static void print_litteral(FILE *out, PDDLLitteral *litteral)
   }
 }
 
-static void print_litteral_list(FILE *out, PDDLLitteral **litterals, long litterals_nb)
+static void print_litteral_list(FILE *out, PDDLLitteral **litterals, size_t litterals_nb)
 {
   FOR(litteral, litterals) {
     fprintf(out, "  ");
@@ -835,7 +836,6 @@ static void print_duration_minus_epsilon(FILE *out, PDDLOperator *ope)
 static void print_timed_operator(FILE *out, PDDLOperator *ope, TemporalModality mod, bool has_atend, bool has_overall)
 {
   const char *string_next = mod_string[mod != ATSTART_MOD || has_overall ? mod : mod + 1];
-  //bool trigger_next = mod == ATSTART_MOD || (mod == OVERALL_MOD && has_atend);
   bool trigger_next = (mod == ATSTART_MOD && (has_overall || has_atend)) || (mod == OVERALL_MOD && has_atend);
 
   fprintf(out, "(:action %s%s\n", ope->name, mod_string[mod - 1]);
@@ -903,7 +903,7 @@ static void print_timed_operator(FILE *out, PDDLOperator *ope, TemporalModality 
   fprintf(out, ")\n");
 }
 
-static void print_timed_litteral_list(FILE *out, PDDLLitteral **litterals, long litterals_nb, TemporalModality mod)
+static void print_timed_litteral_list(FILE *out, PDDLLitteral **litterals, size_t litterals_nb, TemporalModality mod)
 {
   FOR(litteral, litterals) {
     if (litteral->mod.temporal == NO_TEMP_MOD || mod == litteral->mod.temporal) {

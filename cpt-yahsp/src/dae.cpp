@@ -1,4 +1,5 @@
 #include "cpt.h"
+#include "options.h"
 #include "structs.h"
 #include "instantiation.h"
 #include "problem.h"
@@ -36,7 +37,7 @@ static CPTFluentArray all_fluents;
 
 static void create_attribute_spaces()
 {
-  int i;
+  size_t i;
   
   cpt_malloc(predicates, pddl_domain->predicates_nb);
 
@@ -91,7 +92,7 @@ CPTFluentArray *fluents_costs;
 
 static void compute_costs()
 {
-  long i = 0;
+  size_t i = 0;
   TimeVal maxim = 0;
   cpt_malloc(costs.elems, fluents_nb * 2);
   FOR(f, fluents) {
@@ -216,7 +217,7 @@ CPTCostArray cptGetCosts()
 
 CPTFluentArray cptGetFluentsByCost(long cost)
 {
-  long i;
+  size_t i;
   //return all_fluents;
   for (i = 0; i < costs.nb; i++) 
     if (costs.elems[i] == cost)

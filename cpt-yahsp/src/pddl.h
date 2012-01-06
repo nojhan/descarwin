@@ -208,7 +208,7 @@ extern gdsl_list_t token_set_expression_mod(gdsl_list_t tokens, ExpressionModali
 extern void domain_add_token_operator(PDDLDomain *domain, PDDLOperator *ope);
 extern PDDLDomain *parse_domain(char *dom_name, char *prob_name);
 
-extern char *make_name(const char *first_name, PDDLTerm **terms, long terms_nb);
+extern char *make_name(const char *first_name, PDDLTerm **terms, size_t terms_nb);
 extern void print_pddl_types(FILE *output, PDDLDomain *domain);
 
 
