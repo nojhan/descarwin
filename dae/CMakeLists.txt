@@ -45,7 +45,7 @@ ELSE()
 ENDIF()
 
 # target + link libraries
-LINK_LIBRARIES(eoutils gmp eo gcov gdsl)
+LINK_LIBRARIES(eoutils gmp eo rt gcov gdsl)
 
 # VV  : cpt_yahsp_library-common-dae-omp and  cpt_yahsp_library-dae are  no more
 # factorized because dae + yahsp-mt need  to be completely recompiled due to TLS
