@@ -433,7 +433,6 @@ int yahsp_compress_plans()
   solution_plan = plan;
 #ifdef DAE
   FOR(s, plan->steps) { plan->cost += s->action->cost; } EFOR;
-  printf("%d ", plan->cost);
 #endif
   return PLAN_FOUND;
 }

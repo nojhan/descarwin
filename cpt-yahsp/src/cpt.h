@@ -32,7 +32,7 @@
 #define BITS_VALUE 16
 #endif
 #ifndef BITS_TIME
-#define BITS_TIME 32
+#define BITS_TIME 64
 #endif
 
 //#define NOTRACE
