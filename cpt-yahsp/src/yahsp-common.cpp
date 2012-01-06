@@ -388,7 +388,12 @@ SolutionPlan *create_solution_plan(Node *node)
   }
   vector_sort(plan->steps, precedes_in_plan);
 #ifdef DAE
-  FOR(s, plan->steps) { plan->cost += s->action->cost; } EFOR;
+  FOR(s, plan->steps) { 
+    plan->cost += s->action->cost; 
+    maximize(plan->risk, s->action->cost);
+    if (s->action->cost > plan->risk) plan->risk = s->action->cost;
+  } EFOR;
+  printf("(%lld %lld) ", plan->cost, plan->risk);
 #endif
   return plan;
 }
@@ -432,7 +437,11 @@ int yahsp_compress_plans()
   vector_sort(plan->steps, precedes_in_plan);
   solution_plan = plan;
 #ifdef DAE
-  FOR(s, plan->steps) { plan->cost += s->action->cost; } EFOR;
+  FOR(s, plan->steps) { 
+    plan->cost += s->action->cost; 
+    maximize(plan->risk, s->action->cost);
+  } EFOR;
+  printf("(%lld %lld) ", plan->cost, plan->risk);
 #endif
   return PLAN_FOUND;
 }

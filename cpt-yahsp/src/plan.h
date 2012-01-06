@@ -49,6 +49,7 @@ struct SolutionPlan {
   TimeVal makespan;
 #ifdef DAE
   TimeVal cost;
+  TimeVal risk;
 #endif
   double search_time;
   double total_time;
