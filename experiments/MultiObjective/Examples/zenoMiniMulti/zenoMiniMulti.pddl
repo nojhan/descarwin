@@ -13,6 +13,7 @@
 	city4
 	)
 (:init
+	(= (total-cost) 0)
 	(= (citythreat city0) 0)
 	(= (citythreat city1) 100)
 	(= (citythreat city2) 10)
