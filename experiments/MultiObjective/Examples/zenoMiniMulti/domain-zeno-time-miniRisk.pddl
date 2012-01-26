@@ -1,5 +1,5 @@
 (define (domain zeno-travel)
-(:requirements :strips)
+(:requirements :strips :durative-actions :action-costs)
 (:predicates
 	 (at ?x ?c) (aircraft ?p) (person ?x) (city ?x) (libre ?x)
 )
