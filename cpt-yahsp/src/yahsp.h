@@ -20,11 +20,11 @@ struct YStep {
 };
 
 struct Node {
-  ulong id;
+  size_t id;
   Node *parent;
   ulong key;
   State state;
-  long fvalue;
+  ulong fvalue;
   ulong length;
   TimeVal makespan;
   VECTOR(YStep, steps);

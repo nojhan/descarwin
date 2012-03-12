@@ -104,79 +104,79 @@ char *fluent_name(Fluent *f)
 
 void print_fluent(Fluent *f)
 {
-  trace(normal, "FLUENT %lu : %s\n  INIT -> ", f->id, fluent_name(f));
+  cpt_trace(normal, "FLUENT %zu : %s\n  INIT -> ", f->id, fluent_name(f));
   print_time(cptout, f->init);
-  trace(normal, "\n  PRODUCERS -> ");
-  FOR(a, f->producers) { trace(normal, " %s", action_name(a)); } EFOR;
-  trace(normal, "\n  CONSUMERS -> ");
-  FOR(a, f->consumers) { trace(normal, " %s", action_name(a)); } EFOR;
-  trace(normal, "\n  DELETERS -> ");
-  FOR(a, f->deleters) { trace(normal, " %s", action_name(a)); } EFOR;
-  trace(normal, "\n  EDELETERS -> ");
-  FOR(a, f->edeleters) { trace(normal, " %s", action_name(a)); } EFOR;
-  trace(normal, "\n\n");
+  cpt_trace(normal, "\n  PRODUCERS -> ");
+  FOR(a, f->producers) { cpt_trace(normal, " %s", action_name(a)); } EFOR;
+  cpt_trace(normal, "\n  CONSUMERS -> ");
+  FOR(a, f->consumers) { cpt_trace(normal, " %s", action_name(a)); } EFOR;
+  cpt_trace(normal, "\n  DELETERS -> ");
+  FOR(a, f->deleters) { cpt_trace(normal, " %s", action_name(a)); } EFOR;
+  cpt_trace(normal, "\n  EDELETERS -> ");
+  FOR(a, f->edeleters) { cpt_trace(normal, " %s", action_name(a)); } EFOR;
+  cpt_trace(normal, "\n\n");
 }
 
 #ifdef RESOURCES
 void print_resources_local(ResourceLocal **resources, long resources_nb, bool print_action)
 {
   FOR(rl, resources) { 
-    if (print_action) trace(normal, "  ACTION %s ->\n", action_name(rl->action));
+    if (print_action) cpt_trace(normal, "  ACTION %s ->\n", action_name(rl->action));
     char *name = resource_name(rl->resource);
-    if (val_known(rl->min_level)) trace(normal, "    check %s >= %" TIMEP "\n", name, rl->min_level);
-    if (val_known(rl->max_level)) trace(normal, "    check %s <= %" TIMEP "\n", name, rl->max_level);
-    if (val_known(rl->increased)) trace(normal, "    increase %s by %" TIMEP "\n", name, rl->increased);
-    if (val_known(rl->decreased)) trace(normal, "    decrease %s by %" TIMEP "\n", name, rl->decreased);
-    if (val_known(rl->assigned)) trace(normal, "    assign %s to %" TIMEP "\n", name, rl->assigned); 
+    if (val_known(rl->min_level)) cpt_trace(normal, "    check %s >= %" TIMEP "\n", name, rl->min_level);
+    if (val_known(rl->max_level)) cpt_trace(normal, "    check %s <= %" TIMEP "\n", name, rl->max_level);
+    if (val_known(rl->increased)) cpt_trace(normal, "    increase %s by %" TIMEP "\n", name, rl->increased);
+    if (val_known(rl->decreased)) cpt_trace(normal, "    decrease %s by %" TIMEP "\n", name, rl->decreased);
+    if (val_known(rl->assigned)) cpt_trace(normal, "    assign %s to %" TIMEP "\n", name, rl->assigned); 
   } EFOR;
 }
 #endif
 
 void print_complete_action(Action *a)
 {
-  trace(normal, "ACTION %lu : %s\n", a->id, action_name(a));
-  trace(normal, "  INIT -> ");
+  cpt_trace(normal, "ACTION %zu : %s\n", a->id, action_name(a));
+  cpt_trace(normal, "  INIT -> ");
   print_time(cptout, a->init);
-  trace(normal, "\n  DURATION -> ");
+  cpt_trace(normal, "\n  DURATION -> ");
   print_time(cptout, duration(a));
   if (opt.pddl21 && a->ope->real_duration) {
-    trace(normal, "\n  RDURATION -> ");
+    cpt_trace(normal, "\n  RDURATION -> ");
     print_time(cptout, a->rdur.t);
   }
-  trace(normal, "\n  PREC ->");
-  FOR(f, a->prec) { trace(normal, " %s", fluent_name(f)); } EFOR;
-  trace(normal, "\n  ADD ->");
-  FOR(f, a->add) { trace(normal, " %s", fluent_name(f)); } EFOR;
-  trace(normal, "\n  DEL ->");
-  FOR(f, a->del) { trace(normal, " %s", fluent_name(f)); } EFOR;
-  trace(normal, "\n  EDEL ->");
-  FOR(f, a->edel) { trace(normal, " %s", fluent_name(f)); } EFOR;
+  cpt_trace(normal, "\n  PREC ->");
+  FOR(f, a->prec) { cpt_trace(normal, " %s", fluent_name(f)); } EFOR;
+  cpt_trace(normal, "\n  ADD ->");
+  FOR(f, a->add) { cpt_trace(normal, " %s", fluent_name(f)); } EFOR;
+  cpt_trace(normal, "\n  DEL ->");
+  FOR(f, a->del) { cpt_trace(normal, " %s", fluent_name(f)); } EFOR;
+  cpt_trace(normal, "\n  EDEL ->");
+  FOR(f, a->edel) { cpt_trace(normal, " %s", fluent_name(f)); } EFOR;
 #ifdef RESOURCES
   if (a->resources) {
-    trace(normal, "\n  RESOURCES ->\n");
+    cpt_trace(normal, "\n  RESOURCES ->\n");
     print_resources_local(a->resources, a->resources_nb, false);
   }
 #endif
   if (a->ac_constraints) {
-    trace(normal, "\n  ACTIVITY ->\n");
+    cpt_trace(normal, "\n  ACTIVITY ->\n");
     FOR(ac, a->ac_constraints) {
-      trace(normal, "    %s -- min : ", fluent_name(ac->fluent));
+      cpt_trace(normal, "    %s -- min : ", fluent_name(ac->fluent));
       print_time(cptout, ac->min.t);
-      trace(normal, " -- max : ");
+      cpt_trace(normal, " -- max : ");
       print_time(cptout, ac->max.t);
       if (ac->time) {
-	trace(normal, "\n\t\t");
+	cpt_trace(normal, "\n\t\t");
 	FOR2(t, ac->time, d, ac->dur) {
-	  trace(normal, "(");
+	  cpt_trace(normal, "(");
 	  print_time(cptout, t.t);
-	  trace(normal, ",");
+	  cpt_trace(normal, ",");
 	  print_time(cptout, d.t);
-	  trace(normal, ") ");
+	  cpt_trace(normal, ") ");
 	} EFOR;
       }
     } EFOR;
   }
-  trace(normal, "\n\n");
+  cpt_trace(normal, "\n\n");
 }
 
 char *action_name(Action *a)
@@ -186,13 +186,13 @@ char *action_name(Action *a)
 
 void print_action(Action *a)
 {
-  trace(normal, "%s%s%lu[", (a->used ? "*" : (a->excluded ? "!" : "")), action_name(a), a->id);
+  cpt_trace(normal, "%s%s%zu[", (a->used ? "*" : (a->excluded ? "!" : "")), action_name(a), a->id);
   print_time(cptout, first_start(a));
-  trace(normal, ",");
+  cpt_trace(normal, ",");
   print_time(cptout, last_start(a));
-  trace(normal, "](");
+  cpt_trace(normal, "](");
   print_time(cptout, duration(a));
-  trace(normal, ")");
+  cpt_trace(normal, ")");
 #ifdef RESOURCES
   if (a->synchro) fprintf(cptout, "[%" TIMEP ",%" TIMEP "]", min_level(a), max_level(a));
 #endif
@@ -245,7 +245,7 @@ char *resource_name(Resource *r)
 
 void print_resource(Resource *r)
 {
-  trace(normal, "RESOURCE %s :\n", resource_name(r));
+  cpt_trace(normal, "RESOURCE %s :\n", resource_name(r));
   FOR(a, r->fluent_modified->producers) {
     ResourceLocal *resource =  resource_local(a, r);
     print_resources_local(&resource, 1, true);
@@ -255,13 +255,13 @@ void print_resource(Resource *r)
 
 void print_causal(Causal *c)
 {
-  trace(normal, "S(%s, [", fluent_name(c->fluent));
+  cpt_trace(normal, "S(%s, [", fluent_name(c->fluent));
   print_time(cptout, first_start(c));
-  trace(normal, " ");
+  cpt_trace(normal, " ");
   print_time(cptout, last_start(c));
-  trace(normal, "],");
+  cpt_trace(normal, "],");
   print_action(c->consumer);
-  trace(normal, ")");
+  cpt_trace(normal, ")");
 }
 
 static void create_structures(void) 
@@ -520,7 +520,7 @@ static void keep_reachable(void)
   memmove(actions + actions_nb, actions + actions_orig, (opt.max_plan_length + 1) * sizeof(Action *));
   cpt_realloc(actions, actions_nb + opt.max_plan_length + 1);
   
-/*   FOR(f, fluents) { trace(normal, "%s %d\n", fluent_name(f), f->end); } EFOR; */
+/*   FOR(f, fluents) { cpt_trace(normal, "%s %d\n", fluent_name(f), f->end); } EFOR; */
   FOR(f, fluents) {
     cpt_free(f->consumers);
     cpt_free(f->producers);

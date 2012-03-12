@@ -320,10 +320,11 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
 	  !evaluate_expression(domain, ac_values[i * 2 + 1], ac->max, params) ||
 	  (ac->inter != NULL && !(ac_inter[i] = evaluate_function(domain, ac->inter->litteral, params))))
 	{
-	  while (i >= 0) {
-	    mpq_clear(ac_values[i * 2]);
-	    mpq_clear(ac_values[i * 2 + 1]);
-	    i--;
+	  int j = i; // as i size_t
+	  while (j >= 0) {
+	    mpq_clear(ac_values[j * 2]);
+	    mpq_clear(ac_values[j * 2 + 1]);
+	    j--;
 	  }
 	  mpq_clear(dur_tmp);
 	  if (ope->real_duration) 

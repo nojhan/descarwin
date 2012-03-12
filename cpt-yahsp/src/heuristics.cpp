@@ -10,10 +10,9 @@
 #include "cpt.h"
 #include "options.h"
 #include "structs.h"
-#include "plan.h"
-#include "heuristics.h"
-#include "trace.h"
 #include "globs.h"
+#include "branching.h"
+#include "heuristics.h"
 
 
 /*****************************************************************************/
@@ -122,15 +121,8 @@ double ch3(Action *a, Action *b)
   TimeVal Tmax_a = mini(last_start(a), last_start(b) - delta_aa(a, b));
   //if (Tmax_a - first_start(a) == 0) return MAXTIME;
   double d = duration(a);
+  // return d*d / (Tmax_a - first_start(a)+1);
   return d*d*d / (double) sqrt(Tmax_a - first_start(a)+1);
-}
-
-double ch30(Action *a, Action *b)
-{
-  TimeVal Tmin_b = maxi(first_start(b), first_start(a) + delta_aa(a, b));
-  //if (Tmax_a - first_start(a) == 0) return MAXTIME;
-  double d = duration(b);
-  return d*d*d / (double) sqrt(last_start(b) - Tmin_b+1);
 }
 
 double ch2(Action *a, Action *b)
@@ -140,9 +132,11 @@ double ch2(Action *a, Action *b)
   double da = duration(a);
   double db = duration(b);
 
-  return mini(1 / (double) (1+Tmax_a - first_start(a)),  1 / (double) (1+last_start(b) - Tmin_b));
+  return  da*da*da / (double) sqrt(1+Tmax_a - first_start(a)) + db*db*db / (double) sqrt(1+last_start(b) - Tmin_b);
+  return (da+db)*(da+db)*(da+db) / (double) sqrt(1 + Tmax_a - first_start(a) + last_start(b) - Tmin_b);
+  return mini(da*da*da / (double) (1+Tmax_a - first_start(a)),  db*db*db / (double) (1+last_start(b) - Tmin_b));
 
-  return mini(da*da / (double) (1+Tmax_a - first_start(a)),  db*db / (double) (1+last_start(b) - Tmin_b));
+  return mini(1 / (double) (1+Tmax_a - first_start(a)),  1 / (double) (1+last_start(b) - Tmin_b));
   return (da+db)*(da+db) / (double) sqrt(1 + Tmax_a - first_start(a) + last_start(b) - Tmin_b);
   //return  (da*da+db*db) / (double) (1+Tmax_a - first_start(a)+last_start(b) - Tmin_b);
   return  (da+db)*(da+db) / (double) sqrt ( (1+Tmax_a - first_start(a)) * (1+last_start(b) - Tmin_b));
@@ -150,40 +144,64 @@ double ch2(Action *a, Action *b)
   return  da*da / (double) sqrt(1+Tmax_a - first_start(a)) + db*db / (double) sqrt(1+last_start(b) - Tmin_b);
 }
 
-double ch6(Action *a, Action *b)
+double ch2b(Action *a, Action *b)
 {
   TimeVal Tmin_b = maxi(first_start(b), first_start(a) + delta_aa(a, b));
   TimeVal Tmax_a = mini(last_start(a), last_start(b) - delta_aa(a, b));
   double da = duration(a);
   double db = duration(b);
-  return  maxi(da*da / (double) (1+Tmax_a - first_start(a)),  db*db / (double) (1+last_start(b) - Tmin_b));
-  //return  (da+db)*(da+db) / (double) sqrt(1 + Tmax_a - first_start(a) + last_start(b) - Tmin_b);
-  //return  (da*da+db*db) / (double) sqrt(1+Tmax_a - first_start(a)+last_start(b) - Tmin_b);
-  //return  da*da / (double) sqrt(1+Tmax_a - first_start(a)) + db*db / (double) sqrt(1+last_start(b) - Tmin_b);
+
+  return  da*da*da / (double) sqrt(1+Tmax_a - first_start(a)) + db*db*db / (double) sqrt(1+last_start(b) - Tmin_b);
+  return maxi(da*da*da / (double) (1+Tmax_a - first_start(a)),  db*db*db / (double) (1+last_start(b) - Tmin_b));
 }
 
-double ch4(Action *a, Action *b)
-{
-  TimeVal Tmax_a = mini(last_start(a), last_start(b) - delta_aa(a, b));
-  TimeVal Tmin_b = maxi(first_start(b), first_start(a) + delta_aa(a, b));
-  return Tmax_a - first_start(a) + last_start(b) - Tmin_b;
-}
+#define wdeg3(a) ((a)->origin->weight+1)
+
 
 double ch5(Action *a, Action *b)
 {
   TimeVal Tmax_a = mini(last_start(a), last_start(b) - delta_aa(a, b));
   TimeVal Tmin_b = maxi(first_start(b), first_start(a) + delta_aa(a, b));
-  return mini(Tmax_a - first_start(a), last_start(b) - Tmin_b);
+  // return maxi(Tmax_a - first_start(a), last_start(b) - Tmin_b);
+  double da = duration(a);
+  double db = duration(b);
+  return maxi((Tmax_a - first_start(a)+1)/wdeg3(a), (last_start(b) - Tmin_b+1)/wdeg3(b));
 }
 
-extern Action *lc1, *lc2;
+double ch6(Action *a, Action *b)
+{
+  TimeVal Tmax_a = mini(last_start(a), last_start(b) - delta_aa(a, b));
+  TimeVal Tmin_b = maxi(first_start(b), first_start(a) + delta_aa(a, b));
+  // return mini(Tmax_a - first_start(a), last_start(b) - Tmin_b);
+  double da = duration(a);
+  double db = duration(b);
+  return mini((Tmax_a - first_start(a)+1)/wdeg3(a), (last_start(b) - Tmin_b+1)/wdeg3(b));
+}
+
+double ch1(Action *a, Action *b)
+{
+  return (last_start(a) + last_start(b) - first_start(a) - first_start(b) + 2) / (wdeg3(a) + wdeg3(b));
+}
+
+double ch1b(Action *a, Action *b)
+{
+  return (last_start(a) - first_start(a)) / wdeg3(a);
+}
 
 Comparison is_best_mutex_optimal(Action *a, Action *b, Action *a0, Action *b0)
 {
-  PREFER((a == lc1 && b == lc2) || (a == lc2 && b == lc1), (a0 != lc1 && a0 != lc2) || (b0 != lc1 && b0 != lc2));
-  GREATER(mini(ch3(a, b), ch3(b, a)), mini(ch3(a0, b0), ch3(b0, a0)));
+  //printf("(%d %d) ", mini(wdeg3(a), wdeg3(b)), mini(wdeg3(a0), wdeg3(b0)));
+  //if (opt.wdeg) GREATER(wdeg(a) + wdeg(b), wdeg(a0) + wdeg(b0));
+  //if (opt.wdeg) GREATER(mini(wdeg(a), wdeg(b)), mini(wdeg(a0), wdeg(b0)));
+  //if (opt.wdeg) LESS(maxi(wdeg(a), wdeg(b)), maxi(wdeg(a0), wdeg(b0)));
+  //LESS(maxi(slack_aa(a, b), slack_aa(b, a)), maxi(slack_aa(a0, b0), slack_aa(b0, a0)));
 
-  GREATER(mini(ch2(a, b), ch2(b, a)), mini(ch2(a0, b0), ch2(b0, a0)));
+  //GREATER(mini(ch3(a, b), ch3(b, a)), mini(ch3(a0, b0), ch3(b0, a0)));
+  //GREATER(mini(ch2(a, b), ch2(b, a)), mini(ch2(a0, b0), ch2(b0, a0)));
+  //LESS(ch1(a, b), ch1(a0, b0));
+  LESS(maxi(ch5(a, b), ch5(b, a)), maxi(ch5(a0, b0), ch5(b0, a0)));
+  return Equal;
+
 
   //GREATER(wdeg(a), wdeg(a0));
 
@@ -231,13 +249,11 @@ Comparison order_mutex_before_optimal(Action *a1, Action *a2)
 {
   //GREATER(slack_aa(a1, a2), slack_aa(a2, a1));
   //LESS(ch3(a1, a2), ch3(a2, a1));
-
-  //LESS(ch3(a1, a2), ch3(a2, a1));
-  LESS(ch2(a1, a2), ch2(a2, a1));
-  LESS(ch6(a1, a2), ch6(a2, a1));
+  //LESS(ch2b(a1, a2), ch2b(a2, a1));
+  //GREATER(ch1b(a1, a2), ch1b(a2, a1));
+  GREATER(ch6(a1, a2), ch6(a2, a1));
 
   //GREATER(ch4(a1, a2), ch4(a2, a1));
-  //GREATER(ch5(a1, a2), ch5(a2, a1));
   return Equal;
 }
 

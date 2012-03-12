@@ -129,7 +129,7 @@ void node_compute_key(Node *node)
   // D. J. Bernstein hash function
   long i;
   for (i = 0; i < yahsp_state_size; i++) 
-    node->key = node->key * 33 + ((char *) node->state)[i];
+    node->key = node->key * 33 + ((uint8_t *) node->state)[i];
 }
 
 void copy_applicable_actions(Node *node)
@@ -282,7 +282,7 @@ void node_apply_action(Node *node, Action *a)
       } EFOR;
       tmp = tmp->parent;
     }
-  end:;
+  end:
     maximize(node->makespan, init + duration(a));
   }
 #ifdef YAHSP_MPI
@@ -378,6 +378,7 @@ SolutionPlan *create_solution_plan(Node *node)
   cpt_malloc(plan->steps, (plan->steps_nb = length));
   plan->makespan = node->makespan;
   plan->backtracks = stats.evaluated_nodes;
+  plan->length = length;
   while (node != NULL) {
     RFOR(a, node->steps) {
       Step *s = cpt_calloc(plan->steps[--length], 1);

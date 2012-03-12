@@ -12,7 +12,6 @@
 #include "structs.h"
 #include "problem.h"
 #include "propagations.h"
-#include "preprocess.h"
 #include "scheduling.h"
 #include "plan.h"
 #include "trace_planner.h"
@@ -40,10 +39,7 @@ static void protect(Action *a1, Action *a2);
 void propagate_action(Action *a)
 {
   if (a->excluded) return;
-  //if (a->excluded || (opt.limit_initial_propagation && first_start(a) > first_start(end_action))) return;
-  //if (a == end_action) trace(normal, "% " TIMEP, first_start(end_action));
   trace_proc(propagate_action, a);
-  //if (opt.bound > 0 && last_start(end_action) < MAXTIME && first_end(a) > opt.bound) { exclude_action(a); return; }
   protect_against(a);
   if (a->excluded) return;
   FOR(c, a->causals) { activate_causal(c); } EFOR;
@@ -53,7 +49,6 @@ void propagate_action(Action *a)
 
 void propagate_causal(Causal *c)
 {
-  //if (c->excluded || (opt.limit_initial_propagation && first_start(c->consumer) > first_start(end_action))) return;
   if (c->excluded) return;
   trace_proc(propagate_causal, c);
   synchronize_causal(c);
@@ -69,7 +64,7 @@ static void synchronize_causal(Causal *c)
   
   trace_proc(synchronize_causal, c);
   if (prod) {
-    trace_proc(producer_used, c); 
+    trace_proc(producer_used, c);
     if (!prod->used && prod->origin->nb_instances > 0) clone_action(prod, c);
     ActivityConstraint *ac = find_ac_constraint(prod, c->fluent);
     if (ac != NULL) {
@@ -90,21 +85,18 @@ static void synchronize_causal(Causal *c)
     if (c->consumer->used) make_precede(prod, c->consumer);
   } else {
     TimeVal min_cons_init = MAXTIME, min_prod_init = MAXTIME, max_prod_init = 0, max_cons_init = 0;
-    int nb = 0; Action *prod = NULL;
 
     FORPROD(a, c) {
-      if (last_start(a) < first_start(c) || first_start(a) > last_start(c) || cannot_precede_aa(a, c->consumer) ||
-	  first_start(c) > last_start(c->consumer) - delta_aa(a, c->consumer))
+      if (last_start(a) < first_start(c) || first_start(a) > last_start(c) || cannot_precede_aa(a, c->consumer) 
+	  || first_start(c) > last_start(c->consumer) - delta_aa(a, c->consumer))
 	rem_producer(c, a);
       else {
 	ActivityConstraint *ac = find_ac_constraint(a, c->fluent);
 	if (ac != NULL) {
-	  nb++;
-	  prod = a;
 	  TimeVal acmin, acmax;
 	  evaluate_ac_forward(ac, maxi(first_start(a), first_start(c)) + duration(a), 
 				 mini(last_start(a), last_start(c)) + duration(a),&acmin, &acmax);
-	  minimize(min_cons_init, maxi(acmin, maxi(first_start(a), first_start(c)) + delta_aa(a, c->consumer))); 
+	  minimize(min_cons_init, maxi(acmin, maxi(first_start(a), first_start(c)) + delta_aa(a, c->consumer)));
 	  maximize(max_cons_init, acmax);
 	  
 	  evaluate_ac_backward(ac, first_start(c->consumer), last_start(c->consumer), &acmin, &acmax);
@@ -122,10 +114,6 @@ static void synchronize_causal(Causal *c)
     update_inf_c(c, min_prod_init);
     update_sup_c(c, max_prod_init);
     update_sup_a(c->consumer, max_cons_init);
-    if (nb == 1 && c->required) {
-      update_inf_a(prod, first_start(c));
-      update_sup_a(prod, last_start(c));
-    }
   }
 }
 
@@ -138,13 +126,11 @@ static void protect_causal(Causal *c)
   }
   if (opt.unique_supports && c->required && actual_event == InstantiateEvent && edeletes(c->consumer, c->fluent)) {
     Action *prod = get_producer(c);
-    if (prod && prod->used) {
+    if (prod && prod->used)
       FOR(c2, c->fluent->causals) {
-	if (c != c2 && edeletes(c2->consumer, c->fluent)) {
+	if (c != c2 && edeletes(c2->consumer, c->fluent))
 	  rem_producer(c2, prod);
-	}
       } EFOR;
-    }
   }
   if (!c->excluded && opt.local_mutex_sets) local_mutex_sets(c);
 }
@@ -200,10 +186,8 @@ void use_action(Action *a)
 	  exclude_action(a);
       } EFOR;
     }
-    //protect_against(a); // ici ou en dessous ?
     activate_action(a);
   }
-  //protect_against(a);
 }
 
 
@@ -224,16 +208,18 @@ static void exclude_action2(Action *a, Causal *c)
 	} EFOR;
       } else {
 	FORCOUPLE(f, a->add, c, f->active_causals) { 
-	  if (get_producer(c) == a) increment_weight(c); 
+	  if (get_producer(c) == a) increment_weight(c);
 	} EFORCOUPLE;
 	FOR(b, active_actions) { 
-	  if (b != a && amutex(a,b) && (precedes(a, b) || precedes(b, a))) 
-	    b->origin->weight++; 
+	  //if (b != a && amutex(a,b) && (precedes(a, b) || precedes(b, a))) 
+	  if (b != a && amutex(a,b)) 
+	    b->origin->weight++;
 	} EFOR;
 	a->origin->weight++;
       }
     }
-    contradiction(); 
+    //printf(".");
+    contradiction();
   }
   store(a->excluded, true);
   FORCOUPLE(f, a->add, c, f->causals) { rem_producer(c, a); } EFORCOUPLE;
@@ -260,13 +246,19 @@ static void make_order_ac(Action *a, Causal *c)
   }
 }
 
+#define incr_weight(a, b) NEST(a->origin->weight++; b->origin->weight++; /*printf("X");*/ )
+
 void order_before_aa(Action *a1, Action *a2)
 {
   TimeVal d = delta_aa(a1, a2);
 
   trace_proc(order_before_aa, a1, a2);
-  if (a1->used) update_inf_a(a2, first_start(a1) + d);
-  if (a2->used) update_sup_a(a1, last_start(a2) - d);
+  //XXX
+  // if (a1->used) update_inf_a(a2, first_start(a1) + d);
+  // if (a2->used) update_sup_a(a1, last_start(a2) - d);
+  if (a1->used) { if (first_start(a1) + d > last_start(a2)) incr_weight(a1, a2); update_inf_a(a2, first_start(a1) + d); }
+  if (a2->used) { if (last_start(a2) - d < first_start(a1)) incr_weight(a1, a2); update_sup_a(a1, last_start(a2) - d); }
+
   //if (!precedes(a1, a2) && (!duration(a1) || !duration(a2))) FOR(c, a1->causals) { rem_producer(c, a2); } EFOR; // rajout pour actions de synchro
   make_precede(a1, a2);
 }
@@ -280,7 +272,6 @@ void order_before_ca(Causal *c, Action *a)
 void order_before_ac(Action *a, Causal *c)
 {
   Action *prod = get_producer(c);
-
   trace_proc(order_before_ac, a, c);
   if (prod) {
     if (a != prod && prod->used) order_before_aa(a, prod);
@@ -304,11 +295,14 @@ void make_precede(Action *a1, Action *a2)
   
   if (a1 == a2 || precedes(a1, a2)) return;
   if (precedes(a2, a1)) {
-    if (a1->used) { exclude_action(a2); return; }
-    else if (a2->used) { exclude_action(a1); return; }
+    // XXX
+    // if (a1->used) { exclude_action(a2); return; }
+    // else if (a2->used) { exclude_action(a1); return; }
+    if (a1->used) { if (a2->used) incr_weight(a1, a2); exclude_action(a2); return; }
+    else if (a2->used) { if (a1->used) incr_weight(a1, a2); exclude_action(a1); return; }
   }
   if (opt.complete_qualprec) { 
-    if ((a1)->excluded || (a2)->excluded) return; 
+    if ((a1)->excluded || (a2)->excluded) return;
     act = actions; act_nb = actions_nb;
   } else {
     if (!(a1)->used || !(a2)->used)  return;
@@ -347,9 +341,7 @@ static void protect(Action *a1, Action *a2)
 	if  (opt.complete_qualprec) { caus = f->causals; caus_nb = f->causals_nb; }
 	else { caus = f->active_causals; caus_nb = f->active_causals_nb; }
 	FOR(c, caus) {
-	  if (precedes(a2, c->consumer)) {
-	    rem_producer(c, a1);
-	  }
+	  if (precedes(a2, c->consumer)) rem_producer(c, a1);
 	} EFOR;
       }
     } EFOR;
@@ -358,8 +350,7 @@ static void protect(Action *a1, Action *a2)
     FOR(c, a2->causals) {
       if (edeletes(a1, c->fluent))
 	FORPROD(prod, c) {
-	  if (precedes(prod, a1))
-	    rem_producer(c, prod);
+	  if (precedes(prod, a1)) rem_producer(c, prod);
 	} EFOR;
     } EFOR;
 }
@@ -440,7 +431,7 @@ void clone_action(Action *a, Causal *causal)
 
   if (!clone) error(max_plan_length, "Increase the maximum plan length (actually %ld)", opt.max_plan_length);
   store(a->origin->nb_instances, a->origin->nb_instances - 1);
-  memcpy(clone, a, CSIZE_ACTION); 
+  memcpy(clone, a, CSIZE_ACTION);
   clone_bound_variable(&clone->start, &a->start);
   bitarray_copy(clone->precedences, a->precedences, total_actions_nb);
   store(actions_nb, actions_nb + 1);
@@ -448,8 +439,8 @@ void clone_action(Action *a, Causal *causal)
   if (a->synchro) clone_bound_variable(&clone->reslevel, &a->reslevel);
 #endif
 
-  FOR2(c1, clone->causals, c2, a->causals) { 
-    memcpy(c1, c2, CSIZE_CAUSAL); 
+  FOR2(c1, clone->causals, c2, a->causals) {
+    memcpy(c1, c2, CSIZE_CAUSAL);
     clone_bound_variable(&c1->start, &c2->start);
     clone_enum_variable(&c1->support, &c2->support);
     store(causals_nb, causals_nb + 1);
@@ -482,21 +473,43 @@ void clone_action(Action *a, Causal *causal)
 void more_propagations(void)
 {
   if (opt.pddl21) {
+    Causal *causals[100];
+    size_t causals_nb = 0;
     FOR(a, active_actions) {
       FOR(ac, a->ac_constraints) {
         if (ac->mandatory) {
+	  Causal *cc = NULL;
+	  int nbcc = 0;
+	  causals_nb = 0;
           FOR(c, ac->fluent->causals) {
-            if (can_produce(c, a)) {
-              if (!c->consumer->used) {
-                if (c->consumer->origin->nb_instances > 0) clone_action(c->consumer, NULL);
-                set_producer(c, a);
-                use_action(c->consumer);
-                return;
-              }
-              goto ac_found;
-            }
-          } EFOR;
-          contradiction();
+	    //if (get_producer(c) == a) goto ac_found;
+	    if (can_produce(c, a) && c->consumer->used) goto ac_found;
+	    if (can_produce(c, a)) { nbcc++; cc = c; causals[causals_nb++] = c; }
+	  } EFOR;
+	  if (cc == NULL) contradiction();
+	  //if (nbcc != 1) exit(57);
+	  if (nbcc > 1) {
+	    printf("\n");
+	    printf("\n");
+	    print_action(a);
+	    printf("\n");
+	    printf("\n");
+	    FOR(c, causals) { 
+	      print_causal(c);
+	      printf("\n");
+	      FORPROD(a, c) {
+		printf("    ");
+		print_action(a);
+		printf("\n");
+	      } EFOR;
+		printf("\n");
+	    } EFOR;
+	    exit(57);
+	  }
+	  if (cc->consumer->origin->nb_instances > 0) clone_action(cc->consumer, NULL);
+	  set_producer(cc, a);
+	  use_action(cc->consumer);
+	  return;
         }
       ac_found:;
       } EFOR;

@@ -10,9 +10,7 @@
 #include "cpt.h"
 #include "options.h"
 #include "trace.h"
-#include "pddl.h"
 #include "structs.h"
-#include "plan.h"
 #include "globs.h"
 
 
@@ -326,8 +324,8 @@ PDDLDomain *parse_domain(char *dom_name, char *prob_name)
   if (opt.max_makespan) parse_number(domain->max_makespan.q, opt.max_makespan);
   if (opt.precision2) parse_number(domain->precision2.q, opt.precision2);
 
-  trace(normal, "domain : %s\n", domain->name);
-  trace(normal, "problem : %s\n", domain->probname);
+  cpt_trace(normal, "domain : %s\n", domain->name);
+  cpt_trace(normal, "problem : %s\n", domain->probname);
   return domain;
 }
 
@@ -353,7 +351,7 @@ static void parse_domain_types(PDDLDomain *domain)
   if (!domain->token_types) return;
   Token *token;
   PDDLType *tmp[gdsl_list_get_size(domain->token_types)];
-  long tmp_nb = 0;
+  size_t tmp_nb = 0;
   while ((token = (Token *) gdsl_list_remove_head(domain->token_types))) {
     PDDLType *type = (PDDLType *) gdsl_rbtree_insert(domain->types_table, (void *) token->name, &lost_int);
     tmp[tmp_nb++] = type;
@@ -493,7 +491,7 @@ static void parse_number(mpq_t number, const char *src)
 {
   char buffer[strlen(src) * 2 + 1];
   char *dst = buffer;
-  long nb = 0;
+  size_t nb = 0;
   while (*src && *src != '.') *dst++ = *src++;
   if (*src) src++;
   while (*src) { *dst++ = *src++; nb++; }
@@ -581,7 +579,7 @@ static void parse_term_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLTerm ***
 char *make_name(const char *name, PDDLTerm **terms, size_t terms_nb)
 {
   static char buffer[STRING_MAX];
-  long i = 1;
+  size_t i = 1;
   buffer[0] = '(';
   while (*name != '\0') buffer[i++] = *name++;
   FOR(term, terms) {

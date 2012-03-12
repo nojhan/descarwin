@@ -19,24 +19,10 @@
 #define NO_PLAN 5
 
 
-#ifdef WALLCLOCK_TIME
-
-#include <time.h>
-#define TIMER(x) static clock_t x##_start
-#define start_timer(x) NEST( x##_start = clock(); )
-#define get_timer(x) ((clock() - x##_start) / (double) CLOCKS_PER_SEC)
-#define get_wtimer(x) ((clock() - x##_start) / (double) CLOCKS_PER_SEC)
-
-#else
-
-#include <time.h>
-#include <sys/time.h>
 #define TIMER(x) struct timespec x##_start, x##_end, x##_wstart, x##_wend
-#define start_timer(x) NEST(clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &x##_start); clock_gettime(CLOCK_REALTIME, &x##_wstart);)
-#define get_timer(x) ({ clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &x##_end); ((x##_end.tv_sec - x##_start.tv_sec  + (x##_end.tv_nsec - x##_start.tv_nsec) / (double) 1e9)); })
-#define get_wtimer(x) ({ clock_gettime(CLOCK_REALTIME, &x##_wend); ((x##_wend.tv_sec - x##_wstart.tv_sec  + (x##_wend.tv_nsec - x##_wstart.tv_nsec) / (double) 1e9)); })
-
-#endif
+#define start_timer(x) NEST( clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &x##_start); clock_gettime(CLOCK_REALTIME, &x##_wstart); )
+#define get_timer(x) ({ clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &x##_end); clock_gettime(CLOCK_REALTIME, &x##_wend); ((x##_end.tv_sec - x##_start.tv_sec  + (x##_end.tv_nsec - x##_start.tv_nsec) / (double) 1e9)); })
+#define get_wtimer(x) ({ clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &x##_end); clock_gettime(CLOCK_REALTIME, &x##_wend); ((x##_wend.tv_sec - x##_wstart.tv_sec  + (x##_wend.tv_nsec - x##_wstart.tv_nsec) / (double) 1e9)); })
 
 
 typedef struct SolutionPlan SolutionPlan;

@@ -53,7 +53,7 @@ static void makespan_before(Causal *c);
 void shaving_bounds(void);
 void shaving_bounds2(void);
 void shaving_precedences(void);
-static void shaving_supports(void);
+void shaving_supports(void);
 
 
 /*****************************************************************************/
@@ -312,15 +312,15 @@ static void makespan_before(Causal *c)
 
 void shaving(void)
 {
-  trace(normal, "<S"); 
+  cpt_trace(normal, "<S"); 
   //set_backtrack_limit(1000000);
   //shaving_precedences();
-  //shaving_bounds();
-  shaving_supports();
-  trace(normal, ">");
+  shaving_bounds();
+  //shaving_supports();
+  cpt_trace(normal, ">");
 }
 
-static void shaving_supports(void)
+void shaving_supports(void)
 {
   bool cont = true;
 
@@ -395,7 +395,7 @@ void shaving_bounds2(void)
     }
     FORMIN(a, tab, 2) {
     deb:
-      if (new_world2(false)) {
+      if (protected(true)) {
 	update_sup_a(a, first_start(a));
 	propagate();
 	backtrack(false);
@@ -407,7 +407,7 @@ void shaving_bounds2(void)
 	goto deb;
       }
     deb2:
-      if (new_world2(false)) {
+      if (protected(true)) {
 	update_inf_a(a, last_start(a));
 	propagate();
 	backtrack(false);
@@ -461,7 +461,7 @@ void shaving_bounds(void)
       dicsup = last_start(a);
       while (dicinf < dicsup) {
 	mid = (dicinf + dicsup) / 2;
-	if (new_world2(false)) {
+	if (protected(true)) {
 	  update_inf_a(a, mid);
 	  propagate();
 	  backtrack(false);
@@ -479,7 +479,7 @@ void shaving_bounds(void)
       dicsup = last_start(a);
       while (dicinf < dicsup) {
 	mid = (dicinf + dicsup) / 2;
-	if (new_world2(false)) {
+	if (protected(true)) {
 	  update_sup_a(a, mid);
 	  propagate();
 	  backtrack(false);

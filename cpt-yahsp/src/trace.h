@@ -53,20 +53,17 @@
 
 #define begin_monitor(...)
 #define end_monitor(...)
-#define trace(v, args...)
+#define cpt_trace(v, args...)
 #define trace_proc(...)
 
 #else
 
-#define begin_monitor _begin_monitor
-#define end_monitor _end_monitor
-#define trace(v, args...) NEST( if (TR_##v & opt.verbosity) { fprintf(cptout,args); fflush(cptout); } )
+#define begin_monitor(s) NEST( size_t i; start_timer(stats.monitor); cpt_trace(monitor, "%s", s); for (i = 0; i < 34 - strlen(s); i++) cpt_trace(monitor, "."); )
+#define end_monitor() cpt_trace(monitor, " done : %.3f          \n", get_timer(stats.monitor))
+#define cpt_trace(v, args...) NEST( if (TR_##v & opt.verbosity) { fprintf(cptout,args); fflush(cptout); } )
 #define trace_proc(v, args...) NEST( if (TR_##v & opt.verbosity) { trace_##v(args); fflush(cptout); } )
 
 #endif
-
-extern void _begin_monitor(const char *s);
-extern void _end_monitor(void);
 
 
 #define ERR_allocation 100
@@ -80,7 +77,7 @@ extern void _end_monitor(void);
 #define ERR_options 108
 #define ERR_station 109
 
-#define error(errno, args...) NEST( trace(error, "\n\n"); trace(error, args); trace(error, "...\n\n"); exit(ERR_##errno); )
+#define error(errno, args...) NEST( cpt_trace(error, "\n\n"); cpt_trace(error, args); cpt_trace(error, "...\n\n"); exit(ERR_##errno); )
 
 
 #endif /* #define TRACE_H */

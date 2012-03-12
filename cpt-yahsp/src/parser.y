@@ -196,13 +196,16 @@ expression { $$ = token_add_head(NULL, NULL, $1); }
 
 void parser_read_pddl_file(PDDLDomain *domain, char *file, int pipefd)
 {
-#ifdef WALLCLOCK_TIME
-  if (!(pddl_in = fopen(file, "r"))) error(no_file, "File '%s' does not exist", file);
-#else
-  char cmd[file ? strlen(file) : 0 + 12];
-  if (file != NULL) sprintf(cmd, "bzcat -f %s", file);
-  if (!(pddl_in = file == NULL ? fdopen(pipefd, "r") : popen(cmd, "r"))) error(no_file, "File '%s' does not exist", file);
-#endif
+  if (file != NULL) {
+    if ((pddl_in = fopen("/bin/bzcat", "r")) == NULL) error(no_file, "Command 'bzcat' not found");
+    fclose(pddl_in);
+    if ((pddl_in = fopen(file, "r")) == NULL) error(no_file, "File '%s' cannot be opened", file);
+    fclose(pddl_in);
+    char bzcat[] = "/bin/bzcat -qf %s 2>/dev/null";
+    char cmd[strlen(bzcat) + strlen(file)];
+    sprintf(cmd, bzcat, file);
+    pddl_in = popen(cmd, "r");
+  } else pddl_in = fdopen(pipefd, "r");
   parser_reset_lineno();
   pddl_parse(domain);
   fclose(pddl_in);

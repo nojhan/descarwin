@@ -12,30 +12,37 @@
 #include "structs.h"
 #include "problem.h"
 #include "branching.h"
-#include "plan.h"
 #include "globs.h"
 #include "trace_planner.h"
 #include "yahsp.h"
 #include "yahsp-mpi.h"
 
 
-/*---------------------------------------------------------------------------*/
-/* Local Variables                                                           */
-/*---------------------------------------------------------------------------*/
-
-/*---------------------------------------------------------------------------*/
-/* Static Functions                                                          */
-/*---------------------------------------------------------------------------*/
-
-
 /*****************************************************************************/
 
-void trace_new_world(void) {
-  fprintf(cptout, "\n================================================ New World : %lu ================================================\n\n\n", current_world());
+
+void trace_world(const char *message, int sep) {
+  char world[100];
+  size_t cols;
+  size_t i;
+
+  if (tgetent(NULL, getenv("TERM")) < 0) cols = 80;
+  else cols = tgetnum("co");
+  sprintf(world, " %s : %lu ", message, current_world());
+  fprintf(cptout, "\n");
+  for(i = 0; i < (cols - strlen(world)) / 2; i++) fputc(sep, cptout);
+  fprintf(cptout, "%s", world);
+  for(i += strlen(world); i < cols; i++) fputc(sep, cptout);
+  fprintf(cptout, "\n\n");
 }
 
-void trace_backtrack(void) {
-  fprintf(cptout, "\n------------------------------------------- Backtrack to World : %lu -------------------------------------------\n\n", current_world());
+void trace_new_world()
+{
+  trace_world("New World", '=');
+}
+void trace_backtrack(void) 
+{
+  trace_world("Backtrack to World", '-');
 }
 
 void trace_begin_bound(TimeVal bound)
@@ -43,7 +50,6 @@ void trace_begin_bound(TimeVal bound)
   fprintf(cptout, "Bound : ");
   print_time(cptout, bound - (opt.pddl21 ? pddl_domain->precision.t : 0));
   fprintf(cptout, "  ---  ");
-
 }
 
 void trace_end_bound(ulong nodes, ulong backtracks, double time)
@@ -61,7 +67,7 @@ void trace_restart(ulong nodes, ulong backtracks, double time, TimeVal bound)
 void trace_problem_stats(size_t actions_nb, size_t fluents_nb, size_t causals_nb)
 {
   fprintf(cptout, "\nProblem : %zu actions, %zu fluents, %zu causals\n          %zu init facts, %zu goals\n\n",
-	 actions_nb, fluents_nb, causals_nb, start_action->add_nb, end_action->prec_nb);
+	  actions_nb, fluents_nb, causals_nb, start_action->add_nb, end_action->prec_nb);
 }
 
 void trace_solution_plan(SolutionPlan *plan)
@@ -116,9 +122,9 @@ void trace_search_stats()
     }
 #ifdef YAHSP_MT
 #ifdef YAHSP_MPI
-    fprintf(cptout, "Core utility : %.3f\n", mini(100, stats.usearch * 100 / (stats.wsearch * mpi_get_numtasks() * opt.yahsp_threads * opt.yahsp_teams)));
+    fprintf(cptout, "Core utility : %.3f\n", mini(100.0, stats.usearch * 100 / (stats.wsearch * mpi_get_numtasks() * opt.yahsp_threads * opt.yahsp_teams)));
 #else
-    fprintf(cptout, "Core utility : %.3f\n", mini(100, stats.usearch * 100 / (stats.wsearch * mini(opt.yahsp_threads * opt.yahsp_teams, omp_get_num_procs()))));
+    fprintf(cptout, "Core utility : %.3f\n", mini(100.0, stats.usearch * 100 / (stats.wsearch * mini(opt.yahsp_threads * opt.yahsp_teams, omp_get_num_procs()))));
 #endif
 #endif
     fprintf(cptout, "Search us time : %.3f\n", stats.usearch);
@@ -281,4 +287,3 @@ void trace_update_inf_c(Causal *c, TimeVal i)
 {
   if (first_start(c) < i) { fprintf(cptout, "update inf "); print_causal(c); fprintf(cptout, " : "); print_time(cptout, i); fprintf(cptout, "\n"); }
 }
-

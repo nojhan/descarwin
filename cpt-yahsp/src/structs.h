@@ -29,9 +29,9 @@ typedef struct ResourceLocal ResourceLocal;
 
 
 struct Fluent {
-  ulong id;
-  ulong bit_index;
-  ulong bit_mask;
+  size_t id;
+  size_t bit_index;
+  size_t bit_mask;
   PDDLAtom *atom;
   Value *indac;
   BitArray mutex;
@@ -85,9 +85,9 @@ struct Action {
   BitArray deletes_included;
 
   /* static fields */
-  ulong id;
-  ulong bit_index;
-  ulong bit_mask;
+  size_t id;
+  size_t bit_index;
+  size_t bit_mask;
   BoundVariable start;
   Causal **causals;
   size_t nb_instances;
@@ -128,7 +128,7 @@ struct ActivityConstraint {
 
 #ifdef RESOURCES
 struct Resource {
-  ulong id;
+  size_t id;
   PDDLAtom *atom;
   Fluent *fluent_available;
   Fluent *fluent_modified;
@@ -139,7 +139,7 @@ struct Resource {
 struct ResourceLocal {
   Resource *resource;
   Action *action;
-  ulong index_causal;
+  size_t index_causal;
   TimeVal min_level;
   TimeVal max_level;
   TimeVal increased;
@@ -174,7 +174,7 @@ struct ResourceLocal {
 #define set_precedes(a1, a2) bitarray_save_and_set((a1)->precedences, a2)
 #define precedes(a1, a2) bitarray_get((a1)->precedences, a2)
 
-#define set_distance(a1, a2, d) (a1)->distances[(a2)->id] = d
+#define set_distance(a1, a2, d) ((a1)->distances[(a2)->id] = d)
 #define distance(a1, a2) (a1)->distances[(a2)->origin->id]
 #define store_distance(a1, a2, d) store((a1)->distances[(a2)->num], d)
 
@@ -215,12 +215,12 @@ struct ResourceLocal {
 #define can_precede_ca(c, a) can_precede_aa((c)->consumer, a)
 #define can_precede_ac(a, c) (can_produce(c, a) || first_start(a) + delta_ac(a, c) <= first_start(c))
 
-#define update_sup_a(v, x) NEST( if (x < last_start(v)) { trace_proc(update_sup_a, v, x); update_sup_variable(&(v)->start, x); } )
-#define update_sup_c(v, x) NEST( if (x < last_start(v)) { trace_proc(update_sup_c, v, x); update_sup_variable(&(v)->start, x); } )
-#define update_inf_a(v, x) NEST( if (x > first_start(v)) { trace_proc(update_inf_a, v, x); update_inf_variable(&(v)->start, x); } )
-#define update_inf_c(v, x) NEST( if (x > first_start(v)) { trace_proc(update_inf_c, v, x); update_inf_variable(&(v)->start, x); } )
-#define increment_inf_a(v, x) update_inf_a(v, first_start(v) + x)
-#define decrement_sup_a(v, x) update_sup_a(v, last_start(v) - x)
+#define update_sup_a(a, x) NEST( if (x < last_start(a)) { trace_proc(update_sup_a, a, x); update_sup_variable(&(a)->start, x); } )
+#define update_sup_c(c, x) NEST( if (x < last_start(c)) { trace_proc(update_sup_c, c, x); update_sup_variable(&(c)->start, x); } )
+#define update_inf_a(a, x) NEST( if (x > first_start(a)) { trace_proc(update_inf_a, a, x); update_inf_variable(&(a)->start, x); } )
+#define update_inf_c(c, x) NEST( if (x > first_start(c)) { trace_proc(update_inf_c, c, x); update_inf_variable(&(c)->start, x); } )
+#define increment_inf_a(a, x) update_inf_a(a, first_start(a) + x)
+#define decrement_sup_a(a, x) update_sup_a(a, last_start(a) - x)
 
 #define producer2value(c, a) (c)->fluent->indac[(a)->id]
 #define value2producer(c, i) (c)->fluent->producers[i]

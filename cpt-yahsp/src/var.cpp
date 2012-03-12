@@ -15,12 +15,13 @@
 
 
 /*---------------------------------------------------------------------------*/
-/* Local Variables                                                           */
+/* Global Variables                                                          */
 /*---------------------------------------------------------------------------*/
 
 
 WorldStack wstack;
-EnumEventQueue queue_removal, queue_instantiate;
+EnumEventQueue queue_removal;
+EnumEventQueue queue_instantiate;
 BoundEventQueue queue_bound;
 VarEvent actual_event;
 
@@ -28,9 +29,9 @@ VarEvent actual_event;
 /*****************************************************************************/
 
 
-void create_enum_variable(EnumVariable *v, ulong n, ulong sup, void *hook, PropagationProc propagate, EmptyProc empty)
+void create_enum_variable(EnumVariable *v, size_t n, size_t sup, void *hook, PropagationProc propagate, EmptyProc empty)
 {
-  ulong i;
+  size_t i;
   
   if (n + sup > MAXVAL) 
     error(bucket, "Too many values in bucket");
@@ -42,10 +43,9 @@ void create_enum_variable(EnumVariable *v, ulong n, ulong sup, void *hook, Propa
   v->event = NoEvent;
   v->propagate = propagate;
   v->empty = empty;
-  v->bucket_nb = n + sup + 1;
-  cpt_malloc(v->bucket, v->bucket_nb);
-  for (i = 0; i < v->bucket_nb; i++)
-    v->bucket[i] = (i < n ? i : VAL_UNKNOWN);
+  cpt_malloc(v->bucket, (v->bucket_nb = n + sup + 1));
+  for (i = 0; i < n; i++) v->bucket[i] = i;
+  for (i = n; i < v->bucket_nb; i++) v->bucket[i] = VAL_UNKNOWN;
   register_var(v, removal);
   register_var(v, instantiate);
 }
@@ -132,9 +132,10 @@ void update_sup_variable(BoundVariable *v, TimeVal i)
   }
 }
 
-#define propagate_event_queue(q) \
+#define propagate_event_queue(q)					\
   NEST( typeof(*queue_##q.elt) _v;					\
-	pop_event(_v, q); if (_v) { actual_event = _v->event; _v->event = NoEvent; _v->propagate(_v->hook); goto loop; } )
+	pop_event(_v, q);						\
+	if (_v) { actual_event = _v->event; _v->event = NoEvent; _v->propagate(_v->hook); goto loop; } )
 
 #define propagate_all_queues()			\
   NEST(						\

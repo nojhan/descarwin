@@ -410,7 +410,7 @@ void yahsp_init()
   yahsp_reset();
 #ifdef YAHSP_MPI
   OMP_PARALLEL(num_threads(opt.yahsp_threads * opt.yahsp_teams)) {
-    cpt_rand(opt.seed + mpi_get_rank() OMP(* (opt.yahsp_teams) + omp_get_thread_num()));
+    cpt_srand(opt.seed + mpi_get_rank() OMP(* (opt.yahsp_teams) + omp_get_thread_num()));
   }
 #else
   cpt_srand(opt.seed);

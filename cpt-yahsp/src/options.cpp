@@ -45,14 +45,11 @@ typedef struct {
   const char *argument;
   char letter;
   const char *detail;
-} CPTOption;
-
-int global_argc;
-const char **global_argv;
+} OptItem;
 
 static long nb_options;
 
-static CPTOption long_options[] = {
+static OptItem long_options[] = {
   {NULL, "Input"},
   {"ops", NULL, "<file>", 'o', "Domain file (typed/untyped PDDL)"},
   {"facts", NULL, "<file>", 'f', "Problem file (typed/untyped PDDL)"},
@@ -95,7 +92,7 @@ static CPTOption long_options[] = {
   {"no-optimal", "sub", NULL, 'O', "Tunes propagations and heuristics for suboptimal planning. This option can be used with a high value of the initial bound (see -b above)." },
   {"give-suboptimal", "gs", NULL, 'u', "Gives suboptimal solution when dichotomic search is used when limiting the number of backtracks." },
   {"dichotomy", NULL, "<x>", 'h', "Dichotomic search for temporal planning. Possible values are 0 (no dichotomy), 1 (increment set to the minimal duration), 2 (increment set to the mean duration, default), 3 (increment set to the maximal duration minus minimum duration), 4 (increment set to maximum duration)."},
-  {"restarts", NULL, "<f,m,i>", 'r', "Enables restarts. Argument are <f>: first maximum number of backtracks, <m>: multiplier, <i>: minimum increment."},
+  {"restarts", NULL, "<f,m,i,t>", 'r', "Enables restarts. Argument are <f>: first maximum number of backtracks, <m>: multiplier, <i>: minimum increment, <t>: maximum number of tries before unlimited search."},
   {"seed", NULL, "<x>", 's', "Randomized search with seed <x>."},
   {"max-backtracks-bound", "maxbb", "<x>", 'x', "Maximum number of backtracks <x> allowed at each bound."},
   {"max-backtracks", "maxb", "<x>", 'X', "Maximum number of backtracks <x> allowed for the whole problem."},
@@ -139,9 +136,7 @@ static void usage(void);
 
 void cmd_line(int argc, const char **argv)
 {
-  global_argc = argc;
-  global_argv = argv;
-  nb_options = sizeof(long_options) / sizeof(CPTOption);
+  nb_options = sizeof(long_options) / sizeof(OptItem);
   struct option options[nb_options * 2 + 1];
   char arg_string[nb_options + 1];
   int c, i, j = 0, k = 0;
@@ -224,58 +219,58 @@ void cmd_line(int argc, const char **argv)
   while ((c = GETOPT(argc, (char * const *) argv, arg_string, options, NULL)) != EOF) {
     switch ((char) c) {
     case 'a': opt.pddl21 = true; opt.precision = strtok(optarg,","); opt.precision2 = strtok(NULL,","); 
-      trace(options, "PDDL2.1 semantics with temporal precision : %s,%s\n", opt.precision, opt.precision2); break;
-    case 'b': opt.bound = optarg; trace(options, "initial bound : %s\n", opt.bound); break;
-    case 'c': opt.max_plan_length = 0; trace(options, "enable canonicity\n"); break;
-    case 'd': opt.distances = atol(optarg); trace(options, "distances : h%ld\n", opt.distances); break;
-    case 'e': opt.complete_qualprec = true; trace(options, "complete qualitative precedences\n"); break;
-    case 'f': opt.facts_file = (char *) optarg; trace(options, "problem file : %s\n", opt.facts_file); break;
-    case 'g': opt.branching_strategy = CONFLICTS_FIRST; trace(options, "conflicts first strategy\n"); break;
-    case 'h': opt.dichotomy = atol(optarg); trace(options, "dichotomy : %ld\n", opt.dichotomy); break;
-    case 'i': opt.initial_heuristic = atol(optarg); trace(options, "initial heuristic : h%ld\n", opt.initial_heuristic); break;
-    case 'j': opt.branching_strategy = SUPPORTS_FIRST; trace(options, "supports first strategy\n"); break;
-    case 'k': opt.branching_strategy = MUTEX_FIRST; trace(options, "mutex first strategy\n"); break;
-    case 'l': opt.max_plan_length = atol(optarg); trace(options, "max plan length : %ld\n", opt.max_plan_length); break;
-    case 'm': opt.max_makespan = optarg; trace(options, "max makespan : %s\n", opt.max_makespan); break;
-    case 'n': opt.propagate_inactive_causals = true; trace(options, "propagate inactive causals\n"); break;
-    case 'o': opt.ops_file = optarg; trace(options, "domain file : %s\n", opt.ops_file); break;
-    case 'p' : opt.verbose_preprocessing = true; trace(options, "enable verbose preprocessing\n"); break;
-    case 'q' : opt.print_actions = true; trace(options, "print actions\n"); break;
+      cpt_trace(options, "PDDL2.1 semantics with temporal precision : %s,%s\n", opt.precision, opt.precision2); break;
+    case 'b': opt.bound = optarg; cpt_trace(options, "initial bound : %s\n", opt.bound); break;
+    case 'c': opt.max_plan_length = 0; cpt_trace(options, "enable canonicity\n"); break;
+    case 'd': opt.distances = atol(optarg); cpt_trace(options, "distances : h%ld\n", opt.distances); break;
+    case 'e': opt.complete_qualprec = true; cpt_trace(options, "complete qualitative precedences\n"); break;
+    case 'f': opt.facts_file = (char *) optarg; cpt_trace(options, "problem file : %s\n", opt.facts_file); break;
+    case 'g': opt.branching_strategy = CONFLICTS_FIRST; cpt_trace(options, "conflicts first strategy\n"); break;
+    case 'h': opt.dichotomy = atol(optarg); cpt_trace(options, "dichotomy : %ld\n", opt.dichotomy); break;
+    case 'i': opt.initial_heuristic = atol(optarg); cpt_trace(options, "initial heuristic : h%ld\n", opt.initial_heuristic); break;
+    case 'j': opt.branching_strategy = SUPPORTS_FIRST; cpt_trace(options, "supports first strategy\n"); break;
+    case 'k': opt.branching_strategy = MUTEX_FIRST; cpt_trace(options, "mutex first strategy\n"); break;
+    case 'l': opt.max_plan_length = atol(optarg); cpt_trace(options, "max plan length : %ld\n", opt.max_plan_length); break;
+    case 'm': opt.max_makespan = optarg; cpt_trace(options, "max makespan : %s\n", opt.max_makespan); break;
+    case 'n': opt.propagate_inactive_causals = true; cpt_trace(options, "propagate inactive causals\n"); break;
+    case 'o': opt.ops_file = optarg; cpt_trace(options, "domain file : %s\n", opt.ops_file); break;
+    case 'p' : opt.verbose_preprocessing = true; cpt_trace(options, "enable verbose preprocessing\n"); break;
+    case 'q' : opt.print_actions = true; cpt_trace(options, "print actions\n"); break;
     case 'r': opt.restarts = true; opt.random = true; opt.restarts_init = atol(strtok(optarg,",")); opt.restarts_factor = atof(strtok(NULL,",")); 
       opt.restarts_min_increment = atol(strtok(NULL,",")); { char *tries = strtok(NULL,","); if (tries) opt.restarts_max_tries = atol(tries); }
-      trace(options, "restarts : init : %ld, factor : %.3f, min increment : %ld, max tries : %ld\n", 
+      cpt_trace(options, "restarts : init : %ld, factor : %.3f, min increment : %ld, max tries : %ld\n", 
 	    opt.restarts_init, opt.restarts_factor, opt.restarts_min_increment, opt.restarts_max_tries); 
 	break;
-    case 's': opt.random = true; opt.seed = atol(optarg); trace(options, "randomized, seed : %ld\n", opt.seed); break;
-    case 't': opt.timer = atol(optarg); trace(options, "timer : %ld\n", opt.timer); break;
-    case 'u': opt.give_suboptimal = true; trace(options, "give suboptimal solution for dichotomic search and limiting backtracks\n"); break;
+    case 's': opt.random = true; opt.seed = atol(optarg); cpt_trace(options, "randomized, seed : %ld\n", opt.seed); break;
+    case 't': opt.timer = atol(optarg); cpt_trace(options, "timer : %ld\n", opt.timer); break;
+    case 'u': opt.give_suboptimal = true; cpt_trace(options, "give suboptimal solution for dichotomic search and limiting backtracks\n"); break;
     case 'v': 
       opt.verbosity = atol(optarg); 
-      trace(options, "verbosity level : %ld\n", opt.verbosity); break;
+      cpt_trace(options, "verbosity level : %ld\n", opt.verbosity); break;
 #ifdef RATP
     case 'w': opt.ratp = true; opt.ratp_input = strtok(optarg,","); opt.ratp_output = strtok(NULL,","), opt.branching_strategy = SUPPORTS_FIRST; 
       opt.task_intervals = false; 
       opt.max_plan_length = 0;
-      trace(options, "ratp files : %s, %s\n", opt.ratp_input, opt.ratp_output); break;
+      cpt_trace(options, "ratp files : %s, %s\n", opt.ratp_input, opt.ratp_output); break;
 #endif
-    case 'x': opt.limit_backtracks = true; opt.max_backtracks = atol(optarg); trace(options, "maximum backtracks/bound : %ld\n", opt.max_backtracks); break;
-    case 'X': opt.limit_backtracks_all = true; opt.max_backtracks = atol(optarg); trace(options, "maximum backtracks/all : %ld\n", opt.max_backtracks); break;
+    case 'x': opt.limit_backtracks = true; opt.max_backtracks = atol(optarg); cpt_trace(options, "maximum backtracks/bound : %ld\n", opt.max_backtracks); break;
+    case 'X': opt.limit_backtracks_all = true; opt.max_backtracks = atol(optarg); cpt_trace(options, "maximum backtracks/all : %ld\n", opt.max_backtracks); break;
     case 'y': { opt.yahsp = true; opt.pb_restrict = true; opt.yahsp_threads = atol(strtok(optarg, ","));
 	opt.max_plan_length = 0;
       char *teams = strtok(NULL, ","); opt.yahsp_teams = teams ? atol(teams) : 1;
       if (teams) { char *strategy = strtok(NULL, ","); opt.yahsp_strategy = strategy ? atol(strategy) : 0; }
-      trace(options, "suboptimal yahsp search, threads : %d, teams : %d, strategy : %ld\n", 
+      cpt_trace(options, "suboptimal yahsp search, threads : %d, teams : %d, strategy : %ld\n", 
 	    opt.yahsp_threads, opt.yahsp_teams, opt.yahsp_strategy); break; }
-    case 'z': opt.read_actions = true; opt.read_actions_input = (char *) optarg; trace(options, "action file : %s\n", opt.read_actions_input); break;
-    case 'A': opt.landmarks = true; trace(options, "enable landmarks\n"); break;
-    case 'B': opt.bad_supporters_pruning = false; trace(options, "disable bad supporters pruning\n"); break;
-    case 'C': opt.last_conflicts = atol(optarg); trace(options, "number of last conflicts : %ld\n", opt.last_conflicts); break;
-    case 'D': opt.distance_boosting = false; trace(options, "disable distance increase\n"); break;
+    case 'z': opt.read_actions = true; opt.read_actions_input = (char *) optarg; cpt_trace(options, "action file : %s\n", opt.read_actions_input); break;
+    case 'A': opt.landmarks = true; cpt_trace(options, "enable landmarks\n"); break;
+    case 'B': opt.bad_supporters_pruning = false; cpt_trace(options, "disable bad supporters pruning\n"); break;
+    case 'C': opt.last_conflicts = atol(optarg); cpt_trace(options, "number of last conflicts : %ld\n", opt.last_conflicts); break;
+    case 'D': opt.distance_boosting = false; cpt_trace(options, "disable distance increase\n"); break;
     case 'E': opt.dae = true; opt.dae_threads = atol(optarg); opt.limit_initial_propagation = true; opt.max_propagations = 10000; opt.pb_restrict = opt.yahsp; 
-      trace(options, "divide-and-evolve approach with %ld threads\n", opt.dae_threads); break;
-    case 'F': opt.fluent_mutexes = true; trace(options, "enables h2 based fluent mutexes in yahsp\n"); break;
-    case 'G': opt.global_mutex_sets = true; trace(options, "enable global mutex sets\n"); break;
-    case'H': opt.output_file = (char *) optarg; trace(options, "output file : %s\n", opt.output_file); break;
+      cpt_trace(options, "divide-and-evolve approach with %ld threads\n", opt.dae_threads); break;
+    case 'F': opt.fluent_mutexes = true; cpt_trace(options, "enables h2 based fluent mutexes in yahsp\n"); break;
+    case 'G': opt.global_mutex_sets = true; cpt_trace(options, "enable global mutex sets\n"); break;
+    case'H': opt.output_file = (char *) optarg; cpt_trace(options, "output file : %s\n", opt.output_file); break;
 #ifdef RATP
     case 'I': opt.ratp_interval_incr = atol(strtok(optarg,",")); 
       opt.ratp_interval_incr_optim = atol(strtok(NULL,",")); 
@@ -283,37 +278,37 @@ void cmd_line(int argc, const char **argv)
       opt.limit_backtracks_all = true; 
       opt.max_backtracks = atol(strtok(NULL,",")); 
       opt.give_suboptimal = true;
-      trace(options, "interval increments : %ld (relaxation), %ld (optimization)\nwait max increment : %ld\nmaximum backtracks : %ld\n", 
+      cpt_trace(options, "interval increments : %ld (relaxation), %ld (optimization)\nwait max increment : %ld\nmaximum backtracks : %ld\n", 
 	    opt.ratp_interval_incr, opt.ratp_interval_incr_optim, opt.ratp_incr, opt.max_backtracks); break;
 #endif
     case 'J': opt.limit_initial_propagation = true; opt.max_propagations = atol(optarg); 
-      trace(options, "limited propagation : %ld\n", opt.max_propagations); break;
+      cpt_trace(options, "limited propagation : %ld\n", opt.max_propagations); break;
     case 'K': { opt.precision = strdup(strtok(optarg,",")); 
       char *p = strtok(NULL,","); if (p != NULL) opt.precision2 = strdup(p);
-      trace(options, "temporal precision : %s,%s\n", opt.precision, opt.precision2); break; }
-    case 'L': opt.local_mutex_sets = true; trace(options, "enable local mutex sets\n"); break;
-    case 'M': opt.global_mutex_sets = true; opt.local_mutex_sets = true; trace(options, "enable global and local mutex sets\n"); break;
-    case 'N': opt.anytime = true; trace(options, "anytime behavior\n"); break;
+      cpt_trace(options, "temporal precision : %s,%s\n", opt.precision, opt.precision2); break; }
+    case 'L': opt.local_mutex_sets = true; cpt_trace(options, "enable local mutex sets\n"); break;
+    case 'M': opt.global_mutex_sets = true; opt.local_mutex_sets = true; cpt_trace(options, "enable global and local mutex sets\n"); break;
+    case 'N': opt.anytime = true; cpt_trace(options, "anytime behavior\n"); break;
     case 'O': opt.optimal = false; opt.complete_qualprec = true;
       opt.relevance = false; opt.bound = (char *) "10000"; opt.propagate_inactive_causals = true;
-      opt.landmarks = true; opt.branching_strategy = SUPPORTS_FIRST; trace(options, "suboptimal search\n"); break;
-    case 'P': opt.sequential = true; trace(options, "sequential plan search\n"); break;
-    case 'Q': opt.rationals = true; trace(options, "rationals printing\n"); break;
-    case 'R': opt.relevance = false; trace(options, "disable relevance\n"); break;
-    case 'S': opt.shaving = true; trace(options, "enable shaving\n"); break;
-    case 'T': opt.task_intervals = true; trace(options, "enable task intervals\n"); break;
-    case 'U': opt.unique_supports = false; trace(options, "disable unique supports\n"); break;
-    case 'W': opt.wdeg = true; trace(options, "enable wdeg\n"); break;
-    case 'Y': opt.yahsp_duplicate_search = true; trace(options, "duplicate search in yahsp\n"); break;
+      opt.landmarks = true; opt.branching_strategy = SUPPORTS_FIRST; cpt_trace(options, "suboptimal search\n"); break;
+    case 'P': opt.sequential = true; cpt_trace(options, "sequential plan search\n"); break;
+    case 'Q': opt.rationals = true; cpt_trace(options, "rationals printing\n"); break;
+    case 'R': opt.relevance = false; cpt_trace(options, "disable relevance\n"); break;
+    case 'S': opt.shaving = true; cpt_trace(options, "enable shaving\n"); break;
+    case 'T': opt.task_intervals = true; cpt_trace(options, "enable task intervals\n"); break;
+    case 'U': opt.unique_supports = false; cpt_trace(options, "disable unique supports\n"); break;
+    case 'W': opt.wdeg = true; cpt_trace(options, "enable wdeg\n"); break;
+    case 'Y': opt.yahsp_duplicate_search = true; cpt_trace(options, "duplicate search in yahsp\n"); break;
     }
   }
   
-  trace(options, "\n");
+  cpt_trace(options, "\n");
   if (optind < argc) {
-    trace(options, "arguments error : ");
+    cpt_trace(options, "arguments error : ");
     while (optind < argc)
-      trace(options, "%s ", argv[optind++]);
-    trace(options, "\n\n");
+      cpt_trace(options, "%s ", argv[optind++]);
+    cpt_trace(options, "\n\n");
     exit(ERR_options);
   }
   if (!opt.ops_file) { usage(); error(options, "Ops file missing"); }
@@ -322,11 +317,11 @@ void cmd_line(int argc, const char **argv)
 
 static void usage(void)
 {
-  CPTOption *o = long_options;
-  long i, max = TEXT_WIDTH - 10;
+  OptItem *o = long_options;
+  long i, max = tgetent(NULL, getenv("TERM")) < 0 ? 70 : tgetnum("co") - 10;
   const char *s; 
   char *end, buf[max + 1];
-  
+
   buf[max] = 0;
   printf("Usage:    cpt -o <domain file> -f <problem file> [Options]\n\n");
   for (i = 0; i < nb_options; i++) {

@@ -8,6 +8,7 @@
 
 
 #include "cpt.h"
+#include "options.h"
 #include "trace.h"
 #include "structs.h"
 #include "globs.h"
@@ -318,15 +319,17 @@ Node *mpi_synchronize_solution(Node *node, TimeVal *best_makespan, bool *stop_on
   OMP_BARRIER;
   OMP_MASTER {
     MPI_Recv(NULL, 0, BYTE, ANY_SOURCE, EXCH, COMM, NO_STATUS);
-    struct { long makespan; int rank; } in = {(node == NULL ? MAXTIME : node->makespan), rank}, out;
+    // problem here for int64_t on 32 bits machines
+    //struct { TimeVal makespan; int rank; } in = {(node == NULL ? MAXTIME : node->makespan), rank}, out;
+    struct { long makespan; int rank; } in = {(node == NULL ? LONG_MAX : node->makespan), rank}, out;
     MPI_Allreduce(&in, &out, 1, LONG_INT, MPI_MINLOC, COMM);
     int stop = *stop_on_timer;
     MPI_Allreduce(&stop, stop_on_timer, 1, INT, MPI_LOR, COMM);
     if (out.makespan < mpi_best_makespan)  {
       mpi_best_makespan = out.makespan;
-      if (!opt.yahsp_duplicate_search)
-	*best_makespan = mpi_best_makespan;
+      if (!opt.yahsp_duplicate_search) *best_makespan = mpi_best_makespan;
       MPI_Bcast(&node, 1, LONG, out.rank, COMM);
+      if (node == NULL) exit(55);
       if (rank == master) {
 	int dest;
 	node = root = gather_node(node, out.rank);

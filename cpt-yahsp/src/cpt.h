@@ -10,17 +10,25 @@
 #ifndef CPT_H
 #define CPT_H 
 
+#define __STDC_CONSTANT_MACROS
+#define __STDC_LIMIT_MACROS 
+#define __STDC_FORMAT_MACROS
+
 #include <ctype.h>
+#include <fenv.h>
+#include <gmp.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <math.h>
-#include <fenv.h>
+#include <setjmp.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <termcap.h>
+#include <time.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <sys/wait.h>
-#include <gmp.h>
 #include "../gdsl/src/gdsl.h"
 #ifdef _OPENMP
 #include <omp.h>
@@ -92,45 +100,46 @@ struct TimeStruct {
 
 #define NEST(body...) do { body } while (0)
 
-#define maxi(a, b) ({ typeof(a) _x = (a); typeof(b) _y = (b); (_x > _y ? _x : _y); })
-#define mini(a, b) ({ typeof(a) _x = (a); typeof(b) _y = (b); (_x < _y ? _x : _y); })
-#define maximize(a, b) NEST( typeof(&a) _x = (&a); typeof(b) _y = (b); if (*_x < _y) *_x = _y; )
-#define minimize(a, b) NEST( typeof(&a) _x = (&a); typeof(b) _y = (b); if (*_x > _y) *_x = _y; )
-#define exchange(a, b) NEST( typeof(a) _tmp = a; a = b ; b = _tmp; )
+#define maxi(a, b) ({ typeof(a) _a = a, _b = b; (_a > _b ? _a : _b); })
+#define mini(a, b) ({ typeof(a) _a = a, _b = b; (_a < _b ? _a : _b); })
+#define maximize(a, b) NEST( typeof(b) _b = b; if (a < _b) a = _b; )
+#define minimize(a, b) NEST( typeof(b) _b = b; if (a > _b) a = _b; )
+#define exchange(a, b) NEST( typeof(a) _a = a; a = b ; b = _a; )
 
-/* Allocation helpers */
+/* Allocation */
 
-#define check_allocation(ptr, x, res) ({ if (x > 0) { if (!(ptr = (typeof(ptr)) res)) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
+#define check_alloc(ptr, x, res) ({ if (x > 0) { if ((ptr = (typeof(ptr)) res) == NULL) error(allocation, "Memory allocation error"); } else ptr = NULL; ptr; })
 
-#define cpt_calloc(ptr, n) ({ size_t _x = n; typeof(&(ptr)) _p = &(ptr); check_allocation(*_p, _x, calloc(_x, sizeof (*ptr))); })
-#define cpt_malloc(ptr, n) ({ size_t _x = n; typeof(&(ptr)) _p = &(ptr); check_allocation(*_p, _x, malloc(_x * sizeof (*ptr))); })
-#define cpt_realloc(ptr, n) ({ size_t _x = n; typeof(&(ptr)) _p = &(ptr); check_allocation(*_p, _x, realloc(*_p, _x * sizeof (*ptr))); })
+#define cpt_calloc(ptr, n) ({ size_t _n = n; typeof(&ptr) _p = &ptr; check_alloc(*_p, _n, calloc(_n, sizeof (*ptr))); })
+#define cpt_malloc(ptr, n) ({ size_t _n = n; typeof(&ptr) _p = &ptr; check_alloc(*_p, _n, malloc(_n * sizeof (*ptr))); })
+#define cpt_realloc(ptr, n) ({ size_t _n = n; typeof(&ptr) _p = &ptr; check_alloc(*_p, _n, realloc(*_p, _n * sizeof (*ptr))); })
 #define cpt_free(ptr) NEST( free(ptr); ptr = NULL; )
 
-/* Vector facilities */
+/* Vectors */
 
 #define VECTOR(args...) _mkvector(args)
 #define EVECTOR(args...) _mkvector(args, extern)
 #define SVECTOR(args...) _mkvector(args, static)
 #define _mkvector(type, name, kw...) kw type *name; kw size_t name##_nb
-#define vector_copy(dest, source) NEST( cpt_malloc(dest, (dest##_nb = source##_nb)); memcpy(dest, source, dest##_nb * sizeof(typeof(*dest))); )
+#define vector_copy(dest, source) memcpy(cpt_malloc(dest, (dest##_nb = source##_nb)), source, source##_nb * sizeof(typeof(*dest)))
 #define vector_sort(name, cmp_func) qsort(name, name##_nb, sizeof(typeof(*name)), (int (*) (const void *, const void *)) cmp_func)
 
 /* Bit arrays */
 
 typedef ulong *BitArray;
 
-#define bitarray_create(n) ((ulong *) calloc(((n) - 1) / WORDSIZE + 1, sizeof(ulong)))
-#define bitarray_copy(dest, source, n) memcpy(dest, source, (((n) - 1) / WORDSIZE + 1) * sizeof(ulong))
-#define bitarray_clone(dest, source, n) NEST( dest = bitarray_create(n); bitarray_copy(dest, source, n); )
-#define bitarray_cmp(dest, source, n) memcmp(dest, source, (((n) - 1) / WORDSIZE + 1) * sizeof(ulong))
+#define bitarray_create(n) ((BitArray) calloc(((n) - 1) / WORDSIZE + 1, sizeof(BitArray*)))
+#define bitarray_malloc(n) ((BitArray) malloc((((n) - 1) / WORDSIZE + 1) * sizeof(BitArray*)))
+#define bitarray_copy(dest, source, n) memcpy(dest, source, (((n) - 1) / WORDSIZE + 1) * sizeof(BitArray*))
+#define bitarray_clone(dest, source, n) bitarray_copy(dest = bitarray_malloc(n), source, n)
+#define bitarray_cmp(dest, source, n) memcmp(dest, source, (((n) - 1) / WORDSIZE + 1) * sizeof(BitArray*))
 #define bitarray_set_index(x) NEST( (x)->bit_index = (x)->id / WORDSIZE; (x)->bit_mask = 1UL << ((x)->id % WORDSIZE); )
-#define bitarray_set(tab, x) NEST( tab[(x)->bit_index] |= (x)->bit_mask; )
-#define bitarray_unset(tab, x) NEST( tab[(x)->bit_index] &= ~(x)->bit_mask; )
+#define bitarray_set(tab, x) (tab[(x)->bit_index] |= (x)->bit_mask)
+#define bitarray_unset(tab, x) (tab[(x)->bit_index] &= ~(x)->bit_mask)
 #define bitarray_get(tab, x) (tab[(x)->bit_index] & (x)->bit_mask)
 #define bitarray_save_and_set(tab, x) NEST( save(tab[(x)->bit_index]); tab[(x)->bit_index] |= (x)->bit_mask; )
 
-/* Loop facilities */
+/* Loops on vectors */
 
 #define _for(x, i, tab, min, max) do { typeof(max) i; typeof(*(tab)) x; for (i = min; i < max; i++) { x = (tab)[i];
 #define _rfor(x, i, tab, max, min) do { typeof(max) i, _j; typeof(*(tab)) x; for (_j = min, i = max - 1; _j < max; i--, _j++) { x = (tab)[i];
@@ -161,19 +170,19 @@ typedef ulong *BitArray;
 /* Random numbers */
 
 #define cpt_srand(seed) srand48_r(seed, &random_buffer)
-#define cpt_rand() ({ long x; lrand48_r(&random_buffer, &x); x; })
+#define cpt_rand() ({ long _x; lrand48_r(&random_buffer, &_x); _x; })
 
 /* Comparisons */
 
 typedef enum {Better = -1, Equal = 0, Worse = 1} Comparison;
 
-#define LESS(x, y) NEST( typeof(x) _x = x; typeof(y) _y = y; if (_x < _y) return Better; if (_x > _y) return Worse; )
-#define GREATER(x, y) NEST( typeof(x) _x = x; typeof(y) _y = y; if (_x > _y) return Better; if (_x < _y) return Worse; )
+#define LESS(x, y) NEST( typeof(x) _x = x, _y = y; if (_x < _y) return Better; if (_x > _y) return Worse; )
+#define GREATER(x, y) NEST( typeof(x) _x = x, _y = y; if (_x > _y) return Better; if (_x < _y) return Worse; )
 #define PREFER(x, y) NEST( bool _x = x, _y = y; if (_x && _y) return Better; if (!_x && !_y) return Worse; )
 
-#define preferred(comp, rand, ties) ({ Comparison test = comp; test == Worse ? false : !rand ? test == Better : test == Better ? (ties = 1) : cpt_rand() % ++ties == 0; })
+#define preferred(comp, rand, ties) ({ Comparison _c = comp; _c == Worse ? false : !rand ? _c == Better : _c == Better ? (ties = 1) : cpt_rand() % ++ties == 0; })
 
-#define mpz_get_timeval(n) ({ char *s = mpz_get_str(NULL, 10, n); TimeVal res = atoll(s); free(s); res; })
+#define mpz_get_timeval(n) ({ char *_s = mpz_get_str(NULL, 10, n); TimeVal res = atoll(_s); free(_s); res; })
 
 
 #endif /* CPT_H */

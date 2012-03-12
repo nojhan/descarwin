@@ -40,9 +40,6 @@ EVECTOR(SolutionPlan *, plans);
 
 extern Statistics stats;
 
-extern Causal *last_conflict_candidate;
-EVECTOR(Causal *, last_conflicts);
-
 extern FILE *cptout;
 
 extern struct drand48_data random_buffer;

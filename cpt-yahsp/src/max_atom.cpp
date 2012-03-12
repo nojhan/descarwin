@@ -303,7 +303,7 @@ void compute_h2_distances(void)
   FOR(f, fluents) { cpt_malloc(pair_cost[f->id], fluents_nb); } EFOR;
 
   FORMIN(a, actions, 2) {
-    trace(monitor, " %lu/%zu\r", a->id, actions_nb);
+    cpt_trace(monitor, " %zu/%zu\r", a->id, actions_nb);
     FOR(a, actions) {     
       set_ainit(a, MAXCOST);
       set_areachable(a, (a->id > 0 && a->prec_nb == 0)); 
@@ -320,7 +320,7 @@ void compute_h2_distances(void)
     FORMIN(a2, actions, 0) {
       set_distance(a, a2, get_ainit(a2));
     } EFOR;
-    trace(monitor, "Computing distances...............");
+    cpt_trace(monitor, "Computing distances...............");
   } EFOR;
 
   FOR(f, fluents) { cpt_free(pair_cost[f->id]); } EFOR;

@@ -10,7 +10,6 @@
 #include "cpt.h"
 #include "options.h"
 #include "structs.h"
-#include "problem.h"
 #include "propagations.h"
 #include "scheduling.h"
 #include "plan.h"
@@ -33,6 +32,15 @@ struct Choice {
   bool direction;
   void (*propagate) (Choice *c, bool first);
 };
+
+
+/*---------------------------------------------------------------------------*/
+/* Global Variables                                                          */
+/*---------------------------------------------------------------------------*/
+
+
+Causal *last_conflict_candidate;
+VECTOR(Causal *, last_conflicts);
 
 
 /*---------------------------------------------------------------------------*/
@@ -62,9 +70,9 @@ static bool (*make_choice) (Choice *c);
 
 #define set_choice(type, c, c0, a0, dir)				\
   (c0 == NULL ? false :							\
-   (c->choice1 = c0, c->choice2 = a0,					\
-    c->direction = ({ Comparison test = dir; test == Better || (opt.random && test == Equal && cpt_rand() % 2 == 0); }), \
-    c->propagate = propagate_##type##_choice, stats.type##_choices++, true))
+    ({ Comparison test = dir; c->choice1 = c0; c->choice2 = a0;				\
+      c->direction = (test == Better || (opt.random && test == Equal && cpt_rand() % 2 == 0)); \
+      c->propagate = propagate_##type##_choice; stats.type##_choices++; true; }))
 
 #define _inith(h, o) h = h##_##o
 #define _init_heuristic(o)						\
@@ -85,7 +93,7 @@ static bool (*make_choice) (Choice *c);
 
 
 static bool choose_support(Choice *c);
-Action *best_action(Causal *c);
+static Action *best_action(Causal *c);
 static bool choose_conflict(Choice *c);
 static bool choose_mutex(Choice *choice);
 static void propagate_conflict_choice(Choice *c, bool first);
@@ -115,13 +123,23 @@ void init_heuristics(void)
   }
 }
 
-#define wdeg(x) ((0+x->origin->weight) / (double) (1 + last_start(x) - first_start(x)))
+void reset_last_conflicts(void)
+{
+  last_conflict_candidate = NULL;
+  last_conflicts_nb = 0;
+}
+
+void reset_weights(void)
+{
+  FOR(c, causals) { c->weight = 0; } EFOR;
+  FOR(a, actions) { a->weight = 0; } EFOR; 
+}
 
 static bool choose_support(Choice *choice)
 {
   Causal *c0 = NULL;
   Action *a, *a0 = NULL;
-  long ties = 1;
+  ulong ties = 1;
 
   FOR(c, active_causals) {
 #ifndef RESOURCES
@@ -145,14 +163,12 @@ static bool choose_support(Choice *choice)
   return set_choice(support, choice, c0, a0, Better);
 }
 
-#define FORPROD2(a, c) do { Value _i; for (_i = (c)->support.min; _i <= (c)->support.max; _i = (c)->support.bucket[_i+1]) { Action *a = (c)->fluent->producers[_i];
-
-Action *best_action(Causal *c)
+static Action *best_action(Causal *c)
 {
   Action *a0 = NULL;
-  long ties = 1;
+  ulong ties = 1;
 
-  FORPROD2(a, c) {
+  FORPROD(a, c) {
     if (!a0 || preferred(is_best_action(a, a0, c), opt.random, ties)) a0 = a; } EFOR;
   return a0;
 }
@@ -161,44 +177,38 @@ static bool choose_conflict(Choice *choice)
 {
   Causal *c0 = NULL;
   Action *a0 = NULL;
-  long ties = 1;
+  ulong ties = 1;
 
   RFOR(c, active_causals) {
     FOR(a, c->fluent->edeleters) {
-      if (support_threat(c, a)) 
-	if (!c0 || preferred(is_best_conflict(c, a, c0, a0), opt.random, ties)) 
-	  { c0 = c; a0 = a; }
+      if (support_threat(c, a) && (!c0 || preferred(is_best_conflict(c, a, c0, a0), opt.random, ties)))
+	{ c0 = c; a0 = a; }
     } EFOR;
   } EFOR;  
   return set_choice(conflict, choice, c0, a0, order_threat_before(c0, a0)); 
 }
 
-Action *lc1, *lc2;
-
 static bool choose_mutex(Choice *choice)
 {
   Action *a0 = NULL;
   Action *b0 = NULL;
-  long ties = 1;
+  ulong ties = 1;
 
   FORPAIR(a, b, active_actions) {
-    if (mutex_threat(a, b))
-      if (!a0 || preferred(is_best_mutex(a, b, a0, b0), opt.random, ties))
-	{ a0 = a ; b0 = b; }
+    if (mutex_threat(a, b) && (!a0 || preferred(is_best_mutex(a, b, a0, b0), opt.random, ties)))
+      { a0 = a ; b0 = b; }
   } EFORPAIR;
-  lc1 = a0;
-  lc2 = b0;
   return set_choice(mutex, choice, a0, b0, order_mutex_before(a0, b0));
 }
 
 static bool choose_start_time(Choice *choice)
 {
   Action *a0 = NULL;
-  long ties = 1;
+  ulong ties = 1;
 
   FOR(a, active_actions) {
-    if (first_start(a) < last_start(a))
-      if (!a0 || preferred(is_best_start_time(a, a0), opt.random, ties)) a0 = a ;
+    if (first_start(a) < last_start(a) && (!a0 || preferred(is_best_start_time(a, a0), opt.random, ties)))
+	a0 = a ;
   } EFOR;
   return set_choice(start_time, choice, a0, NULL, Better);
 }
@@ -230,8 +240,8 @@ static void propagate_support_choice(Choice *choice, bool first)
       last_conflicts[0] = c;
       last_conflicts_nb = 1;
       last_conflict_candidate = NULL;
-    suite:;
     }
+  suite:
     set_producer(c, a);
   }
   else {
@@ -240,8 +250,8 @@ static void propagate_support_choice(Choice *choice, bool first)
 	FOR(conflict, last_conflicts) { if (c == conflict) goto suite2; } EFOR;
 	last_conflict_candidate = c;
       }
-    suite2:;
     }
+  suite2:
     rem_producer(c, a);      
   }
 }
@@ -283,11 +293,6 @@ static bool mutex_first(Choice *c)
 void search(void)
 {
   Choice c;
-
-#ifdef WALLCLOCK_TIME
-  if (clock() / CLOCKS_PER_SEC > opt.timer) 
-      error(timer_interruption, "Timer interruption");
-#endif
 
   propagate();
   if (opt.shaving) shaving();

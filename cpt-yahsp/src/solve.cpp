@@ -66,9 +66,6 @@ VECTOR(SolutionPlan *, plans);
 
 Statistics stats;
  
-Causal *last_conflict_candidate;
-VECTOR(Causal *, last_conflicts);
-
 #ifdef DAE
 FILE *cptout = stderr;
 #else
@@ -92,40 +89,23 @@ struct drand48_data random_buffer;
 
 
 static void solve2(void);
-#ifndef WALLCLOCK_TIME
 static void partial_statistics_request(int n);
 static void user_interruption(int n);
 static void timer_interruption(int n);
-#endif
 
 /*****************************************************************************/
 
 
-void _begin_monitor(const char *s) 
-{
-  long i; 
-  start_timer(stats.monitor);
-  trace(monitor, "%s", s);
-  for (i = 0; i < 34 - (long) strlen(s); i++) trace(monitor, ".");
-}
-
-void _end_monitor(void) 
-{
-  trace(monitor, " done : %.3f          \n", get_timer(stats.monitor)); 
-}
-
-#ifndef WALLCLOCK_TIME
-
 static void init_system(long time_limit)
 {
-  struct itimerval timer;
   signal(SIGTSTP, partial_statistics_request);
   signal(SIGINT, user_interruption);
-  timer.it_interval.tv_sec = 0;
-  timer.it_interval.tv_usec = 0;
-  timer.it_value.tv_usec = 0;
-  timer.it_value.tv_sec = abs(time_limit);
   if (time_limit > 0) {
+    struct itimerval timer;
+    timer.it_interval.tv_sec = 0;
+    timer.it_interval.tv_usec = 0;
+    timer.it_value.tv_usec = 0;
+    timer.it_value.tv_sec = abs(time_limit);
     signal(SIGVTALRM, timer_interruption);
     setitimer(ITIMER_VIRTUAL, &timer, NULL);
   }
@@ -135,9 +115,9 @@ static void partial_statistics_request(int n)
 {
   int v = opt.verbosity;
   opt.verbosity = 1;
-  trace(normal, "\n----- Partial statistics at bound ");
+  cpt_trace(normal, "\n----- Partial statistics at bound ");
   print_time(cptout, last_start(end_action));
-  trace(normal, " -----\n");
+  cpt_trace(normal, " -----\n");
   stats.usearch = get_timer(stats.search);
   stats.utotal = get_timer(stats.total);
   stats.wsearch = get_wtimer(stats.search);
@@ -163,8 +143,6 @@ static void timer_interruption(int n)
   error(timer_interruption, "Timer interruption");
 }
 
-#endif
-
 int cpt_main(int argc, const char **argv)
 {
   start_timer(stats.total);
@@ -177,9 +155,7 @@ int cpt_main(int argc, const char **argv)
 
   init_heuristics();
 
-#ifndef WALLCLOCK_TIME
   init_system(opt.timer);
-#endif
   
   create_problem();
 
@@ -211,7 +187,7 @@ int cpt_main(int argc, const char **argv)
   case BOUND_LIMIT : error(no_plan,"No plan of makespan lower than upper limit of the bound");
   case BACKTRACK_LIMIT : 
     if (!solution_plan || !opt.give_suboptimal) error(no_plan, "The maximum number of backtracks is reached"); 
-    trace(normal, "\nWARNING : The maximum number of backtracks is reached before proving optimality !\n");
+    cpt_trace(normal, "\nWARNING : The maximum number of backtracks is reached before proving optimality !\n");
   case PLAN_FOUND :
     trace_proc(solution_plan, solution_plan);
     trace_proc(plan_stats, solution_plan);
@@ -272,18 +248,13 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
 #endif
 
   begin_monitor("Initial propagations");
-  if ((initial_prop_backtrackable && new_world(false)) || (!initial_prop_backtrackable && protected())) {
+  if ((initial_prop_backtrackable && new_world(false)) || (!initial_prop_backtrackable && protected(false))) {
     if (compress) compress_plans(compress_causals, compress_orderings);
     set_limit_initprop(opt.limit_initial_propagation, opt.max_propagations);
     restrict_problem(init, init_nb, goals, goals_nb);
   } else return INIT_PROP_FAILED;
-  end_monitor();
-
-  if (opt.limit_initial_propagation && propagations_limit_reached()) {
-/*     restore_initial_world(0); */
-/*     return INIT_PROP_FAILED;  */
-  }
   set_limit_initprop(false, 0);
+  end_monitor();
 
   /* landmarks : avant ou après la première propagation ??? */
   if (opt.landmarks) {
@@ -294,13 +265,18 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
   
   trace_proc(problem_stats, actions_nb_orig, fluents_nb_orig, causals_nb_orig);
 
-  bound = dic_lower = dic_upper = maxi(pddl_domain->bound.t + (opt.pddl21 ? pddl_domain->precision.t : 0), first_start(end_action));
+  //bound = dic_lower = dic_upper = maxi(pddl_domain->bound.t + (opt.pddl21 ? pddl_domain->precision.t : 0), first_start(end_action));
+  bound = dic_upper = maxi(pddl_domain->bound.t + (opt.pddl21 ? pddl_domain->precision.t : 0), first_start(end_action));
+  if (opt.dichotomy == 5)
+    dic_lower = first_start(end_action) - 1; // XXX
+  else 
+    dic_lower = dic_upper;
   if (bound > maxmsp) {
     restore_initial_world(0);
     return BOUND_LIMIT;
   }
   
-  if (opt.dichotomy != 0) {
+  if (opt.dichotomy > 0 && opt.dichotomy < 5) {
     TimeVal mind = MAXTIME, maxd = 0;
     long nbac = 0;
     double mean = 0;
@@ -322,13 +298,10 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
     case 4: dic_increment = maxd; break;
     }
     maximize(dic_increment, 1);
-    dic_increment *= 2;
-  }
+    dic_increment *= 2;  }
 
-  FOR(c, causals) { c->weight = 0; } EFOR;
-  FOR(a, actions) { a->weight = 0; } EFOR;
-  last_conflict_candidate = NULL;
-  last_conflicts_nb = 0;
+  reset_last_conflicts();
+  reset_weights();
 
   start_timer(stats.search);
 
@@ -338,7 +311,6 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
   // not useful due to global mutex sets ?
   if (opt.sequential) {
     propagate();
-    //maximize(bound, active_actions_nb - 2);
     maximize(bound, total_plan_cost);
     dic_lower = dic_upper = bound;
   }
@@ -353,10 +325,7 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
       update_sup_a(end_action, bound);
       compute_relevance(bound);
       if (opt.shaving) { propagate(); shaving(); }
-      last_conflict_candidate = NULL;
-      last_conflicts_nb = 0;
-/*       FOR(c, causals) { c->weight = 0; } EFOR; */
-/*       FOR(a, actions) { a->weight = 0; } EFOR; */
+      reset_last_conflicts();
       solve2();
       /* print_time(cptout, first_start(end_action)); printf("\n"); */
       if (solution_plan) plan_free(solution_plan);
@@ -382,7 +351,9 @@ int cpt_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb,
       restore_initial_world(0);
       return solution_plan ? PLAN_FOUND : BOUND_LIMIT;
     }
-    bound = (dic_lower + dic_upper + 1) / 2;
+    if (opt.dichotomy == 5 && pddl_domain->bound.t >= bound - (opt.pddl21 ? pddl_domain->precision.t : 0))
+      bound = dic_upper - 1;
+    else bound = (dic_lower + dic_upper + 1) / 2;
   }
 }
 
@@ -391,8 +362,6 @@ static void solve2(void)
   bool first_run = true;
   long tries = opt.restarts_max_tries;
   TIMER(iteration);
-
-  (void)iteration_wend; // to avoid warning message at compile time as the variable is not used.
 
   if (opt.limit_backtracks) set_backtrack_limit(opt.max_backtracks);
   else if (opt.restarts) set_backtrack_limit(opt.restarts_init);

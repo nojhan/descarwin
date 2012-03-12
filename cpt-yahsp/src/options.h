@@ -14,9 +14,6 @@ typedef struct Option Option;
 
 typedef enum { CONFLICTS_FIRST, SUPPORTS_FIRST, MUTEX_FIRST } BranchingStrategy;
 
-extern int global_argc;
-extern const char **global_argv;
-
 struct Option {
   bool anytime;
   char *bound;
