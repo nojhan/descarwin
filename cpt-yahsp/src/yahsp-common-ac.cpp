@@ -408,6 +408,7 @@ bool node_action_schedule(Node *node)
   
  nocontradiction:
 
+  node->makespan = vertices[vertices_nb - 1]->est;
   if (!contradiction) {
     i = vertices_nb - 1;
     while (node != NULL) {
