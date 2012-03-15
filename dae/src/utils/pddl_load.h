@@ -89,7 +89,7 @@ public:
     void compute_chrono_partition();
 
 
-    std::vector< daex::Atom*> atoms() const { return this->_atoms; }
+    const std::vector< daex::Atom*> & atoms() const { return this->_atoms; }
     
     const ChronoPartition & chronoPartitionAtom() { return this->_chrono_partition_atom; }
 

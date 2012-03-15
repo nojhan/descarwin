@@ -15,8 +15,8 @@
 #include <gmpxx.h>
 //extern "C" {
 #include <src/cpt.h>
-#include <src/branching.h>
 #include <src/structs.h>
+#include <src/branching.h>
 #include <src/problem.h>
 //}
 

@@ -40,13 +40,13 @@ public:
 
     //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
     
-     Plan() : _makespan( INT_MAX ), _search_steps(0), _is_valid(false),_plan_rep("No plan") ,_cost_add(INT_MAX ), _cost_max(INT_MAX ) {}
+     Plan() : _makespan( INT_MAX ),_cost_add(INT_MAX ), _cost_max(INT_MAX ), _search_steps(0), _is_valid(false), _plan_rep("No plan") {}
 	
       ~Plan(){}
      
-     Plan( SolutionPlan * p_plan ) : _makespan(p_plan->makespan), _search_steps(0), _is_valid(true), _cost_add(p_plan ->cost_add), _cost_max(p_plan-> cost_max)
+     Plan( SolutionPlan * p_plan ) : _makespan(p_plan->makespan), _cost_add(p_plan ->cost_add), _cost_max(p_plan-> cost_max), _search_steps(0), _is_valid(true)
       {   // get the plan representation
-// OMP DIRTY
+//FIXME OMP DIRTY
 #pragma omp critical
         _plan_rep = plan_to_str( p_plan );
       }
@@ -54,9 +54,6 @@ public:
     //! Construct a invalid plan from scratch
     /*! @TODO INT_MAX may not be the best choice here, FIXME
      */
-    
-     
-     
       Plan  & operator=(const daex::Plan  & other){
        if (this != &other) {
             _makespan = other._makespan;

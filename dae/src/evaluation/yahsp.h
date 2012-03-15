@@ -314,33 +314,33 @@ protected:
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "ok" << std::endl;
                                  #endif
-};
+     };
 
 
     //! Free all necessary pointers to global variables
     // that have been used during call
-      void free_yahsp_structures(){
+    void free_yahsp_structures()
+    {
                                  #ifndef NDEBUG
-                                     eo::log << eo::xdebug << "\t\tfree plans...";
-                                     eo::log.flush();
+                                         eo::log << eo::xdebug << "\t\tfree plans...";
+                                         eo::log.flush();
                                  #endif
-    // libère la variable globale "plans", utilisée par yahsp lors de la compression
-    for( unsigned int p=0; p < (unsigned int) plans_nb; ++p ) {
-      plan_free( plans[p] );
-    }
-    plans_nb = 0;
-    
-    cpt_free( plans );
+        // libère la variable globale "plans", utilisée par yahsp lors de la compression
+        for( unsigned int p=0; p < (unsigned int) plans_nb; ++p ) {
+            plan_free( plans[p] );
+        }
+        plans_nb = 0;
 
-    if( solution_plan != NULL ) {
-        plan_free( solution_plan );
-        solution_plan = NULL;
-    }
+        cpt_free( plans );
+
+        if( solution_plan != NULL ) {
+            plan_free( solution_plan );
+            solution_plan = NULL;
+        }
                                  #ifndef NDEBUG
-                                     eo::log << eo::xdebug << "ok" << std::endl;
+                                        eo::log << eo::xdebug << "ok" << std::endl;
                                  #endif
-}
-;
+    };
 
     // VV : moved to Decomposition
     //! État à chaque itération
