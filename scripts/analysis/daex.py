@@ -159,7 +159,7 @@ def lines( pattern ):
     fds = fopen(files)
     return cat( fds )
 
-def parse( pattern, keyword = "MakeSpan" ):
+def parse( pattern, keyword = "MakeSpan", index=-1 ):
     """Open files matchin pattern, filter the lines matching the keyword and returns the list of the last item of each line, converted in float"""
     if pattern == "":
 #        print "WARNING empty pattern"
@@ -167,7 +167,7 @@ def parse( pattern, keyword = "MakeSpan" ):
 
     rawlines = lines(pattern)
     greped = grep( rawlines, keyword )
-    cuts = cut( greped, -1 ) # -1 = the last item
+    cuts = cut( greped, index ) # -1 = the last item
 
     # FIXME ugly hack
     strs = cuts
@@ -184,7 +184,7 @@ def parse( pattern, keyword = "MakeSpan" ):
         return res
 
 
-def parse_func( filenames, functions, keyword = "MakeSpan", labels=False ):
+def parse_func( filenames, functions, keyword = "MakeSpan", labels=False, index=-1  ):
     """Call a set of functions on the parsed data and build a table with the results, 
     if label==True, the labels are part of the table and every item is a str, else a float."""
     tab = []
@@ -206,7 +206,7 @@ def parse_func( filenames, functions, keyword = "MakeSpan", labels=False ):
         #name = different_characters( p_i, fn )
         name = p_i
 
-        makespans = parse( fnames[i], keyword )
+        makespans = parse( fnames[i], keyword, index  )
 
         trow = []
         if labels:
@@ -416,28 +416,28 @@ def plot_box( tab, title="", labels=[], ylabel="", xlabel=""):
 # COMMANDS
 ######################################
 
-def plotdistrib( filenames, key ):
+def plotdistrib( filenames, key, index=-1  ):
     # plot the distributions
     tab = []
     for pattern in filenames:
-        tab.append( [ parse( pattern, key ) ] )
+        tab.append( [ parse( pattern, key, index ) ] )
 
     plot_histo( tab, common_characters(filenames), labels=filenames )
 
 
-def boxplot( filenames, key ):
+def boxplot( filenames, key, index=-1  ):
     # plot the distributions
     tab = []
     for pattern in filenames:
-        tab.append( [ parse( pattern, key ) ] )
+        tab.append( [ parse( pattern, key, index ) ] )
 
     plot_box( tab, common_characters(filenames), labels=filenames )
 
 
-def compare_median( filenames, key, p_thresh = 0.95 ):
+def compare_median( filenames, key, p_thresh = 0.95, index=-1  ):
     ms = []
     for pattern in filenames:
-        ms.append( (pattern, parse( pattern, key ) ) )
+        ms.append( (pattern, parse( pattern, key, index ) ) )
 
     for i in xrange(len(ms)):
         for j in xrange(i,len(ms)):
@@ -472,10 +472,10 @@ def compare_median( filenames, key, p_thresh = 0.95 ):
 
 
 
-def compare( filenames, key, p_thresh = 0.95 ):
+def compare( filenames, key, p_thresh = 0.95, index=-1  ):
     ms = []
     for pattern in filenames:
-        ms.append( (pattern, parse( pattern, key ) ) )
+        ms.append( (pattern, parse( pattern, key, index ) ) )
 
     print "WILCOXON:\td1 VS d2\tmin_i<=>min_j\tmedian_i<=>median_j\tp-val\tbest"
 
@@ -628,26 +628,26 @@ def process_commands( opts, filepatterns ):
     if opts.basestats:
         #stats = [len,min,median,mean,std,skew,kurtosis]
         stats = [f for k,f in available_functions.items() ]
-        tab = parse_func( filepatterns, stats, key, labels=has_labels )
+        tab = parse_func( filepatterns, stats, key, labels=has_labels, index=opts.index )
         #printa(tab,transpose=False)
 
     if opts.compare:
-        compare_median(filepatterns,key)
+        compare_median(filepatterns,key, opts.index )
 
     if opts.plotdistrib:
-        plotdistrib(filepatterns,key)
+        plotdistrib(filepatterns,key, opts.index )
 
     if opts.boxplot:
-        boxplot(filepatterns,key)
+        boxplot(filepatterns,key, opts.index )
 
     if opts.function:
         f = available_functions[opts.function]
-        tab = parse_func( filepatterns, [f], key, labels=has_labels )
+        tab = parse_func( filepatterns, [f], key, labels=has_labels, index=opts.index  )
         #printa(tab,transpose=False)
 
     if opts.plot:
         f = available_functions[opts.function]
-        tab = parse_func( filepatterns, [f], key, labels=False )
+        tab = parse_func( filepatterns, [f], key, labels=False, index=opts.index  )
         plot_line(
                 tab, 
                 title= common_characters( filepatterns ), 
@@ -736,6 +736,10 @@ Comparing the distributions of several runs for 3 algorithms, by instance and sh
     parser.add_option("-m", "--instancemarker", dest="instancemarker", 
             action="store", type="str", default="p[0-9]{2}", metavar="REGEXP",
             help="regexp marking the instance number in the files names" )
+
+    parser.add_option("-e", "--index", dest="index", 
+            action="store", type="int", default=-1, metavar="IDX",
+            help="index of the element to extract from the line matching the data marker, defaults to -1, which is the last one on the line" )
 
 
     av_funcs = [len,min,max,mean,median,std,skew,kurtosis,copy.copy]

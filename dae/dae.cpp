@@ -319,6 +319,7 @@ int main ( int argc, char* argv[] )
     std::string plusOrComma =  parser.createParam(std::string("Comma"), "plusOrComma", "Plus (parents+offspring) or Comma (only offspring) for replacement", '\0', "Evolution Engine").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plusOrComma" << plusOrComma << std::endl;
 
+    // FIXME tester une valeur de taille de tournoi pour le remplacement par défaut à 5 à la place de 1
     unsigned replaceTourSize = parser.createParam(unsigned(1), "replaceTourSize", "Size of Replacement Tournament (1->deterministic (hum, pas logique ;-(", '\0', "Evolution Engine" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "replaceTourSize" << replaceTourSize << std::endl;
 
