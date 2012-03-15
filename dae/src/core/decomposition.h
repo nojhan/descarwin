@@ -10,54 +10,76 @@
 
 #include <eo>
 
-#include "decomposition.h"
+ 
 #include "goal.h"
 #include "plan.h"
-#include "src/globs.h"
-#include "src/yahsp.h"
+#include <src/globs.h>
+#include <src/yahsp.h>
 
 namespace daex
 {
 
 //! A decomposition is a list of Goal objects, and we are trying to minimize a scalar fitness (e.g. time or number of actions)
-class Decomposition : public std::list<Goal>, public EO< eoMinimizingDualFitness >
+class Decomposition : public std::list<Goal>  ,  public EO< eoMinimizingFitness >
 {
 public:
 
-    //! After a modification of the decomposition, it needs to be re-evaluated
-    //! Variation operator should use this method to indicate it
-    void invalidate();
+   
 
     //! At instanciation, a decomposition does not have any plan
     /*!
      * Note: and is not feasible, @see eoDualFitness
      */
-    //Decomposition() : _plan_global(NULL) {}
+     Decomposition() :_plan_global(), _plans_sub(), _b_max(0), _u(0), _k(0), _B(0){}  
 
-    Plan plan_copy() const
+     virtual ~Decomposition(){}
+    
+    
+    Decomposition & operator=(const Decomposition & other){
+       if (this != &other) {
+             std::list<Goal>::operator=(other);
+             _plan_global = other.plan_copy();
+             _plans_sub = other.subplans(); 
+             _b_max = other.b_max();
+             _k = other.get_number_evaluated_goals();
+             _u = other.get_number_useful_goals();
+             _B = other.get_number_evaluated_nodes();            
+        }
+        return *this;
+    }
+    
+     //! After a modification of the decomposition, it needs to be re-evaluated
+    //! Variation operator should use this method to indicate it
+    virtual void invalidate();
+    
+    daex::Plan plan_copy() const
     {
         return _plan_global;
     }
 
-    Plan & plan()
+    daex::Plan & plan()
     {
         return _plan_global;
     }
+    
 
-    Plan & subplan(unsigned int i)
+    daex::Plan & subplan(unsigned int i) 
     {
         return _plans_sub[i];
     }
 
-    std::vector<Plan> & subplans()
+    std::vector<daex::Plan>  subplans()  const
     {
         return _plans_sub;
     }
 
-    Plan & last_subplan()
+    daex::Plan & last_subplan()
     {
         return *(_plans_sub.end() - 1 );
     }
+    
+    
+    
 
     unsigned int subplans_size() const
     {
@@ -100,39 +122,49 @@ public:
     }
     */
 
-    void plan_global( Plan p );
+    void plan_global( daex::Plan p );
 
-    void plans_sub_add( Plan p );
+    void plans_sub_add( daex::Plan p );
 
     void plans_sub_reset();
 
-    /*virtual*/ void printOn( std::ostream & out ) const;
+    virtual void printOn( std::ostream & out ) const;
+    
+    virtual void readFrom(std::istream & _is){};
+
 
     Decomposition::iterator iter_at( unsigned int i );
 
     // VV : getters/setters for 4 fields taken from daeCptYahspEval
     void b_max( unsigned int b ) { _b_max = b; }
-    unsigned int b_max() { return _b_max; }
+    unsigned int b_max() const { return _b_max; } 
 
-    unsigned int get_number_evaluated_goals() { return _k; }
+    unsigned int get_number_evaluated_goals()const { return _k; } 
     void reset_number_evaluated_goals() { _k = 0; }
     void incr_number_evaluated_goals(unsigned int k) { _k += k; }
 
-    unsigned int get_number_useful_goals() { return _u; }
+    unsigned int get_number_useful_goals()const { return _u; } 
     void reset_number_useful_goals() { _u = 0; }
     void incr_number_useful_goals(unsigned int u) { _u += u; }
 
-    unsigned int get_number_evaluated_nodes() { return _B; }
+    unsigned int get_number_evaluated_nodes() const { return _B; }
     void reset_number_evaluated_nodes() { _B = 0; }
     void incr_number_evaluated_nodes(unsigned int B) { _B += B; }
+    void setFeasible(bool  b){	_is_feasible = b; }
+    bool is_feasible() const { return _is_feasible; }
+   
+private:
+   
+    bool _is_feasible;
+
 
 protected:
 
-    //! Plan global compressé
-    Plan _plan_global;
+    //! daex::Plan global compressé
+    daex::Plan _plan_global;
 
     //! Vecteur des sous-plans
-    std::vector< Plan > _plans_sub;
+    std::vector< daex::Plan > _plans_sub;
 
     // VV : 4 fields made local to decomposition instead of daeCptYahspEval
 
@@ -147,6 +179,8 @@ protected:
 
     //! compteur des tentatives de recherche
     unsigned int _B;
+    
+    
 
 }; // class Decomposition
 

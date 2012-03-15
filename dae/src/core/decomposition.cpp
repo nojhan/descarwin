@@ -7,25 +7,24 @@
 namespace daex
 {
 
-void Decomposition::invalidate() 
-{
-    this->EO<eoMinimizingDualFitness>::invalidate();
+  void Decomposition::invalidate() 
+ {   this->EO<eoMinimizingFitness>::invalidate();
 
-    // clear the sub_plans vector
-    // because if the decomposition becomes invalid, so are its intermediate plans
+    //clear the sub_plans vector
+    //because if the decomposition becomes invalid, so are its intermediate plans
     this->plans_sub_reset();
 
-    // plan vide
-    this->_plan_global = Plan();
+    //plan vide
+   this->_plan_global = daex::Plan();
 
-}
+ }
 
-void Decomposition::plan_global( Plan p )
+void Decomposition::plan_global( daex::Plan p )
 {
     _plan_global = p;
 }
 
-void Decomposition::plans_sub_add( Plan p ) 
+void Decomposition::plans_sub_add( daex::Plan p ) 
 {
     _plans_sub.push_back( p );
 }
@@ -39,16 +38,19 @@ void Decomposition::plans_sub_reset()
     _plans_sub.reserve( this->size() + 1 );
 }
 
-void Decomposition::printOn( std::ostream & out ) const 
+ void Decomposition::printOn( std::ostream & out ) const 
 {
-    EO< eoMinimizingDualFitness >::printOn(out);
+    EO< eoMinimizingFitness >::printOn(out);
     out << " ";
 
-    out << "(Decomposition[" << this->size() << "]: ";
+    out << "(Decomposition[" <<  this->size() << "]: ";
 
     std::copy( this->begin(), this->end(), std::ostream_iterator<Goal>(out, " ") );
 
     out << ")";
+ 
+     //out << this->plan_copy(); 
+  
 }
 
 Decomposition::iterator Decomposition::iter_at( unsigned int i )

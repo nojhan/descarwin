@@ -11,7 +11,9 @@
 
 namespace daex {
   // JACK: Conforme au code et pas à l'article.
-class MutationChangeAddAtom: public eoMonOp<Decomposition>
+  
+template<class EOT>
+class MutationChangeAddAtom: public eoMonOp<EOT>
 {
 public:
     MutationChangeAddAtom( 
@@ -22,7 +24,7 @@ public:
       :_proba_change(proba_change), /*_proba_add(proba_add), */ _times(times), _maxtry_search_candidate(maxtry_search_candidate), _maxtry_search_mutex(maxtry_search_mutex)
     {}
 
-    bool operator()( Decomposition & decompo )
+    bool operator()( EOT & decompo )
     {
 #ifndef NDEBUG
         eo::log << eo::debug << "a";

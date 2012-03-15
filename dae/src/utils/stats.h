@@ -58,7 +58,7 @@ public:
     void operator()(const std::vector<const EOT*>& pop)  
     {
         // get the best decomposition
-        daex::Decomposition best_decompo = *( pop[0] );
+        EOT best_decompo = *( pop[0] );
 
         // if its fitness is better
         if( best_decompo.fitness() > _best_fitness ) {

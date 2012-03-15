@@ -1,26 +1,30 @@
 
 #include <eo>
-
+#include <iostream>
+#include <list>
 #include "core/decomposition.h"
 
 namespace daex {
 
 //! Modify decompo1 such that it is a cross-over of the two individuals, the choice of wether the first part comes from a decomposition or the other is made by looking at the earliest start time of the goal chosen as a cut limit.
 // Note : this version does not consider if goals are ordered on earliest start times or not
-class CrossOver : public eoQuadOp<Decomposition>
+
+template <class EOT> 
+
+class CrossOver : public eoQuadOp<EOT>
 {
 public:
     // TODO create a .cpp file
-    bool operator()( Decomposition & decompo1, Decomposition & decompo2 )
+    bool operator()( EOT & decompo1, EOT & decompo2 )
     {
         if( decompo1.empty() || decompo2.empty() ) {
             return false;
         }
 
         // choix au hasard de l'emplacement du découpage dans chaque décomposition
-        Decomposition::iterator decompo1_middle = decompo1.begin();
+        std::list<daex::Goal>::iterator decompo1_middle = decompo1.begin();
         std::advance( decompo1_middle, rng.random( decompo1.size() ) );
-        Decomposition::iterator decompo2_middle = decompo2.begin();
+        std::list<daex::Goal>::iterator decompo2_middle = decompo2.begin();
         std::advance( decompo2_middle, rng.random( decompo2.size() ) );
 
         TimeVal d1 = decompo1_middle->earliest_start_time();
@@ -51,10 +55,11 @@ public:
 //! Modify decompo1 such that it is a cross-over of the two individuals, the choice of wether the first part comes from a decomposition or the other is made by looking at the earliest start time of the goal chosen as a cut limit.
 // Note : this version filters out goals with earliest start times that are earlier than the goal of the cut limit (which may occurs with the addGoal mutation)
 // TODO warning: only the right half of the decomposition is filtered
-class CrossOverTimeFilterHalf : public eoQuadOp<Decomposition>
+template <class EOT> 
+class CrossOverTimeFilterHalf : public eoQuadOp<EOT>
 {
 public:
-    bool operator()( Decomposition & decompo1, Decomposition & decompo2 )
+    bool operator()( EOT & decompo1, EOT & decompo2 )
     {
         if( decompo1.empty() || decompo2.empty() ) {
             return false;
@@ -72,7 +77,7 @@ public:
 #endif
 
         // choix au hasard de l'emplacement du découpage dans chaque décomposition
-        Decomposition::iterator decompo1_middle = decompo1.begin();
+        std::list<daex::Goal>::iterator decompo1_middle = decompo1.begin();
 #ifndef NDEBUG
         unsigned int i1 = rng.random( decompo1.size() );
         std::advance( decompo1_middle, i1 );
@@ -80,7 +85,7 @@ public:
         std::advance( decompo1_middle, rng.random( decompo1.size() ) );
 #endif
 
-        Decomposition::iterator decompo2_middle = decompo2.begin();
+        std::list<daex::Goal>::iterator decompo2_middle = decompo2.begin();
 #ifndef NDEBUG
         unsigned int i2 = rng.random( decompo2.size() );
         std::advance( decompo2_middle, i2 );
@@ -100,12 +105,12 @@ public:
         // d'abord les goal de 1, puis les goals de 2
         if( d2 > d1 ) {
             // consider the next element, to avoid erasing the middle goal
-            Decomposition::iterator decompo1_middle_next = decompo1_middle;
+            std::list<daex::Goal>::iterator decompo1_middle_next = decompo1_middle;
             decompo1_middle_next++;
 
             decompo1.erase( decompo1_middle_next, decompo1.end() );
 
-            for( Decomposition::iterator igoal = decompo2_middle, iend = decompo2.end(); igoal != iend; ++igoal ) {
+            for( std::list<daex::Goal>::iterator igoal = decompo2_middle, iend = decompo2.end(); igoal != iend; ++igoal ) {
                 if( igoal->earliest_start_time() > d1 ) {
                     decompo1.push_back( *igoal );
                 }
@@ -117,8 +122,8 @@ public:
 
             // back loop and front insert
 //            unsigned int c = 0;
-            Decomposition::iterator igoal;
-            Decomposition::iterator ibegin = decompo2.begin();
+            std::list<daex::Goal>::iterator igoal;
+            std::list<daex::Goal>::iterator ibegin = decompo2.begin();
             for( igoal = decompo2_middle; igoal != ibegin; --igoal ) {
 //                std::clog << " " << c++;
                 if( igoal->earliest_start_time() < d2 ) {
