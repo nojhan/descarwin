@@ -30,7 +30,7 @@ public:
     /*!
      * Note: and is not feasible, @see eoDualFitness
      */
-     Decomposition() :_plan_global(), _plans_sub(), _b_max(0), _u(0), _k(0), _B(0){}  
+     Decomposition() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}  
 
      virtual ~Decomposition(){}
     
@@ -130,7 +130,7 @@ public:
 
     virtual void printOn( std::ostream & out ) const;
     
-    virtual void readFrom(std::istream & _is){};
+    virtual void readFrom(std::istream & _is) {/*FIXME : à implémenter*/};
 
 
     Decomposition::iterator iter_at( unsigned int i );

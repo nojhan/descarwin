@@ -224,7 +224,7 @@ public:
         
         } ;
     
-     void pre_call( EOT & decompo ) {};   
+     void pre_call( EOT & decompo ) {/* FIXME unused variable */};   
      
      void operator()( EOT & decompo ) { 
         pre_call( decompo );
