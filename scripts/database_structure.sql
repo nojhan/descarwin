@@ -153,10 +153,10 @@ CREATE TABLE solution_run (
 );
 
 -- instance <-> solution
--- CREATE SEQUENCE instance_solution_id_seq;
-CREATE TABLE instance_solution (
+-- CREATE SEQUENCE solution_instance_id_seq;
+CREATE TABLE solution_instance (
     id INT4 PRIMARY KEY NOT NULL auto_increment,
--- id INT4 DEFAULT nextval('instance_solution_id_seq') PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('solution_instance_id_seq') PRIMARY KEY NOT NULL auto_increment,
     id_instance INT4 NOT NULL DEFAULT 0 REFERENCES instance(id),
     id_solution INT4 NOT NULL DEFAULT 0 REFERENCES solution(id),
     description TEXT NOT NULL DEFAULT ''
