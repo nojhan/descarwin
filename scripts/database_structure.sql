@@ -9,7 +9,7 @@
 --   create a database: createdb test
 --   import the script: psql -d test -a -f database_structure.sql
 -- 
--- NOTE: with PostgreSQL, the PRIMARY KEY statement create an implicit index called "<table name>_pkey"
+-- NOTE: with PostgreSQL, the PRIMARY KEY NOT NULL auto_increment statement create an implicit index called "<table name>_pkey"
 --       (e.g. algorithm_pkey), this is a feature.
 
 -- ------------------------
@@ -19,8 +19,8 @@
 -- Algorithms versions
 -- CREATE SEQUENCE algorithm_id_seq;
 CREATE TABLE algorithm (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('algorithm_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('algorithm_id_seq') PRIMARY KEY NOT NULL auto_increment,
     svn_tag VARCHAR(64) NOT NULL DEFAULT '',
     date TIMESTAMP NOT NULL DEFAULT NOW(),
     description TEXT NOT NULL DEFAULT '',
@@ -32,8 +32,8 @@ CREATE TABLE algorithm (
 -- Domains
 -- CREATE SEQUENCE domain_id_seq;
 CREATE TABLE domain (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('domain_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('domain_id_seq') PRIMARY KEY NOT NULL auto_increment,
     name VARCHAR(64) NOT NULL DEFAULT '',
     IPC INT4 NOT NULL DEFAULT 0,
     version VARCHAR(64) NOT NULL DEFAULT '',
@@ -43,8 +43,8 @@ CREATE TABLE domain (
 -- Hardware
 -- CREATE SEQUENCE hardware_id_seq;
 CREATE TABLE hardware (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('hardware_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('hardware_id_seq') PRIMARY KEY NOT NULL auto_increment,
     archi VARCHAR(64) NOT NULL DEFAULT '',
     CPU_frequency INT4 NOT NULL DEFAULT 0,
     RAM INT4 NOT NULL DEFAULT 0,
@@ -55,8 +55,8 @@ CREATE TABLE hardware (
 -- Parameters
 -- CREATE SEQUENCE parameter_set_id_seq;
 CREATE TABLE parameter_set (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('parameter_set_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('parameter_set_id_seq') PRIMARY KEY NOT NULL auto_increment,
     id_set INT4 DEFAULT 0, -- the parameter belongs to this set
     param_name VARCHAR(64) NOT NULL DEFAULT '',
     param_value VARCHAR(64) NOT NULL DEFAULT '',
@@ -66,8 +66,8 @@ CREATE TABLE parameter_set (
 -- Solutions
 -- CREATE SEQUENCE solution_id_seq;
 CREATE TABLE solution (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('solution_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('solution_id_seq') PRIMARY KEY NOT NULL auto_increment,
     plan TEXT NOT NULL DEFAULT '',
     decomposition TEXT NOT NULL DEFAULT '',
     expanded_nodes INT4 NOT NULL DEFAULT 0,
@@ -87,8 +87,8 @@ CREATE TABLE solution (
 -- Instances
 -- CREATE SEQUENCE instance_id_seq;
 CREATE TABLE instance (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('instance_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('instance_id_seq') PRIMARY KEY NOT NULL auto_increment,
     id_domain INT4 NOT NULL DEFAULT 0 REFERENCES domain(id),
     number INT4 NOT NULL DEFAULT 0,
     -- not in the Domain table because could be the same as the instance, as in IPC6 and some IPC3
@@ -102,8 +102,8 @@ CREATE INDEX idx_instance_id_domain ON instance(id_domain);
 -- Campaigns: a specific algorithm version with a specific tuning
 -- CREATE SEQUENCE campaign_id_seq;
 CREATE TABLE campaign (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('campaign_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('campaign_id_seq') PRIMARY KEY NOT NULL auto_increment,
     id_algo INT4 NOT NULL DEFAULT 0 REFERENCES algorithm(id),
     date TIMESTAMP NOT NULL DEFAULT NOW(),
     tuning_method VARCHAR(128) NOT NULL DEFAULT '', 
@@ -116,8 +116,8 @@ CREATE INDEX idx_campaign_id_algo ON campaign(id_algo);
 -- Runs
 -- CREATE SEQUENCE run_id_seq;
 CREATE TABLE run (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('run_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('run_id_seq') PRIMARY KEY NOT NULL auto_increment,
     id_hardware INT4 NOT NULL DEFAULT 0 REFERENCES hardware(id),
     id_instance INT4 NOT NULL DEFAULT 0 REFERENCES instance(id),
     id_param INT4 NOT NULL DEFAULT 0 REFERENCES instance(id),
@@ -136,8 +136,8 @@ CREATE INDEX idx_run_id_param ON run(id_param);
 -- campaign <-> run
 -- CREATE SEQUENCE campaign_run_id_seq;
 CREATE TABLE campaign_run (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('campaign_run_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('campaign_run_id_seq') PRIMARY KEY NOT NULL auto_increment,
     id_campaign INT4 NOT NULL DEFAULT 0 REFERENCES campaign(id),
     id_run INT4 NOT NULL DEFAULT 0 REFERENCES run(id)
     -- at_iteration INT4 NOT NULL DEFAULT 0 -- FIXME what was it for?
@@ -146,8 +146,8 @@ CREATE TABLE campaign_run (
 -- solution <-> run
 -- CREATE SEQUENCE solution_run_id_seq;
 CREATE TABLE solution_run (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('solution_run_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('solution_run_id_seq') PRIMARY KEY NOT NULL auto_increment,
     id_solution INT4 NOT NULL DEFAULT 0 REFERENCES solution(id),
     id_run INT4 NOT NULL DEFAULT 0 REFERENCES run(id)
 );
@@ -155,8 +155,8 @@ CREATE TABLE solution_run (
 -- instance <-> solution
 -- CREATE SEQUENCE instance_solution_id_seq;
 CREATE TABLE instance_solution (
-    id INT4 PRIMARY KEY,
--- id INT4 DEFAULT nextval('instance_solution_id_seq') PRIMARY KEY,
+    id INT4 PRIMARY KEY NOT NULL auto_increment,
+-- id INT4 DEFAULT nextval('instance_solution_id_seq') PRIMARY KEY NOT NULL auto_increment,
     id_instance INT4 NOT NULL DEFAULT 0 REFERENCES instance(id),
     id_solution INT4 NOT NULL DEFAULT 0 REFERENCES solution(id),
     description TEXT NOT NULL DEFAULT ''
