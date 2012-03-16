@@ -18,8 +18,6 @@
 #include "daex.h"
 #include "evaluation/cpt-yahsp.h"
 #include "evaluation/yahsp.h"
-#include "evaluation/portfolio.h"
-#include "utils/evalBestPlanDump.h"
 
 #define LOG_FILL ' '
 #define FORMAT_LEFT_FILL_WIDTH(width) "\t" << std::left << std::setfill(LOG_FILL) << std::setw(width) 
@@ -358,7 +356,7 @@ int main ( int argc, char* argv[] )
 
     // l'initialisation se fait en fonction de la liste des dates au plus tot possibles (start time set)
     // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
-    daex::Init init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
+    daex::Init<daex::Decomposition> init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
     
 #ifndef NDEBUG
     eo::log << eo::logging << std::endl;
@@ -408,8 +406,7 @@ int main ( int argc, char* argv[] )
 	    goodguys=0;
             b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-            //daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
-            daePortfolioEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+            daeYahspEval<daex::Decomposition> eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
 
 // in non multi-threaded version, use the plan dumper
 //#ifndef SINGLE_EVAL_ITER_DUMP
@@ -442,7 +439,7 @@ int main ( int argc, char* argv[] )
             for (size_t i = 0; i < popsize; ++i) {
                 // unfeasible individuals are invalidated in order to be re-evaluated 
                 // with a larger bmax at the next iteration but we keep the good guys.
-                if (pop[i].fitness().is_feasible()) goodguys++;
+                if (pop[i].is_feasible()) goodguys++;
                 else pop[i].invalidate();
             }
 	    // If no individual haven't yet been found, then try a direct call to YAHSP (i.e. the empty decomposition evaluation)
@@ -457,7 +454,7 @@ int main ( int argc, char* argv[] )
                 eval_bestfile(empty_decompo);
 #endif
 //#endif
-                if (empty_decompo.fitness().is_feasible()){
+                if (empty_decompo.is_feasible()){
                     found = true;
                     /*
                     std::ofstream of(plan_file.c_str());
@@ -494,8 +491,7 @@ int main ( int argc, char* argv[] )
     b_max_in = b_max_fixed;
     b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
-    //daeYahspEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
-    daePortfolioEval eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    daeYahspEval<daex::Decomposition> eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
     eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
     eval_y( pop, pop );
 
@@ -719,16 +715,16 @@ int main ( int argc, char* argv[] )
     // VARIATION
 
     // mutations
-    daex::MutationDelGoal delgoal;
+    daex::MutationDelGoal<daex::Decomposition> delgoal;
 //    daex::MutationDelOneAtom delatom;
-    daex::MutationDelAtom delatom( proba_del_atom );
+    daex::MutationDelAtom<daex::Decomposition> delatom( proba_del_atom );
     // partition, radius, l_max
-    daex::MutationAddGoal addgoal( pddl.chronoPartitionAtom(), radius /*, init.l_max()*/ );
+    daex::MutationAddGoal<daex::Decomposition> addgoal( pddl.chronoPartitionAtom(), radius /*, init.l_max()*/ );
     // partition, proba_change, proba_add, maxtry_search_candidate, maxtry_search_mutex 
     // (maxtry à 0 pour essayer tous les atomes)
     //    daex::MutationAddAtom addatom( pddl.chronoPartitionAtom(), 0.8, 0.5, 11, 11 );
     //    daex::MutationAddAtom addatom( pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
-    daex::MutationChangeAddAtom addatom( pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
+    daex::MutationChangeAddAtom<daex::Decomposition> addatom( pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
 
     // call one of operator, chosen randomly
     eoPropCombinedMonOp<daex::Decomposition> mutator( delgoal, w_delgoal );
@@ -738,7 +734,7 @@ int main ( int argc, char* argv[] )
 
     // crossover
     // JACK in the crossover, filter out the right half of the decomposition from goals that have a greater date than the date at which we cut
-    daex::CrossOverTimeFilterHalf crossover;
+    daex::CrossOverTimeFilterHalf<daex::Decomposition> crossover;
 
     // first call the crossover with the given proba, then call the mutator with the given proba
     // FIXME most of the mutation use the last_reached information, what if they are called after a crossover?
