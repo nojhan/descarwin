@@ -115,7 +115,7 @@ public:
               // FIXME what is the effect on variation operators that relies on last_reached?
         if( decompo.size() >  daeCptYahspEval<EOT>::_l_max ) {
            decompo.fitness(daeCptYahspEval<EOT>::fitness_unfeasible_too_long());
-	   decompo.setFeasible(false);
+           decompo.setFeasible(false);
         } else 
                                  #endif
         {
@@ -172,10 +172,10 @@ public:
             if( code != PLAN_FOUND ) {
 #ifdef PAPERVERSION
               decompo.fitness(fitness_unfeasible(decompo, previous_state), false);
-	     decompo.setFeasible(false);
+         decompo.setFeasible(false);
 #else
               decompo.fitness(fitness_unfeasible_intermediate(decompo));
-	      decompo.setFeasible(false);
+          decompo.setFeasible(false);
 #endif 
               break;
             }
@@ -197,7 +197,7 @@ public:
                 */
 
                 decompo.fitness(fitness_feasible( decompo ));
-		decompo.setFeasible(true);
+        decompo.setFeasible(true);
 
                                  #ifndef NDEBUG
                                                  eo::log << eo::debug << "*";
@@ -206,10 +206,10 @@ public:
             } else {
 #ifdef PAPERVERSION
                 decompo.fitness(fitness_unfeasible(decompo, previous_state));
-		decompo.setFeasible(false);
+        decompo.setFeasible(false);
 #else
                 decompo.fitness(fitness_unfeasible_final(decompo) );
-		decompo.setFeasible(false);
+        decompo.setFeasible(false);
 #endif 
             } // if PLAN_FOUND for last goal
         } // if PLAN_FOUND
@@ -287,7 +287,7 @@ protected:
     }
                         /*else { // return_code != NO_PLAN && != GOALS_MUTEX && != PLAN_FOUND
                                    throw std::runtime_error( "Unknown error code from cpt_search" );
-	                  }*/
+                      }*/
     return return_code;
 };
 
@@ -367,8 +367,8 @@ public:
             unsigned int b_max_in = 10000, 
             unsigned int b_max_last = 30000, 
             double fitness_weight = 10,
-	    double fitness_penalty = 1e6
-	    ) : daeYahspEval<EOT>( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty ) 
+        double fitness_penalty = 1e6
+        ) : daeYahspEval<EOT>( l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty ) 
     {
       node_numbers.reserve( pop_size * l_max );
     }

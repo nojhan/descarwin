@@ -36,6 +36,24 @@ inline void LOG_LOCATION( eo::Levels level )
 */
 
 
+unsigned int estimate_bmax_incremental(
+        eoParser & parser, eoPop<daex::Decomposition> & pop, daex::Init<daex::Decomposition> & init, 
+        TimeVal & best_makespan )
+{
+/*
+    unsigned int popsize = parser.getParam("popSize")->getValue();
+    unsigned int b_max_init = parser.getParam("bmax-init")->getValue();
+    unsigned int b_max_ratio = parser.getParam("bmax-ratio")->getValue();
+    unsigned int fitness_weight = parser.getParam("fitness-weight")->getValue();
+    unsigned int fitness_penalty = parser.getParam("fitness-penalty")->getValue();
+    unsigned int plan_file = parser.getParam("plan-file")->getValue();
+//    unsigned int = parser.getParam("")->getValue();
+    unsigned int goodguys = 0;
+    unsigned int b_max_in = 1;
+    unsigned int b_max_last = 0;
+*/
+}
+
 
 int main ( int argc, char* argv[] )
 {
@@ -148,7 +166,7 @@ int main ( int argc, char* argv[] )
     if( b_max_quantile < 0 || b_max_quantile > 1 ) {
         std::cout << "bmax-quantile must be a double in [0,1] (=" << b_max_quantile << ") type --help for usage." << std::endl;
         exit(1);
-    }
+    }looser throw specifier for
     */
     unsigned int b_max_fixed = parser.createParam( (unsigned int)0, "bmax-fixed", "Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0", 'b', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_fixed" << b_max_fixed << std::endl;
@@ -318,14 +336,16 @@ int main ( int argc, char* argv[] )
      * Incremental strategy to fix bmax 
      ************************************/
     
-    unsigned int b_max_in=1, b_max_last, goodguys=0, popsize = pop.size();
+    daex::MutationDelGoal<daex::Decomposition> delgoal;
+    
+    unsigned int b_max_in=1, b_max_last=1;
     
 #ifndef NDEBUG
     // used to pass the eval count through the several eoEvalFuncCounter evaluators
     unsigned int eval_count = 0;
 #endif
     
-    TimeVal best_makespan = INT_MAX; // FIXME UINT_MAX returns -1, why?
+    TimeVal best_makespan = MAXTIME;
 
 #ifndef SINGLE_EVAL_ITER_DUMP
     std::string dump_sep = ".";
@@ -337,97 +357,183 @@ int main ( int argc, char* argv[] )
     daex::Decomposition empty_decompo;
     bool found = false;
 
-    if( b_max_fixed == 0 ) {
+    bool insemination = true;
+    if( insemination ) {
+       
+        eo::log << eo::logging << "Evaluate a firt empty plan" << std::endl; 
+        
+        unsigned int return_code = cpt_basic_search();
+        assert( return_code == PLAN_FOUND );
+        eo::log << eo::debug << "Found a plan" << std::endl;
+
+        eo::log << eo::logging << "Build Adam from the flat plan" << std::endl; 
+        // get the flat plan from yahsp and build a complete decomposition with it
+        Adam yahsp_adam = yahsp_create_adam( solution_plan );
 #ifndef NDEBUG
-        eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
+        eo::log << eo::debug << "YAHSP Adam:" << std::endl;
+        yahsp_print_adam( yahsp_adam );
 #endif
-	//	while( (((double)goodguys/(double)popsize) < b_max_ratio) && (!found) && (b_max_in < b_max_init) ) {
-	//12.1 while( (goodguys == 0) && (!found) && (b_max_in < b_max_init) ) {
-	while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
-	    goodguys=0;
-            b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
+        daex::Decomposition adam;
+        for( unsigned int i=0; i < yahsp_adam.states_nb; ++i) {
 
-            daeYahspEval<daex::Decomposition> eval_yahsp( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
-
-// in non multi-threaded version, use the plan dumper
-//#ifndef SINGLE_EVAL_ITER_DUMP
-                daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
-
-// if we do not want MT, but we want debug, add more eval wrappers
-#ifndef NDEBUG
-                    eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
-                    eval_counter.value( eval_count );
-                    eoPopLoopEval<daex::Decomposition> eval_y( eval_counter );
-
-// else, only the plan dumper
-#else // ifdef NDEBUG
-                    eoPopLoopEval<daex::Decomposition> eval_y( eval_bestfile );
-#endif
-
-// if we want to compile a multi-threaded version with OpenMP, we only want the basic evaluator, not the other wrappers, even the one that dump plans
-//#else // ifdef SINGLE_EVAL_ITER_DUMP
-//                eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
-//#endif
-            eval_y( pop, pop );
-
-#ifndef NDEBUG
-	    eoBestFitnessStat<daex::Decomposition> best_statTEST("Best");
-	    best_statTEST(pop);
-	    //	    eo::log << eo::logging << "\tbest_fitness " << timeValToString(best_statTEST.value());
-	    eo::log << eo::logging << "\tbest_fitness " << best_statTEST.value();
-#endif
-
-            for (size_t i = 0; i < popsize; ++i) {
-                // unfeasible individuals are invalidated in order to be re-evaluated 
-                // with a larger bmax at the next iteration but we keep the good guys.
-                if (pop[i].is_feasible()) goodguys++;
-                else pop[i].invalidate();
+            daex::Goal goal;
+            TimeVal goal_time = 0;
+            for( unsigned int j=0; j < yahsp_adam.states[i].fluents_nb; ++j ) {
+                unsigned int common_id = yahsp_adam.states[i].fluents[j]->id;
+                daex::Atom* atom = pddl.atoms()[common_id];
+                goal.push_back( atom );
+                goal_time = std::max( goal_time, atom->earliest_start_time() );
             }
-	    // If no individual haven't yet been found, then try a direct call to YAHSP (i.e. the empty decomposition evaluation)
-            if ((goodguys == 0) && (!found)) {
-                empty_decompo.invalidate();
-//#ifdef SINGLE_EVAL_ITER_DUMP
-//                eval_yahsp( empty_decompo );
-//#else
-#ifndef NDEBUG
-                eval_counter(empty_decompo);
-#else
-                eval_bestfile(empty_decompo);
-#endif
-//#endif
-                if (empty_decompo.is_feasible()){
-                    found = true;
-                    /*
-                    std::ofstream of(plan_file.c_str());
-                    of << empty_decompo.plan();
-                    of.close();
-                    */
+            goal.earliest_start_time( goal_time );
+
+            adam.push_back( goal );
+        }
+        eo::log << eo::debug << "Adam:" << std::endl << adam << std::endl;
+
+        eo::log << eo::logging << "Create a population of Adam" << std::endl; 
+        pop.clear(); // FIXME si insémination, ne pas faire l'init plus haut
+        
+        for( unsigned int i = 0; i < pop_size; ++i ) {
+            pop.push_back( adam );
+        }
+
+        eo::log << eo::logging << "Try to del goals and to increase b_max" << std::endl; 
+        // global parameters
+        unsigned int bmax_iters = 10;
+        
+        daeYahspEval<daex::Decomposition> eval_yahsp( 
+                init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+
+
+        // while the pop is largely feasible, try to del goals
+        double feasibility_ratio = 1.0;
+        while( feasibility_ratio > b_max_ratio )  {
+            unsigned int feasibles = 0;
+            for( unsigned int i = 0; i < pop_size; ++i ) {
+                delgoal( pop[i] );
+                eval_yahsp( pop[i] );
+                if( pop[i].is_feasible() ) {
+                    feasibles++;
                 }
-            } // if ! goodguys && ! found
-
-//#ifdef SINGLE_EVAL_ITER_DUMP
-//            best_makespan = pop.best_element().plan_copy().makespan();
-//#else
-            best_makespan = eval_bestfile.best();
-            dump_file_count = eval_bestfile.file_count();
-//#endif
-            
-#ifndef NDEBUG
-            eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize);
-            eo::log << "\tbest_makespan " << best_makespan;
-            if(found) {
-                eo::log << "\tfeasible empty decomposition";
             }
-            eo::log << std::endl;
-            eval_count = eval_counter.value();
+            feasibility_ratio = static_cast<double>(feasibles) / pop_size;
+            
+            unsigned int iters = 0;
+            while( feasibility_ratio < b_max_ratio && iters <= bmax_iters && b_max_in <= b_max_init )  {
+                unsigned int feasibles = 0;
+
+                for( unsigned int i = 0; i < pop_size; ++i ) {
+                    eval_yahsp( pop[i] );
+                    if( pop[i].is_feasible() ) {
+                        feasibles++;
+                    }
+                }
+
+                b_max_in= b_max_in * b_max_increase_coef;
+                iters++;
+                feasibility_ratio = static_cast<double>(feasibles) / pop_size;
+            }
+        } // while feasibility_ratio > b_max_ratio
+
+        b_max_fixed = b_max_in;
+        eo::log << eo::logging << "After insemination, b_max=" << b_max_in << std::endl;
+
+    } else { // if not insemination
+        if( b_max_fixed == 0 ) {
+            unsigned int goodguys = 1;
+            unsigned int popsize = pop.size();
+            //        b_max_fixed = estimate_bmax_incremental( parser, pop );
+
+#ifndef NDEBUG
+            eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
 #endif
-            b_max_fixed = b_max_in;
-            b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
-        } // while
-//12.1	if (((double)goodguys/(double)popsize) < b_max_ratio) {
-//12.1	b_max_fixed= b_max_fixed * 2;
-//12.1	}
-    } // if b_max_fixed == 0 
+            while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
+                goodguys=0;
+                b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
+
+                daeYahspEval<daex::Decomposition> eval_yahsp( 
+                        init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
+
+                // in non multi-threaded version, use the plan dumper
+                //#ifndef SINGLE_EVAL_ITER_DUMP
+                daex::evalBestMakespanPlanDump eval_bestfile( 
+                        eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
+
+                // if we do not want MT, but we want debug, add more eval wrappers
+#ifndef NDEBUG
+                eoEvalFuncCounter<daex::Decomposition> eval_counter( eval_bestfile, "Eval.\t" );
+                eval_counter.value( eval_count );
+                eoPopLoopEval<daex::Decomposition> eval_y( eval_counter );
+
+                // else, only the plan dumper
+#else // ifdef NDEBUG
+                eoPopLoopEval<daex::Decomposition> eval_y( eval_bestfile );
+#endif
+
+                // if we want to compile a multi-threaded version with OpenMP, 
+                // we only want the basic evaluator, not the other wrappers, 
+                // even the one that dump plans
+                //#else // ifdef SINGLE_EVAL_ITER_DUMP
+                //                eoPopLoopEval<daex::Decomposition> eval_y( eval_yahsp );
+                //#endif
+                eval_y( pop, pop );
+
+#ifndef NDEBUG
+                eoBestFitnessStat<daex::Decomposition> best_statTEST("Best");
+                best_statTEST(pop);
+                //        eo::log << eo::logging << "\tbest_fitness " << timeValToString(best_statTEST.value());
+                eo::log << eo::logging << "\tbest_fitness " << best_statTEST.value();
+#endif
+
+                for (size_t i = 0; i < popsize; ++i) {
+                    // unfeasible individuals are invalidated in order to be re-evaluated 
+                    // with a larger bmax at the next iteration but we keep the good guys.
+                    if (pop[i].is_feasible()) goodguys++;
+                    else pop[i].invalidate();
+                }
+                // If no individual haven't yet been found, then try a direct call to YAHSP (i.e. the empty decomposition evaluation)
+                if ((goodguys == 0) && (!found)) {
+                    empty_decompo.invalidate();
+                    //#ifdef SINGLE_EVAL_ITER_DUMP
+                    //                eval_yahsp( empty_decompo );
+                    //#else
+#ifndef NDEBUG
+                    eval_counter(empty_decompo);
+#else
+                    eval_bestfile(empty_decompo);
+#endif
+                    //#endif
+                    if (empty_decompo.is_feasible()){
+                        found = true;
+                        /*
+                           std::ofstream of(plan_file.c_str());
+                           of << empty_decompo.plan();
+                           of.close();
+                           */
+                    }
+                } // if ! goodguys && ! found
+
+                //#ifdef SINGLE_EVAL_ITER_DUMP
+                //            best_makespan = pop.best_element().plan_copy().makespan();
+                //#else
+                best_makespan = eval_bestfile.best();
+                dump_file_count = eval_bestfile.file_count();
+                //#endif
+
+#ifndef NDEBUG
+                eo::log << eo::logging << "\tb_max_in "   << b_max_in << "\tfeasible_ratio " <<  ((double)goodguys/(double)popsize);
+                eo::log << "\tbest_makespan " << best_makespan;
+                if(found) {
+                    eo::log << "\tfeasible empty decomposition";
+                }
+                eo::log << std::endl;
+                eval_count = eval_counter.value();
+#endif
+                b_max_fixed = b_max_in;
+                b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
+            } // while
+        } // if b_max_fixed == 0 
+    } // if insemination
 
     b_max_in = b_max_fixed;
     b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
@@ -556,11 +662,12 @@ int main ( int argc, char* argv[] )
     // for us, has the form "fitness feasibility" (e.g. "722367 1")
     eoBestFitnessStat<daex::Decomposition> best_stat("Best");
 
+    // FIXME désactiver la séparation faisable/non-faisable ou la faire différement
     //eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false), "IQR" );
-    eoInterquartileRangeStat<daex::Decomposition> iqr_f( std::make_pair(0.0,false), "IQR_f" );
-    eoInterquartileRangeStat<daex::Decomposition> iqr_uf( std::make_pair(0.0,false), "IQR_uf" );
-    eoDualStatSwitch<daex::Decomposition,eoInterquartileRangeStat<daex::Decomposition> > dual_iqr( iqr_f, iqr_uf, "\t" );
- 
+//    eoInterquartileRangeStat<daex::Decomposition> iqr_f( std::make_pair(0.0,false), "IQR_f" );
+//    eoInterquartileRangeStat<daex::Decomposition> iqr_uf( std::make_pair(0.0,false), "IQR_uf" );
+//    eoDualStatSwitch<daex::Decomposition,eoInterquartileRangeStat<daex::Decomposition> > dual_iqr( iqr_f, iqr_uf, "\t" );
+// 
     // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
     eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
     /*
@@ -569,7 +676,7 @@ int main ( int argc, char* argv[] )
     eoDualStatSwitch<daex::Decomposition,eoNthElementFitnessStat<daex::Decomposition> > dual_median( median_f, median_uf, "\t/\t" );
     */
 
-    eoFeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
+    daex::FeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
 
     eoAverageSizeStat<daex::Decomposition> asize_stat( "Av.Size" );
 
@@ -582,7 +689,7 @@ int main ( int argc, char* argv[] )
         checkpoint.add( median_stat );
         //checkpoint.add( dual_median );
         //checkpoint.add( iqr_stat );
-        checkpoint.add( dual_iqr );
+//        checkpoint.add( dual_iqr );
 #ifdef SINGLE_EVAL_ITER_DUMP
         checkpoint.add( stat_makespan );
         checkpoint.add( stat_plan );
@@ -597,7 +704,7 @@ int main ( int argc, char* argv[] )
         clog_monitor.add( median_stat );
         //clog_monitor.add( dual_median );
         //clog_monitor.add( iqr_stat );
-        clog_monitor.add( dual_iqr );
+//        clog_monitor.add( dual_iqr );
         
         // the checkpoint should call the monitor at every generation
         checkpoint.add( clog_monitor );
@@ -656,7 +763,6 @@ int main ( int argc, char* argv[] )
     // VARIATION
 
     // mutations
-    daex::MutationDelGoal<daex::Decomposition> delgoal;
 //    daex::MutationDelOneAtom delatom;
     daex::MutationDelAtom<daex::Decomposition> delatom( proba_del_atom );
     // partition, radius, l_max

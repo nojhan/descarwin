@@ -17,6 +17,7 @@ public:
 
     Goal( TimeVal t ) : _earliest_start_time( t ) {}
 
+    Goal() : _earliest_start_time( 0 ) {}
 
     TimeVal earliest_start_time(  ) const
     {

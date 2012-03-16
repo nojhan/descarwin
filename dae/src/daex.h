@@ -24,5 +24,6 @@
 #include "utils/stats.h"
 #include "utils/evalBestPlanDump.h"
 #include "utils/cli.h"
+#include "utils/FeasibleStat.h"
 
 #endif // __DAEX_H__

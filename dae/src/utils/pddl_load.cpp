@@ -63,13 +63,13 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
         // il utilise indifférement la valeur passé à l'un ou l'autre
         // ( max-backtracks / maxb / X )
         // ( max-backtracks-bound / maxbb / x )
-        cpt_call.push_back( "-max-backtracks" ); // nb maximal de noeuds (search steps)
+        //cpt_call.push_back( "-max-backtracks" ); // nb maximal de noeuds (search steps)
 
         // normalement, le nb de noeuds n'est pas utilisé lors du chargement, 
         // mais uniquement lors de l'eval, cependant, comme il faut l'initialiser
         // on le met à zéro
         // la valeur est changée par la suite, par les opérateurs d'évaluation
-        cpt_call.push_back( "0" );
+        //cpt_call.push_back( "0" );
 
         // Heuristic for computing a lower bound of the makespan. 
         // Possible values are :

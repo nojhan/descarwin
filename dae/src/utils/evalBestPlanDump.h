@@ -1,6 +1,6 @@
 
 #ifndef eoEvalBestPlanFileDump_H
-#define eoEvalestPlanFileDump_H
+#define eoEvalBestPlanFileDump_H
 
 #include <fstream>
 

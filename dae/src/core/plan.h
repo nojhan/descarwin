@@ -8,7 +8,9 @@
 #include <cstdlib>
 
 //extern "C" {
+#include <src/cpt.h>
 #include <src/plan.h>
+#include <src/yahsp.h>
 //}
 
 
@@ -52,7 +54,6 @@ public:
       }
     
     //! Construct a invalid plan from scratch
-     */
       Plan  & operator=(const daex::Plan  & other){
        if (this != &other) {
             _makespan = other._makespan;
