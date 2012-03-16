@@ -23,4 +23,6 @@
 #include "utils/posix_timer.h"
 #include "utils/stats.h"
 #include "utils/evalBestPlanDump.h"
+#include "utils/cli.h"
+
 #endif // __DAEX_H__

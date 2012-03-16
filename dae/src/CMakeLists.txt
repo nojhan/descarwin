@@ -12,6 +12,7 @@ SET (DAEX_SOURCES
   utils/posix_timer.cpp
   utils/pddl_load.cpp
   utils/evalBestPlanDump.cpp
+  utils/cli.cpp
   core/decomposition.cpp
   core/goal.cpp
   )
