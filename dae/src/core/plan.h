@@ -40,7 +40,7 @@ public:
 
     //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
     
-     Plan() : _makespan( INT_MAX ),_cost_add(INT_MAX ), _cost_max(INT_MAX ), _search_steps(0), _is_valid(false), _plan_rep("No plan") {}
+     Plan() : _makespan( MAXTIME ),_cost_add(MAXTIME ), _cost_max(MAXTIME ), _search_steps(0), _is_valid(false), _plan_rep("No plan") {}
 	
       ~Plan(){}
      
@@ -52,7 +52,6 @@ public:
       }
     
     //! Construct a invalid plan from scratch
-    /*! @TODO INT_MAX may not be the best choice here, FIXME
      */
       Plan  & operator=(const daex::Plan  & other){
        if (this != &other) {
