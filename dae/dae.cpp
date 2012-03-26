@@ -19,6 +19,7 @@
 #include "evaluation/cpt-yahsp.h"
 #include "evaluation/yahsp.h"
 
+#include "do/make_continue_dae.h"
 
 // MODIFS MS START
 // at the moment, in utils/make_help.cpp
@@ -35,25 +36,25 @@ inline void LOG_LOCATION( eo::Levels level )
 #endif
 */
 
-
-unsigned int estimate_bmax_incremental(
-        eoParser & parser, eoPop<daex::Decomposition> & pop, daex::Init<daex::Decomposition> & init, 
-        TimeVal & best_makespan )
-{
-/*
-    unsigned int popsize = parser.getParam("popSize")->getValue();
-    unsigned int b_max_init = parser.getParam("bmax-init")->getValue();
-    unsigned int b_max_ratio = parser.getParam("bmax-ratio")->getValue();
-    unsigned int fitness_weight = parser.getParam("fitness-weight")->getValue();
-    unsigned int fitness_penalty = parser.getParam("fitness-penalty")->getValue();
-    unsigned int plan_file = parser.getParam("plan-file")->getValue();
+//
+//unsigned int estimate_bmax_incremental(
+//        eoParser & parser, eoPop<daex::Decomposition> & pop, daex::Init<daex::Decomposition> & init, 
+//        TimeVal & best_makespan )
+//{
+///*
+//    unsigned int popsize = parser.getParam("popSize")->getValue();
+//    unsigned int b_max_init = parser.getParam("bmax-init")->getValue();
+//    unsigned int b_max_ratio = parser.getParam("bmax-ratio")->getValue();
+//    unsigned int fitness_weight = parser.getParam("fitness-weight")->getValue();
+//    unsigned int fitness_penalty = parser.getParam("fitness-penalty")->getValue();
+//    unsigned int plan_file = parser.getParam("plan-file")->getValue();
 //    unsigned int = parser.getParam("")->getValue();
-    unsigned int goodguys = 0;
-    unsigned int b_max_in = 1;
-    unsigned int b_max_last = 0;
-*/
-}
-
+//    unsigned int goodguys = 0;
+//    unsigned int b_max_in = 1;
+//    unsigned int b_max_last = 0;
+//*/
+//}
+//
 
 int main ( int argc, char* argv[] )
 {
@@ -88,6 +89,8 @@ int main ( int argc, char* argv[] )
     eoParser parser(argc, argv);
     make_verbose(parser);
     make_parallel(parser);
+    
+    eoState state;
     
     // PARAMETERS
     eo::log << eo::logging << "Parameters:" << std::endl;
@@ -247,17 +250,12 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
 #endif
 
-    unsigned int mingen = parser.createParam( (unsigned int)10, "gen-min", 
-            "Minimum number of iterations", 'n', "Stopping criterions" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "mingen" << mingen << std::endl;
+    daex::do_make_continue_param( parser );
+    // Those parameters are needed during restarts (see below)
+    unsigned int mingen = parser.value<unsigned int>("gen-min");
+    unsigned int steadygen = parser.value<unsigned int>("gen-steady");
+    unsigned int maxgens = parser.value<unsigned int>("gen-max");
 
-    unsigned int steadygen = parser.createParam( (unsigned int)50, "gen-steady", 
-            "Number of iterations without improvement", 's', "Stopping criterions" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "steadygen" << steadygen << std::endl;
-
-    unsigned int maxgens = parser.createParam( (unsigned int)1000, "gen-max", 
-            "Maximum number of iterations", 'x', "Stopping criterions" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxgens" << maxgens << std::endl;
 
     unsigned int maxruns = parser.createParam( (unsigned int)0, "runs-max", 
             "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
@@ -295,7 +293,6 @@ int main ( int argc, char* argv[] )
     // PDDL
 
     // parse les pddl
-    // FIXME ATTENTION : il y a une option cachée dans l'init qui précise à yahsp si on est en temporel ou en séquentiel, il faut la régler correctement en fonction du problème visé
 #ifndef NDEBUG
     eo::log << eo::progress << "Load the instance..." << std::endl;
     eo::log.flush();
@@ -604,38 +601,14 @@ int main ( int argc, char* argv[] )
 #endif
 
     // STOPPING CRITERIA
+   
+    eoCombinedContinue<daex::Decomposition> continuator = daex::do_make_continue_op<daex::Decomposition>( parser, state );
     
-    /*
-  ____________________________________________
- | Checkpoint                                 |
- |    __________________________              |
- | <-| Combined Continue        |             |
- |   |    _____________________ |             |
- |   | <-| Steady Fit Continue ||             |
- |   |   |_____________________||             |
- |   |    ______________        |             |
- |   | <-| Gen Continue |       |             |
- |   |   |______________|       |             |
- |   |__________________________|             |
- |                       ___________________  |
- |                   <--| Best fitness stat | |
- |    _________________ |                   | |
- | <-| Stdout monitor  ||                   | |
- |   |               <--|___________________| |
- |   |                 |                      | ______________
- |   |               <-------------------------| Eval Counter |
- |   |                 |                      ||______________|
- |   |_________________|                      |
- |____________________________________________|
-    */
-
-    // continuators == stopping criteria
-    eoSteadyFitContinue<daex::Decomposition> steadyfit( mingen, steadygen );
-    eoGenContinue<daex::Decomposition> maxgen( maxgens );
-
-    // combine the continuators
-    eoCombinedContinue<daex::Decomposition> continuator( steadyfit );
-    continuator.add(maxgen);
+    // Direct access to continuators are needed during restarts (see below)
+    eoSteadyFitContinue<daex::Decomposition> & steadyfit 
+        = *( dynamic_cast<eoSteadyFitContinue<daex::Decomposition>* >( continuator[0] ) );
+    eoGenContinue<daex::Decomposition> & maxgen 
+        = *( dynamic_cast< eoGenContinue<daex::Decomposition>* >( continuator[1] ) );
 
     // attach a continuator to the checkpoint
     // the checkpoint is here to get some stat during the search
@@ -723,7 +696,6 @@ int main ( int argc, char* argv[] )
     // MODIFS MS START 
     // pour plus d'output (recopiés de do/make_checkpoint)
     // un state, pour sauver l'état courant
-    eoState state;
     state.registerObject(parser);
     state.registerObject(pop);
     state.registerObject(eo::rng);
