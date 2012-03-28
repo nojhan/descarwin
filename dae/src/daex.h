@@ -26,4 +26,7 @@
 #include "utils/cli.h"
 #include "utils/FeasibleStat.h"
 
+#include "do/make_continue_dae.h"
+#include "do/make_checkpoint_dae.h"
+
 #endif // __DAEX_H__

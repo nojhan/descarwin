@@ -11,7 +11,6 @@
 
 #include <eo>
 //#include <do/make_pop.h>
-//#include <do/make_checkpoint.h>
 #include <ga.h>
 #include <utils/eoFeasibleRatioStat.h>
 
@@ -21,11 +20,6 @@
 
 #include "do/make_continue_dae.h"
 
-// MODIFS MS START
-// at the moment, in utils/make_help.cpp
-// this should become some eoUtils.cpp with corresponding eoUtils.h
-bool testDirRes(std::string _dirName, bool _erase);
-// MODIFS MS END
 
 /*
 #ifndef NDEBUG
@@ -256,20 +250,13 @@ int main ( int argc, char* argv[] )
     unsigned int steadygen = parser.value<unsigned int>("gen-steady");
     unsigned int maxgens = parser.value<unsigned int>("gen-max");
 
+    daex::do_make_checkpoint_param( parser );
 
     unsigned int maxruns = parser.createParam( (unsigned int)0, "runs-max", 
             "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
     // MODIFS MS START
-#ifndef NDEBUG
-    eoValueParam<std::string>& dirNameParam =  parser.createParam(std::string("Res"), "resDir", "Directory to store DISK outputs", '\0', "Output - Disk");
-
-    // shoudl we empty it if exists
-    eoValueParam<bool>& eraseParam = parser.createParam(true, "eraseDir", "erase files in dirName if any", '\0', "Output - Disk");
-
-    eoValueParam<unsigned>& saveFrequencyParam = parser.createParam(unsigned(0), "saveFrequency", "Save every F generation (0 = only final state, absent = never)", '\0', "Persistence" );
-#endif
 
     std::string plusOrComma =  parser.createParam(std::string("Comma"), "plusOrComma", "Plus (parents+offspring) or Comma (only offspring) for replacement", '\0', "Evolution Engine").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plusOrComma" << plusOrComma << std::endl;
@@ -610,112 +597,13 @@ int main ( int argc, char* argv[] )
     eoGenContinue<daex::Decomposition> & maxgen 
         = *( dynamic_cast< eoGenContinue<daex::Decomposition>* >( continuator[1] ) );
 
-    // attach a continuator to the checkpoint
-    // the checkpoint is here to get some stat during the search
-    eoCheckPoint<daex::Decomposition> checkpoint( continuator );
 
-#ifdef SINGLE_EVAL_ITER_DUMP
-    daex::BestMakespanStat stat_makespan("BestMakespan");
-    daex::BestPlanStat stat_plan("BestPlan");
-#endif
-
+    // CHECKPOINTING 
+    eoCheckPoint<daex::Decomposition> & checkpoint = daex::do_make_checkpoint_op( continuator, parser, state, pop
 #ifndef NDEBUG
-    // get the best plan only if it improve the fitness
-    // note: fitness is different from the makespan!
-    //eoBestPlanImprovedStat<daex::Decomposition> best_plan( worst_fitness, "Best improved plan");
-    // at each generation
-    //checkpoint.add( best_plan );
-    
-    // display the stats on std::cout
-    // ostream & out, bool _verbose=true, std::string _delim = "\t", unsigned int _width=20, char _fill=' ' 
-    eoOStreamMonitor clog_monitor( std::clog, "\t", 10, ' '); 
-
-
-    // get best fitness
-    // for us, has the form "fitness feasibility" (e.g. "722367 1")
-    eoBestFitnessStat<daex::Decomposition> best_stat("Best");
-
-    // FIXME désactiver la séparation faisable/non-faisable ou la faire différement
-    //eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false), "IQR" );
-//    eoInterquartileRangeStat<daex::Decomposition> iqr_f( std::make_pair(0.0,false), "IQR_f" );
-//    eoInterquartileRangeStat<daex::Decomposition> iqr_uf( std::make_pair(0.0,false), "IQR_uf" );
-//    eoDualStatSwitch<daex::Decomposition,eoInterquartileRangeStat<daex::Decomposition> > dual_iqr( iqr_f, iqr_uf, "\t" );
-// 
-    // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
-    eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
-    /*
-    eoNthElementFitnessStat<daex::Decomposition> median_f( pop.size() / 2, "Median_f" ); 
-    eoNthElementFitnessStat<daex::Decomposition> median_uf( pop.size() / 2, "Median_uf" ); 
-    eoDualStatSwitch<daex::Decomposition,eoNthElementFitnessStat<daex::Decomposition> > dual_median( median_f, median_uf, "\t/\t" );
-    */
-
-    daex::FeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
-
-    eoAverageSizeStat<daex::Decomposition> asize_stat( "Av.Size" );
-
-    if( eo::log.getLevelSelected() >= eo::progress ) {
-
-        // compute stas at each generation
-        checkpoint.add( best_stat );
-        checkpoint.add( feasible_stat );
-        checkpoint.add( asize_stat );
-        checkpoint.add( median_stat );
-        //checkpoint.add( dual_median );
-        //checkpoint.add( iqr_stat );
-//        checkpoint.add( dual_iqr );
-#ifdef SINGLE_EVAL_ITER_DUMP
-        checkpoint.add( stat_makespan );
-        checkpoint.add( stat_plan );
-        clog_monitor.add( stat_makespan );
-        clog_monitor.add( stat_plan );
-#else
-        clog_monitor.add( eval_counter );
+        , eval_counter
 #endif
-        clog_monitor.add( best_stat );
-        clog_monitor.add( asize_stat );
-        clog_monitor.add( feasible_stat );
-        clog_monitor.add( median_stat );
-        //clog_monitor.add( dual_median );
-        //clog_monitor.add( iqr_stat );
-//        clog_monitor.add( dual_iqr );
-        
-        // the checkpoint should call the monitor at every generation
-        checkpoint.add( clog_monitor );
-    }
-
-#ifdef SINGLE_EVAL_ITER_DUMP
-    // Note: commented here because superseeded by the eoEvalBestPlanFileDump
-    // append the plans in a file
-    // std::string _filename, std::string _delim = " ", bool _keep = false, bool _header=false, bool _overwrite = false
-    eoFileMonitor file_monitor( plan_file, "\n", false, false, true);
-    file_monitor.add( stat_plan );
-    checkpoint.add( file_monitor );
-#endif
-    
-
-    // MODIFS MS START 
-    // pour plus d'output (recopiés de do/make_checkpoint)
-    // un state, pour sauver l'état courant
-    state.registerObject(parser);
-    state.registerObject(pop);
-    state.registerObject(eo::rng);
-
-    bool dirOK = false;
-    
-    if (parser.isItThere(saveFrequencyParam)) {
-      if (! dirOK ) {
-	dirOK = testDirRes(dirNameParam.value(), eraseParam.value());
-    eo::log << eo::progress << "TESTRESDIR" << std::endl;
-      }
-    }
-
-    unsigned freq = (saveFrequencyParam.value()>0 ? saveFrequencyParam.value() : UINT_MAX );
-    std::string stmp = dirNameParam.value() + "/generations";
-    eoCountedStateSaver stateSaver1 (freq, state, stmp);
-    checkpoint.add(stateSaver1);
-    // MODIFS MS END
-    
-#endif // NDEBUG
+    );
 
     // SELECTION
     // TODO cet opérateur, fait soit un tri de la pop (true), soit un shuffle (false), idéalement, on ne voudrait ni l'un ni l'autre, car on parcours tout, peu importe l'ordre
