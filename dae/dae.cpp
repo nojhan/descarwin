@@ -18,9 +18,6 @@
 #include "evaluation/cpt-yahsp.h"
 #include "evaluation/yahsp.h"
 
-#include "do/make_continue_dae.h"
-
-
 /*
 #ifndef NDEBUG
 inline void LOG_LOCATION( eo::Levels level )
@@ -134,16 +131,6 @@ int main ( int argc, char* argv[] )
             "Minimum number of goals in a decomposition", 'l', "Initialization" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "l_min" << l_min << std::endl;
 
-    // Selection
-    unsigned int toursize = parser.createParam( (unsigned int)5, "tournament", 
-            "Size of the deterministic tournament for the selection", 't', "Selection" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "toursize" << toursize << std::endl;
-
-    unsigned int offsprings = parser.createParam( (unsigned int)pop_size*7, "offsprings", 
-            "Number of offsprings to produces", 'f', "Selection" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "offsprings" << offsprings << std::endl;
-
-
     // Evaluation
     unsigned int fitness_weight = parser.createParam( (unsigned int)10, "fitness-weight", 
             "Unknown weight in the feasible and unfeasible fitness computation", 'W', "Evaluation" ).value();
@@ -184,58 +171,13 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_increase_coef" << b_max_increase_coef << std::endl;
 
     // Other
-    unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
-    unsigned int maxtry_mutex = 0;     // deactivated by default: should try every candidates
-    /*
-    unsigned int maxtry_candidate = parser.createParam( (unsigned int)11, "maxtry-candidate", 
-            "Maximum number of atoms to try when searching for a candidate in the changeAtom mutation", 'y', "Misc" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxtry_candidate" << maxtry_candidate << std::endl;
-
-
-    unsigned int maxtry_mutex = parser.createParam( (unsigned int)11, "maxtry-mutex", 
-            "Maximum number of atoms to try when searching for mutexes in the changeAtom mutation", 'z', "Misc" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxtry_mutex" << maxtry_mutex << std::endl;
-    */
 
     std::string plan_file = parser.createParam( (std::string)"plan.soln", "plan-file", "Plan file backup", 'F', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plan-file" << plan_file << std::endl;
 
-    // Variation
-    unsigned int radius = parser.createParam( (unsigned int)2, "radius", 
-            "Number of neighbour goals to consider for the addGoal mutation", 'R', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "radius" << radius << std::endl;
 
-    double proba_change = parser.createParam( (double)0.8, "proba-change", 
-            "Probability to change an atom for the changeAtom mutation", 'c', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_change" << proba_change << std::endl;
-
-    double proba_del_atom = parser.createParam( (double)0.8, "proba-del-atom", 
-            "Average probability to delete an atom for the delAtom mutation", 'd', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_del_atom" << proba_del_atom << std::endl;
-
-    double w_delgoal = parser.createParam( (double)1, "w-delgoal", 
-            "Relative weight defining the probability to call the delGoal mutation", 'a', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "w_delgoal" << w_delgoal << std::endl;
-
-    double w_addgoal = parser.createParam( (double)3, "w-addgoal", 
-            "Relative weight defining the probability to call the addGoal mutation", 'A', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "w_addgoal" << w_addgoal << std::endl;
-
-    double w_delatom = parser.createParam( (double)1, "w-delatom", 
-            "Relative weight defining the probability to call the delAtom mutation", 'g', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "w_delatom" << w_delatom << std::endl;
-
-    double w_addatom = parser.createParam( (double)1, "w-addatom", 
-            "Relative weight defining the probability to call the addAtom mutation", 'G', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "w_addatom" << w_addatom << std::endl;
-
-    double proba_cross = parser.createParam( (double)0.2, "proba-cross", 
-            "Probability to apply a cross-over", 'c', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_cross" << proba_cross << std::endl;
-
-    double proba_mut = parser.createParam( (double)0.8, "proba-mut", 
-            "Probability to apply one of the mutation", 'm', "Variation" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_mut" << proba_mut << std::endl;
+    // Selection, mutation & crossover
+    daex::do_make_variation_param( parser, pop_size);
 
     // Stopping criterions
 #ifndef SINGLE_EVAL_ITER_DUMP
@@ -256,8 +198,8 @@ int main ( int argc, char* argv[] )
             "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
-    // MODIFS MS START
 
+    // MODIFS MS START
     std::string plusOrComma =  parser.createParam(std::string("Comma"), "plusOrComma", "Plus (parents+offspring) or Comma (only offspring) for replacement", '\0', "Evolution Engine").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plusOrComma" << plusOrComma << std::endl;
 
@@ -605,52 +547,10 @@ int main ( int argc, char* argv[] )
 #endif
     );
 
-    // SELECTION
-    // TODO cet opérateur, fait soit un tri de la pop (true), soit un shuffle (false), idéalement, on ne voudrait ni l'un ni l'autre, car on parcours tout, peu importe l'ordre
+
+    // SELECTION AND VARIATION
+    eoGeneralBreeder<daex::Decomposition> & breed = daex::do_make_variation_op<daex::Decomposition>( parser, state, pddl, &delgoal );
     
-    // JACK the article indicate that tere is no selection, but the article use a deterministic tournament
-
-    eoSelectOne<daex::Decomposition> * p_selectone;
-    if ( toursize == 1 ) {
-    // L'article indique qu'il n'y a pas de sélection, on aurait alors ça :
-      p_selectone = (eoSelectOne<daex::Decomposition> *) ( new eoSequentialSelect<daex::Decomposition> ( true ) );
-    }
-    else {
-    /// MAIS le code utilise un tournoi déterministe, on a donc ça :
-      p_selectone = (eoSelectOne<daex::Decomposition> *) ( new eoDetTournamentSelect<daex::Decomposition> ( toursize ) );
-    }
-    
-    // VARIATION
-
-    // mutations
-//    daex::MutationDelOneAtom delatom;
-    daex::MutationDelAtom<daex::Decomposition> delatom( proba_del_atom );
-    // partition, radius, l_max
-    daex::MutationAddGoal<daex::Decomposition> addgoal( pddl.chronoPartitionAtom(), radius /*, init.l_max()*/ );
-    // partition, proba_change, proba_add, maxtry_search_candidate, maxtry_search_mutex 
-    // (maxtry à 0 pour essayer tous les atomes)
-    //    daex::MutationAddAtom addatom( pddl.chronoPartitionAtom(), 0.8, 0.5, 11, 11 );
-    //    daex::MutationAddAtom addatom( pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
-    daex::MutationChangeAddAtom<daex::Decomposition> addatom( pddl.chronoPartitionAtom(), proba_change, maxtry_candidate, maxtry_mutex );
-
-    // call one of operator, chosen randomly
-    eoPropCombinedMonOp<daex::Decomposition> mutator( delgoal, w_delgoal );
-    mutator.add( delatom, w_delatom );
-    mutator.add( addgoal, w_addgoal );
-    mutator.add( addatom, w_addatom );
-
-    // crossover
-    // JACK in the crossover, filter out the right half of the decomposition from goals that have a greater date than the date at which we cut
-    daex::CrossOverTimeFilterHalf<daex::Decomposition> crossover;
-
-    // first call the crossover with the given proba, then call the mutator with the given proba
-    // FIXME most of the mutation use the last_reached information, what if they are called after a crossover?
-    eoSGAGenOp<daex::Decomposition> variator( crossover, proba_cross, mutator, proba_mut);
-
-    // selector, variator, rate (for selection), interpret_as_rate
-    eoGeneralBreeder<daex::Decomposition> breed( *p_selectone, variator, (double)offsprings, false );
-    // FIXME tester si on veut 700% ou 700
-
 
     // REPLACEMENT
     
@@ -692,6 +592,7 @@ int main ( int argc, char* argv[] )
       }
 
     // ALGORITHM
+    unsigned int offsprings = parser.value<unsigned int>("offsprings");
     eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, (*pt_replace), offsprings );
 
 #ifndef NDEBUG
