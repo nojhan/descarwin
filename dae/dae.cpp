@@ -198,20 +198,7 @@ int main ( int argc, char* argv[] )
             "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
-
-    // MODIFS MS START
-    std::string plusOrComma =  parser.createParam(std::string("Comma"), "plusOrComma", "Plus (parents+offspring) or Comma (only offspring) for replacement", '\0', "Evolution Engine").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plusOrComma" << plusOrComma << std::endl;
-
-    unsigned replaceTourSize = parser.createParam(unsigned(1), "replaceTourSize", "Size of Replacement Tournament (1->deterministic (hum, pas logique ;-(", '\0', "Evolution Engine" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "replaceTourSize" << replaceTourSize << std::endl;
-
-    bool removeDuplicates = parser.createParam(false, "removeDuplicates", "Does not allow duplicates in replacement (if possible)", '\0', "Evolution Engine").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "removeDuplicates" << removeDuplicates << std::endl;
-
-    bool weakElitism = parser.createParam(true, "weakElitism", "Weak Elitism in replacement", '\0', "Evolution Engine").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "weakElitism" << weakElitism << std::endl;
-    // MODIFS MS END
+    daex::do_make_replace_param( parser );
 
     make_help( parser );
 
@@ -553,47 +540,11 @@ int main ( int argc, char* argv[] )
     
 
     // REPLACEMENT
-    
-    // JACK : L'article indique qu'on fait un remplacement en tournoi déterministe et qu'il n'y a pas d'élistisme, on aurait alors ça :
-    //eoSSGADetTournamentReplacement<daex::Decomposition> replace(5);
-    
-    // MODIFS MS START
-    // plus de paramétrage du remplacement
-    eoReplacement<daex::Decomposition> * pt_replace;
-    // MAIS le code utilise un remplacement intégral des parents par le meilleur des parents+enfants, avec élitisme faible, on a donc 
-    // Note MS: le commentaire était incohérent entre Plus et Comma ???
-    
-    // Use the eoMergeReduce construct
-    
-    // Merge: either merge (Plus strategy, parents + offspring) or only keep offspring (Comma)
-    // eoMerge<daex::Decomposition> * pt_merge;
-    // if (plusOrComma == "Comma") {
-    //   pt_merge = (eoMerge<daex::Decomposition> *) (new eoNoElitism<daex::Decomposition>);
-    // } else { // Plus
-    //   pt_merge = (eoMerge<daex::Decomposition> *) (new eoPlus<daex::Decomposition>);
-    // }
-    // // Reduce: either truncate (deterministic) or tournament
-    // eoReduce<daex::Decomposition> * pt_reduce;
-    // if (replaceTourSize == 1) {
-    //   pt_reduce = (eoReduce<daex::Decomposition> *) (new eoTruncate<daex::Decomposition>);
-    // } else {
-    //   pt_reduce = (eoReduce<daex::Decomposition> *) (new eoDetTournamentTruncate<daex::Decomposition> ( replaceTourSize ));
-    // }
-    // // the full MergeReduce object
-    // eoMergeReduce<daex::Decomposition> mergeReduce (*pt_merge, *pt_reduce);
-
-    eoEPReplacement<daex::Decomposition> mergeReduce(replaceTourSize);
-
-    // Now the weak elitism
-    if (weakElitism) {
-	pt_replace = (eoReplacement<daex::Decomposition> *) (new eoWeakElitistReplacement<daex::Decomposition> ( mergeReduce ) );
-      } else {
-	pt_replace = &mergeReduce;
-      }
+    eoReplacement<daex::Decomposition> & replacor = daex::do_make_replace_op<daex::Decomposition>( parser, state );
+     unsigned int offsprings = parser.value<unsigned int>("offsprings");
 
     // ALGORITHM
-    unsigned int offsprings = parser.value<unsigned int>("offsprings");
-    eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, (*pt_replace), offsprings );
+    eoEasyEA<daex::Decomposition> dae( checkpoint, *p_eval, breed, replacor, offsprings );
 
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
