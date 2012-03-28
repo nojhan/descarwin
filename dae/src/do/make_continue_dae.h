@@ -1,6 +1,6 @@
  
-#ifndef MAKE_CONTINUE_DAE_H_
-#define MAKE_CONTINUE_DAE_H_
+#ifndef _MAKE_CONTINUE_DAE_H_
+#define _MAKE_CONTINUE_DAE_H_
 
 
 #include <eoCombinedContinue.h>
@@ -69,4 +69,4 @@ eoContinue<EOT> & do_make_continue( eoParser & parser, eoState & state )
 
 } // namespace daex
 
-#endif MAKE_CONTINUE_DAE_H_
+#endif // _MAKE_CONTINUE_DAE_H_
