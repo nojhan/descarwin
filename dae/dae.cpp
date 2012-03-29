@@ -27,26 +27,6 @@ inline void LOG_LOCATION( eo::Levels level )
 #endif
 */
 
-//
-//unsigned int estimate_bmax_incremental(
-//        eoParser & parser, eoPop<daex::Decomposition> & pop, daex::Init<daex::Decomposition> & init, 
-//        TimeVal & best_makespan )
-//{
-///*
-//    unsigned int popsize = parser.getParam("popSize")->getValue();
-//    unsigned int b_max_init = parser.getParam("bmax-init")->getValue();
-//    unsigned int b_max_ratio = parser.getParam("bmax-ratio")->getValue();
-//    unsigned int fitness_weight = parser.getParam("fitness-weight")->getValue();
-//    unsigned int fitness_penalty = parser.getParam("fitness-penalty")->getValue();
-//    unsigned int plan_file = parser.getParam("plan-file")->getValue();
-//    unsigned int = parser.getParam("")->getValue();
-//    unsigned int goodguys = 0;
-//    unsigned int b_max_in = 1;
-//    unsigned int b_max_last = 0;
-//*/
-//}
-//
-
 int main ( int argc, char* argv[] )
 {
 
@@ -101,12 +81,6 @@ int main ( int argc, char* argv[] )
     std::string instance = parser.createParam( (std::string)"zeno10.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "instance" << instance << std::endl;
 
-    /*
-    bool is_sequential = parser.createParam( (bool)false, "sequential", "Is the problem a sequential one?", 'q', "Problem", true ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "is_sequential" << is_sequential << std::endl;
-    */
-
-    // un total de 20 paramètres
 
     // Initialization
     unsigned int pop_size = parser.createParam( (unsigned int)100, "popSize", "Population Size", 'P', "Evolution Engine").value();
@@ -175,10 +149,6 @@ int main ( int argc, char* argv[] )
     std::string plan_file = parser.createParam( (std::string)"plan.soln", "plan-file", "Plan file backup", 'F', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plan-file" << plan_file << std::endl;
 
-
-    // Selection, mutation & crossover
-    daex::do_make_variation_param( parser, pop_size);
-
     // Stopping criterions
 #ifndef SINGLE_EVAL_ITER_DUMP
     unsigned int max_seconds = parser.createParam( (unsigned int)0, "max-seconds", 
@@ -186,19 +156,20 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
 #endif
 
+    daex::do_make_variation_param( parser, pop_size);
+    daex::do_make_checkpoint_param( parser );
+    daex::do_make_replace_param( parser );
+
     daex::do_make_continue_param( parser );
     // Those parameters are needed during restarts (see below)
     unsigned int mingen = parser.value<unsigned int>("gen-min");
     unsigned int steadygen = parser.value<unsigned int>("gen-steady");
     unsigned int maxgens = parser.value<unsigned int>("gen-max");
 
-    daex::do_make_checkpoint_param( parser );
-
     unsigned int maxruns = parser.createParam( (unsigned int)0, "runs-max", 
             "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
-    daex::do_make_replace_param( parser );
 
     make_help( parser );
 
