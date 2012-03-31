@@ -30,5 +30,7 @@
 #include "do/make_checkpoint_dae.h"
 #include "do/make_variation_dae.h"
 #include "do/make_replace_dae.h"
+#include "do/make_eval_dae.h"
+#include "do/make_init_dae.h"
 
 #endif // __DAEX_H__

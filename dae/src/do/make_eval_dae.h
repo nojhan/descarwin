@@ -1,192 +1,122 @@
 
-//-----------------------------------------------------------------------------
-/*
- * <make_eval_dae.h>
- * Copyright (C) TAO Project-Team, INRIA Saclay-LRI && Thales Group, 2011-2012
- * DESCARWIN ANR project 
- * Author: <Mostepha R. Khouadjia>
- * Copyright: See COPYING file that comes with this distribution
- *
- *
- *///-----------------------------------------------------------------------------
+#ifndef _MAKE_EVAL_DAE_H_
+#define _MAKE_EVAL_DAE_H_
 
+#include "evaluation/cpt-yahsp.h"
+#include "evaluation/yahsp.h"
 
-#ifndef MAKE_EVAL_DAE_H_
-#define MAKE_EVAL_DAE_H_
+namespace daex {
 
-
-#include <utils/eoParser.h>
-#include <utils/eoState.h>
-#include <eoEvalFuncCounter.h>
-#include <daex.h>
-#include <evaluation/yahsp.h>
-#include <apply.h>
-/*
- * This function creates an eoEvalFuncCounter<eoFlowShop> that can later be used to evaluate an individual.
- * @param eoParser& _parser  to get user parameters
- * @param eoState& _state  to store the memory
- */
-
-eoEvalFuncCounter<daex::Decomposition> &   do_make_eval(eoParser& _parser, eoState& _state,eoPop<daex::Decomposition> & _pop,   daex::Init<daex::Decomposition> & _init)
+void do_make_eval_param( eoParser & parser )
 {
+    // FIXME use double instead of int?
+    unsigned int fitness_weight = parser.createParam( (unsigned int)10, "fitness-weight", 
+            "Unknown weight in the feasible and unfeasible fitness computation", 'W', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "fitness_weight" << fitness_weight << std::endl;
 
-    unsigned int b_max_init = _parser.createParam( (unsigned int)1e4, "bmax-init", 
-            "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" ).value();
+    unsigned int fitness_penalty = parser.createParam( (unsigned int)2, "fitness-penalty", 
+            "Penalty in the unfeasible fitnesses computation", 'w', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "fitness_penalty" << fitness_penalty << std::endl;
 
-    unsigned int fitness_weight = _parser.createParam( (unsigned int)10, "fitness-weight", "Unknown weight in the feasible and unfeasible fitness computation", 'W', "Evaluation" ).value();
+#ifndef SINGLE_EVAL_ITER_DUMP
+    unsigned int max_seconds = parser.createParam( (unsigned int)0, "max-seconds", 
+            "Maximum number of user seconds in CPU for the whole search, set it to 0 to deactivate (1800 = 30 minutes)", 'i', "Stopping criterions" ).value(); // 1800 seconds = 30 minutes
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "max_seconds" << max_seconds << std::endl;
+#endif
+    
+    unsigned int b_max_init = parser.createParam( (unsigned int)1e4, "bmax-init", "Number of allowed expanded nodes for the initial computation of b_max", 'B', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_init" << b_max_init << std::endl;
 
-    unsigned int fitness_penalty = _parser.createParam( (unsigned int)2, "fitness-penalty", "Penalty in the unfeasible fitnesses computation", 'w', "Evaluation" ).value();
+    /* nonsense with the incremental strategy
+    double b_max_quantile = parser.createParam( (double)0.5, "bmax-quantile", 
+            "Quantile to use for estimating b_max (in [0,1], 0.5=median)", 'Q', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_quantile" << b_max_quantile << std::endl;
+    if( b_max_quantile < 0 || b_max_quantile > 1 ) {
+        std::cout << "bmax-quantile must be a double in [0,1] (=" << b_max_quantile << ") type --help for usage." << std::endl;
+        exit(1);
+    }looser throw specifier for
+    */
 
+    unsigned int b_max_fixed = parser.createParam( (unsigned int)0, "bmax-fixed", "Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0", 'b', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_fixed" << b_max_fixed << std::endl;
 
-    daeYahspEvalInit<daex::Decomposition> *eval_yahsp_init = new daeYahspEvalInit<daex::Decomposition> ( _pop.size(), _init.l_max(), b_max_init, b_max_init, fitness_weight, fitness_penalty );
-
-    _state.storeFunctor(eval_yahsp_init);
-
-
-    unsigned int b_max_fixed = _parser.createParam( (unsigned int)0, "bmax-fixed", 
-
-            "Fixed number of allowed expanded nodes. Overrides bmaxinit if != 0", 'b', "Evaluation" ).value();
-
-    double b_max_last_weight = _parser.createParam( (double)3, "bmax-last-weight",
+    double b_max_last_weight = parser.createParam( (double)3, "bmax-last-weight",
             "Weighting for the b_max used during the last search towards the end goal (must be strictly positive)", 'T', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_last_weight" << b_max_last_weight << std::endl;
 
     if( b_max_last_weight <= 0 ) {
         std::cout << "bmax-last-weight must be strictly positive (=" << b_max_last_weight << ") type --help for usage." << std::endl;
         exit(1);
     }
 
-    double b_max_quantile = _parser.createParam( (double)0.5, "bmax-quantile", 
-            "Quantile to use for estimating b_max (in [0,1], 0.5=median)", 'Q', "Evaluation" ).value();
-
-    if( b_max_quantile < 0 || b_max_quantile > 1 ) {
-        std::cout << "bmax-quantile must be a double in [0,1] (=" << b_max_quantile << ") type --help for usage." << std::endl;
-        exit(1);
-    }
-
-
-    unsigned int b_max_in=0,
-                 b_max_last=0, 
-                 goodguys=0, 
-                 popsize=_pop.size(); 
-
-    ///#######################################################################################################################################
-
-    ///Strategie incrementale 
-
-    double b_max_increase_coef = _parser.createParam( (double)2, "bmax-increase-coef", "Multiplier increment for the computation of b_max", 'K', "Evaluation" ).value();
-
-    double b_max_ratio = _parser.createParam( 0.01, "bmax-ratio","Satisfying proportion of feasible individuals for the computation of b_max", 'J', "Evaluation" ).value();
-
-
-    daeYahspEval <daex::Decomposition>  *eval_yahsp = NULL ;
-
-    _state.storeFunctor(eval_yahsp);
-
-
-    if( b_max_fixed == 0 ) {
-
-        std::cout<< "Apply an incremental computation strategy to fix bmax_last:" << std::endl;
-
-        b_max_in = 1;
-
-        while( (((double)goodguys/(double)popsize) <= b_max_ratio) && (b_max_in < b_max_init) ) {
-
-            goodguys=0;
-
-            b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
-
-            //daeYahspEval& temp_yahsp = daeYahspEval( init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty );
-
-            eval_yahsp = new daeYahspEval <daex::Decomposition>  ( _init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty);
-
-            // in non multi-threaded version, use the plan dumper
-            //#ifndef SINGLE_EVAL_ITER_DUMP
-
-            apply(*eval_yahsp, _pop);  
-
-            for (size_t i = 0; i < popsize; ++i) {
-                // unfeasible individuals are invalidated in order to be re-evaluated 
-                // with a larger bmax at the next iteration but we keep the good guys.
-                if (_pop[i].is_feasible()) goodguys++;
-                else _pop[i].invalidate();
-            }
-
-            b_max_fixed = b_max_in;
-            b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
-        } // while
-        //delete temp_yahsp; 
-
-
-    }
-
-
-    ///############################################################################################################################################
-
-    ///Strategie par estimation
-
-    //     
-    // 
-    //         //if we want to estimate the initial b_max other a first search step
-    //         if( b_max_fixed == 0 ) {
-    //         //FIRST INIT LOOP FOR B_MAX ESTIMATION
-    //  
-    //         //start the eval on the first random pop
-    //        //eoPopLoopEval<daex::Decomposition> eval_init( _eval_yahsp_init );
-    //         apply(*eval_yahsp_init, _pop);
-    //         //eval_init( _pop, _pop );
-    // 
-    //         //estimate the b_max from the eval results
-    //         b_max_in = eval_yahsp_init -> estimate_b_max( b_max_quantile );
-    //     
-    //     }
-    //     
-    ///##########################################################################################################################################"
-    ///Strategie standard
-
-    //if we want a fixed b_max for the whole search
-    else  { // if b_max_fixed != 0 
-
-        std::cout<< "Apply the standard strategy to fix bmax_last:" << std::endl;
-
-        b_max_in = b_max_fixed;
-        assert( b_max_in > 0 );
-        // The b_max for the very last search towards the end goal
-        // is the estimated b_max * a given weight (3 by default)
-        b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
-        assert( b_max_last > 0 );
-        // eval that uses the correct b_max
-        eval_yahsp = new daeYahspEval <daex::Decomposition>   ( _init.l_max(), b_max_in, b_max_last, fitness_weight, fitness_penalty);
-
-        apply(*eval_yahsp, _pop);
-
-    }
-
-    goodguys=0; 
-
-    for (size_t i = 0; i < popsize; ++i) {
-        // unfeasible individuals are invalidated in order to be re-evaluated 
-        // with a larger bmax at the next iteration but we keep the good guys.
-        if (_pop[i].is_feasible()) goodguys++;
-
-    }
-
-
-    std::cout << "  \tfeasible_ratio:" <<  ((double)goodguys/(double)popsize);
-    std::cout << std::endl << "\tb_max for intermediate goals, b_max_in: "   << b_max_in   << std::endl;
-    std::cout << "\tb_max for  final goal,  b_max_last: " << b_max_last << std::endl;
-
-    // counter, for checkpointing
-    eoEvalFuncCounter<daex::Decomposition> *eval_counter = new eoEvalFuncCounter<daex::Decomposition> ( *eval_yahsp, "Eval.\t" );
-
-    _state.storeFunctor(eval_counter);
-
-    return *eval_counter;
-
-
-
-
 }
 
 
-#endif /* MAKE_EVAL_DAE_H_*/
+template<class EOT>
+std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
+    do_make_eval_op( 
+            eoParser & parser, eoState & state,
+            unsigned int l_max,
+            unsigned int eval_count, unsigned int estimated_b_max, unsigned int b_max_last,
+            std::string plan_file, TimeVal best_makespan, 
+            std::string dump_sep, unsigned int dump_file_count, std::string metadata
+    )
+{
+    unsigned int fitness_weight = parser.valueOf<unsigned int>("fitness-weight");
+    unsigned int fitness_penalty = parser.valueOf<unsigned int>("fitness-penalty");
+    unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
+
+    daeYahspEval<EOT> eval_yahsp( l_max, estimated_b_max, b_max_last, fitness_weight, fitness_penalty );
+
+    // nested evals:
+    eoEvalFunc<EOT> * p_eval;
+
+    //#ifndef SINGLE_EVAL_ITER_DUMP
+    // dump the best solution found so far in a file
+    daex::evalBestMakespanPlanDump* eval_bestfile = new daex::evalBestMakespanPlanDump( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
+    state.storeFunctor( eval_bestfile );
+
+#ifndef NDEBUG
+    // counter, for checkpointing
+    eoEvalFuncCounter<EOT>* eval_counter = new eoEvalFuncCounter<EOT>( *eval_bestfile, "Eval.\t" );
+    eval_counter->value( eval_count );
+    state.storeFunctor( eval_counter );
+#endif
+    //#endif
+
+    // if we do not want to add a time limit, do not add an EvalTime
+    //#ifdef SINGLE_EVAL_ITER_DUMP
+    //        p_eval = & eval_yahsp;
+    //#else // ifndef SINGLE_EVAL_ITER_DUMP
+    if( max_seconds == 0 ) {
+#ifndef NDEBUG
+        p_eval = eval_counter;
+#else
+        p_eval = eval_bestfile;
+#endif
+    } else {
+        // an eval that raises an exception if maxtime is reached
+        /* eoEvalTimeThrowException<EOT> * p_eval_maxtime 
+           = new eoEvalTimeThrowException<EOT>( eval_counter, max_seconds ); */
+        eoEvalUserTimeThrowException<EOT> * p_eval_maxtime
+#ifndef NDEBUG
+            = new eoEvalUserTimeThrowException<EOT>( *eval_counter,  max_seconds );
+#else
+            = new eoEvalUserTimeThrowException<EOT>( *eval_bestfile, max_seconds );
+#endif
+        state.storeFunctor( p_eval_maxtime );
+        p_eval = p_eval_maxtime;
+    }
+    //#endif // SINGLE_EVAL_ITER_DUMP
+    
+#ifndef NDEBUG
+    return std::make_pair<eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*>( *p_eval, eval_counter );
+#else
+    return std::make_pair<eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*>( *p_ eval, NULL );
+#endif
+}
+
+} // namespace daex
+
+#endif // _MAKE_EVAL_DAE_H_
 

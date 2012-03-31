@@ -36,9 +36,9 @@ void do_make_continue_param( eoParser & parser )
 template <class EOT>
 eoCombinedContinue<EOT> & do_make_continue_op( eoParser & parser, eoState & state )
 {
-    unsigned int mingen = parser.value<unsigned int>("gen-min");
-    unsigned int steadygen = parser.value<unsigned int>("gen-steady");
-    unsigned int maxgens = parser.value<unsigned int>("gen-max");
+    unsigned int mingen = parser.valueOf<unsigned int>("gen-min");
+    unsigned int steadygen = parser.valueOf<unsigned int>("gen-steady");
+    unsigned int maxgens = parser.valueOf<unsigned int>("gen-max");
 
     eoSteadyFitContinue<EOT>* steadyfit = new eoSteadyFitContinue<EOT>( mingen, steadygen );
     state.storeFunctor( steadyfit );

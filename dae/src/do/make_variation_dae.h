@@ -68,18 +68,18 @@ void do_make_variation_param( eoParser & parser, unsigned int pop_size )
 template<class EOT>
 eoGeneralBreeder<EOT> & do_make_variation_op( eoParser & parser, eoState & state, pddlLoad & pddl, MutationDelGoal<EOT> * ext_delgoal = NULL )
 {
-    unsigned int toursize = parser.value<unsigned int>("tournament");
-    unsigned int offsprings = parser.value<unsigned int>("offsprings");
+    unsigned int toursize = parser.valueOf<unsigned int>("tournament");
+    unsigned int offsprings = parser.valueOf<unsigned int>("offsprings");
 
-    unsigned int radius = parser.value<unsigned int>("radius");
-    double proba_change = parser.value<double>("proba-change");
-    double proba_del_atom = parser.value<double>("proba-del-atom");
-    double w_delgoal = parser.value<double>("w-delgoal");
-    double w_addgoal = parser.value<double>("w-addgoal");
-    double w_delatom = parser.value<double>("w-delatom");
-    double w_addatom = parser.value<double>("w-addatom");
-    double proba_cross = parser.value<double>("proba-cross");
-    double proba_mut = parser.value<double>("proba-mut");
+    unsigned int radius = parser.valueOf<unsigned int>("radius");
+    double proba_change = parser.valueOf<double>("proba-change");
+    double proba_del_atom = parser.valueOf<double>("proba-del-atom");
+    double w_delgoal = parser.valueOf<double>("w-delgoal");
+    double w_addgoal = parser.valueOf<double>("w-addgoal");
+    double w_delatom = parser.valueOf<double>("w-delatom");
+    double w_addatom = parser.valueOf<double>("w-addatom");
+    double proba_cross = parser.valueOf<double>("proba-cross");
+    double proba_mut = parser.valueOf<double>("proba-mut");
 
     unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
     unsigned int maxtry_mutex = 0;     // deactivated by default: should try every candidates

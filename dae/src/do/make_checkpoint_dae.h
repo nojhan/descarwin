@@ -135,13 +135,13 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator, eoPars
     state.registerObject(eo::rng);
 
 
-    unsigned int out_save_freq = parser.value<unsigned int>("out-save-freq");
+    unsigned int out_save_freq = parser.valueOf<unsigned int>("out-save-freq");
         eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "out-save-freq" << out_save_freq << std::endl;
 
-    std::string out_dir = parser.value<std::string>("out-dir");
+    std::string out_dir = parser.valueOf<std::string>("out-dir");
         eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "out-dir" << out_dir << std::endl;
 
-    bool out_dir_erase = parser.value<bool>("out-dir-erase");
+    bool out_dir_erase = parser.valueOf<bool>("out-dir-erase");
         eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "out-dir-erase" << out_dir_erase << std::endl;
 
     bool dirOK = testDirRes( out_dir, out_dir_erase ) ;
