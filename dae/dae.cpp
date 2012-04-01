@@ -273,7 +273,10 @@ int main ( int argc, char* argv[] )
     // start at the best element of the init
     daex::Decomposition best = pop.best_element();
     unsigned int run = 1;
+
+    // evaluate an empty decomposition, for comparison with decomposed solutions
     daex::Decomposition empty_decompo;
+    eval( empty_decompo );
 
     try { 
 
@@ -335,6 +338,7 @@ int main ( int argc, char* argv[] )
         checkpoint( pop );
 #endif
 
+        // Added an evaluated decomposition, in case it would be better than a decomposed one
         pop.push_back( empty_decompo );
         print_results( pop, time_start, run );
         return 0;
