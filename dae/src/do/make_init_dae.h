@@ -95,9 +95,11 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     eo::log << eo::debug << "Adam:" << std::endl << adam << std::endl;
 
     eo::log << eo::logging << "Create a population of Adam" << std::endl; 
+    // Remember the pop size before clearing it
+    unsigned int pop_size = pop.size(); 
     pop.clear(); // FIXME si insémination, ne pas faire l'init plus haut
 
-    for( unsigned int i = 0; i < pop.size(); ++i ) {
+    for( unsigned int i = 0; i < pop_size; ++i ) {
         pop.push_back( adam );
     }
 
@@ -114,20 +116,20 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     daex::MutationDelGoal<EOT> delgoal;
     while( feasibility_ratio > b_max_ratio )  {
         unsigned int feasibles = 0;
-        for( unsigned int i = 0; i < pop.size(); ++i ) {
+        for( unsigned int i = 0; i < pop_size; ++i ) {
             delgoal( pop[i] );
             eval_yahsp( pop[i] );
             if( pop[i].is_feasible() ) {
                 feasibles++;
             }
         }
-        feasibility_ratio = static_cast<double>(feasibles) / pop.size();
+        feasibility_ratio = static_cast<double>(feasibles) / pop_size;
 
         unsigned int iters = 0;
         while( feasibility_ratio < b_max_ratio && iters <= bmax_iters && b_max_in <= b_max_init )  {
             unsigned int feasibles = 0;
 
-            for( unsigned int i = 0; i < pop.size(); ++i ) {
+            for( unsigned int i = 0; i < pop_size; ++i ) {
                 eval_yahsp( pop[i] );
                 if( pop[i].is_feasible() ) {
                     feasibles++;
@@ -136,7 +138,7 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
             b_max_in= b_max_in * b_max_increase_coef;
             iters++;
-            feasibility_ratio = static_cast<double>(feasibles) / pop.size();
+            feasibility_ratio = static_cast<double>(feasibles) / pop_size;
         }
     } // while feasibility_ratio > b_max_ratio
 
