@@ -66,14 +66,15 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
     unsigned int fitness_penalty = parser.valueOf<unsigned int>("fitness-penalty");
     unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
 
-    daeYahspEval<EOT> eval_yahsp( l_max, estimated_b_max, b_max_last, fitness_weight, fitness_penalty );
+    daeYahspEval<EOT>* eval_yahsp = new daeYahspEval<EOT>( l_max, estimated_b_max, b_max_last, fitness_weight, fitness_penalty );
+    state.storeFunctor( eval_yahsp );
 
     // nested evals:
     eoEvalFunc<EOT> * p_eval;
 
     //#ifndef SINGLE_EVAL_ITER_DUMP
     // dump the best solution found so far in a file
-    daex::evalBestMakespanPlanDump* eval_bestfile = new daex::evalBestMakespanPlanDump( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
+    daex::evalBestMakespanPlanDump* eval_bestfile = new daex::evalBestMakespanPlanDump( *eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
     state.storeFunctor( eval_bestfile );
 
 #ifndef NDEBUG
