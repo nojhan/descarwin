@@ -109,7 +109,7 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
     daeYahspEval<daex::Decomposition> eval_yahsp( 
             l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
-
+    // FIXME insérer le compteur et le dump du meilleur plan
 
     // while the pop is largely feasible, try to del goals
     double feasibility_ratio = 1.0;
@@ -143,7 +143,6 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     } // while feasibility_ratio > b_max_ratio
 
     eo::log << eo::logging << "After insemination, b_max=" << b_max_in << std::endl;
-
 
     return b_max_in;
 }
@@ -190,20 +189,20 @@ unsigned int estimate_bmax_incremental(
 #ifndef NDEBUG
         eoEvalFuncCounter<EOT> eval_counter( eval_bestfile, "Eval.\t" );
         eval_counter.value( eval_count );
-        eoPopLoopEval<EOT> eval_y( eval_counter );
+        eoPopLoopEval<EOT> eval_pop( eval_counter );
 
         // else, only the plan dumper
 #else // ifdef NDEBUG
-        eoPopLoopEval<EOT> eval_y( eval_bestfile );
+        eoPopLoopEval<EOT> eval_pop( eval_bestfile );
 #endif
 
         // if we want to compile a multi-threaded version with OpenMP, 
         // we only want the basic evaluator, not the other wrappers, 
         // even the one that dump plans
         //#else // ifdef SINGLE_EVAL_ITER_DUMP
-        //                eoPopLoopEval<EOT> eval_y( eval_yahsp );
+        //                eoPopLoopEval<EOT> eval_pop( eval_yahsp );
         //#endif
-        eval_y( pop, pop );
+        eval_pop( pop, pop );
 
 #ifndef NDEBUG
         eoBestFitnessStat<EOT> best_statTEST("Best");
@@ -259,6 +258,21 @@ unsigned int estimate_bmax_incremental(
         b_max_fixed = b_max_in;
         b_max_in = (unsigned int)ceil(b_max_in*b_max_increase_coef);
     } // while
+
+
+    // evaluate pop before leaving
+    daeYahspEval<EOT> eval_yahsp( 
+            l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    daex::evalBestMakespanPlanDump eval_bestfile( 
+            eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
+#ifndef NDEBUG
+    eoEvalFuncCounter<EOT> eval_counter( eval_bestfile, "Eval.\t" );
+    eval_counter.value( eval_count );
+    eoPopLoopEval<EOT> eval_pop( eval_counter );
+#else
+    eoPopLoopEval<EOT> eval_pop( eval_bestfile );
+#endif
+    eval_pop( pop, pop );
 
     return b_max_in;
 }
