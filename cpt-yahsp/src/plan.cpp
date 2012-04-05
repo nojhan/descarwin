@@ -239,3 +239,40 @@ void compress_plans(bool causals, bool orderings)
   //FORMIN(a, actions, 2) { if (!a->used) exclude_action(a); } EFOR;
 }
 
+SolutionPlan *read_plan_from_file(char *filename)
+{
+  FILE *file = fopen(filename, "r");
+  if (file == NULL) error(no_file, "Plan file not found");
+  char buffer[STRING_MAX];
+  SolutionPlan *plan = cpt_calloc(plan, 1);
+  cpt_malloc(plan->steps, 100000);
+  while (fscanf(file, "%[^\n]\n", buffer) != EOF) {
+    char *s = buffer;
+    char *s2 = s;
+    bool action = false;
+    TimeVal init = 0;
+    while (*s2 && *s2 != ':' && *s2 != ';') s2++;
+    if (*s2 == ':') {
+      *s2++ = '\0';
+      init = atoi(s);
+    }
+    while (*s2 && *s2 != ';')
+      if (*s2 == '(') { action = true; s = s2++; }
+      else if (*s2 == ')') { *++s2 = '\0'; break; }
+      else { *s2 = tolower(*s2); s2++; }
+    if (action) {
+      FOR(a, actions) {
+	if (strcmp(s, action_name(a)) == 0) {
+	  cpt_malloc(plan->steps[plan->steps_nb], 1);
+	  plan->steps[plan->steps_nb]->action = a;
+	  plan->steps[plan->steps_nb++]->init = init;
+	  maximize(plan->makespan, init + duration(a)); 
+	}
+      } EFOR;
+    }
+  }
+  fclose(file);
+  cpt_realloc(plan->steps, plan->steps_nb);
+  plan->makespan = plan->steps_nb;
+  return plan;
+}

@@ -118,7 +118,8 @@ static Node *yahsp_plan()
     FOR(a, node->applicable) {
       son = node_derive(node);
       cpt_malloc(son->steps, 1);
-      if (node_apply_action(son, a) && (son = compute_node(son))) return son;
+      if (!node_apply_action(son, a)) continue;
+      if ((son = compute_node(son))) return son;
       if (stats.evaluated_nodes >= nodes_limit) return NULL;
     } EFOR;
     cpt_free(node->applicable);

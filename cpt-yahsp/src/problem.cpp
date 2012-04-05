@@ -707,7 +707,7 @@ void create_problem(void)
       found:;
       }
     } EFOR;
-    increase_pddl21_distances();
+    if (!opt.yahsp) increase_pddl21_distances();
   }
   end_monitor();
 

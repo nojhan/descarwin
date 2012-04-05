@@ -34,8 +34,8 @@ LINK_DIRECTORIES(
   )
 
 # flags to use with compiler
-# VV : -DDAE pour les headers de YAHSP
-ADD_DEFINITIONS(-W -Wall -DDAE) 
+# VV : -DDAE for YAHSP headers, -D__STDC_CONSTANT_MACROS for macros INT64_C...
+ADD_DEFINITIONS(-W -Wall -DDAE -D__STDC_CONSTANT_MACROS)
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
   #ADD_DEFINITIONS(-DPAPERVERSION)
@@ -62,6 +62,11 @@ TARGET_LINK_LIBRARIES(dae-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_lib
 ADD_EXECUTABLE(dae-mt dae.cpp)
 ADD_DEPENDENCIES(dae-mt daex-yahsp-mt)
 TARGET_LINK_LIBRARIES(dae-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
+SET_TARGET_PROPERTIES(
+  dae-mt
+  PROPERTIES 
+  COMPILE_FLAGS "-DYAHSP_MT"
+  )
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
     ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)

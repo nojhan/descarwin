@@ -67,6 +67,9 @@ extern void yahsp_reset();
 extern int yahsp_search(Fluent **init, long init_nb, Fluent **goals, long goals_nb);
 /* Ajouté par Pierre Savéant et Johann Dréo le 2010-03-26 */
 extern int yahsp_compress_plans();
+extern Adam yahsp_create_adam(SolutionPlan *plan);
+extern void yahsp_print_adam(Adam adam);
+extern void yahsp_free_adam(Adam adam);
 extern BitArray * get_current_state();
 /* PS & JD */
 

@@ -24,7 +24,7 @@
 #endif
 
 
-static gdsl_rbtree_t open_list;
+static gdsl_heap_t open_list;
 static gdsl_rbtree_t closed_list;
 
 static State current_state;
@@ -40,13 +40,13 @@ static ulong nodes_limit;
 
 static Comparison open_list_cmp(Node *node1, Node *node2)
 {
-  LESS(node1->fvalue, node2->fvalue);
+  GREATER(node1->fvalue, node2->fvalue);
 #ifdef DAE
   LESS(node1->makespan, node2->makespan);
 #else
-  LESS(node1->length, node2->length);
+  GREATER(node1->length, node2->length);
 #endif
-  LESS(node1->id, node2->id);
+  GREATER(node1->id, node2->id);
   return Equal;
 }
 
@@ -58,8 +58,7 @@ static Comparison closed_list_cmp(Node *node1, Node *node2)
 
 static Node *open_list_insert(Node *node)
 {
-  int gdsl_return;
-  return (Node *) gdsl_rbtree_insert(open_list, node, &gdsl_return);
+  return (Node *) gdsl_heap_insert(open_list, node);
 }
 
 static Node *closed_list_insert(Node *node)
@@ -94,18 +93,9 @@ static Node *compute_node(Node *node)
   return compute_node(apply_relaxed_plan(open_list_insert(node), best_makespan));
 }
 
-static int open_list_map(Node *node, gdsl_location_t loc, Node **data) 
-{
-  if (*data == NULL) *data = node;
-  return GDSL_MAP_STOP;
-}
-
 static Node *open_list_pop_best()
 {
-  Node *node = NULL;
-  gdsl_rbtree_map_infix(open_list, (gdsl_map_func_t) open_list_map, &node);
-  if (node != NULL) gdsl_rbtree_remove(open_list, node);
-  return node;
+  return (Node *) gdsl_heap_remove_top(open_list);
 }
 
 static Node *yahsp_plan()
@@ -135,7 +125,7 @@ void yahsp_reset()
 void yahsp_init()
 {
   alloc_eval_structures();
-  open_list = gdsl_rbtree_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) open_list_cmp);
+  open_list = gdsl_heap_alloc(NULL, NULL, NULL, (gdsl_compare_func_t) open_list_cmp);
   closed_list = gdsl_rbtree_alloc(NULL, NULL, (gdsl_free_func_t) node_free, (gdsl_compare_func_t) closed_list_cmp);
 #ifdef DAE
   heuristic_create();
@@ -156,14 +146,16 @@ int yahsp_main(ulong max_evaluated_nodes)
   stats.evaluated_nodes = 0;
   stats.expanded_nodes = 0;
   best_makespan = MAXTIME;
-
+  solution_plan = read_plan_from_file("plan");
+  print_plan_ipc(stdout, solution_plan, 0);
+  plan_free(solution_plan);
   Node *node = yahsp_plan();
 
   if (node != NULL) {
     state_copy(current_state, node->state);
     solution_plan = create_solution_plan(node);
   }
-  gdsl_rbtree_flush(open_list);
+  gdsl_heap_flush(open_list);
   gdsl_rbtree_flush(closed_list);
   stats.nodes_by_sec = stats.evaluated_nodes / get_timer(stats.search);
   return (node == NULL ? NO_PLAN : PLAN_FOUND);

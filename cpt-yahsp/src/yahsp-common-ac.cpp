@@ -386,7 +386,6 @@ bool node_action_schedule(Node *node)
     } EFOR;
   } EFOR;
 
-  
   bool propagate = true;
   bool contradiction = false;
 
@@ -468,7 +467,9 @@ bool node_apply_action(Node *node, Action *a)
   node->steps[node->steps_nb].init = init;
   node->steps_nb++;
   node->length++;
-  return node_action_schedule(node);
+  bool test = node_action_schedule(node);
+  //if (!test) { node->steps_nb--;node->length--; }
+  return test;
 }
 
 Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)

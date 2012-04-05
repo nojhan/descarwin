@@ -51,6 +51,7 @@
 #include "gdsl_rbtree.h"          /* red-black trees */
 #include "gdsl_hash.h"            /* hashtables */
 #include "gdsl_sort.h"            /* general-sorting functions */
+#include "gdsl_heap.h"            /* general-sorting functions */
 
 
 /* 

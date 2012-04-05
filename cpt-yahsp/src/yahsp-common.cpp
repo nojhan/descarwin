@@ -443,3 +443,45 @@ int yahsp_compress_plans()
 #endif
   return PLAN_FOUND;
 }
+
+Adam yahsp_create_adam(SolutionPlan *plan)
+{
+  Adam adam;
+  State state;
+  cpt_malloc(adam.states, (adam.states_nb = plan->length - 1));
+  state = state_create();
+  FOR(f, init_state) { state_add(state, f); } EFOR;
+  FORMAXi(s, i, plan->steps, adam.states_nb) {
+    FOR(f, s->action->del) { state_del(state, f); } EFOR;
+    FOR(f, s->action->add) { state_add(state, f); } EFOR;
+    adam.states[i].fluents_nb = 0;
+    FOR(f, fluents) {
+      if (state_contains(state, f)) adam.states[i].fluents_nb++;
+    } EFOR;
+    cpt_malloc(adam.states[i].fluents, adam.states[i].fluents_nb);
+    size_t j = 0;
+    FOR(f, fluents) {
+      if (state_contains(state, f)) adam.states[i].fluents[j++] = f;
+    } EFOR;
+  } EFOR;
+  cpt_free(state);
+  return adam;
+}
+
+void yahsp_print_adam(Adam adam)
+{
+  FOR(s, adam.states) {
+    FOR(f, s.fluents) {
+      cpt_trace(normal, "%s ", fluent_name(f));
+    } EFOR;
+    cpt_trace(normal, "\n");
+  } EFOR;
+}
+
+void yahsp_free_adam(Adam adam)
+{
+  FOR(s, adam.states) {
+    cpt_free(s.fluents);
+  } EFOR;
+  cpt_free(adam.states);
+}

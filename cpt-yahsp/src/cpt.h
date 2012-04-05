@@ -10,9 +10,6 @@
 #ifndef CPT_H
 #define CPT_H 
 
-#define __STDC_CONSTANT_MACROS
-#define __STDC_LIMIT_MACROS 
-#define __STDC_FORMAT_MACROS
 
 #include <ctype.h>
 #include <fenv.h>
@@ -22,6 +19,8 @@
 #include <math.h>
 #include <setjmp.h>
 #include <stddef.h>
+#include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <termcap.h>
@@ -87,6 +86,7 @@ typedef int32_t TimeVal;
 typedef int64_t TimeVal;
 #define TIMEP PRId64
 #define MAXTIME INT64_C(1000000000000000000)
+//#define MAXTIME 1000000000000000000LL
 #define MAXCOST MAXTIME
 #define time_round llrintl
 #endif

@@ -54,6 +54,16 @@ struct Step {
 #endif
 };
 
+typedef struct AdamState AdamState;
+typedef struct Adam Adam;
+
+struct AdamState {
+  VECTOR(Fluent *,fluents);
+};
+
+struct Adam {
+  VECTOR(AdamState, states);
+};
 
 struct Statistics {
   /* CPT statistics */
@@ -96,6 +106,7 @@ extern SolutionPlan *plan_save(Action **actions, size_t actions_nb, double searc
 extern void plan_free(SolutionPlan *plan);
 extern void compress_plans(bool causals, bool orderings);
 extern Comparison precedes_in_plan(Step **s1, Step **s2);
+extern SolutionPlan *read_plan_from_file(char *filename);
 
 
 #endif /* PLAN_H */

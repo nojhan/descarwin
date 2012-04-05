@@ -404,7 +404,7 @@ void compute_init_edeletes(void)
   } EFOR;
 
   FOR(f, fluents) {
-    if (fmutex(f, f) == MAXCOST) 
+    if (fmutex(f, f)) 
       f->init = MAXCOST;
   } EFOR;
  
