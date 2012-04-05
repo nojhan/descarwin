@@ -146,9 +146,9 @@ int yahsp_main(ulong max_evaluated_nodes)
   stats.evaluated_nodes = 0;
   stats.expanded_nodes = 0;
   best_makespan = MAXTIME;
-  solution_plan = read_plan_from_file("plan");
-  print_plan_ipc(stdout, solution_plan, 0);
-  plan_free(solution_plan);
+  // solution_plan = read_plan_from_file("plan");
+  // print_plan_ipc(stdout, solution_plan, 0);
+  // plan_free(solution_plan);
   Node *node = yahsp_plan();
 
   if (node != NULL) {
