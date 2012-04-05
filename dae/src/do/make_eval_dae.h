@@ -113,7 +113,7 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
 #ifndef NDEBUG
     return std::make_pair<eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*>( *p_eval, eval_counter );
 #else
-    return std::make_pair<eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*>( *p_ eval, NULL );
+    return std::make_pair<eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*>( *p_eval, NULL );
 #endif
 }
 
