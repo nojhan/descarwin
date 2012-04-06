@@ -213,7 +213,7 @@ int main ( int argc, char* argv[] )
 
     eo::log << eo::progress << "OK" << std::endl;
     
-    eo::log << eo::progress << "Evaluating the first popoulation...";
+    eo::log << eo::progress << "Evaluating the first population...";
     eo::log.flush();
 #endif
 
