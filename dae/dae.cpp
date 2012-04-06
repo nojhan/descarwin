@@ -206,16 +206,22 @@ int main ( int argc, char* argv[] )
             );
     eoEvalFunc<daex::Decomposition>& eval = eval_pair.first;
 
+#ifndef NDEBUG
+    // in debug mode, we should have a func counter
+    assert( eval_pair.second != NULL );
+    eoEvalFuncCounter<daex::Decomposition>& eval_counter = * eval_pair.second;
+
+    eo::log << eo::progress << "OK" << std::endl;
+    
+    eo::log << eo::progress << "Evaluating the first popoulation...";
+    eo::log.flush();
+#endif
+
     // a first evaluation of generated pop
     eoPopLoopEval<daex::Decomposition> pop_eval( eval );
     pop_eval( pop, pop );
 
 #ifndef NDEBUG
-    // in debug mode, we should have a func counter
-    assert( eval_pair.second != NULL );
-    eoEvalFuncCounter<daex::Decomposition>& eval_counter = * eval_pair.second;
-    eval_counter.value( eval_count );
-
     eo::log << eo::progress << "OK" << std::endl;
 #endif
 
@@ -340,6 +346,7 @@ int main ( int argc, char* argv[] )
 
         // Added an evaluated decomposition, in case it would be better than a decomposed one
         pop.push_back( empty_decompo );
+        pop_eval( pop, pop ); // FIXME normalement inutile
         print_results( pop, time_start, run );
         return 0;
     }
@@ -351,6 +358,7 @@ int main ( int argc, char* argv[] )
     pop.push_back( empty_decompo );
     // push the best result, in case it was not in the last run
     pop.push_back( best );
+    pop_eval( pop, pop ); // FIXME normalement inutile
     print_results( pop, time_start, run );
 
     return 0;
