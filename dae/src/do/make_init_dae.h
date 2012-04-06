@@ -92,6 +92,7 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
         adam.push_back( goal );
     }
+    yahsp_free_adam(yahsp_adam);
     eo::log << eo::debug << "Adam:" << std::endl << adam << std::endl;
 
     eo::log << eo::logging << "Create a population of Adam" << std::endl; 
