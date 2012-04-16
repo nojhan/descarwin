@@ -126,13 +126,13 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator, eoPars
     checkpoint->add( *file_monitor );
 #endif
     
+    //state.formatJSON("dae_state");
 
-    // MODIFS MS START 
     // pour plus d'output (recopiés de do/make_checkpoint)
     // un state, pour sauver l'état courant
     state.registerObject(parser);
     state.registerObject(pop);
-    state.registerObject(eo::rng);
+    //state.registerObject(eo::rng);
 
 
     unsigned int out_save_freq = parser.valueOf<unsigned int>("out-save-freq");
@@ -150,7 +150,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator, eoPars
     }
 
     unsigned freq = out_save_freq>0 ? out_save_freq : std::numeric_limits<unsigned int>::max();
-    std::string stmp = out_dir + "/generations";
+    std::string stmp = out_dir + "/generation_";
 
     eoCountedStateSaver* state_saver = new eoCountedStateSaver(freq, state, stmp);
     state.storeFunctor( state_saver );
