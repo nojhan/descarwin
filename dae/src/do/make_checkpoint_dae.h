@@ -152,7 +152,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator, eoPars
     unsigned freq = out_save_freq>0 ? out_save_freq : std::numeric_limits<unsigned int>::max();
     std::string stmp = out_dir + "/generation_";
 
-    eoCountedStateSaver* state_saver = new eoCountedStateSaver(freq, state, stmp);
+    eoCountedStateSaver* state_saver = new eoCountedStateSaver(freq, state, stmp, true, "sav", -1);
     state.storeFunctor( state_saver );
 
     checkpoint->add( *state_saver );
