@@ -50,11 +50,13 @@ void print_results( eoPop<daex::Decomposition> pop, time_t time_start, int run )
 
     // the pop being unsorted, sorting it before getting the first is more efficient
     // than using best_element (that uses std::max_element)
-    pop.sort();
+    //pop.sort();
 
 #ifndef NDEBUG
-    std::cout << IPC_PLAN_COMMENT << pop.front() << std::endl;
+    //std::cout << IPC_PLAN_COMMENT << pop.front() << std::endl;
+    std::cout << IPC_PLAN_COMMENT << pop.best_element() << std::endl;
 #endif
-    std::cout << pop.front().plan() << std::endl;
+    //std::cout << pop.front().plan() << std::endl;
+    std::cout << pop.best_element().plan_copy() << std::endl;
 }
 
