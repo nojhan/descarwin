@@ -57,9 +57,7 @@ struct Action {
   Action *origin;
   TimeStruct dur;
   TimeStruct rdur;
-#ifdef DAE
   TimeVal cost;
-#endif
   Action *pddl21_next;
   Action *pddl21_prev;
   TimeVal init;

@@ -33,10 +33,8 @@ struct SolutionPlan {
   VECTOR(Step *, steps);
   ulong length;
   TimeVal makespan;
-#ifdef DAE
   TimeVal cost_add;
   TimeVal cost_max;
-#endif
   double search_time;
   double total_time;
   ulong backtracks;

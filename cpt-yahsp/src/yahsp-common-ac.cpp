@@ -416,14 +416,13 @@ bool node_action_schedule(Node *node)
       } EFOR;
       node = node->parent;
     }
-
     // FOR(v, vertices) { 
     //   print_time(stdout, v->est);
     //   cpt_trace(normal, " ");
     //   print_time(stdout, v->lst);
-    //   cpt_trace(normal, " %s\n", action_name(v->a));
+    //   cpt_trace(normal, " %s [%lld]\n", action_name(v->a), duration(v->a));
     // } EFOR;
-    // cpt_trace(normal, "\n\n");
+    // cpt_trace(normal, "\nMKSP: %lld\n", vertices[vertices_nb - 1]->est);
   }
 
   FOR(v, vertices) { 
@@ -468,7 +467,11 @@ bool node_apply_action(Node *node, Action *a)
   node->steps_nb++;
   node->length++;
   bool test = node_action_schedule(node);
-  //if (!test) { node->steps_nb--;node->length--; }
+  if (!test) { 
+    FOR(f, a->add) { state_del(node->state, f); } EFOR;
+    FOR(f, a->del) { state_add(node->state, f); } EFOR;
+    node->steps_nb--; node->length--; 
+  }
   return test;
 }
 
@@ -519,6 +522,7 @@ Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)
   /*   } */
   /*   next_action:; */
   /* } EFOR; */
+
   FORi(a, i, relaxed_plan) {
     if (a == NULL || a == end_action) continue;
     FOR(b, relaxed_plan) {
@@ -566,12 +570,10 @@ SolutionPlan *create_solution_plan(Node *node)
     node = node->parent;
   }
   vector_sort(plan->steps, precedes_in_plan);
-#ifdef DAE
   FOR(s, plan->steps) { 
     plan->cost_add += s->action->cost; 
     maximize(plan->cost_max, s->action->cost);
   } EFOR;
-#endif
   return plan;
 }
 
@@ -613,11 +615,9 @@ int yahsp_compress_plans()
   } EFOR;
   vector_sort(plan->steps, precedes_in_plan);
   solution_plan = plan;
-#ifdef DAE
   FOR(s, plan->steps) { 
     plan->cost_add += s->action->cost; 
     maximize(plan->cost_max, s->action->cost);
   } EFOR;
-#endif
   return PLAN_FOUND;
 }

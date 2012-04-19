@@ -79,12 +79,14 @@ void trace_solution_plan(SolutionPlan *plan)
 void trace_plan_stats(SolutionPlan *plan)
 {
   if (opt.verbosity > 0) {
-    if (pddl_domain->action_costs) {
-      fprintf(cptout, "\nTotal cost : ");
-      print_time(cptout, plan->makespan);
-    } else if (!opt.sequential) {
+    if (pddl_domain->durative_actions) {
       fprintf(cptout, "\nMakespan : ");
       print_time(cptout, plan->makespan);
+    }
+    if (pddl_domain->action_costs) {
+      fprintf(cptout, "\nTotal cost : ");
+      if (pddl_domain->durative_actions) print_time(cptout, plan->cost_add);
+      else print_time(cptout, plan->makespan);
     }
     fprintf(cptout, "\nLength : %lu\n", plan->length);
   }

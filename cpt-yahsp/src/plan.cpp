@@ -34,11 +34,7 @@ void print_plan(FILE *out, SolutionPlan *plan, bool print_synchro)
 #ifdef RESOURCES
     if (!print_synchro && step->action->synchro) continue;
 #endif
-#ifdef DAE
-    if (pddl_domain->action_costs && !pddl_domain->action_costs) fprintf(out, "%zu", i);
-#else
-    if (pddl_domain->action_costs) fprintf(out, "%zu", i);
-#endif
+    if (pddl_domain->action_costs && !pddl_domain->durative_actions) fprintf(out, "%zu", i);
     else if (opt.sequential) print_time(out, step->init);
     else print_time_incr(out, step->init, i);
     fprintf(out, ": %s", action_name(step->action));
@@ -47,10 +43,8 @@ void print_plan(FILE *out, SolutionPlan *plan, bool print_synchro)
       print_time(out, opt.pddl21 ? step->action->rdur.t : duration(step->action));
       fprintf(out, "]");
     }
-#ifdef DAE
     if (pddl_domain->durative_actions && pddl_domain->action_costs)
       fprintf(out, " [%" TIMEP "]", step->action->cost);
-#endif
 #ifdef RESOURCES
     if (step->action->synchro) fprintf(out, " [%" TIMEP ",%" TIMEP "]", step->min_level, step->max_level);
 #endif

@@ -91,6 +91,8 @@ static Node *compute_node(Node *node)
   copy_applicable_actions(node);
   compute_relaxed_plan(node);
   node->fvalue = get_node_fvalue(node);
+  // open_list_insert(node);
+  // return NULL;
   return compute_node(apply_relaxed_plan(open_list_insert(node), best_makespan));
 }
 

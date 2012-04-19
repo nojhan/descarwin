@@ -388,12 +388,10 @@ SolutionPlan *create_solution_plan(Node *node)
     node = node->parent;
   }
   vector_sort(plan->steps, precedes_in_plan);
-#ifdef DAE
   FOR(s, plan->steps) { 
     plan->cost_add += s->action->cost; 
     maximize(plan->cost_max, s->action->cost);
   } EFOR;
-#endif
   return plan;
 }
 
@@ -435,12 +433,10 @@ int yahsp_compress_plans()
   } EFOR;
   vector_sort(plan->steps, precedes_in_plan);
   solution_plan = plan;
-#ifdef DAE
   FOR(s, plan->steps) { 
     plan->cost_add += s->action->cost; 
     maximize(plan->cost_max, s->action->cost);
   } EFOR;
-#endif
   return PLAN_FOUND;
 }
 
