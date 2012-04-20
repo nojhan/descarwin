@@ -15,6 +15,7 @@
 #include "plan.h"
 #include "trace_planner.h"
 #include "globs.h"
+#include "propagations.h"
 // VERY DIRTY
 #define end_action (&yend_action)
 #include "yahsp.h"
@@ -262,7 +263,179 @@ bool action_must_precede(Action *a1, Action *a2)
   return false;
 }
 
-void node_apply_action(Node *node, Action *a) 
+bool actions_mutex(Action *a1, Action *a2)
+{
+  if (opt.sequential || (opt.fluent_mutexes && amutex(a1, a2))) return true;
+  FOR(f, a1->del) { if (consumes(a2, f) || produces(a2, f)) return true; } EFOR;
+  FOR(f, a2->del) { if (consumes(a1, f) || produces(a1, f)) return true; } EFOR;
+  return false;
+}
+
+
+typedef struct Edge Edge;
+
+typedef struct Vertice Vertice;
+
+struct Edge {
+  Vertice *src;
+  Vertice *dst;
+  ActivityConstraint *ac;
+};
+
+struct Vertice {
+  Action *a;
+  TimeVal est;
+  TimeVal lst;
+  VECTOR(Edge *, in);
+  VECTOR(Edge *, out);
+  bool prop;
+};
+
+void add_edge(Vertice *v1, Vertice *v2, Fluent *f)
+{
+  Edge *edge = cpt_calloc(edge, 1);
+  edge->src = v1;
+  edge->dst = v2;
+  cpt_realloc(v1->out, v1->out_nb + 1);
+  v1->out[v1->out_nb++] = edge;
+  cpt_realloc(v2->in, v2->in_nb + 1);
+  v2->in[v2->in_nb++] = edge;
+  if (f != NULL) edge->ac = find_ac_constraint(edge->src->a, f);
+}
+
+static bool order(Edge *e)
+{
+  Vertice *s = e->src, *d = e->dst;
+  if (e->ac != NULL) {
+    TimeVal acmin = 0, acmax = 0;
+    evaluate_ac_forward(e->ac, s->est + duration(s->a), s->lst + duration(s->a), &acmin, &acmax);
+    if (acmin > d->est) {
+      d->est = acmin;
+      d->prop = true;
+      if (d->est > d->lst) return false;
+    }
+    if (acmax < d->lst) {
+      d->lst = acmax;
+      d->prop = true;
+      if (d->est > d->lst) return false;
+    }
+    evaluate_ac_backward(e->ac, d->est, d->lst, &acmin, &acmax);
+    if (acmin - duration(s->a) > s->est) {
+      s->est = acmin - duration(s->a);
+      s->prop = true;
+      if (s->est > s->lst) return false;
+    }
+    if (acmax - duration(s->a) < s->lst) {
+      s->lst = acmax - duration(s->a);
+      s->prop = true;
+      if (s->est > s->lst) return false;
+    }
+  } else {
+    if (s->est + duration(s->a) > d->est) {
+      d->est = s->est + duration(s->a);
+      d->prop = true;
+      if (d->est > d->lst) return false;
+    }
+    if (d->lst - duration(s->a) < s->lst) {
+      s->lst = d->lst - duration(s->a);
+      s->prop = true;
+      if (d->est > d->lst) return false;
+    }
+  }
+  return true;
+}
+
+bool node_action_schedule(Node *node)
+{
+  size_t vertices_nb = node->length + 2;
+  Vertice *vertices[vertices_nb];
+  Node *tmp = node;
+  size_t i = vertices_nb;
+  FORi(v, i, vertices) { 
+    v = cpt_calloc(vertices[i], 1);
+    // cpt_malloc(v->in, vertices_nb*2);
+    // cpt_malloc(v->out, vertices_nb*2);
+    v->prop = true;
+    v->lst = MAXTIME;
+  } EFOR;
+  vertices[--i]->a = end_action;
+  vertices[0]->a = start_action;
+  vertices[0]->lst = 0;
+  while (tmp != NULL) {
+    RFOR(s, tmp->steps) {
+      vertices[--i]->a = s.action;
+    } EFOR;
+    tmp = tmp->parent;
+  }
+  // FOR(a, vertices) { cpt_trace(normal, "%s ", action_name(a->a)); } EFOR;
+  // cpt_trace(normal, "\n\n");
+
+  FORi(v1, i, vertices) {
+    FOR(f, v1->a->prec) {
+      RFORMAX(v2, vertices, i) {
+	if (produces(v2->a, f)) {
+	  add_edge(v2, v1, f);
+	  break;
+	}
+      } EFOR;
+    } EFOR;
+    FORMAX(v2, vertices, i) {
+      if (actions_mutex(v1->a, v2->a)) {
+	add_edge(v2, v1, NULL); 
+      }
+    } EFOR;
+  } EFOR;
+
+  bool propagate = true;
+  bool contradiction = false;
+
+  while (propagate) {
+    propagate = false;
+    FOR(v, vertices) {
+      if (v->prop) {
+	propagate = true;
+	v->prop = false;
+	FOR(e, v->in) { if (!order(e)) goto contradiction; } EFOR;
+	FOR(e, v->out) { if (!order(e)) goto contradiction; } EFOR;
+      }
+    } EFOR;
+  }
+  goto nocontradiction;
+
+ contradiction:
+  contradiction = true;
+  
+ nocontradiction:
+
+  node->makespan = vertices[vertices_nb - 1]->est;
+  if (!contradiction) {
+    i = vertices_nb - 1;
+    while (node != NULL) {
+      RFORi(s, j, node->steps) {
+	node->steps[j].init = vertices[--i]->est;
+      } EFOR;
+      node = node->parent;
+    }
+    // FOR(v, vertices) { 
+    //   print_time(stdout, v->est);
+    //   cpt_trace(normal, " ");
+    //   print_time(stdout, v->lst);
+    //   cpt_trace(normal, " %s [%lld]\n", action_name(v->a), duration(v->a));
+    // } EFOR;
+    // cpt_trace(normal, "\nMKSP: %lld\n", vertices[vertices_nb - 1]->est);
+  }
+
+  FOR(v, vertices) { 
+    FOR(e, v->out) { cpt_free(e); } EFOR;
+    cpt_free(v->out);
+    cpt_free(v->in);
+    cpt_free(v);
+  } EFOR;
+
+  return !contradiction;
+}
+
+bool node_apply_action(Node *node, Action *a) 
 {
   FOR(f, a->del) { state_del(node->state, f); } EFOR;
   FOR(f, a->add) { state_add(node->state, f); } EFOR;
@@ -293,6 +466,13 @@ void node_apply_action(Node *node, Action *a)
   node->steps[node->steps_nb].init = init;
   node->steps_nb++;
   node->length++;
+  if (pddl_domain->activity_constraints && !node_action_schedule(node)) { 
+    FOR(f, a->add) { state_del(node->state, f); } EFOR;
+    FOR(f, a->del) { state_add(node->state, f); } EFOR;
+    node->steps_nb--; 
+    node->length--; 
+    return false;
+  } else return true;
 }
 
 Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)
@@ -305,10 +485,11 @@ Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)
  start:
   FORi(a, i, relaxed_plan) {
     if (a != NULL && a != end_action && can_be_applied(son, a)) {
-      relaxed_plan[i] = NULL;
-      node_apply_action(son, a);
-      if (son->makespan > best_makespan) { node_free(son); return NULL; }
-      goto start;
+      if (node_apply_action(son, a)) {
+	relaxed_plan[i] = NULL;
+	if (son->makespan > best_makespan) { node_free(son); return NULL; }
+	goto start;
+      }
     }
   } EFOR;
   /* FORi(a, i, relaxed_plan) { */
@@ -341,6 +522,7 @@ Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)
   /*   } */
   /*   next_action:; */
   /* } EFOR; */
+
   FORi(a, i, relaxed_plan) {
     if (a == NULL || a == end_action) continue;
     FOR(b, relaxed_plan) {
@@ -377,8 +559,8 @@ SolutionPlan *create_solution_plan(Node *node)
   long length = node->length;
   cpt_malloc(plan->steps, (plan->steps_nb = length));
   plan->makespan = node->makespan;
-  plan->backtracks = stats.evaluated_nodes;
   plan->length = length;
+  plan->backtracks = stats.evaluated_nodes;
   while (node != NULL) {
     RFOR(a, node->steps) {
       Step *s = cpt_calloc(plan->steps[--length], 1);
@@ -438,46 +620,4 @@ int yahsp_compress_plans()
     maximize(plan->cost_max, s->action->cost);
   } EFOR;
   return PLAN_FOUND;
-}
-
-Adam yahsp_create_adam(SolutionPlan *plan)
-{
-  Adam adam;
-  State state;
-  cpt_malloc(adam.states, (adam.states_nb = plan->length - 1));
-  state = state_create();
-  FOR(f, init_state) { state_add(state, f); } EFOR;
-  FORMAXi(s, i, plan->steps, adam.states_nb) {
-    FOR(f, s->action->del) { state_del(state, f); } EFOR;
-    FOR(f, s->action->add) { state_add(state, f); } EFOR;
-    adam.states[i].fluents_nb = 0;
-    FOR(f, fluents) {
-      if (state_contains(state, f)) adam.states[i].fluents_nb++;
-    } EFOR;
-    cpt_malloc(adam.states[i].fluents, adam.states[i].fluents_nb);
-    size_t j = 0;
-    FOR(f, fluents) {
-      if (state_contains(state, f)) adam.states[i].fluents[j++] = f;
-    } EFOR;
-  } EFOR;
-  cpt_free(state);
-  return adam;
-}
-
-void yahsp_print_adam(Adam adam)
-{
-  FOR(s, adam.states) {
-    FOR(f, s.fluents) {
-      cpt_trace(normal, "%s ", fluent_name(f));
-    } EFOR;
-    cpt_trace(normal, "\n");
-  } EFOR;
-}
-
-void yahsp_free_adam(Adam adam)
-{
-  FOR(s, adam.states) {
-    cpt_free(s.fluents);
-  } EFOR;
-  cpt_free(adam.states);
 }

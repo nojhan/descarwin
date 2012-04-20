@@ -7,9 +7,6 @@ SET(SOURCES
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} cpt_yahsp_library-common cpt_yahsp_library)
 
-ADD_EXECUTABLE(${PROJECT_NAME}-ac ${SOURCES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME}-ac cpt_yahsp_library-common cpt_yahsp_library-ac)
-
 if (SCC)
 
   SET_TARGET_PROPERTIES(

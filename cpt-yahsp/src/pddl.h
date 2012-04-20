@@ -45,6 +45,7 @@ struct PDDLDomain {
   bool typing;
   bool numerical_fluents;
   bool action_costs;
+  bool activity_constraints;
   gdsl_rbtree_t symbols_table;
   gdsl_rbtree_t types_table;
   gdsl_rbtree_t predicates_table;

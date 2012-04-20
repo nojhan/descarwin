@@ -392,6 +392,7 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
       }
     } EFOR;
     if (cpt_malloc(action->ac_constraints, (action->ac_constraints_nb = ope->ac_constraints_nb))) {
+      domain->activity_constraints = true;
       FORi(ac, i, ope->ac_constraints) {
 	ActivityConstraint *aci = cpt_calloc(action->ac_constraints[i], 1);
 	aci->fluent = instantiate_atom(domain, ac->litteral->atom, params);

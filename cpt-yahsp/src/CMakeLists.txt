@@ -28,7 +28,6 @@ SET(SOURCES
 
 SET(SEQ_SOURCES yahsp-common.cpp yahsp-seq.cpp)
 SET(MT_SOURCES yahsp-common.cpp yahsp-mt.cpp)
-SET(AC_SOURCES yahsp-common-ac.cpp yahsp-ac.cpp)
 SET(MPI_SOURCES yahsp-mpi.cpp)
 SET(DAE_SOURCES yahsp-dae.cpp)
 
@@ -36,7 +35,6 @@ LINK_LIBRARIES(gdsl gmp rt termcap)
 
 ADD_LIBRARY(${PROJECT_NAME}-common STATIC ${SOURCES})
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${SEQ_SOURCES})
-ADD_LIBRARY(${PROJECT_NAME}-ac STATIC ${AC_SOURCES})
 
 
 if (SCC)
