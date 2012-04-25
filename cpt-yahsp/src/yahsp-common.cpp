@@ -45,33 +45,76 @@ VECTOR(Action *, applicable);
 #define get_finit(f) finit[(f)->id]
 #define set_finit(f, t) finit[(f)->id] = t
 
+bool yahsp_optimize_cost;
+bool yahsp_optimize_makespan;
+static bool yahsp_optimize_aggreg_max;
+static ulong yahsp_optimize_weight = 3;
 
-#ifdef DAE
+#define COST(a) ({							\
+      TimeVal cost = 0;							\
+      if (yahsp_optimize_aggreg_max)						\
+	FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR;		\
+      else								\
+	FOR(f, a->prec) {						\
+	  if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; }	\
+	  else cost += get_finit(f);					\
+	} EFOR;								\
+      cost; })
 
-#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
-//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
-//#define INCCOST(cost, action) (cost += ceil(duration(action) * (double) pddl_domain->time_gcd / pddl_domain->time_lcm) + (pddl_domain->action_costs ? 1 : 0))
-#define INCCOST(cost, action) (cost += duration(action) + 1)
-#define NODE_GVALUE(node) node->length
+#define INCCOST(cost, action)						\
+  (cost += (yahsp_optimize_cost ? action->cost : yahsp_optimize_makespan ? duration(action) : 0) + 1)
+
+
+#define NODE_GVALUE(node) \
+  (yahsp_optimize_cost ? node->cost : \
+   yahsp_optimize_makespan ? node->makespan : \
+   node->length)
 #define NODE_HVALUE(node) get_ainit(end_action)
-//#define NODE_HVALUE(node) relaxed_plan_nb
-#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node))
-//#define NODE_FVALUE(node) (NODE_HVALUE(node))
+#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * yahsp_optimize_weight)
 
-#else
+void yahsp_set_optimize_length()
+{
+  yahsp_optimize_cost = false;
+  yahsp_optimize_makespan = false;
+  yahsp_optimize_aggreg_max = false;
+}
 
-#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { if (get_finit(f) == MAXTIME) { cost = MAXTIME; break; } else cost += get_finit(f); } EFOR; cost; })
-//#define COST(a) ({ TimeVal cost = 0; FOR(f, a->prec) { maximize(cost, get_finit(f)); } EFOR; cost; })
-//#define INCCOST(cost, action) (cost += duration(action) * pddl_domain->time_gcd / pddl_domain->time_lcm + 1)
-#define INCCOST(cost, action) (cost++)
-#define NODE_GVALUE(node) node->length
-#define NODE_HVALUE(node) get_ainit(end_action)
-//#define NODE_HVALUE(node) relaxed_plan_nb
-#define NODE_FVALUE(node) (NODE_GVALUE(node) + NODE_HVALUE(node) * 3)
-//#define NODE_FVALUE(node) (NODE_HVALUE(node))
+void yahsp_set_optimize_cost()
+{
+  if (pddl_domain->durative_actions && pddl_domain->action_costs) {
+    yahsp_optimize_cost = true;
+    yahsp_optimize_makespan = false;
+  } else {
+    yahsp_optimize_cost = false;
+    yahsp_optimize_makespan = true;
+  }
+  yahsp_optimize_aggreg_max = false;
+}
 
-#endif
+void yahsp_set_optimize_makespan_max()
+{
+  yahsp_optimize_cost = false;
+  yahsp_optimize_makespan = true;
+  yahsp_optimize_aggreg_max = true;
+}
 
+void yahsp_set_optimize_makespan_add()
+{
+  yahsp_optimize_cost = false;
+  yahsp_optimize_makespan = true;
+  yahsp_optimize_aggreg_max = false;
+}
+
+void yahsp_set_weight(long weight)
+{
+  yahsp_optimize_weight = weight;
+}
+
+void yahsp_set_seed(long seed)
+{
+  opt.random = true;
+  cpt_srand(seed);
+}
 
 void alloc_eval_structures()
 {
@@ -117,6 +160,7 @@ Node *node_derive(Node *node)
   son->parent = node;
   son->length = node->length;
   son->makespan = node->makespan;
+  son->cost = node->cost;
 #ifdef YAHSP_MPI
   son->rank = mpi_get_rank();
   //son->fvalue = node->fvalue - node->steps_nb;
@@ -149,9 +193,10 @@ static inline Comparison is_best_action_rp(Action *prod, Action *best)
 {
   PREFER(prod->id > 1, best->id <= 1);
   LESS(get_ainit(prod), get_ainit(best));
-#ifdef DAE
-  LESS(duration(prod), duration(best));
-#endif
+  if (yahsp_optimize_makespan)
+    LESS(duration(prod), duration(best));
+  else if (yahsp_optimize_cost)
+    LESS(prod->cost, best->cost);
   return Equal;
 }
 
@@ -466,6 +511,7 @@ bool node_apply_action(Node *node, Action *a)
   node->steps[node->steps_nb].init = init;
   node->steps_nb++;
   node->length++;
+  node->cost += a->cost;
   if (pddl_domain->activity_constraints && !node_action_schedule(node)) { 
     FOR(f, a->add) { state_del(node->state, f); } EFOR;
     FOR(f, a->del) { state_add(node->state, f); } EFOR;

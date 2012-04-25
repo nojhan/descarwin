@@ -27,12 +27,16 @@ struct Node {
   ulong fvalue;
   ulong length;
   TimeVal makespan;
+  TimeVal cost;
   VECTOR(YStep, steps);
   VECTOR(Action *, applicable);
 #ifdef YAHSP_MPI
   int rank;
 #endif
 };
+
+extern bool yahsp_optimize_cost;
+extern bool yahsp_optimize_makespan;
 
 #ifdef YAHSP_MT
 #define DO_PRAGMA(x) _Pragma(#x)
@@ -58,6 +62,13 @@ struct Node {
 #define state_contains(s, f) bitarray_get(s, f)
 #define state_add(s, f) bitarray_set(s, f)
 #define state_del(s, f) bitarray_unset(s, f)
+
+extern void yahsp_set_optimize_length();
+extern void yahsp_set_optimize_cost();
+extern void yahsp_set_optimize_makespan_max();
+extern void yahsp_set_optimize_makespan_add();
+extern void yahsp_set_weight(long weight);
+extern void yahsp_set_seed(long seed);
 
 
 extern void yahsp_init();

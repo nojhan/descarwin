@@ -83,6 +83,9 @@ static ulong node_limits_nb = 1;
 static struct { int nb_threads; ulong max_nodes; } node_limits[] = { {64, ULONG_MAX} };
 static ulong node_limits_nb = 1;
 #endif
+#else
+static struct { int nb_threads; ulong max_nodes; } node_limits[] = { {64, ULONG_MAX} };
+static ulong node_limits_nb = 1;
 #endif
 
 static Comparison open_list_cmp(Node *node1, Node *node2)

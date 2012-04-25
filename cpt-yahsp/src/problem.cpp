@@ -139,6 +139,9 @@ void print_complete_action(Action *a)
   print_time(cptout, a->init);
   cpt_trace(normal, "\n  DURATION -> ");
   print_time(cptout, duration(a));
+  if (pddl_domain->durative_actions && pddl_domain->action_costs) {
+    cpt_trace(normal, "\n  COST -> %" TIMEP "", a->cost);
+  }
   if (opt.pddl21 && a->ope->real_duration) {
     cpt_trace(normal, "\n  RDURATION -> ");
     print_time(cptout, a->rdur.t);

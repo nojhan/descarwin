@@ -346,9 +346,8 @@ static void instantiate_operator(PDDLDomain *domain, PDDLOperator *ope, PDDLTerm
     }
     if (domain->action_costs && action->resources) {
       if (val_known(action->resources[0]->increased)) {
-	if (domain->durative_actions)
-	  action->cost = action->resources[0]->increased;
-	else
+	action->cost = action->resources[0]->increased;
+	if (!domain->durative_actions)
 	  mpq_set_si(dur_tmp, action->resources[0]->increased, 1);
       }
       cpt_free(action->resources[0]);
