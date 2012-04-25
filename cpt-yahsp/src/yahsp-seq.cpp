@@ -135,7 +135,7 @@ void yahsp_init()
   current_state = state_create();
   FOR(f, init_state) { state_add(initial_bitstate, f); } EFOR;
   yahsp_reset();
-  cpt_srand(seed);
+  cpt_srand(opt.seed);
   //yahsp_set_optimize_makespan_max();
 }
 
