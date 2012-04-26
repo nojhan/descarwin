@@ -53,7 +53,10 @@ public:
     // JACK effectue le tirage des dates _avec remise_, il essaye au plus 11*size fois de tirer d'autres dates que celles déjà choisies 
     // tire des dates au hasard dans la chrono partition
     // tirage _sans remise_
-    for( unsigned int i = 0; i < decompo_nb; ++i ) {
+
+   size_t i= 0;
+    
+   while ( i < decompo_nb && _times_tmp.size()>0) {
 
         // supprime une date au hasard, car on ne veut pas la tirer plusieurs fois
         // et garde sa valeur dans t
@@ -63,6 +66,8 @@ public:
         t_candidates.push_back(*it); 
 
         _times_tmp.erase( it );
+
+	i++;
     }
 
     // trie le vecteur
