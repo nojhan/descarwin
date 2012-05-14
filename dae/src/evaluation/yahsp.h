@@ -356,7 +356,7 @@ protected:
 
 
 //! Classe à utiliser lors de la première itération, pour estimer b_max
-template<class EOT>
+template<class EOT=daex::Decomposition>
 class daeYahspEvalInit : public daeYahspEval<EOT>
 {
 public:
