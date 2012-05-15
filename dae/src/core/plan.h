@@ -13,6 +13,11 @@
 #include <src/yahsp.h>
 //}
 
+#ifdef WITH_MPI
+#include <boost/mpi.hpp>
+#include <boost/serialization/string.hpp>
+namespace mpi = boost::mpi;
+#endif // WITH_MPI
 
 namespace daex
 {
@@ -39,6 +44,21 @@ protected:
     std::string _plan_rep;
 
 public:
+
+#ifdef WITH_MPI
+	friend class boost::serialization::access;
+
+	template <class Archive>
+	void serialize( Archive & ar, const unsigned int version )
+	{
+		ar 	& _makespan 
+			& _cost_add 
+			& _cost_max 
+			& _search_steps 
+			& _is_valid 
+			& _plan_rep;
+	}
+#endif // WITH_MPI
 
     //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
     

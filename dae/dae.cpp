@@ -65,6 +65,7 @@ int main ( int argc, char* argv[] )
     make_parallel(parser);
     
     eoState state;
+
     
     // log some EO parameters
     eo::log << eo::logging << "Parameters:" << std::endl;
@@ -126,6 +127,7 @@ int main ( int argc, char* argv[] )
 
     make_help( parser );
 
+    // TODO TODOB Ici s'arrête le parsing, donc ce que fait le master.
 
     /***********
      * PARSING *
