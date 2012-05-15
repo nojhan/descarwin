@@ -20,8 +20,8 @@ IF(OPENMP_FOUND)
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 ENDIF()
 
-IF(WITH_MPI STREQUAL "yes")
-	MESSAGE("-- Compilation with MPI.")
+IF(DAE_WITH_MPI)
+	MESSAGE("[DAE] Compilation with MPI.")
 
 	# for conditional compilation in code
 	LINK_DIRECTORIES(${BOOST_LIB_DIR})
@@ -68,37 +68,50 @@ LINK_LIBRARIES(eoutils gmp eo rt gcov gdsl termcap)
 
 ADD_EXECUTABLE(dae dae.cpp)
 ADD_DEPENDENCIES(dae daex)
-TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+# TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp
+# cpt_yahsp_library-dae) # TODO check if correct
+TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common cpt_yahsp_library-dae)
 
-ADD_EXECUTABLE(dae-sm dae.cpp)
-ADD_DEPENDENCIES(dae-sm daex)
-TARGET_LINK_LIBRARIES(dae-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae-sm)
+# only if OpenMP on yahsp is activated
+IF (CPT_WITH_MP)
+    ADD_EXECUTABLE(dae-sm dae.cpp)
+    ADD_DEPENDENCIES(dae-sm daex)
+    TARGET_LINK_LIBRARIES(dae-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae-sm)
 
-ADD_EXECUTABLE(dae-mt dae.cpp)
-ADD_DEPENDENCIES(dae-mt daex-yahsp-mt)
-TARGET_LINK_LIBRARIES(dae-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
-SET_TARGET_PROPERTIES(
-  dae-mt
-  PROPERTIES 
-  COMPILE_FLAGS "-DYAHSP_MT"
-  )
+    ADD_EXECUTABLE(dae-mt dae.cpp)
+    ADD_DEPENDENCIES(dae-mt daex-yahsp-mt)
+    TARGET_LINK_LIBRARIES(dae-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
+    SET_TARGET_PROPERTIES(
+    dae-mt
+    PROPERTIES 
+    COMPILE_FLAGS "-DYAHSP_MT"
+    )
+ENDIF()
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
     ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
     ADD_DEPENDENCIES(test_chronopartition daex)
-    TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    # TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+    # TODO check if correct
 
     ADD_EXECUTABLE(test_b_max test_b_max.cpp)
     ADD_DEPENDENCIES(test_b_max daex)
-    TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    # TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+    # TODO check if correct
 
     ADD_EXECUTABLE(test_stats test_stats.cpp)
     ADD_DEPENDENCIES(test_stats daex)
-    TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    # TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+    # TODO check if correct
 
     ADD_EXECUTABLE(featureselector featureselector.cpp)
     ADD_DEPENDENCIES(featureselector daex)
-    TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    # TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+    # TODO check if correct
 ENDIF()
 
 # process to sources

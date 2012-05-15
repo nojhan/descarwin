@@ -31,11 +31,11 @@ SET(MT_SOURCES yahsp-common.cpp yahsp-mt.cpp)
 SET(MPI_SOURCES yahsp-mpi.cpp)
 SET(DAE_SOURCES yahsp-dae.cpp)
 
-LINK_LIBRARIES(gdsl gmp rt ncurses)
+LINK_LIBRARIES(gdsl gmp rt ncurses) # TODO check if all the libraries are mandatory in all cases
 
 ADD_LIBRARY(${PROJECT_NAME}-common STATIC ${SOURCES})
 ADD_LIBRARY(${PROJECT_NAME} STATIC ${SEQ_SOURCES})
-
+ADD_LIBRARY(${PROJECT_NAME}-dae STATIC ${SEQ_SOURCES} ${DAE_SOURCES})
 
 if (SCC)
 
@@ -94,7 +94,6 @@ if (OPENMP_FOUND)
     )
 
   ADD_LIBRARY(${PROJECT_NAME}-common-dae-omp STATIC ${SOURCES})
-  ADD_LIBRARY(${PROJECT_NAME}-dae STATIC ${SEQ_SOURCES} ${DAE_SOURCES})
   ADD_LIBRARY(${PROJECT_NAME}-dae-sm STATIC ${SEQ_SOURCES} ${DAE_SOURCES})
   ADD_LIBRARY(${PROJECT_NAME}-dae-mt STATIC ${SOURCES} ${MT_SOURCES} ${DAE_SOURCES})
 

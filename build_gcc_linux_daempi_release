@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+mkdir -p release
+cd release
+cmake -DDAE_WITH_MPI=yes ..
+make
+cd ..

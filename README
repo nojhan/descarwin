@@ -13,6 +13,8 @@ COMMON STEPS
 
 1) EO:
  * edit the file $ROOT/install.cmake and define the variable EO_DIR
+ * ensure to compile yourself openmpi statically and define the variable MPI_DIR
+ * ensure to compile yourself boost::mpi statically and define the variables BOOST_*
 
 2) use one of the scripts available to build the project (cf. build_gcc_linux_*)
 
@@ -22,3 +24,13 @@ COMMON STEPS
  * dae binaries are available in the directory dae,
  * cpt-yahsp binaries in cpt-yahsp directory,
  * all the libraries are in lib directory.
+
+ ---------------------------
+ AVAILABLE OPTIONS FOR CMAKE
+ ---------------------------
+
+You can launch cmake with these options in order to customize your version of dae :
+"-DCMAKE_BUILD_TYPE=Debug" : compilation in debug mode. Without this option, release mode is default.
+"-DDAE_WITH_MPI=yes" : compilation with OpenMPI and Boost::MPI to ensure dae parallelization.
+"-DCPT_WITH_MP=yes" : compilation of cpt-yahsp with OpenMP (shared memory solution for parallelization).
+"-DCPT_WITH_MPI=yes" : comilation of cpt-yahsp with OpenMPI (messsage passage interface for parallelization).
