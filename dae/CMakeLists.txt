@@ -20,6 +20,21 @@ IF(OPENMP_FOUND)
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 ENDIF()
 
+IF(WITH_MPI STREQUAL "yes")
+	MESSAGE("-- Compilation with MPI.")
+
+	# for conditional compilation in code
+	LINK_DIRECTORIES(${BOOST_LIB_DIR})
+    LINK_DIRECTORIES(${MPI_DIR}/lib)
+
+	INCLUDE_DIRECTORIES(${BOOST_INC_DIR})
+    INCLUDE_DIRECTORIES(${MPI_DIR}/include)
+
+	SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
+
+	ADD_DEFINITIONS(-DWITH_MPI)
+ENDIF()
+
 # include the sources
 INCLUDE_DIRECTORIES(
   ${EO_SRC_DIR}
