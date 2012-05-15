@@ -197,11 +197,11 @@ expression { $$ = token_add_head(NULL, NULL, $1); }
 void parser_read_pddl_file(PDDLDomain *domain, char *file, int pipefd)
 {
   if (file != NULL) {
-    if ((pddl_in = fopen("bzcat", "r")) == NULL) error(no_file, "Command 'bzcat' not found");
+    if ((pddl_in = fopen("/bin/bzcat", "r")) == NULL) error(no_file, "Command 'bzcat' not found");
     fclose(pddl_in);
     if ((pddl_in = fopen(file, "r")) == NULL) error(no_file, "File '%s' cannot be opened", file);
     fclose(pddl_in);
-    char bzcat[] = "bzcat -qf %s 2>/dev/null";
+    char bzcat[] = "/bin/bzcat -qf %s 2>/dev/null";
     char cmd[strlen(bzcat) + strlen(file)];
     sprintf(cmd, bzcat, file);
     pddl_in = popen(cmd, "r");

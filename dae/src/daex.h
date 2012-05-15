@@ -3,7 +3,6 @@
 #define __DAEX_H__
 
 #include "core/atom.h"
-#include "undef_yahsp.h"
 
 #include "utils/pddl_load.h"
 #include "utils/pddl.h"

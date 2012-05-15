@@ -1,7 +1,0 @@
-release
-debug
-lib
-cmake_install.cmake
-install.cmake
-Makefile
-CMakeFiles

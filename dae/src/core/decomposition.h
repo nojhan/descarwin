@@ -16,13 +16,6 @@
 #include <src/globs.h>
 #include <src/yahsp.h>
 
-#ifdef WITH_MPI
-#include <boost/mpi.hpp>
-#include <boost/serialization/list.hpp>
-#include <boost/serialization/vector.hpp>
-namespace mpi = boost::mpi;
-#endif // WITH_MPI
-
 namespace daex
 {
 
@@ -31,6 +24,8 @@ class Decomposition : public std::list<Goal>  ,  public EO< eoMinimizingFitness 
 {
 public:
 
+   
+
     //! At instanciation, a decomposition does not have any plan
     /*!
      * Note: and is not feasible, @see eoDualFitness
@@ -38,6 +33,7 @@ public:
      Decomposition() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}  
 
      virtual ~Decomposition(){}
+    
     
     Decomposition & operator=(const Decomposition & other){
        if (this != &other) {
@@ -52,25 +48,6 @@ public:
         return *this;
     }
     
-#ifdef WITH_MPI
-	friend class boost::serialization::access;
-
-	template <class Archive>
-	void serialize( Archive & ar, const unsigned int version )
-	{
-		// First, serializes parent part
-		ar & boost::serialization::base_object< std::list< Goal > >( *this );
-		// then specific members
-		ar 	& _plan_global
-			& _plans_sub
-			& _b_max
-			& _k
-			& _u
-			& _B
-			& _is_feasible;
-	}
-#endif // WITH_MPI
-
      //! After a modification of the decomposition, it needs to be re-evaluated
     //! Variation operator should use this method to indicate it
     virtual void invalidate();
