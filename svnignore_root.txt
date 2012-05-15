@@ -1,0 +1,7 @@
+release
+debug
+lib
+install.cmake
+cmake_install.cmake
+Makefile
+CMakeFiles
