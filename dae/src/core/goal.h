@@ -7,6 +7,10 @@
 
 #include <eo>
 
+#ifdef WITH_MPI
+#include <boost/serialization/list.hpp>
+#endif // WITH_MPI
+
 #include "atom.h"
 
 namespace daex {
@@ -28,6 +32,23 @@ public:
     {
       _earliest_start_time = d;
     }
+
+#ifdef WITH_MPI
+    // Mandatory for boost serialisation
+	friend class boost::serialization::access;
+
+    /**
+     * Serializes the goal into a boost archive (useful for boost::mpi)
+     */
+	template <class Archive>
+	void serialize( Archive & ar, const unsigned int version )
+	{
+		// First, serializes parent part
+		ar & boost::serialization::base_object< std::list< Atom* > >( *this );
+		// then specific members
+		ar & _earliest_start_time;
+	}
+#endif // WITH_MPI
 
     friend std::ostream& operator<<( std::ostream & out, const Goal & goal )
     {
@@ -51,7 +72,7 @@ public:
     out << ")";
 
     return out;
-};
+	};
 
     Goal::iterator iter_at( unsigned int i );
 
