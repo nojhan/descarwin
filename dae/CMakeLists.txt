@@ -89,6 +89,14 @@ IF (CPT_WITH_MP)
 ENDIF()
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
+    ADD_EXECUTABLE(test_boost_serial tests/test_boost_serial.cpp)
+    ADD_DEPENDENCIES(test_boost_serial daex)
+    TARGET_LINK_LIBRARIES(test_boost_serial daex cpt_yahsp_library-common
+        cpt_yahsp_library-dae boost_serialization)
+
+    # TODO TODOB vérifier que toutes les librairies indiquées sont nécessaires
+    # pour chacun des exécutables.
+
     ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
     ADD_DEPENDENCIES(test_chronopartition daex)
     # TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
