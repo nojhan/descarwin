@@ -79,6 +79,10 @@ void Decomposition::printOn( std::ostream & os ) const
     os << " }" << std::endl;
 }
 
+void Decomposition::readFrom( std::istream & is )
+{
+
+}
 
 Decomposition::iterator Decomposition::iter_at( unsigned int i )
 {

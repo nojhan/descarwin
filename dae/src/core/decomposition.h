@@ -1,4 +1,3 @@
-
 #ifndef __DECOMPOSITION_H__
 #define __DECOMPOSITION_H__
 
@@ -10,22 +9,24 @@
 
 #include <eo>
 
- 
 #include "goal.h"
 #include "plan.h"
 #include <src/globs.h>
 #include <src/yahsp.h>
 
+#include "utils/json/Json.h"
+
 #ifdef WITH_MPI
-#include <boost/serialization/list.hpp>
-#include <boost/serialization/vector.hpp>
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/split_member.hpp>
 #endif // WITH_MPI
 
 namespace daex
 {
 
 //! A decomposition is a list of Goal objects, and we are trying to minimize a scalar fitness (e.g. time or number of actions)
-class Decomposition : public std::list<Goal>  ,  public EO< eoMinimizingFitness >
+class Decomposition : public std::list<Goal>  ,  public EO< eoMinimizingFitness >, public json::Serializable
 {
 public:
 
@@ -57,20 +58,23 @@ public:
     /**
      * Serializes the decomposition in a boost archive (useful for boost::mpi)
      */
-	template <class Archive>
-	void serialize( Archive & ar, const unsigned int version )
+    template <class Archive>
+	void save( Archive & ar, const unsigned int version ) const
 	{
-		// First, serializes parent part
-		ar & boost::serialization::base_object< std::list< Goal > >( *this );
-		// then specific members
-		ar 	& _plan_global
-			& _plans_sub
-			& _b_max
-			& _k
-			& _u
-			& _B
-			& _is_feasible;
+        
+        (void) version; // avoid compilation warning
 	}
+
+    template <class Archive>
+    void load( Archive & ar, const unsigned int version )
+    {
+		
+        (void) version; // avoid compilation warning
+    }
+    
+    // Indicates that save and load operations are not the same.
+    BOOST_SERIALIZATION_SPLIT_MEMBER()
+
 #endif // WITH_MPI
 
      //! After a modification of the decomposition, it needs to be re-evaluated
@@ -86,7 +90,6 @@ public:
     {
         return _plan_global;
     }
-    
 
     daex::Plan & subplan(unsigned int i) 
     {
@@ -102,9 +105,6 @@ public:
     {
         return *(_plans_sub.end() - 1 );
     }
-    
-    
-    
 
     unsigned int subplans_size() const
     {
@@ -155,7 +155,7 @@ public:
 
     virtual void printOn( std::ostream & out ) const;
     
-    virtual void readFrom(std::istream & _is) {/*FIXME : à implémenter*/};
+    virtual void readFrom(std::istream & _is) ;
 
 
     Decomposition::iterator iter_at( unsigned int i );
@@ -204,9 +204,87 @@ protected:
 
     //! compteur des tentatives de recherche
     unsigned int _B;
-    
-    
 
+public:
+    json::Object* toJson(void)
+    {
+        json::Object* json = new json::Object;
+
+        // list<Goal>
+        json::Array* listGoal = new json::Array;
+        for ( std::list<Goal>::iterator it = this->begin(),
+                end = this->end();
+              it != end;
+              ++it)
+        {
+            listGoal->push_back( it->toJson() );
+        }
+        json->addPair( "goals", listGoal );
+
+        // eoFitness
+        bool invalidFitness = EO< eoMinimizingFitness >::invalid();
+        eoMinimizingFitness fitness = EO< eoMinimizingFitness >::fitness();
+        float fitnessValue = fitness; // implicit operator cast
+        json->addPair( "invalidFitness", json::String::make(invalidFitness) );
+        json->addPair( "fitnessValue", json::String::make(fitnessValue) );
+
+        // specific members
+        json->addPair( "plan_global", &_plan_global );
+        // subplans
+        json::Array* subplans = new json::Array;
+        for ( std::vector< daex::Plan >::iterator it = _plans_sub.begin(),
+                end = _plans_sub.end();
+              it != end;
+              ++it)
+        {
+            subplans->push_back( it->toJson() );
+        }
+        json->addPair( "subplans", subplans );
+        json->addPair( "b_max", json::String::make(_b_max) );
+        json->addPair( "goal_count", json::String::make(_k) );
+        json->addPair( "useful_goals", json::String::make(_u) );
+        json->addPair( "attempts", json::String::make(_B) );
+
+        return json;
+    }
+
+    void fromJson( json::Object* json )
+    {
+        // list<Goal>
+        json::Array* listGoal = json->getArray( "goals" );
+        for(unsigned int i = 0, size = listGoal->size();
+                i < size;
+                ++i)
+        {
+            this->push_back( listGoal->getObject< Goal >( i ) );
+        }
+
+        // EO fitness
+        bool invalidFitness = json->get<bool>( "invalidFitness" );
+        if (invalidFitness) 
+        {
+            EO< eoMinimizingFitness >::invalidate();
+        }
+        eoMinimizingFitness fitness;
+        float fitnessValue = json->get<float>( "fitnessValue" );
+        fitness = fitnessValue;
+        EO< eoMinimizingFitness >::fitness( fitness );
+
+        // specific members
+        _plan_global = json->getObject< daex::Plan >( "plan_global" );
+        // _plans_sub
+        json::Array* subplans = json->getArray( "subplans" );
+        for (unsigned int i = 0, size = subplans->size();
+                i < size;
+                ++i)
+        {
+            _plans_sub.push_back( subplans->getObject< daex::Plan >( i ) );
+        }
+        _b_max = json->get<unsigned int>( "b_max" );
+        _k = json->get<unsigned int>( "goal_count" );
+        _u = json->get<unsigned int>( "useful_goals" );
+        _B = json->get<unsigned int>( "attempts" );
+    }
 }; // class Decomposition
 
 //! Print a decomposition in a simple format

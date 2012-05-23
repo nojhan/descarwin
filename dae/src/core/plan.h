@@ -13,14 +13,17 @@
 #include <src/yahsp.h>
 //}
 
+#include "utils/json/Json.h"
+
 #ifdef WITH_MPI
+#include <boost/serialization/access.hpp>
 #include <boost/serialization/string.hpp>
 #endif // WITH_MPI
 
 namespace daex
 {
 
-class Plan
+class Plan : public json::Serializable
 {
 protected:
 
@@ -53,12 +56,8 @@ public:
 	template <class Archive>
 	void serialize( Archive & ar, const unsigned int version )
 	{
-		ar 	& _makespan 
-			& _cost_add 
-			& _cost_max 
-			& _search_steps 
-			& _is_valid 
-			& _plan_rep;
+
+        (void) version; // avoid compilation warning
 	}
 #endif // WITH_MPI
 
@@ -142,14 +141,35 @@ public:
     friend std::ostream& operator<<( std::ostream& out, const daex::Plan & plan ) 
     {
         out << plan._plan_rep;
-	return out;
+        return out;
     }
 
-      std::string & plan_rep(){
+    std::string & plan_rep()
+    {
+        return _plan_rep ;
+    }
 
-		return _plan_rep ;
-	}
+    json::Object* toJson(void)
+    {
+        json::Object* json = new json::Object;
+        json->addPair( "makespan", json::String::make(_makespan) );
+        json->addPair( "cost_add", json::String::make(_cost_add) );
+        json->addPair( "cost_max", json::String::make(_cost_max) );
+        json->addPair( "search_steps", json::String::make(_search_steps) );
+        json->addPair( "is_valid", json::String::make(_is_valid) );
+        json->addPair( "plan_rep", json::String::make(_plan_rep) );
+        return json;
+    }
 
+    void fromJson( json::Object* json )
+    {
+        _makespan = json->get< TimeVal >( "makespan" );
+        _cost_add = json->get< TimeVal >( "cost_add" );
+        _cost_max = json->get< TimeVal >( "cost_max" );
+        _search_steps = json->get< unsigned int >( "search_steps" );
+        _is_valid = json->get< bool >( "is_valid" );
+        _plan_rep = json->get< std::string >( "plan_rep" );
+    }
 };
 
 } // namespace daex
