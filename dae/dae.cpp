@@ -253,8 +253,8 @@ int main ( int argc, char* argv[] )
     );
 
     // SELECTION AND VARIATION
-    daex::MutationDelGoal<daex::Decomposition> delgoal;
-    eoGeneralBreeder<daex::Decomposition> & breed = daex::do_make_variation_op<daex::Decomposition>( parser, state, pddl, &delgoal );
+    daex::MutationDelGoal<daex::Decomposition>* delgoal = new daex::MutationDelGoal<daex::Decomposition>;
+    eoGeneralBreeder<daex::Decomposition> & breed = daex::do_make_variation_op<daex::Decomposition>( parser, state, pddl, delgoal );
 
     // REPLACEMENT
     eoReplacement<daex::Decomposition> & replacor = daex::do_make_replace_op<daex::Decomposition>( parser, state );
