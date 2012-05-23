@@ -17,7 +17,7 @@ std::ostream& Object::print( std::ostream& out )
         {
             first = false;
         } else {
-            out << ",\n";
+            out << ", ";
         }
 
         out << '"' << it->first << "\":";   // key

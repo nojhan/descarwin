@@ -5,7 +5,7 @@ namespace json
 
 std::ostream& Array::print( std::ostream& out )
 {
-    out << '[';
+    out << "[\n";
     bool first = true;
     for (ArrayChildren::iterator it = children.begin(),
             end = children.end();
@@ -16,7 +16,7 @@ std::ostream& Array::print( std::ostream& out )
         {
             first = false;
         } else {
-            out << ',';
+            out << ",\n";
         }
         (*it)->print( out );
     }

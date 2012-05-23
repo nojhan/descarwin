@@ -38,12 +38,33 @@ static std::string parseString(const std::string& str, size_t & pos)
     std::string value;
     size_t firstQuote = str.find( '"', pos );
     size_t secondQuote;
-    // instead of just seeking the second quote, we need to ensure
+
+    /* instead of just seeking the second quote, we need to ensure
     // that there is no escaped quote before this one.
+    // actually this is harder than that. Using backslashes
+    // to escape double quotes mean that backslashes have to be
+    // escaped to.
+    // example : "text\\" to symbolize : text\
+    // example : "text\\\" to symbolize : text\"
+    // In fact, we should find if number of backslashes is odd; in this case,
+    // the double quotes are escaped and we should find the next one.
+    */
+    int backslashesCount;
     do {
         ++pos;
         secondQuote = str.find( '"', pos );
-    } while( str[ secondQuote - 1 ] == '\\' );
+        size_t i = secondQuote - 1;
+
+        // Find the backslashes
+        backslashesCount = 0;
+        while ( str[ i ] == '\\' )
+        {
+            --i;
+            ++backslashesCount;
+        }
+        pos = secondQuote;
+    } while( backslashesCount % 2 == 1 );
+
     value = str.substr( firstQuote+1, secondQuote-firstQuote-1 );
     pos = secondQuote + 1;
     return value;
