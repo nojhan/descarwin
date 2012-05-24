@@ -17,7 +17,7 @@ namespace JsonUtils
         return ret;
     }
 
-        template<typename T>
+    template<typename T>
     inline T get ( const json::Entity* json )
     {
         std::stringstream ss;
@@ -25,6 +25,12 @@ namespace JsonUtils
         T ret;
         ss >> ret;
         return ret;
+    }
+
+    template<>
+    inline std::string get ( const json::Entity* json )
+    {
+        return static_cast<const json::String*>( json )->content();
     }
 
     inline const json::Array* getArray( const json::Entity* json )

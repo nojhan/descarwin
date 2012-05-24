@@ -18,11 +18,12 @@ void printOn(const json::Serializable* obj, std::ostream& out)
 void readFrom(json::Serializable* obj, std::istream& _is)
 {
     std::string str;
+    char temp[1024]; // FIXME taille max de buffer
     while( _is )
     {
-        std::string temp;
-        _is >> temp;
+        _is.getline( temp, 1024, '\n' );
         str += temp;
+        str += '\n';
     }
     obj->fromJson( json::Parser::parse( str ) );
 }

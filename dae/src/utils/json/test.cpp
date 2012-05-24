@@ -37,21 +37,23 @@ int main (int argc, char **argv)
     
     /*
     string toParse;
+    char temp[1024];
     while (cin)
     {
-        string temp;
-        cin >> temp;
+        cin.getline( temp, 1024, '\n' );
         toParse += temp;
+        toParse += '\n';
     }
     cout << Parser::parse( toParse ) << endl;
     */
 
-    // /*
+    ///*
 
     MyObject o;
     o.integer = 1337;
     o.boolean = false;
-    o.str = "KTHXBYE";
+    o.str = "KTHXBYE \
+             What if you add spaces and new lines ? I guess they are deleted :)";
     
     o.array.push_back(1);
     o.array.push_back(9);
@@ -99,14 +101,13 @@ int main (int argc, char **argv)
     // anotherO.str = JsonUtils::get<std::string>( (*parsed)["str"] );
     // anotherO.sub = JsonUtils::getObject<MySubObj>( (*parsed)["sub"] );
 
-    /*
     // The line 112 is equivalent to the commented following lines
-    const Array* array = parsed->getArray( "array" );
-    for (unsigned int i = 0; i < array->size(); ++i)
-    {
-        anotherO.array.push_back( array->get<int>(i) );
-    }
-    */
+    //const Array* array = parsed->getArray( "array" );
+    //for (unsigned int i = 0; i < array->size(); ++i)
+    //{
+    //    anotherO.array.push_back( array->get<int>(i) );
+    //}
+
     vector<int>* parray = 
     parsed->getCompletedArray<int, vector, JsonUtils::GetAlgorithm >( "array" );
     anotherO.array = *parray;
@@ -122,7 +123,7 @@ int main (int argc, char **argv)
 
     delete parsed;
 
-    // */
+    //*/
     return 0;
 }
 
