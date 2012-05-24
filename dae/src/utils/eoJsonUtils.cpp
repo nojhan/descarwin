@@ -25,7 +25,9 @@ void readFrom(json::Serializable* obj, std::istream& _is)
         str += temp;
         str += '\n';
     }
-    obj->fromJson( json::Parser::parse( str ) );
+    json::Object* read = json::Parser::parse( str );
+    obj->fromJson( read );
+    delete read;
 }
 
 } // namespace json

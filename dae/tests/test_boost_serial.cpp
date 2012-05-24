@@ -1,7 +1,8 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 
-#include <sys/time.h>
+//#include <sys/time.h>
+#include <ctime>
 #include <sys/resource.h>
 
 #include <iostream>
@@ -268,14 +269,19 @@ int main ( int argc, char* argv[] )
     // Shows decomposition found in cout.
     best.printOn( std::cout );
 
+
     std::ofstream ofile("decomposition.dump.eo");
     boost::archive::text_oarchive oa(ofile);
+    clock_t before_writing = std::clock();
     oa << best;
+    clock_t after_writing = std::clock();
     ofile.close();
 
     std::ifstream ifile("decomposition.dump.eo");
     boost::archive::text_iarchive oi(ifile);
+    clock_t before_reading = std::clock();
     oi >> read;
+    clock_t after_reading = std::clock();
     ifile.close();
 
     // Shows decomposition read in cout.
@@ -284,7 +290,11 @@ int main ( int argc, char* argv[] )
     oa2 << read;
     ofile2.close();
 
+    std::cout << std::endl;
     read.printOn( std::cout );
+
+    std::cout   << "\n\nTime for writing : " << before_writing << std::endl
+                << "Time for reading : " << before_reading << std::endl;
     // */
     
     std::cout << "\n\nEnd of main, test is finished.\n" << std::endl;
