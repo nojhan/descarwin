@@ -21,6 +21,7 @@
 
 #include "utils/pddl.h"
 #include "utils/json/Json.h"
+#include "utils/eoJsonUtils.h"
 
 #ifdef WITH_MPI
 
@@ -83,17 +84,15 @@ public:
 
     void printOn(std::ostream& out) const
     {
-        out << "(Atom[" << _earliest_start_time << "]: " << _fluentIndex << ")";
-        out.flush();
-        // return out;
+        json::printOn( this, out );
     }
 
     void readFrom(std::istream& _is)
     {
-
+        json::readFrom( this, _is );
     }
 
-    json::Object* toJson()
+    json::Object* toJson() const
     {
         json::Object* obj = new json::Object;
         obj->addPair( "start_time", json::String::make(_earliest_start_time) );
@@ -101,7 +100,7 @@ public:
         return obj;
     }
 
-    void fromJson( json::Object* json )
+    void fromJson( const json::Object* json )
     {
         _earliest_start_time = json->get<TimeVal>( "start_time" );
         _fluentIndex = json->get<unsigned int>( "fluent_index" );

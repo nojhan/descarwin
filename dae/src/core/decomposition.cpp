@@ -4,6 +4,8 @@
 #include "decomposition.h"
 #include "goal.h"
 
+#include "utils/eoJsonUtils.h"
+
 namespace daex
 {
 
@@ -55,33 +57,12 @@ void Decomposition::plans_sub_reset()
 
 void Decomposition::printOn( std::ostream & os ) const
 {
-    Plan plan = this->plan_copy();
-
-    // JSON formating
-    os << "{ "; 
-    os << "\"makespan\":\"" << plan.makespan() << "\", ";
-    os << "\"fitness\":\"";
-        EO< eoMinimizingFitness >::printOn(os);
-        os << "\",";
-    os << "\"is_feasible\":\"" << this->is_feasible() << "\", ";
-    os << "\"b_max\":\"" << this->b_max() << "\", ";
-    os << "\"expanded_nodes\":\"" << plan.search_steps() << "\", ";
-    os << "\"decomposition_size\":\"" << this->size() << "\", ";
-    os << "\"last_reached\":\"" << this->last_reached() << "\", ";
-    os << "\"useful_goals\":\"" << this->get_number_useful_goals() << "\", ";
-    os << std::endl;
-    os << "\"plan\":\"" << plan << "\", ";
-    os << std::endl;
-    os << "\"decomposition\":\"";
-        os << "(Decomposition[" <<  this->size() << "]: ";
-        std::copy( this->begin(), this->end(), std::ostream_iterator<Goal>(os, "\n") );
-        os << "\"";
-    os << " }" << std::endl;
+    json::printOn( this, os );
 }
 
 void Decomposition::readFrom( std::istream & is )
 {
-
+    json::readFrom( this, is );
 }
 
 Decomposition::iterator Decomposition::iter_at( unsigned int i )

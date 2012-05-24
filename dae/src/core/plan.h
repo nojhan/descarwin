@@ -13,7 +13,9 @@
 #include <src/yahsp.h>
 //}
 
+#include <eo>
 #include "utils/json/Json.h"
+#include "utils/eoJsonUtils.h"
 
 #ifdef WITH_MPI
 #include <boost/serialization/access.hpp>
@@ -23,7 +25,7 @@
 namespace daex
 {
 
-class Plan : public json::Serializable
+class Plan : public json::Serializable, public eoPersistent
 {
 protected:
 
@@ -149,7 +151,7 @@ public:
         return _plan_rep ;
     }
 
-    json::Object* toJson(void)
+    json::Object* toJson(void) const
     {
         json::Object* json = new json::Object;
         json->addPair( "makespan", json::String::make(_makespan) );
@@ -161,7 +163,7 @@ public:
         return json;
     }
 
-    void fromJson( json::Object* json )
+    void fromJson( const json::Object* json )
     {
         _makespan = json->get< TimeVal >( "makespan" );
         _cost_add = json->get< TimeVal >( "cost_add" );
@@ -169,6 +171,16 @@ public:
         _search_steps = json->get< unsigned int >( "search_steps" );
         _is_valid = json->get< bool >( "is_valid" );
         _plan_rep = json->get< std::string >( "plan_rep" );
+    } 
+    
+    void printOn(std::ostream& out) const
+    {
+        json::printOn( this, out );
+    }
+
+    void readFrom(std::istream& _is)
+    {
+        json::readFrom( this, _is );
     }
 };
 

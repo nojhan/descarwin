@@ -12,11 +12,12 @@
 #endif // WITH_MPI
 
 #include "utils/json/Json.h"
+#include "utils/eoJsonUtils.h"
 #include "atom.h"
 
 namespace daex {
 
-class Goal : public std::list<Atom*>, public json::Serializable
+class Goal : public std::list<Atom*>, public json::Serializable, public eoPersistent
 {
 public:
 
@@ -83,7 +84,7 @@ protected:
 
 public:
 
-    json::Object* toJson()
+    json::Object* toJson() const
     {
         // begin with list members
         json::Array* members = new json::Array;
@@ -101,10 +102,10 @@ public:
         return obj;
     }
 
-    void fromJson( json::Object* obj )
+    void fromJson( const json::Object* obj )
     {
         // begin with list members
-        json::Array* members = obj->getArray( "members" );
+        const json::Array* members = obj->getArray( "members" );
         for (unsigned int i = 0, end = members->size();
                 i < end;
                 ++i)
@@ -115,6 +116,16 @@ public:
         }
         // continues with self
         _earliest_start_time = obj->get<TimeVal>( "start_time" );
+    }
+
+    void printOn(std::ostream& out) const
+    {
+        json::printOn( this, out );
+    }
+
+    void readFrom(std::istream& _is)
+    {
+        json::readFrom( this, _is );
     }
 };
 

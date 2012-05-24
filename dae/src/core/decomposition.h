@@ -26,7 +26,7 @@ namespace daex
 {
 
 //! A decomposition is a list of Goal objects, and we are trying to minimize a scalar fitness (e.g. time or number of actions)
-class Decomposition : public std::list<Goal>  ,  public EO< eoMinimizingFitness >, public json::Serializable
+class Decomposition : public std::list<Goal>  , public EO< eoMinimizingFitness >, public json::Serializable
 {
 public:
 
@@ -206,13 +206,13 @@ protected:
     unsigned int _B;
 
 public:
-    json::Object* toJson(void)
+    json::Object* toJson(void) const
     {
         json::Object* json = new json::Object;
 
         // list<Goal>
         json::Array* listGoal = new json::Array;
-        for ( std::list<Goal>::iterator it = this->begin(),
+        for ( std::list<Goal>::const_iterator it = this->begin(),
                 end = this->end();
               it != end;
               ++it)
@@ -232,7 +232,7 @@ public:
         json->addPair( "plan_global", &_plan_global );
         // subplans
         json::Array* subplans = new json::Array;
-        for ( std::vector< daex::Plan >::iterator it = _plans_sub.begin(),
+        for ( std::vector< daex::Plan >::const_iterator it = _plans_sub.begin(),
                 end = _plans_sub.end();
               it != end;
               ++it)
@@ -248,10 +248,10 @@ public:
         return json;
     }
 
-    void fromJson( json::Object* json )
+    void fromJson( const json::Object* json )
     {
         // list<Goal>
-        json::Array* listGoal = json->getArray( "goals" );
+        const json::Array* listGoal = json->getArray( "goals" );
         for(unsigned int i = 0, size = listGoal->size();
                 i < size;
                 ++i)
@@ -273,7 +273,7 @@ public:
         // specific members
         _plan_global = json->getObject< daex::Plan >( "plan_global" );
         // _plans_sub
-        json::Array* subplans = json->getArray( "subplans" );
+        const json::Array* subplans = json->getArray( "subplans" );
         for (unsigned int i = 0, size = subplans->size();
                 i < size;
                 ++i)
