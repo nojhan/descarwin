@@ -23,14 +23,11 @@
 #include "utils/json/Json.h"
 #include "utils/eoJsonUtils.h"
 
-#ifdef WITH_MPI
-
 // Definitions used in cpt-yahsp can break Boost or STL.
 // FIXME These undef are inelegant, another solution should be used
 // (eg : rename all cpt-yahsp definitions, or not use Boost, or...)
 #include "undef_yahsp.h"
 
-#endif // WITH_MPI
 #include <eo>
 
 extern Fluent** fluents;

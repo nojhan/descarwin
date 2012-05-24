@@ -16,6 +16,8 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 FIND_PACKAGE(OpenMP REQUIRED)
 
 IF(OPENMP_FOUND)
+# TODO correct this part, which depends whether we want to compile with openMP
+# or not.
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 ENDIF()
@@ -33,6 +35,14 @@ IF(DAE_WITH_MPI)
 	SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
 
 	ADD_DEFINITIONS(-DWITH_MPI)
+    
+    IF (CMAKE_BUILD_TYPE MATCHES Debug)
+        ADD_EXECUTABLE(test_boost_serial tests/test_boost_serial.cpp)
+        ADD_DEPENDENCIES(test_boost_serial daex)
+        TARGET_LINK_LIBRARIES(test_boost_serial daex cpt_yahsp_library-common
+            cpt_yahsp_library-dae boost_serialization)
+    ENDIF()
+
 ENDIF()
 
 # include the sources
@@ -89,12 +99,7 @@ IF (CPT_WITH_MP)
 ENDIF()
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
-    ADD_EXECUTABLE(test_boost_serial tests/test_boost_serial.cpp)
-    ADD_DEPENDENCIES(test_boost_serial daex)
-    TARGET_LINK_LIBRARIES(test_boost_serial daex cpt_yahsp_library-common
-        cpt_yahsp_library-dae boost_serialization)
-
-    # TODO TODOB vérifier que toutes les librairies indiquées sont nécessaires
+        # TODO TODOB vérifier que toutes les librairies indiquées sont nécessaires
     # pour chacun des exécutables.
 
     ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
@@ -103,17 +108,16 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
     TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common cpt_yahsp_library-dae)
     # TODO check if correct
 
-    ADD_EXECUTABLE(test_b_max test_b_max.cpp)
-    ADD_DEPENDENCIES(test_b_max daex)
-    # TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-    TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common cpt_yahsp_library-dae)
-    # TODO check if correct
-
     ADD_EXECUTABLE(test_stats test_stats.cpp)
     ADD_DEPENDENCIES(test_stats daex)
     # TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
     TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common cpt_yahsp_library-dae)
     # TODO check if correct
+
+    ADD_EXECUTABLE(test_b_max test_b_max.cpp)
+    ADD_DEPENDENCIES(test_b_max daex)
+    # TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common cpt_yahsp_library-dae)
 
     ADD_EXECUTABLE(featureselector featureselector.cpp)
     ADD_DEPENDENCIES(featureselector daex)
