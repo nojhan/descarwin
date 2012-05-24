@@ -11,16 +11,15 @@ struct MySubObj : public Serializable {
     MySubObj() {}
 
     int id;
-    Object* toJson()
+    Object* toJson() const
     {
         Object* obj = new Object;
         obj->addPair( "id", String::make( id ) );
         return obj;
     }
 
-    void fromJson(Object* json)
+    void fromJson(const Object* json)
     {
-        // id = JsonUtils::get<int>( (*json)["id"] );
         id = json->get<int>( "id" );
     }
 };
@@ -100,12 +99,18 @@ int main (int argc, char **argv)
     // anotherO.str = JsonUtils::get<std::string>( (*parsed)["str"] );
     // anotherO.sub = JsonUtils::getObject<MySubObj>( (*parsed)["sub"] );
 
-    Array* array = parsed->getArray( "array" );
+    /*
+    // The line 112 is equivalent to the commented following lines
+    const Array* array = parsed->getArray( "array" );
     for (unsigned int i = 0; i < array->size(); ++i)
     {
-        // anotherO.array.push_back( JsonUtils::get<int>( (*array)[ i ] ) );
         anotherO.array.push_back( array->get<int>(i) );
     }
+    */
+    vector<int>* parray = 
+    parsed->getCompletedArray<int, vector, JsonUtils::GetAlgorithm >( "array" );
+    anotherO.array = *parray;
+    delete parray;
 
     cout    << "\nAnother object...\n"
             << "Integer : " << anotherO.integer << "\n"

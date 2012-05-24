@@ -45,10 +45,10 @@ class String : public json::Entity
         /**
          * @brief Prints out the string.
          */
-        virtual std::ostream& print( std::ostream& out );
+        virtual std::ostream& print( std::ostream& out ) const;
 
         // Getter and setter for content
-        std::string content() { return _content; }
+        std::string content() const{ return _content; }
         void content( std::string str ) { _content = str; }
 
     protected:

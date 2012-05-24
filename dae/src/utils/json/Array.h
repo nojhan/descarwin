@@ -8,13 +8,7 @@
 # include "Serializable.h"
 # include "Object.h"
 
-// Declarations of functions present in JsonUtils.
-namespace JsonUtils
-{
-    template<typename T> T getObject(json::Entity* json);
-    template<typename T> T get(json::Entity* json);
-    json::Array* getArray(json::Entity* json);
-}
+# include "UtilsSignatures.h"
 
 namespace json
 {
@@ -59,7 +53,7 @@ class Array : public json::Entity
          * @brief Reimplementation of size(), so as to use JsonArray as a vector.
          * @return Size of the children vector.
          */
-        size_t size()
+        size_t size() const
         {
             return children.size();
         }
@@ -68,7 +62,7 @@ class Array : public json::Entity
          * @brief Prints the JSON array into the given stream.
          * @param out The stream
          */
-        virtual std::ostream& print( std::ostream& out );
+        virtual std::ostream& print( std::ostream& out ) const;
 
         /**
          * @brief Dtor
@@ -78,26 +72,32 @@ class Array : public json::Entity
         /*
          * Some cool accessors which call JsonUtils, see JsonUtils.
          */
-        // Find a way to put in common this part with JsonObject.h
+        // FIXME Find a way to put in common this part with JsonObject.h
 
         template<typename T>
-        T get ( int i )
+        T get ( int i ) const
         {
             return JsonUtils::get<T>( children[i] );
         }
 
         template<typename T>
         // T should be JsonSerializable
-        T getObject( int i )
+        T getObject( int i ) const
         {
             return JsonUtils::getObject<T>( children[i] );
         }
 
-        json::Array* getArray( int i )
+        template<class Type, JSON_STL_CONTAINER Container, class GetAlgorithm>
+        void getCompletedArray( unsigned int i ) const
         {
-            return JsonUtils::getArray( children[i] );
+            return JsonUtils::getCompletedArray<Type, Container, GetAlgorithm>( children[ i ] );
         }
 
+        const json::Array* getArray( unsigned int i ) const
+        {
+            return JsonUtils::getArray( children[ i ] );
+        }    
+    
     protected:
         typedef std::vector<json::Entity*> ArrayChildren;
         ArrayChildren children;

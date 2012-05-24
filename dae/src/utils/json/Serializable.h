@@ -5,6 +5,7 @@
 
 namespace json
 {
+
 class Object; // to avoid recursive inclusion with JsonObject
 
 /**
@@ -21,14 +22,14 @@ class Serializable
      * @brief Serializes the object to JSON format.
      * @return A JSON object created with new.
      */
-    virtual json::Object* toJson() = 0;
+    virtual json::Object* toJson() const = 0;
 
     /**
      * @brief Loads class fields from a JSON object.
      * @param json A JSON object. Programmer doesn't have to delete it, it
      * is automatically done.
      */
-    virtual void fromJson(json::Object* json) = 0;
+    virtual void fromJson(const json::Object* json) = 0;
 };
 
 } // namespace json

@@ -21,3 +21,7 @@ clean:
 
 mrproper: clean
 	rm -rf $(EXEC)
+
+.PHONY: rebuild
+rebuild: clean all
+

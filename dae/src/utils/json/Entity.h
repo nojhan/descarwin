@@ -19,7 +19,7 @@ class Entity
          * @brief Prints the content of a JSON object into a stream.
          * @param out The stream in which we're printing.
          */
-        virtual std::ostream& print( std::ostream& out ) = 0;
+        virtual std::ostream& print( std::ostream& out ) const = 0;
 
         /**
          * Virtual dtor (base class).

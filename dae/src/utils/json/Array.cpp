@@ -3,11 +3,11 @@
 namespace json
 {
 
-std::ostream& Array::print( std::ostream& out )
+std::ostream& Array::print( std::ostream& out ) const
 {
     out << "[\n";
     bool first = true;
-    for (ArrayChildren::iterator it = children.begin(),
+    for (ArrayChildren::const_iterator it = children.begin(),
             end = children.end();
             it != end;
             ++it)

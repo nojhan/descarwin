@@ -3,7 +3,7 @@
 namespace json
 {
 
-std::ostream& String::print( std::ostream& out )
+std::ostream& String::print( std::ostream& out ) const
 {
     out << '"' << _content << '"';
     return out;

@@ -5,11 +5,11 @@ using namespace json;
 namespace json
 {
 
-std::ostream& Object::print( std::ostream& out )
+std::ostream& Object::print( std::ostream& out ) const
 {
     out << '{';
     bool first = true;
-    for(JsonValues::iterator it = _values.begin(), end = _values.end();
+    for(JsonValues::const_iterator it = _values.begin(), end = _values.end();
             it != end;
           ++it)
     {
@@ -39,12 +39,12 @@ Object::~Object()
 
 Entity*& Object::operator[]( const std::string& str )
 {
-    return _values[ str ];
+    return const_cast<Entity*&>(_values[ str ]);
 }
 
 Entity*& Object::operator[]( const char* str )
 {
-    return _values[ str ];
+    return const_cast<Entity*&>(_values[ str ]);
 }
 
 } // namespace json

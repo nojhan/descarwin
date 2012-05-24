@@ -9,22 +9,12 @@
 # include "String.h"
 # include "Serializable.h"
 
-namespace json
-{
-    class Array; // to avoid recursive inclusion
-
-}
-
-// Declarations of functions present in JsonUtils.
-namespace JsonUtils
-{
-    template<typename T> T getObject(json::Entity* json);
-    template<typename T> T get(json::Entity* json);
-    json::Array* getArray(json::Entity* json);
-}
+# include "UtilsSignatures.h"
 
 namespace json
 {
+
+class Array; // to avoid recursive inclusion
 
 /**
  * @brief JSON Object
@@ -35,7 +25,7 @@ namespace json
 class Object : public json::Entity
 {
     public:
-        typedef std::map<std::string, json::Entity*> JsonValues;
+        typedef std::map<std::string, const json::Entity*> JsonValues;
 
         /**
          * @brief Returns values contained in the object.
@@ -45,7 +35,7 @@ class Object : public json::Entity
         /**
          * @brief Prints the content of a JSON object into a stream.
          */
-        virtual std::ostream& print( std::ostream& out );
+        virtual std::ostream& print( std::ostream& out ) const;
 
         /**
          * @brief Implementation of operator [] to have direct access to map.
@@ -61,7 +51,7 @@ class Object : public json::Entity
          * @param key The key associated with the json object
          * @param json The JSON object as created with framework.
          */
-        void addPair( const std::string& key, json::Entity* json )
+        void addPair( const std::string& key, const json::Entity* json )
         {
             _values[ key ] = json;
         }
@@ -71,7 +61,7 @@ class Object : public json::Entity
          * @param key The key associated with the json object
          * @param obj A JSON-serializable object
          */
-        void addPair( const std::string& key, json::Serializable* obj )
+        void addPair( const std::string& key, const json::Serializable* obj )
         {
             _values[ key ] = obj->toJson();
         }
@@ -79,24 +69,30 @@ class Object : public json::Entity
         /*
          * Some cool accessors which call JsonUtils, see JsonUtils.
          */
-        // Find a way to put in common this part with JsonArray.h
+        // FIXME Find a way to put in common this part with JsonArray.h
 
         template<typename T>
-        T get ( const std::string& key )
+        T get ( const std::string& key ) const
         {
-            return JsonUtils::get<T>( _values[ key ] );
+            return JsonUtils::get<T>( _values.find( key )->second );
         }
 
         template<typename T>
         // T should be JsonSerializable
-        T getObject( const std::string& key )
+        T getObject( const std::string& key ) const
         {
-            return JsonUtils::getObject<T>( _values[ key ] );
+            return JsonUtils::getObject<T>( _values.find( key )->second );
         }
 
-        json::Array* getArray( const std::string& key )
+        template<class Type, JSON_STL_CONTAINER Container, template <typename Type> class GetAlgorithm>
+        Container<Type>* getCompletedArray( const char* key ) const
         {
-            return JsonUtils::getArray( _values[ key ] );
+            return JsonUtils::getCompletedArray<Type, Container, GetAlgorithm>( _values.find( key )->second );
+        }
+
+        const json::Array* getArray( const std::string& key ) const
+        {
+            return JsonUtils::getArray( _values.find( key )->second );
         }
 
         /**
