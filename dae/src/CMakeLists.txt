@@ -22,6 +22,7 @@ SET (DAEX_SOURCES
   utils/json/Object.cpp
   utils/json/Parser.cpp
   utils/json/String.cpp
+  utils/eoJsonUtils.cpp
   )
 
 ADD_LIBRARY(daex STATIC ${DAEX_SOURCES})
