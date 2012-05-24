@@ -61,18 +61,30 @@ public:
     template <class Archive>
 	void save( Archive & ar, const unsigned int version ) const
 	{
-        
+        std::stringstream ss;
+        printOn( ss );
+        std::string asStr = ss.str();
+        ar & asStr;
+
         (void) version; // avoid compilation warning
 	}
 
+    /**
+     * Deserializes the decomposition from a boost archive (useful for boost:mpi)
+     */
     template <class Archive>
     void load( Archive & ar, const unsigned int version )
     {
-		
+        std::string asStr;
+        ar & asStr;
+        std::stringstream ss;
+        ss << asStr;
+        readFrom( ss );
+
         (void) version; // avoid compilation warning
     }
     
-    // Indicates that save and load operations are not the same.
+    // Indicates that boost save and load operations are not the same.
     BOOST_SERIALIZATION_SPLIT_MEMBER()
 
 #endif // WITH_MPI

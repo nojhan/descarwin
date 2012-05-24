@@ -30,9 +30,6 @@
 // (eg : rename all cpt-yahsp definitions, or not use Boost, or...)
 #include "undef_yahsp.h"
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/string.hpp>
-
 #endif // WITH_MPI
 #include <eo>
 
@@ -52,20 +49,6 @@ public:
 
     // Empty ctor used for JSON serialization
     Atom( ) {}
-#ifdef WITH_MPI
-    // Mandatory for boost serialization
-	friend class boost::serialization::access;
-
-    /**
-     * Atom serialization (useful for boost::mpi).
-     */
-	template<class Archive>
-	void serialize( Archive & ar, const unsigned int version )
-	{
-        
-        (void) version; // avoid compilation warning
-	}
-#endif // WITH_MPI
 
     //! Accesseurs
     TimeVal                     earliest_start_time() const { return _earliest_start_time; }

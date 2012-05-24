@@ -17,11 +17,6 @@
 #include "utils/json/Json.h"
 #include "utils/eoJsonUtils.h"
 
-#ifdef WITH_MPI
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/string.hpp>
-#endif // WITH_MPI
-
 namespace daex
 {
 
@@ -47,22 +42,6 @@ protected:
     std::string _plan_rep;
 
 public:
-
-#ifdef WITH_MPI
-    // Gives access to boost::serialization
-	friend class boost::serialization::access;
-
-    /**
-     * Serializes the plan into a boost archive (useful for boost::mpi)
-     */
-	template <class Archive>
-	void serialize( Archive & ar, const unsigned int version )
-	{
-
-        (void) version; // avoid compilation warning
-	}
-#endif // WITH_MPI
-
     //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
     
      Plan() : _makespan( MAXTIME ),_cost_add(MAXTIME ), _cost_max(MAXTIME ), _search_steps(0), _is_valid(false), _plan_rep("No plan") {}

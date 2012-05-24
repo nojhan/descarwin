@@ -6,11 +6,6 @@
 
 #include <eo>
 
-#ifdef WITH_MPI
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/string.hpp>
-#endif // WITH_MPI
-
 #include "utils/json/Json.h"
 #include "utils/eoJsonUtils.h"
 #include "atom.h"
@@ -35,21 +30,6 @@ public:
     {
       _earliest_start_time = d;
     }
-
-#ifdef WITH_MPI
-    // Mandatory for boost serialisation
-	friend class boost::serialization::access;
-
-    /**
-     * Serializes the goal into a boost archive (useful for boost::mpi)
-     */
-	template <class Archive>
-	void serialize( Archive & ar, const unsigned int version )
-	{
-
-        (void) version; // to avoid compilation warning
-	}
-#endif // WITH_MPI
 
     friend std::ostream& operator<<( std::ostream & out, const Goal & goal )
     {

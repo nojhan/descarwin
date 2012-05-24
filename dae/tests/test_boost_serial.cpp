@@ -241,12 +241,10 @@ int main ( int argc, char* argv[] )
     // best decomposition of all the runs, in case of multi-start
     // start at the best element of the init
     daex::Decomposition best = pop.best_element();
+    daex::Decomposition read;
 
-    // Shows decomposition found in cout.
-    // best.printOn( std::cout );
-
+    /*
     // Serializes in json
-
     json::Object* jsonBest = best.toJson();
 
     std::stringstream ss;
@@ -259,13 +257,17 @@ int main ( int argc, char* argv[] )
     json::Object* received = json::Parser::parse( ss.str() );
 
     // Deserializes from json
-    daex::Decomposition read;
     read.fromJson( received );
+    delete jsonBest;
 
     std::cout<<"\n\nParsing finished, this is what I read :" << std::endl;
     std::cout << received << std::endl;
+    */
 
-    /*
+    // /*
+    // Shows decomposition found in cout.
+    best.printOn( std::cout );
+
     std::ofstream ofile("decomposition.dump.eo");
     boost::archive::text_oarchive oa(ofile);
     oa << best;
@@ -275,11 +277,15 @@ int main ( int argc, char* argv[] )
     boost::archive::text_iarchive oi(ifile);
     oi >> read;
     ifile.close();
-    */
 
     // Shows decomposition read in cout.
-    // read.printOn( std::cout );
-    delete jsonBest;
+    std::ofstream ofile2("decomposition.new.dump.eo");
+    boost::archive::text_oarchive oa2(ofile2);
+    oa2 << read;
+    ofile2.close();
+
+    read.printOn( std::cout );
+    // */
     
     std::cout << "\n\nEnd of main, test is finished.\n" << std::endl;
 }
