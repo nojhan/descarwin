@@ -35,14 +35,6 @@ IF(DAE_WITH_MPI)
 	SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
 
 	ADD_DEFINITIONS(-DWITH_MPI)
-    
-    IF (CMAKE_BUILD_TYPE MATCHES Debug)
-        ADD_EXECUTABLE(test_boost_serial tests/test_boost_serial.cpp)
-        ADD_DEPENDENCIES(test_boost_serial daex)
-        TARGET_LINK_LIBRARIES(test_boost_serial daex cpt_yahsp_library-common
-            cpt_yahsp_library-dae boost_serialization)
-    ENDIF()
-
 ENDIF()
 
 # include the sources
@@ -124,6 +116,14 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
     # TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
     TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common cpt_yahsp_library-dae)
     # TODO check if correct
+
+    IF(DAE_WITH_MPI)
+        ADD_EXECUTABLE(test_boost_serial tests/test_boost_serial.cpp)
+        ADD_DEPENDENCIES(test_boost_serial daex)
+        TARGET_LINK_LIBRARIES(test_boost_serial daex cpt_yahsp_library-common
+            cpt_yahsp_library-dae boost_serialization)
+    ENDIF()
+
 ENDIF()
 
 # process to sources
