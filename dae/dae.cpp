@@ -1,6 +1,10 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
+# ifdef WITH_MPI
+# include <boost/mpi.hpp>
+namespace mpi = boost::mpi;
+# endif // WITH_MPI
 
 #include <iostream>
 #include <stdexcept>
@@ -32,6 +36,21 @@ int main ( int argc, char* argv[] )
     // WALLOCK TIME COUNTER
     time_t time_start = std::time(NULL);
 
+    /************
+     * MPI INIT *
+     ***********/
+#ifdef WITH_MPI
+    mpi::environment env(argc, argv); // copies argc and argv to each node
+    mpi::communicator world;
+
+    unsigned int rank = world.rank();
+    unsigned int size = world.size();
+
+    // TODO find a solution for avoiding shared variables between workers and master.
+    unsigned int* attributions;
+    unsigned int workersWorking;
+#endif
+
     // SYSTEM
 #ifndef NDEBUG
     struct rlimit limit;
@@ -54,7 +73,6 @@ int main ( int argc, char* argv[] )
     */
 #endif
 
-
     /**************
      * PARAMETERS *
      **************/
@@ -67,6 +85,7 @@ int main ( int argc, char* argv[] )
     eoState state;
     
     // log some EO parameters
+    // TODO TODOB seul le master log.
     eo::log << eo::logging << "Parameters:" << std::endl;
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "verbose" << eo::log.getLevelSelected() << std::endl;
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-loop" << eo::parallel.isEnabled() << std::endl;
@@ -85,6 +104,12 @@ int main ( int argc, char* argv[] )
 
     std::string plan_file = parser.createParam( (std::string)"plan.soln", "plan-file", "Plan file backup", 'F', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plan-file" << plan_file << std::endl;
+# ifdef WITH_MPI
+    // Redefining file name by adding rank number in front of it.
+    std::stringstream ss;
+    ss << "process" << rank << plan_file;
+    plan_file = ss.str();
+# endif
 
     // pop size
     unsigned int pop_size = parser.createParam( (unsigned int)100, "popSize", "Population Size", 'P', "Evolution Engine").value();
@@ -102,10 +127,15 @@ int main ( int argc, char* argv[] )
     eoValueParam<unsigned int> & param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' );
     // if one want to initialize on current time
     if ( param_seed.value() == 0) {
-        // change the parameter itself, that will be dumped in the status file
+      // change the parameter itself, that will be dumped in the status file
       //        param_seed.value( time(0) );
-      param_seed.value()=time(0); // EO compatibility fixed by CC on 2010.12.24
+      param_seed.value() = time(0); // EO compatibility fixed by CC on 2010.12.24
     }
+# ifdef WITH_MPI
+        param_seed.value() *= (1+rank); // to avoid having the same seed for each process
+        std::cout << "[Seed] Process " << rank << " has seed : " << param_seed.value() << std::endl;
+# endif
+
     unsigned int seed = param_seed.value();
     rng.reseed( seed );
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "seed" << seed << std::endl;
@@ -176,12 +206,13 @@ int main ( int argc, char* argv[] )
             // if not insemination, incremental search strategy
             b_max_fixed  = daex::estimate_bmax_incremental<daex::Decomposition>( 
                 pop, parser, init.l_max(), eval_count, plan_file, best_makespan, dump_sep, dump_file_count, metadata 
-            );
+            ); // FIXME bug here when retrieving bmax-last-weight
         }
     }
 
     unsigned b_max_in = b_max_fixed;
-    double b_max_last_weight = parser.valueOf<double>("bmax-last-weight");
+    double b_max_last_weight = parser.valueOf<double>("bmax-last-weight"); 
+
     unsigned int b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 #ifndef NDEBUG
     eo::log << eo::logging << std::endl << "\tb_max for intermediate goals, b_max_in: "   << b_max_in   << std::endl;
@@ -224,7 +255,6 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
 #endif
-
 
     /********************
      * EVOLUTION ENGINE *
@@ -285,50 +315,152 @@ int main ( int argc, char* argv[] )
     daex::Decomposition empty_decompo;
     eval( empty_decompo );
 
+# ifdef WITH_MPI
+    //
+    daex::Decomposition empty;
+            // master send orders
+            if ( rank == 0 )
+            {
+                // This is static assignment
+                unsigned int nbWorkers = size - 1;
+                attributions = new unsigned int[ nbWorkers ]; // TODO what if size == 1 ?
+                for (unsigned int i = 0; i < nbWorkers; attributions[i++] = maxruns / nbWorkers) ;
+                unsigned int diff = maxruns - (maxruns / nbWorkers) * nbWorkers;
+                for (unsigned int i = 0; i < diff; ++attributions[i++]);
+
+                for (unsigned int i = 0; i < size-1; ++i)
+                {
+                    std::cout << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
+                }
+
+                for (unsigned int i = 0; i < size-1; ++i)
+                {
+                    world.send( i+1, 0, attributions[i] );
+                }
+
+                workersWorking = size - 1;
+            } else
+            // workers receive orders
+            {
+                unsigned int runsAsked;
+                world.recv( 0, 0, runsAsked );
+                std::cout << "[Worker " << rank << "] I have to work " << runsAsked << " times ! Diz iz too much, seriously !" << std::endl;
+                maxruns = runsAsked;
+            }
+# endif
+
     try { 
+// TODO TODOB placer distinction WITH_MPI à rajouter
+        if ( rank == 0 )
+        {
+            unsigned int i;
+            for (i = 0; i < size - 1; ++i )
+            {
+                if ( attributions[i] == 0 ) { --workersWorking; }
+            }
+            std::cout << "[Master] I have " << workersWorking << " workers at my feet, let's start the show !" << std::endl;
 
-        while( true ) {
+            while( workersWorking > 0 )
+            {
+                for (i = 0; i < size - 1; ++i)
+                {
+                    if ( attributions[i] > 0 )
+                    {
+                        unsigned int workerRank = i + 1; // as master has rank 0
+                        int whatWorkerIsDoing; // TODO use enum instead
+                        // 0 == nothing better
+                        // 1 == better fitness found, I send it to you.
+                        std::cout << "[Master] Waiting for reaction from process " << workerRank << std::endl;
+                        world.recv( workerRank , 0, whatWorkerIsDoing );
+                        if ( whatWorkerIsDoing == 1 )
+                        {
+                            std::cout << "[Master] Process " << workerRank << " will soon have a promotion." << std::endl;
+                            // worker
+                            daex::Decomposition candidate;
+                            world.recv( workerRank, 1, candidate );
+                            if ( candidate.fitness() > best.fitness() )
+                            {
+                                best = candidate;
+                            }
+                            std::cout << "[Master] Now best candidate has a fitness value of " << best.fitness() << std::endl;
+                        } else {
+                            std::cout << "[Master] Process " << workerRank << " is lazy..." << std::endl;
+                        }
+
+                        --attributions[i];
+                        if ( attributions[i] == 0 ) { --workersWorking ; }
+                    }
+                }
+                std::cout << "[Master] Still remains " << workersWorking << " at work. Let's wait..." << std::endl;
+            }
+
+            delete attributions;
+
+        } else 
+        // Workers
+        {        
+            while( true ) {
 #ifndef NDEBUG
-            eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
+                eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
 
-            // call the checkpoint (log and stats output) on the pop from the init
-            checkpoint( pop );
+                // call the checkpoint (log and stats output) on the pop from the init
+                checkpoint( pop );
 #endif
+                std::cout << "Starting search..." << std::endl;
+                // start a search
+                dae( pop );
 
-            // start a search
-            dae( pop );
+                std::cout << "After dae search..." << std::endl;
 
-            // remember the best of all runs
-            daex::Decomposition best_of_run = pop.best_element();
+                // remember the best of all runs
+                daex::Decomposition best_of_run = pop.best_element();
 
-            // note: operator> is overloaded in EO, don't be afraid: we are minimizing
-            if( best_of_run.fitness() > best.fitness() ) { 
-               best = best_of_run;
+# ifdef WITH_MPI
+                // note: operator> is overloaded in EO, don't be afraid: we are minimizing
+                if( best_of_run.fitness() > best.fitness() ) { 
+                   best = best_of_run;
+                   std::cout << "[Worker " << rank << "] Telling master I've found better." << std::endl;
+                   world.send( 0, 0, 1 ); // TODO enum!
+                   std::cout << "[Worker " << rank << "] Sending master my solution." << std::endl;
+                   world.send( 0, 1, best );
+                   std::cout << "[Worker " << rank << "] Master now knows. I want my money." << std::endl;
+                } else {
+                    std::cout << "[Worker " << rank << "] Didn't find any better..." << std::endl;
+                    world.send( 0, 0, 0 ); // TODO enum!
+                    std::cout << "[Worker " << rank << "] And master knows it !..." << std::endl;
+                }
+# else
+                // note: operator> is overloaded in EO, don't be afraid: we are minimizing
+                if( best_of_run.fitness() > best.fitness() ) { 
+                   best = best_of_run;
+                }
+# endif
+
+                // TODO handle the case when we have several best decomposition with the same fitness but different plans?
+                // TODO use previous searches to re-estimate a better b_max?
+
+                // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
+                run++;
+                if( run >= maxruns && maxruns != 0 ) {
+                    break;
+                }
+
+                // Once the bmax is known, there is no need to re-estimate it,
+                // thus we re-init ater the first search, because the pop has already been created before,
+                // when we were trying to estimate the b_max.
+                pop = eoPop<daex::Decomposition>( pop_size, init );
+                
+                // evaluate
+                //eoPopLoopEval<daex::Decomposition> pop_eval( eval ); // FIXME useful ??
+                pop_eval( pop, pop );
+
+                // reset run's continuator counters
+                steadyfit.totalGenerations( mingen, steadygen );
+                maxgen.totalGenerations( maxgens );
             }
 
-            // TODO handle the case when we have several best decomposition with the same fitness but different plans?
-            // TODO use previous searches to re-estimate a better b_max?
-
-            // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
-            run++;
-            if( run >= maxruns && maxruns != 0 ) {
-                break;
-            }
-
-            // Once the bmax is known, there is no need to re-estimate it,
-            // thus we re-init ater the first search, because the pop has already been created before,
-            // when we were trying to estimate the b_max.
-            pop = eoPop<daex::Decomposition>( pop_size, init );
-            
-            // evaluate
-            //eoPopLoopEval<daex::Decomposition> pop_eval( eval ); // FIXME useful ??
-            pop_eval( pop, pop );
-
-            // reset run's continuator counters
-            steadyfit.totalGenerations( mingen, steadygen );
-            maxgen.totalGenerations( maxgens );
         }
-
+        std::cout << "[Worker " << rank << "] I've finished my work !..." << std::endl;
 
     } catch( std::exception& e ) {
 #ifndef NDEBUG

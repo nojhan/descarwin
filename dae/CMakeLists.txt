@@ -64,12 +64,18 @@ ENDIF()
 # target + link libraries
 LINK_LIBRARIES(eoutils gmp eo rt gcov gdsl termcap)
 
+IF (DAE_WITH_MPI)
+    LINK_LIBRARIES(boost_mpi boost_serialization)
+ENDIF()
+
 # VV  : cpt_yahsp_library-common-dae-omp and  cpt_yahsp_library-dae are  no more
 # factorized because dae + yahsp-mt need  to be completely recompiled due to TLS
 # global references that differ from the ones needed by dae-mt + yahsp.
 
 ADD_EXECUTABLE(dae dae.cpp)
 ADD_DEPENDENCIES(dae daex)
+
+
 # TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp
 # cpt_yahsp_library-dae) # TODO check if correct
 TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common cpt_yahsp_library-dae)
@@ -117,13 +123,14 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
     TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common cpt_yahsp_library-dae)
     # TODO check if correct
 
-    IF(DAE_WITH_MPI)
-        ADD_EXECUTABLE(test_boost_serial tests/test_boost_serial.cpp)
-        ADD_DEPENDENCIES(test_boost_serial daex)
-        TARGET_LINK_LIBRARIES(test_boost_serial daex cpt_yahsp_library-common
-            cpt_yahsp_library-dae boost_serialization)
-    ENDIF()
+    
+ENDIF()
 
+IF(DAE_WITH_MPI)
+    ADD_EXECUTABLE(test_boost_serial tests/test_boost_serial.cpp)
+    ADD_DEPENDENCIES(test_boost_serial daex)
+    TARGET_LINK_LIBRARIES(test_boost_serial daex cpt_yahsp_library-common
+            cpt_yahsp_library-dae boost_serialization)
 ENDIF()
 
 # process to sources
