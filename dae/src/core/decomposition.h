@@ -235,11 +235,15 @@ public:
 
         // eoFitness
         bool invalidFitness = EO< eoMinimizingFitness >::invalid();
-        eoMinimizingFitness fitness = EO< eoMinimizingFitness >::fitness();
-        float fitnessValue = fitness; // implicit operator cast
         json->addPair( "invalidFitness", json::String::make(invalidFitness) );
-        json->addPair( "fitnessValue", json::String::make(fitnessValue) );
 
+        if ( !invalidFitness )
+        {
+            eoMinimizingFitness fitness = EO< eoMinimizingFitness >::fitness();
+            float fitnessValue = fitness; // implicit operator cast
+            json->addPair( "fitnessValue", json::String::make(fitnessValue) );
+        }
+        
         // specific members
         json->addPair( "plan_global", &_plan_global );
         // subplans
@@ -276,12 +280,14 @@ public:
         if (invalidFitness) 
         {
             EO< eoMinimizingFitness >::invalidate();
+        } else
+        {
+            eoMinimizingFitness fitness;
+            float fitnessValue = json->get<float>( "fitnessValue" );
+            fitness = fitnessValue;
+            EO< eoMinimizingFitness >::fitness( fitness );
         }
-        eoMinimizingFitness fitness;
-        float fitnessValue = json->get<float>( "fitnessValue" );
-        fitness = fitnessValue;
-        EO< eoMinimizingFitness >::fitness( fitness );
-
+        
         // specific members
         _plan_global = json->getObject< daex::Plan >( "plan_global" );
         // _plans_sub
