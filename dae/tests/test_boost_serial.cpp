@@ -123,8 +123,8 @@ int main ( int argc, char* argv[] )
     daex::Init<daex::Decomposition>& init = daex::do_make_init_op<daex::Decomposition>( parser, state, pddl );
 
     // randomly generate the population with the init operator
-    // eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
-    eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( 10, init );
+    eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
+    // eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( 10, init );
 
     // used to pass the eval count through the several eoEvalFuncCounter evaluators
     unsigned int eval_count = 0;
@@ -140,7 +140,7 @@ int main ( int argc, char* argv[] )
     unsigned int b_max_fixed = parser.valueOf<unsigned int>("bmax-fixed");
     if( b_max_fixed == 0 ) {
         // b_max_fixed = 2048; // 128
-        b_max_fixed = 128; 
+        b_max_fixed = daex::estimate_bmax_insemination( parser, pddl, pop, init.l_max() );
     }
 
     unsigned b_max_in = b_max_fixed;
@@ -243,28 +243,45 @@ int main ( int argc, char* argv[] )
     daex::Decomposition best = pop.best_element();
     daex::Decomposition read;
 
-    /*
+    // /*
     // Serializes in json
-    json::Object* jsonBest = best.toJson();
+    //
+    int benchNb = 1000;
 
     std::stringstream ss;
-    ss << jsonBest;
+    json::Object* jsonBest;
+    time_t before_serialize = time(0);
+    for (int i = 0; i < benchNb; ++i)
+    {
+        jsonBest = best.toJson();
 
-    std::cout<< "\n\n" << jsonBest << std::endl;
+        ss.clear();
+        ss.str(std::string());
+        ss << jsonBest;
+    }
+    // std::cout<< "\n\n" << jsonBest << std::endl;
+    time_t after_serialize = time(0);
+    std::cout << "[Bench] Serialization took " << after_serialize - before_serialize << " seconds." << std::endl;
     
     std::cout<< "\n\nParsing..." << std::endl;
 
-    json::Object* received = json::Parser::parse( ss.str() );
+    time_t before_deserialize = time(0);
+    for (int i = 0; i < benchNb; ++i)
+    {
+        json::Object* received = json::Parser::parse( ss.str() );
 
-    // Deserializes from json
-    read.fromJson( received );
+        // Deserializes from json
+        read.fromJson( received );
+    }
+    time_t after_deserialize = time(0);
+    
+    // std::cout<<"\n\nParsing finished, this is what I read :" << std::endl;
+    // std::cout << received << std::endl;
+    std::cout << "[Bench] Deserialization took " << after_deserialize - before_deserialize << " seconds." << std::endl;
     delete jsonBest;
+    // */
 
-    std::cout<<"\n\nParsing finished, this is what I read :" << std::endl;
-    std::cout << received << std::endl;
-    */
-
-    // /*
+     /*
     // Shows decomposition found in cout.
     best.printOn( std::cout );
 
@@ -287,7 +304,7 @@ int main ( int argc, char* argv[] )
 
     std::cout << std::endl;
     read.printOn( std::cout );
-    // */
+     */
     
     std::cout << "\n\nEnd of main, test is finished.\n" << std::endl;
 }
