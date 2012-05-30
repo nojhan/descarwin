@@ -22,6 +22,8 @@ namespace mpi = boost::mpi;
 #include "evaluation/cpt-yahsp.h"
 #include "evaluation/yahsp.h"
 
+#undef error // FIXME il y a un define error très embêtant quelque part là haut...
+
 /*
 #ifndef NDEBUG
 inline void LOG_LOCATION( eo::Levels level )
@@ -45,10 +47,6 @@ int main ( int argc, char* argv[] )
 
     unsigned int rank = world.rank();
     unsigned int size = world.size();
-
-    // TODO find a solution for avoiding shared variables between workers and master.
-    unsigned int* attributions;
-    unsigned int workersWorking;
 #endif
 
     // SYSTEM
@@ -309,7 +307,7 @@ int main ( int argc, char* argv[] )
     // best decomposition of all the runs, in case of multi-start
     // start at the best element of the init
     daex::Decomposition best = pop.best_element();
-    unsigned int run = 1;
+    unsigned int run = 0;
 
     // evaluate an empty decomposition, for comparison with decomposed solutions
     daex::Decomposition empty_decompo;
@@ -318,42 +316,50 @@ int main ( int argc, char* argv[] )
 # ifdef WITH_MPI
     //
     daex::Decomposition empty;
-            // master send orders
-            if ( rank == 0 )
-            {
-                // This is static assignment
-                unsigned int nbWorkers = size - 1;
-                attributions = new unsigned int[ nbWorkers ]; // TODO what if size == 1 ?
-                for (unsigned int i = 0; i < nbWorkers; attributions[i++] = maxruns / nbWorkers) ;
-                unsigned int diff = maxruns - (maxruns / nbWorkers) * nbWorkers;
-                for (unsigned int i = 0; i < diff; ++attributions[i++]);
+    
+    // TODO trouver un moyen de mieux segmenter les variables
+    unsigned int* attributions;
+    unsigned int workersWorking;
 
-                for (unsigned int i = 0; i < size-1; ++i)
-                {
-                    std::cout << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
-                }
+    // master send orders
+    if ( rank == 0 )
+    {
+        // This is static assignment
+        unsigned int nbWorkers = size - 1;
+        attributions = new unsigned int[ nbWorkers ]; // TODO what if size == 1 ?
+        for (unsigned int i = 0; i < nbWorkers; attributions[i++] = maxruns / nbWorkers) ;
+        unsigned int diff = maxruns - (maxruns / nbWorkers) * nbWorkers;
+        for (unsigned int i = 0; i < diff; ++attributions[i++]);
 
-                for (unsigned int i = 0; i < size-1; ++i)
-                {
-                    world.send( i+1, 0, attributions[i] );
-                }
+        for (unsigned int i = 0; i < size-1; ++i)
+        {
+            std::cout << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
+        }
 
-                workersWorking = size - 1;
-            } else
-            // workers receive orders
-            {
-                unsigned int runsAsked;
-                world.recv( 0, 0, runsAsked );
-                std::cout << "[Worker " << rank << "] I have to work " << runsAsked << " times ! Diz iz too much, seriously !" << std::endl;
-                maxruns = runsAsked;
-            }
+        for (unsigned int i = 0; i < size-1; ++i)
+        {
+            // rank of worker is i+1, as i begins from 0
+            world.send( i+1, 0, attributions[i] );
+        }
+
+        workersWorking = size - 1;
+    } else
+    // workers receive orders
+    {
+        unsigned int runsAsked;
+        world.recv( 0, 0, runsAsked );
+        std::cout << "[Worker " << rank << "] I have to work " << runsAsked << " times ! Diz iz too much, seriously !" << std::endl;
+        maxruns = runsAsked;
+    }
 # endif
 
     try { 
+
 // TODO TODOB placer distinction WITH_MPI à rajouter
         if ( rank == 0 )
         {
             unsigned int i;
+            // computes real number of workers
             for (i = 0; i < size - 1; ++i )
             {
                 if ( attributions[i] == 0 ) { --workersWorking; }
@@ -362,35 +368,53 @@ int main ( int argc, char* argv[] )
 
             while( workersWorking > 0 )
             {
-                for (i = 0; i < size - 1; ++i)
-                {
-                    if ( attributions[i] > 0 )
-                    {
-                        unsigned int workerRank = i + 1; // as master has rank 0
-                        int whatWorkerIsDoing; // TODO use enum instead
-                        // 0 == nothing better
-                        // 1 == better fitness found, I send it to you.
-                        std::cout << "[Master] Waiting for reaction from process " << workerRank << std::endl;
-                        world.recv( workerRank , 0, whatWorkerIsDoing );
-                        if ( whatWorkerIsDoing == 1 )
-                        {
-                            std::cout << "[Master] Process " << workerRank << " will soon have a promotion." << std::endl;
-                            // worker
-                            daex::Decomposition candidate;
-                            world.recv( workerRank, 1, candidate );
-                            if ( candidate.fitness() > best.fitness() )
-                            {
-                                best = candidate;
-                            }
-                            std::cout << "[Master] Now best candidate has a fitness value of " << best.fitness() << std::endl;
-                        } else {
-                            std::cout << "[Master] Process " << workerRank << " is lazy..." << std::endl;
-                        }
+                mpi::status status = world.probe(mpi::any_source, 0);
+                int wrkRank = status.source();
 
-                        --attributions[i];
-                        if ( attributions[i] == 0 ) { --workersWorking ; }
+                std::cout << "Showing status :\nError : " << status.error()
+                          << "\nTag : " << status.tag()
+                          <<"\nSource : " << status.source()
+                          << std::endl;
+
+                int wrkReqNb = wrkRank - 1;
+                //
+                // stocker le message
+                int answer = -1;
+                world.recv( wrkRank, 0, answer );
+                // 0 == nothing better
+                // 1 == better fitness found, I send it to you.
+                std::cout << "[Master] Node " << wrkRank << " tells : " << answer << std::endl;
+
+                if ( answer == 0 )
+                {
+                    std::cout << "[Master] Nothing better.\n";
+                } else if ( answer == 1 )
+                {
+                    std::cout << "[Master] Better solution to come...\n";
+                    daex::Decomposition received;
+                    world.recv( wrkRank, 1, received );
+                    if (received.fitness() > best.fitness())
+                    {
+                        best = received;
+                        double fitnessValue = best.fitness();
+                        std::cout << "[Master] Better solution found ! Now fitness is " << fitnessValue << std::endl;
                     }
+                } else
+                {
+                    std::cout << "[Master] Unknown answer received : " << answer << std::endl;
                 }
+
+                std::cout << "[Master] Request from " << wrkRank << "r just finished. We are at " << attributions[wrkReqNb] << " requests for this worker." << std::endl;
+
+                --( attributions[wrkReqNb] );
+                if( attributions[wrkReqNb] == 0U )
+                {
+                    --workersWorking;
+                } else
+                {
+                    std::cout << "[Master] worker " << wrkRank << " has still " << attributions[wrkReqNb] << " requests to do, let's give him one more." << std::endl;
+                }
+                
                 std::cout << "[Master] Still remains " << workersWorking << " at work. Let's wait..." << std::endl;
             }
 
@@ -399,6 +423,10 @@ int main ( int argc, char* argv[] )
         } else 
         // Workers
         {        
+            // TODO TODOB gérer le fait de n'avoir rien à faire...
+            if (maxruns == 0)
+                return 0;
+
             while( true ) {
 #ifndef NDEBUG
                 eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
@@ -419,15 +447,13 @@ int main ( int argc, char* argv[] )
                 // note: operator> is overloaded in EO, don't be afraid: we are minimizing
                 if( best_of_run.fitness() > best.fitness() ) { 
                    best = best_of_run;
-                   std::cout << "[Worker " << rank << "] Telling master I've found better." << std::endl;
+                   std::cout << "[Worker " << rank << "] Telling master I've found a solution with fitness equals to " << best.fitness() << std::endl;
+
                    world.send( 0, 0, 1 ); // TODO enum!
-                   std::cout << "[Worker " << rank << "] Sending master my solution." << std::endl;
                    world.send( 0, 1, best );
-                   std::cout << "[Worker " << rank << "] Master now knows. I want my money." << std::endl;
                 } else {
                     std::cout << "[Worker " << rank << "] Didn't find any better..." << std::endl;
-                    world.send( 0, 0, 0 ); // TODO enum!
-                    std::cout << "[Worker " << rank << "] And master knows it !..." << std::endl;
+                    world.send( 0, 0, 0); // TODO enum!
                 }
 # else
                 // note: operator> is overloaded in EO, don't be afraid: we are minimizing
@@ -458,9 +484,8 @@ int main ( int argc, char* argv[] )
                 steadyfit.totalGenerations( mingen, steadygen );
                 maxgen.totalGenerations( maxgens );
             }
-
         }
-        std::cout << "[Worker " << rank << "] I've finished my work !..." << std::endl;
+        std::cout << "[Worker " << rank << "] I've finished my work !..." << std::endl; // TODO TODOB distinction WITH MPI + worker/master
 
     } catch( std::exception& e ) {
 #ifndef NDEBUG
@@ -480,7 +505,7 @@ int main ( int argc, char* argv[] )
         // Added an evaluated decomposition, in case it would be better than a decomposed one
         pop.push_back( empty_decompo );
         pop_eval( pop, pop ); // FIXME normalement inutile
-        print_results( pop, time_start, run );
+        // print_results( pop, time_start, run ); // TODO TODOB temporaire
         return 0;
     }
 
@@ -492,7 +517,7 @@ int main ( int argc, char* argv[] )
     // push the best result, in case it was not in the last run
     pop.push_back( best );
     pop_eval( pop, pop ); // FIXME normalement inutile
-    print_results( pop, time_start, run );
+    // print_results( pop, time_start, run ); // TODO TODOB temporaire
 
     return 0;
 }
