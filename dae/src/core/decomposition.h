@@ -41,6 +41,7 @@ public:
     Decomposition & operator=(const Decomposition & other){
        if (this != &other) {
              std::list<Goal>::operator=(other);
+             EO<eoMinimizingFitness>::operator=(other);
              _plan_global = other.plan_copy();
              _plans_sub = other.subplans(); 
              _b_max = other.b_max();
