@@ -33,6 +33,18 @@ inline void LOG_LOCATION( eo::Levels level )
 #endif
 */
 
+namespace MpiMessage
+{
+    const int WRK_NEW_RESULT = 0;
+    const int WRK_NO_RESULT = 1;
+}
+
+namespace MpiChannel
+{
+    const int COMMANDS = 0;
+    const int DATA = 1;
+}
+
 int main ( int argc, char* argv[] )
 {
     // WALLOCK TIME COUNTER
@@ -339,7 +351,7 @@ int main ( int argc, char* argv[] )
         for (unsigned int i = 0; i < size-1; ++i)
         {
             // rank of worker is i+1, as i begins from 0
-            world.send( i+1, 0, attributions[i] );
+            world.send( i+1, MpiChannel::COMMANDS, attributions[i] );
         }
 
         workersWorking = size - 1;
@@ -347,7 +359,7 @@ int main ( int argc, char* argv[] )
     // workers receive orders
     {
         unsigned int runsAsked;
-        world.recv( 0, 0, runsAsked );
+        world.recv( 0, MpiChannel::COMMANDS, runsAsked );
         std::cout << "[Worker " << rank << "] I have to work " << runsAsked << " times ! Diz iz too much, seriously !" << std::endl;
         maxruns = runsAsked;
     }
@@ -368,7 +380,7 @@ int main ( int argc, char* argv[] )
 
             while( workersWorking > 0 )
             {
-                mpi::status status = world.probe(mpi::any_source, 0);
+                mpi::status status = world.probe(mpi::any_source, MpiChannel::COMMANDS);
                 int wrkRank = status.source();
 
                 std::cout << "Showing status :\nError : " << status.error()
@@ -380,19 +392,19 @@ int main ( int argc, char* argv[] )
                 //
                 // stocker le message
                 int answer = -1;
-                world.recv( wrkRank, 0, answer );
+                world.recv( wrkRank, MpiChannel::COMMANDS, answer );
                 // 0 == nothing better
                 // 1 == better fitness found, I send it to you.
                 std::cout << "[Master] Node " << wrkRank << " tells : " << answer << std::endl;
 
-                if ( answer == 0 )
+                if ( answer == MpiMessage::WRK_NO_RESULT)
                 {
                     std::cout << "[Master] Nothing better.\n";
-                } else if ( answer == 1 )
+                } else if ( answer == MpiMessage::WRK_NEW_RESULT)
                 {
                     std::cout << "[Master] Better solution to come...\n";
                     daex::Decomposition received;
-                    world.recv( wrkRank, 1, received );
+                    world.recv( wrkRank, MpiChannel::DATA, received );
                     if (received.fitness() > best.fitness())
                     {
                         best = received;
@@ -449,11 +461,11 @@ int main ( int argc, char* argv[] )
                    best = best_of_run;
                    std::cout << "[Worker " << rank << "] Telling master I've found a solution with fitness equals to " << best.fitness() << std::endl;
 
-                   world.send( 0, 0, 1 ); // TODO enum!
-                   world.send( 0, 1, best );
+                   world.send( 0, MpiChannel::COMMANDS, MpiMessage::WRK_NEW_RESULT );
+                   world.send( 0, MpiChannel::DATA, best );
                 } else {
                     std::cout << "[Worker " << rank << "] Didn't find any better..." << std::endl;
-                    world.send( 0, 0, 0); // TODO enum!
+                    world.send( 0, MpiChannel::COMMANDS, MpiMessage::WRK_NO_RESULT);
                 }
 # else
                 // note: operator> is overloaded in EO, don't be afraid: we are minimizing
