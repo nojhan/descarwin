@@ -1,5 +1,5 @@
-# ifndef __JSON_OBJECT_H__
-# define __JSON_OBJECT_H__
+# ifndef __EOSERIAL_OBJECT_H__
+# define __EOSERIAL_OBJECT_H__
 
 # include <map>
 # include <string>
@@ -9,7 +9,7 @@
 # include "String.h"
 # include "Serializable.h"
 
-namespace json
+namespace eoserial
 {
 
 /**
@@ -18,27 +18,27 @@ namespace json
  * This class represents a JSON object, which is basically a dictionnary
  * of keys (strings) and values (JSON entities).
  */
-class Object : public json::Entity, public std::map< std::string, json::Entity* >
+class Object : public eoserial::Entity, public std::map< std::string, eoserial::Entity* >
 {
     public:
-        typedef std::map<std::string, json::Entity*> JsonValues;
+        typedef std::map<std::string, eoserial::Entity*> JsonValues;
 
         /**
          * @brief Adds a pair into the JSON object.
-         * @param key The key associated with the json object
-         * @param json The JSON object as created with framework.
+         * @param key The key associated with the eoserial object
+         * @param eoserial The JSON object as created with framework.
          */
-        void addPair( const std::string& key, json::Entity* json )
+        void addPair( const std::string& key, eoserial::Entity* json )
         {
             (*this)[ key ] = json;
         }
 
         /**
          * @brief Adds a pair into the JSON object.
-         * @param key The key associated with the json object
+         * @param key The key associated with the eoserial object
          * @param obj A JSON-serializable object
          */
-        void addPair( const std::string& key, json::Serializable* obj )
+        void addPair( const std::string& key, eoserial::Serializable* obj )
         {
             (*this)[ key ] = obj->toJson();
         }
@@ -86,6 +86,6 @@ class Object : public json::Entity, public std::map< std::string, json::Entity* 
         virtual std::ostream& print( std::ostream& out ) const;
 };
 
-} // namespace json
-# endif // __JSON_OBJECT_H__
+} // namespace eoserial
+# endif // __EOSERIAL_OBJECT_H__
 

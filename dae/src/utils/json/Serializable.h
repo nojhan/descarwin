@@ -1,9 +1,9 @@
-# ifndef __JSON_SERIALIZABLE_H__
-# define __JSON_SERIALIZABLE_H__
+# ifndef __EOSERIAL_SERIALIZABLE_H__
+# define __EOSERIAL_SERIALIZABLE_H__
 
 # include <string>
 
-namespace json
+namespace eoserial
 {
 
 class Object; // to avoid recursive inclusion with JsonObject
@@ -22,16 +22,16 @@ class Serializable
      * @brief Serializes the object to JSON format.
      * @return A JSON object created with new.
      */
-    virtual json::Object* toJson() const = 0;
+    virtual eoserial::Object* toJson() const = 0;
 
     /**
      * @brief Loads class fields from a JSON object.
      * @param json A JSON object. Programmer doesn't have to delete it, it
      * is automatically done.
      */
-    virtual void fromJson(const json::Object* json) = 0;
+    virtual void fromJson(const eoserial::Object* json) = 0;
 };
 
-} // namespace json
+} // namespace eoserial
 
-# endif // __JSON_SERIALIZABLE_H__
+# endif // __EOSERIAL_SERIALIZABLE_H__

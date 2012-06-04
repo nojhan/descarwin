@@ -1,6 +1,6 @@
 # include "Array.h"
 
-namespace json
+namespace eoserial
 {
 
 std::ostream& Array::print( std::ostream& out ) const
@@ -35,4 +35,4 @@ Array::~Array()
     }
 }
 
-} // namespace json
+} // namespace eoserial

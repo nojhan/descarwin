@@ -13,9 +13,9 @@
 // # define DEBUG(x) std::cout << x << std::endl;
 # define DEBUG(x)
 
-using namespace json;
+using namespace eoserial;
 
-namespace json
+namespace eoserial
 {
 
 /**
@@ -141,13 +141,13 @@ Entity* Parser::parseRight(const std::string & str, size_t & pos)
     return value;
 }
 
-void Parser::parseLeft(const std::string & str, size_t & pos, Object* json)
+void Parser::parseLeft(const std::string & str, size_t & pos, Object* eoserial)
 {
     std::string key = parseString(str, pos);
     ++pos; // the colon
     DEBUG("We've read the key ")
-    (*json)[ key ] = parseRight( str, pos ); 
+    (*eoserial)[ key ] = parseRight( str, pos ); 
 }
 
-} // namespace json
+} // namespace eoserial
 

@@ -3,7 +3,7 @@
 using namespace std;
 
 # include "Json.h"
-using namespace json;
+using namespace eoserial;
 
 struct MySubObj : public Serializable {
     public:

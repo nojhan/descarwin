@@ -1,10 +1,10 @@
-# ifndef __ENTITY_H__
-# define __ENTITY_H__
+# ifndef __EOSERIAL_ENTITY_H__
+# define __EOSERIAL_ENTITY_H__
 
 # include <iostream>
 # include <sstream>
 
-namespace json
+namespace eoserial
 {
 
 /**
@@ -32,13 +32,13 @@ public:
 protected:
 };
 
-} // namespace json
+} // namespace eoserial
 
 /**
- * @brief Prints the content of the json object into the stream.
+ * @brief Prints the content of the eoserial object into the stream.
  * @param out The stream in which we're printing
  * @param json The json object (as a pointer) we want to print
  */
-std::ostream& operator<< ( std::ostream& out, const json::Entity * json );
+std::ostream& operator<< ( std::ostream& out, const eoserial::Entity * json );
 
 # endif // __ENTITY_H__

@@ -1,8 +1,8 @@
 # include "Object.h"
 
-using namespace json;
+using namespace eoserial;
 
-namespace json
+namespace eoserial
 {
 
 std::ostream& Object::print( std::ostream& out ) const
@@ -37,4 +37,4 @@ Object::~Object()
     }
 }
 
-} // namespace json
+} // namespace eoserial

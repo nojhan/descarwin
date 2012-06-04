@@ -1,5 +1,5 @@
-# ifndef __JSON_PARSER_H__
-# define __JSON_PARSER_H__
+# ifndef __EOSERIAL_PARSER_H__
+# define __EOSERIAL_PARSER_H__
 
 # include "Entity.h"
 # include "String.h"
@@ -17,7 +17,7 @@
  * @author Benjamin BOUVIER
  */
 
-namespace json
+namespace eoserial
 {
 
 /**
@@ -34,7 +34,7 @@ class Parser
         /**
          * @brief Parses the given string and returns the JSON object read.
          */
-        static json::Object* parse(const std::string & str);
+        static eoserial::Object* parse(const std::string & str);
 
     protected:
 
@@ -52,16 +52,16 @@ class Parser
          * @param pos The index of the current position in the string.
          * @return The JSON object matching the right part.
          */
-        static json::Entity* parseRight(const std::string & str, size_t & pos);
+        static eoserial::Entity* parseRight(const std::string & str, size_t & pos);
 
         /**
          * @brief Parses the left value of a key-value pair, which is the key.
          *
          * @param str The string we're parsing.
          * @param pos The index of the current position in the string.
-         * @param json The current JSON object for which we're adding a key-value pair.
+         * @param eoserial The current JSON object for which we're adding a key-value pair.
          */
-        static void parseLeft(const std::string & str, size_t & pos, json::Object* json);
+        static void parseLeft(const std::string & str, size_t & pos, eoserial::Object* json);
 
         /**
          * @brief Retrieves a string in a JSON content.
@@ -70,9 +70,9 @@ class Parser
          * @param pos The index of the current position of parsing,
          * which will be updated.
          */
-        static json::String* parseJsonString(const std::string & str, size_t & pos);
+        static eoserial::String* parseJsonString(const std::string & str, size_t & pos);
 };
 
-} // namespace json
+} // namespace eoserial
 
-# endif // __JSON_PARSER_H__
+# endif // __EOSERIAL_PARSER_H__

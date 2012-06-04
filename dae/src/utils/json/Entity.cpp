@@ -1,6 +1,6 @@
 # include "Entity.h"
 
-using namespace json;
+using namespace eoserial;
 
 std::ostream& operator<<( std::ostream& out, const Entity* json )
 {

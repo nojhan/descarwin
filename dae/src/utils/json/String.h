@@ -1,12 +1,12 @@
-# ifndef __JSON_STRING_H__
-# define __JSON_STRING_H__
+# ifndef __EOSERIAL_STRING_H__
+# define __EOSERIAL_STRING_H__
 
 # include <string>
 # include <sstream>
 
 # include "Entity.h"
 
-namespace json
+namespace eoserial
 {
 
 /**
@@ -14,7 +14,7 @@ namespace json
  *
  * Wrapper for string, so as to be used as a JSON object.
  */
-class String : public json::Entity, public std::string
+class String : public eoserial::Entity, public std::string
 {
     public:
 
@@ -96,6 +96,6 @@ inline String* String::make( const std::string & value )
     return new String( value );
 }
 
-} // namespace json
+} // namespace eoserial
 
-# endif // __JSON_STRING_H__
+# endif // __EOSERIAL_STRING_H__

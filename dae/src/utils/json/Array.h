@@ -1,5 +1,5 @@
-# ifndef __JSON_ARRAY_H__
-# define __JSON_ARRAY_H__
+# ifndef __EOSERIAL_ARRAY_H__
+# define __EOSERIAL_ARRAY_H__
 
 # include <vector>
 # include <iostream>
@@ -10,7 +10,7 @@
 # include "Object.h"
 # include "String.h"
 
-namespace json
+namespace eoserial
 {
 
 /**
@@ -18,17 +18,17 @@ namespace json
  *
  * Wrapper for an array, so as to be used as a JSON object.
  */
-class Array : public json::Entity, public std::vector< json::Entity* >
+class Array : public eoserial::Entity, public std::vector< eoserial::Entity* >
 {
     protected:
-        typedef std::vector< json::Entity* > ArrayChildren;
+        typedef std::vector< eoserial::Entity* > ArrayChildren;
 
     public:
         /**
          * @brief Adds the serializable object as a JSON object.
          * @param obj Object which implemnets JsonSerializable.
          */
-        void push_back( json::Serializable* obj )
+        void push_back( eoserial::Serializable* obj )
         {
             ArrayChildren::push_back( obj->toJson() );
         }
@@ -36,7 +36,7 @@ class Array : public json::Entity, public std::vector< json::Entity* >
         /**
          * @brief Proxy for vector::push_back.
          */
-        void push_back( json::Entity* json )
+        void push_back( eoserial::Entity* json )
         {
             ArrayChildren::push_back( json );
         }
@@ -78,34 +78,34 @@ class Array : public json::Entity, public std::vector< json::Entity* >
         template<typename T>
         struct BaseAlgorithm
         {
-            virtual void operator()( const json::Array* array, unsigned int i, T & value ) const = 0;
-            virtual void operator()( const json::Object* obj, const std::string& key, T & value ) const = 0;
+            virtual void operator()( const eoserial::Array* array, unsigned int i, T & value ) const = 0;
+            virtual void operator()( const eoserial::Object* obj, const std::string& key, T & value ) const = 0;
         };
 
         template<typename T, typename JsonEntity>
         struct UnpackAlgorithm : public BaseAlgorithm<T>
         {
-            void operator()( const json::Array* array, unsigned int i, T & value ) const
+            void operator()( const eoserial::Array* array, unsigned int i, T & value ) const
             {
                 array->unpack( i, value );
             }
 
-            void operator()( const json::Object* obj, const std::string& key, T & value ) const
+            void operator()( const eoserial::Object* obj, const std::string& key, T & value ) const
             {
                 obj->unpack( key, value );
             }
         };
 
         template<typename Type, template <typename T, typename alloc = std::allocator<T> > class Container>
-        inline Container<Type>* deserialize( const json::Array* json, const BaseAlgorithm<Type> & algo )
+        inline Container<Type>* deserialize( const eoserial::Array* json, const BaseAlgorithm<Type> & algo )
         {
-            Container<Type>* array = new Container<Type>( json->size() );
-            for( unsigned int i = 0, size = json->size();
+            Container<Type>* array = new Container<Type>( eoserial->size() );
+            for( unsigned int i = 0, size = eoserial->size();
                     i < size;
                     ++i)
             {
                 Type t;
-                algo( json, 
+                algo( eoserial, 
                 array->push_back( t );
             }
             return array;
@@ -113,7 +113,7 @@ class Array : public json::Entity, public std::vector< json::Entity* >
         */
 };
 
-} // namespace json
+} // namespace eoserial
 
-# endif // __JSON_ARRAY_H__
+# endif // __EOSERIAL_ARRAY_H__
 
