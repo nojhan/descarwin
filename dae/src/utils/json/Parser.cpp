@@ -87,9 +87,7 @@ static void ignoreChars(const std::string& str, size_t & pos)
 
 String* Parser::parseJsonString(const std::string & str, size_t & pos)
 {
-    String* json = new String;
-    json->content( parseString( str, pos ) );
-    return json;
+    return new String( parseString( str, pos ) );
 }
 
 Object* Parser::parse(const std::string & str)
@@ -148,7 +146,7 @@ void Parser::parseLeft(const std::string & str, size_t & pos, Object* json)
     std::string key = parseString(str, pos);
     ++pos; // the colon
     DEBUG("We've read the key ")
-    json->values()[ key ] = parseRight( str, pos ); 
+    (*json)[ key ] = parseRight( str, pos ); 
 }
 
 } // namespace json

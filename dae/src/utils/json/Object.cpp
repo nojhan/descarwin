@@ -9,7 +9,7 @@ std::ostream& Object::print( std::ostream& out ) const
 {
     out << '{';
     bool first = true;
-    for(JsonValues::const_iterator it = _values.begin(), end = _values.end();
+    for(JsonValues::const_iterator it = begin(), end = this->end();
             it != end;
           ++it)
     {
@@ -29,22 +29,12 @@ std::ostream& Object::print( std::ostream& out ) const
 
 Object::~Object()
 {
-    for(JsonValues::iterator it = _values.begin(), end = _values.end();
+    for(JsonValues::iterator it = begin(), end = this->end();
             it != end;
           ++it)
     {
         delete it->second;
     }
-}
-
-Entity*& Object::operator[]( const std::string& str )
-{
-    return const_cast<Entity*&>(_values[ str ]);
-}
-
-Entity*& Object::operator[]( const char* str )
-{
-    return const_cast<Entity*&>(_values[ str ]);
 }
 
 } // namespace json

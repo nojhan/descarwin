@@ -14,7 +14,7 @@ namespace json
  *
  * Wrapper for string, so as to be used as a JSON object.
  */
-class String : public json::Entity
+class String : public json::Entity, public std::string
 {
     public:
 
@@ -22,7 +22,7 @@ class String : public json::Entity
          * @brief Default ctor.
          * @param str The string we want to wrap.
          */
-        String( const std::string& str ) : _content( str ) {}
+        String( const std::string& str ) : std::string( str ) {}
 
         /**
          * @brief Ctor used only on parsing.
@@ -47,26 +47,43 @@ class String : public json::Entity
          */
         virtual std::ostream& print( std::ostream& out ) const;
 
-        // Getter and setter for content
-        std::string content() const{ return _content; }
-        void content( std::string str ) { _content = str; }
+        /**
+         * @brief Deserializes the current String into a given primitive type value.
+         * @param value The value in which we're writing.
+         */
+        template<class T>
+        inline void deserialize( T & value );
 
     protected:
-        std::string _content;
-
         // Copy and reaffectation are forbidden
         explicit String( const String& _ );
         String& operator=( const String& _ );
 };
+
+template<class T>
+inline void String::deserialize( T & value )
+{
+    std::stringstream ss;
+    ss << *this;
+    ss >> value;
+}
+
+/**
+ * @brief Specialization for strings, which don't need to be converted through
+ * a stringstream.
+ */
+template<>
+inline void String::deserialize( std::string & value )
+{
+    value = *this;
+}
 
 template <typename T>
 String* String::make( const T & value )
 {
     std::stringstream ss;
     ss << value;
-    String* json = new String;
-    json->_content = ss.str();
-    return json;
+    return new String( ss.str() );
 }
 
 /**
@@ -76,9 +93,7 @@ String* String::make( const T & value )
 template<>
 inline String* String::make( const std::string & value )
 {
-    String* json = new String;
-    json->_content = value;
-    return json;
+    return new String( value );
 }
 
 } // namespace json

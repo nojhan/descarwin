@@ -9,12 +9,8 @@
 # include "String.h"
 # include "Serializable.h"
 
-# include "UtilsSignatures.h"
-
 namespace json
 {
-
-class Array; // to avoid recursive inclusion
 
 /**
  * @brief JSON Object
@@ -22,38 +18,19 @@ class Array; // to avoid recursive inclusion
  * This class represents a JSON object, which is basically a dictionnary
  * of keys (strings) and values (JSON entities).
  */
-class Object : public json::Entity
+class Object : public json::Entity, public std::map< std::string, json::Entity* >
 {
     public:
-        typedef std::map<std::string, const json::Entity*> JsonValues;
-
-        /**
-         * @brief Returns values contained in the object.
-         */
-        JsonValues & values() { return _values; }
-
-        /**
-         * @brief Prints the content of a JSON object into a stream.
-         */
-        virtual std::ostream& print( std::ostream& out ) const;
-
-        /**
-         * @brief Implementation of operator [] to have direct access to map.
-         *
-         * This allows to directly retrieve values by given keys and to register
-         * easily new pairs.
-         */
-        json::Entity*& operator[]( const std::string& str );
-        json::Entity*& operator[]( const char* str );
+        typedef std::map<std::string, json::Entity*> JsonValues;
 
         /**
          * @brief Adds a pair into the JSON object.
          * @param key The key associated with the json object
          * @param json The JSON object as created with framework.
          */
-        void addPair( const std::string& key, const json::Entity* json )
+        void addPair( const std::string& key, json::Entity* json )
         {
-            _values[ key ] = json;
+            (*this)[ key ] = json;
         }
 
         /**
@@ -61,38 +38,39 @@ class Object : public json::Entity
          * @param key The key associated with the json object
          * @param obj A JSON-serializable object
          */
-        void addPair( const std::string& key, const json::Serializable* obj )
+        void addPair( const std::string& key, json::Serializable* obj )
         {
-            _values[ key ] = obj->toJson();
+            (*this)[ key ] = obj->toJson();
         }
 
-        /*
-         * Some cool accessors which call JsonUtils, see JsonUtils.
+        /**
+         * @brief Deserializes a Serializable class instance from this JSON object.
+         * @param obj The object we want to rebuild.
          */
-        // FIXME Find a way to put in common this part with JsonArray.h
-
-        template<typename T>
-        T get ( const std::string& key ) const
+        void deserialize( Serializable & obj )
         {
-            return JsonUtils::get<T>( _values.find( key )->second );
+            obj.fromJson( this );
         }
 
-        template<typename T>
-        // T should be JsonSerializable
-        T getObject( const std::string& key ) const
+        /**
+         * @brief Unpack primitive type stocked in the given key.
+         * @param key The key in the map
+         * @param value Instance of the primitive type in which will be written the value.
+         */
+        template<class T>
+        void unpack( const std::string& key, T & value ) const
         {
-            return JsonUtils::getObject<T>( _values.find( key )->second );
+            static_cast<String*>( this->find( key )->second )->deserialize( value );
         }
 
-        template<class Type, JSON_STL_CONTAINER Container, template <typename Type> class GetAlgorithm>
-        Container<Type>* getCompletedArray( const char* key ) const
+        /**
+         * @brief Unpack Serializable type stocked in the given key.
+         * @param key The key in the map
+         * @param value Instance object that we'll rebuild
+         */
+        void unpackObject( const std::string& key, Serializable & value ) const
         {
-            return JsonUtils::getCompletedArray<Type, Container, GetAlgorithm>( _values.find( key )->second );
-        }
-
-        const json::Array* getArray( const std::string& key ) const
-        {
-            return JsonUtils::getArray( _values.find( key )->second );
+            static_cast<Object*>( this->find( key )->second )->deserialize( value );
         }
 
         /**
@@ -101,9 +79,13 @@ class Object : public json::Entity
         ~Object();
 
     protected:
-        JsonValues _values;
+
+        /**
+         * @brief Prints the content of a JSON object into a stream.
+         */
+        virtual std::ostream& print( std::ostream& out ) const;
 };
 
 } // namespace json
-
 # endif // __JSON_OBJECT_H__
+

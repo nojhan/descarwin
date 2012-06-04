@@ -20,7 +20,7 @@ struct MySubObj : public Serializable {
 
     void fromJson(const Object* json)
     {
-        id = json->get<int>( "id" );
+        json->unpack( "id" , id );
     }
 };
 
@@ -90,10 +90,10 @@ int main (int argc, char **argv)
     // Retrieval and reconstruction
     MyObject anotherO;
     
-    anotherO.integer = parsed->get<int>( "integer" );
-    anotherO.boolean = parsed->get<bool>( "boolean" );
-    anotherO.str = parsed->get<std::string>( "str" );
-    anotherO.sub = parsed->getObject<MySubObj>( "sub" );
+    parsed->unpack( "integer",  anotherO.integer );
+    parsed->unpack( "boolean", anotherO.boolean );
+    parsed->unpack( "str", anotherO.str );
+    parsed->unpackObject( "sub", anotherO.sub );
 
     // Another way to do the same thing
     // anotherO.integer = JsonUtils::get<int>( (*parsed)["integer"] );
@@ -101,24 +101,28 @@ int main (int argc, char **argv)
     // anotherO.str = JsonUtils::get<std::string>( (*parsed)["str"] );
     // anotherO.sub = JsonUtils::getObject<MySubObj>( (*parsed)["sub"] );
 
-    // The line 112 is equivalent to the commented following lines
-    //const Array* array = parsed->getArray( "array" );
-    //for (unsigned int i = 0; i < array->size(); ++i)
-    //{
-    //    anotherO.array.push_back( array->get<int>(i) );
-    //}
+    const Array* array = static_cast<Array*>( (*parsed)[ "array" ] );
+    for (unsigned int i = 0; i < array->size(); ++i)
+    {
+        int integer;
+        array->unpack( i, integer );
+        anotherO.array.push_back( integer );
+    }
 
+    /*
+    // TODO no more doable, see Array.h
     vector<int>* parray = 
-    parsed->getCompletedArray<int, vector, JsonUtils::GetAlgorithm >( "array" );
+    parsed->getCompletedArray<int, vector>( "array", JsonUtils::GetAlgorithm<int, String>()  );
     anotherO.array = *parray;
     delete parray;
+    */
 
     cout    << "\nAnother object...\n"
             << "Integer : " << anotherO.integer << "\n"
             << "Boolean : " << ((anotherO.boolean) ? "true" : "false") << "\n"
             << "String : " << anotherO.str << "\n"
             << "Sub object id : " << anotherO.sub.id << "\n"
-            << "3rd value of table : " << anotherO.array[3] << "\n"
+            << "2rd value of table : " << anotherO.array[2] << "\n"
             << endl;
 
     delete parsed;

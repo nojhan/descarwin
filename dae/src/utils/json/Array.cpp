@@ -5,10 +5,10 @@ namespace json
 
 std::ostream& Array::print( std::ostream& out ) const
 {
-    out << "[\n";
+    out << "[";
     bool first = true;
-    for (ArrayChildren::const_iterator it = children.begin(),
-            end = children.end();
+    for (ArrayChildren::const_iterator it = begin(),
+            end = this->end();
             it != end;
             ++it)
     {
@@ -16,7 +16,7 @@ std::ostream& Array::print( std::ostream& out ) const
         {
             first = false;
         } else {
-            out << ",\n";
+            out << ", ";
         }
         (*it)->print( out );
     }
@@ -26,8 +26,8 @@ std::ostream& Array::print( std::ostream& out ) const
 
 Array::~Array()
 {
-    for (ArrayChildren::iterator it = children.begin(),
-            end = children.end();
+    for (ArrayChildren::iterator it = begin(),
+            end = this->end();
             it != end;
             ++it)
     {

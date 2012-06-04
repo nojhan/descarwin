@@ -6,9 +6,9 @@
 
 # include "Entity.h"
 # include "Serializable.h"
-# include "Object.h"
 
-# include "UtilsSignatures.h"
+# include "Object.h"
+# include "String.h"
 
 namespace json
 {
@@ -18,44 +18,27 @@ namespace json
  *
  * Wrapper for an array, so as to be used as a JSON object.
  */
-class Array : public json::Entity
+class Array : public json::Entity, public std::vector< json::Entity* >
 {
-    public:
-        /**
-         * @brief Adds the child to the array.
-         * @param child JSON object, string or array.
-         */
-        void push_back( json::Entity* child )
-        {
-            children.push_back( child );
-        }
+    protected:
+        typedef std::vector< json::Entity* > ArrayChildren;
 
+    public:
         /**
          * @brief Adds the serializable object as a JSON object.
          * @param obj Object which implemnets JsonSerializable.
          */
         void push_back( json::Serializable* obj )
         {
-            children.push_back( obj->toJson() );
+            ArrayChildren::push_back( obj->toJson() );
         }
 
         /**
-         * @brief Reimplementation of operator[], so as to use JsonArray as an vector
-         * @param i Index of wanted child.
-         * @return Pointer to the child.
+         * @brief Proxy for vector::push_back.
          */
-        json::Entity* operator[]( int i )
+        void push_back( json::Entity* json )
         {
-            return children[ i ];
-        }
-
-        /**
-         * @brief Reimplementation of size(), so as to use JsonArray as a vector.
-         * @return Size of the children vector.
-         */
-        size_t size() const
-        {
-            return children.size();
+            ArrayChildren::push_back( json );
         }
 
         /**
@@ -69,38 +52,65 @@ class Array : public json::Entity
          */
         ~Array();
 
-        /*
-         * Some cool accessors which call JsonUtils, see JsonUtils.
+         /**
+         * @brief Unpack primitive type stocked in the given index.
+         * @param index The index in the array
+         * @param value Instance of the primitive type in which will be written the value.
          */
-        // FIXME Find a way to put in common this part with JsonObject.h
+        template<class T>
+        void unpack( unsigned int index, T & value ) const
+        {
+            static_cast<String*>( (*this)[ index ] )->deserialize( value );
+        }
 
+        /**
+         * @brief Unpack Serializable type stocked in the given index.
+         * @param index The index in the array
+         * @param value Instance object that we'll rebuild
+         */
+        void unpackObject( unsigned int index, Serializable & value ) const
+        {
+            static_cast<Object*>( (*this)[ index ] )->deserialize( value );
+        }
+
+        /*
+        // TODO see if it's useful to have generic algorithms for retrieval
         template<typename T>
-        T get ( int i ) const
+        struct BaseAlgorithm
         {
-            return JsonUtils::get<T>( children[i] );
-        }
+            virtual void operator()( const json::Array* array, unsigned int i, T & value ) const = 0;
+            virtual void operator()( const json::Object* obj, const std::string& key, T & value ) const = 0;
+        };
 
-        template<typename T>
-        // T should be JsonSerializable
-        T getObject( int i ) const
+        template<typename T, typename JsonEntity>
+        struct UnpackAlgorithm : public BaseAlgorithm<T>
         {
-            return JsonUtils::getObject<T>( children[i] );
-        }
+            void operator()( const json::Array* array, unsigned int i, T & value ) const
+            {
+                array->unpack( i, value );
+            }
 
-        template<class Type, JSON_STL_CONTAINER Container, class GetAlgorithm>
-        void getCompletedArray( unsigned int i ) const
-        {
-            return JsonUtils::getCompletedArray<Type, Container, GetAlgorithm>( children[ i ] );
-        }
+            void operator()( const json::Object* obj, const std::string& key, T & value ) const
+            {
+                obj->unpack( key, value );
+            }
+        };
 
-        const json::Array* getArray( unsigned int i ) const
+        template<typename Type, template <typename T, typename alloc = std::allocator<T> > class Container>
+        inline Container<Type>* deserialize( const json::Array* json, const BaseAlgorithm<Type> & algo )
         {
-            return JsonUtils::getArray( children[ i ] );
-        }    
-    
-    protected:
-        typedef std::vector<json::Entity*> ArrayChildren;
-        ArrayChildren children;
+            Container<Type>* array = new Container<Type>( json->size() );
+            for( unsigned int i = 0, size = json->size();
+                    i < size;
+                    ++i)
+            {
+                Type t;
+                algo( json, 
+                array->push_back( t );
+            }
+            return array;
+        }
+        */
 };
 
 } // namespace json
