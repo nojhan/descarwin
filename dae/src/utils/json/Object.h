@@ -38,18 +38,18 @@ class Object : public eoserial::Entity, public std::map< std::string, eoserial::
          * @param key The key associated with the eoserial object
          * @param obj A JSON-serializable object
          */
-        void addPair( const std::string& key, eoserial::Serializable* obj )
+        void addPair( const std::string& key, eoserial::Printable* obj )
         {
-            (*this)[ key ] = obj->toJson();
+            (*this)[ key ] = obj->pack();
         }
 
         /**
          * @brief Deserializes a Serializable class instance from this JSON object.
          * @param obj The object we want to rebuild.
          */
-        void deserialize( Serializable & obj )
+        void deserialize( eoserial::Persistent & obj )
         {
-            obj.fromJson( this );
+            obj.unpack( this );
         }
 
         /**
@@ -68,7 +68,7 @@ class Object : public eoserial::Entity, public std::map< std::string, eoserial::
          * @param key The key in the map
          * @param value Instance object that we'll rebuild
          */
-        void unpackObject( const std::string& key, Serializable & value ) const
+        void unpackObject( const std::string& key, Persistent & value ) const
         {
             static_cast<Object*>( this->find( key )->second )->deserialize( value );
         }

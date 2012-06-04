@@ -5,20 +5,20 @@ using namespace std;
 # include "Json.h"
 using namespace eoserial;
 
-struct MySubObj : public Serializable {
+struct MySubObj : public Persistent {
     public:
 
     MySubObj() {}
 
     int id;
-    Object* toJson() const
+    Object* pack() const
     {
         Object* obj = new Object;
         obj->addPair( "id", String::make( id ) );
         return obj;
     }
 
-    void fromJson(const Object* json)
+    void unpack(const Object* json)
     {
         json->unpack( "id" , id );
     }

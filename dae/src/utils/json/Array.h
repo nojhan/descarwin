@@ -28,9 +28,9 @@ class Array : public eoserial::Entity, public std::vector< eoserial::Entity* >
          * @brief Adds the serializable object as a JSON object.
          * @param obj Object which implemnets JsonSerializable.
          */
-        void push_back( eoserial::Serializable* obj )
+        void push_back( eoserial::Printable* obj )
         {
-            ArrayChildren::push_back( obj->toJson() );
+            ArrayChildren::push_back( obj->pack() );
         }
 
         /**
@@ -68,7 +68,7 @@ class Array : public eoserial::Entity, public std::vector< eoserial::Entity* >
          * @param index The index in the array
          * @param value Instance object that we'll rebuild
          */
-        void unpackObject( unsigned int index, Serializable & value ) const
+        void unpackObject( unsigned int index, eoserial::Persistent & value ) const
         {
             static_cast<Object*>( (*this)[ index ] )->deserialize( value );
         }
