@@ -38,7 +38,7 @@ class Object : public eoserial::Entity, public std::map< std::string, eoserial::
          * @param key The key associated with the eoserial object
          * @param obj A JSON-serializable object
          */
-        void addPair( const std::string& key, eoserial::Printable* obj )
+        void addPair( const std::string& key, const eoserial::Printable* obj )
         {
             (*this)[ key ] = obj->pack();
         }
