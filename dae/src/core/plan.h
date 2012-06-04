@@ -20,7 +20,7 @@
 namespace daex
 {
 
-class Plan : public json::Serializable, public eoPersistent
+class Plan : public eoserial::Persistent, public eoPersistent
 {
 protected:
 
@@ -130,36 +130,36 @@ public:
         return _plan_rep ;
     }
 
-    json::Object* toJson(void) const
+    eoserial::Object* pack(void) const
     {
-        json::Object* json = new json::Object;
-        json->addPair( "makespan", json::String::make(_makespan) );
-        json->addPair( "cost_add", json::String::make(_cost_add) );
-        json->addPair( "cost_max", json::String::make(_cost_max) );
-        json->addPair( "search_steps", json::String::make(_search_steps) );
-        json->addPair( "is_valid", json::String::make(_is_valid) );
-        json->addPair( "plan_rep", json::String::make(_plan_rep) );
+        eoserial::Object* json = new eoserial::Object;
+        json->addPair( "makespan", eoserial::String::make(_makespan) );
+        json->addPair( "cost_add", eoserial::String::make(_cost_add) );
+        json->addPair( "cost_max", eoserial::String::make(_cost_max) );
+        json->addPair( "search_steps", eoserial::String::make(_search_steps) );
+        json->addPair( "is_valid", eoserial::String::make(_is_valid) );
+        json->addPair( "plan_rep", eoserial::String::make(_plan_rep) );
         return json;
     }
 
-    void fromJson( const json::Object* json )
+    void unpack( const eoserial::Object* json )
     {
-        _makespan = json->get< TimeVal >( "makespan" );
-        _cost_add = json->get< TimeVal >( "cost_add" );
-        _cost_max = json->get< TimeVal >( "cost_max" );
-        _search_steps = json->get< unsigned int >( "search_steps" );
-        _is_valid = json->get< bool >( "is_valid" );
-        _plan_rep = json->get< std::string >( "plan_rep" );
+        json->unpack< TimeVal >( "makespan", _makespan );
+        json->unpack< TimeVal >( "cost_add", _cost_add );
+        json->unpack< TimeVal >( "cost_max", _cost_max );
+        json->unpack< unsigned int >( "search_steps", _search_steps );
+        json->unpack< bool >( "is_valid", _is_valid );
+        json->unpack< std::string >( "plan_rep", _plan_rep );
     } 
     
     void printOn(std::ostream& out) const
     {
-        json::printOn( this, out );
+        eoserial::printOn( this, out );
     }
 
     void readFrom(std::istream& _is)
     {
-        json::readFrom( this, _is );
+        eoserial::readFrom( this, _is );
     }
 };
 

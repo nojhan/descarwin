@@ -12,7 +12,7 @@
 
 namespace daex {
 
-class Goal : public std::list<Atom*>, public json::Serializable, public eoPersistent
+class Goal : public std::list<Atom*>, public eoserial::Persistent, public eoPersistent
 {
 public:
 
@@ -64,10 +64,10 @@ protected:
 
 public:
 
-    json::Object* toJson() const
+    eoserial::Object* pack() const
     {
         // begin with list members
-        json::Array* members = new json::Array;
+        eoserial::Array* members = new eoserial::Array;
         for( std::list<Atom*>::const_iterator it = this->begin(),
                 end = this->end();
             it != end;
@@ -76,36 +76,36 @@ public:
             members->push_back( *it );
         }
         // continues with self
-        json::Object* obj = new json::Object;
-        obj->addPair( "start_time", json::String::make(_earliest_start_time) );
+        eoserial::Object* obj = new eoserial::Object;
+        obj->addPair( "start_time", eoserial::String::make(_earliest_start_time) );
         obj->addPair( "members", members );
         return obj;
     }
 
-    void fromJson( const json::Object* obj )
+    void unpack( const eoserial::Object* obj )
     {
         // begin with list members
-        const json::Array* members = obj->getArray( "members" );
+        const eoserial::Array* members = static_cast<eoserial::Array*>( obj->find( "members" )->second );
         for (unsigned int i = 0, end = members->size();
                 i < end;
                 ++i)
         {
             Atom* atom = new Atom;
-            *atom = members->getObject<Atom>( i );
+            members->unpackObject( i, *atom );
             this->push_back( atom );
         }
         // continues with self
-        _earliest_start_time = obj->get<TimeVal>( "start_time" );
+        obj->unpack( "start_time", _earliest_start_time );
     }
 
     void printOn(std::ostream& out) const
     {
-        json::printOn( this, out );
+        eoserial::printOn( this, out );
     }
 
     void readFrom(std::istream& _is)
     {
-        json::readFrom( this, _is );
+        eoserial::readFrom( this, _is );
     }
 };
 

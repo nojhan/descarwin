@@ -35,7 +35,7 @@ extern Fluent** fluents;
 namespace daex
 {
 
-class Atom : public eoPersistent, public json::Serializable
+class Atom : public eoPersistent, public eoserial::Persistent
 {
 
 public:
@@ -64,26 +64,26 @@ public:
 
     void printOn(std::ostream& out) const
     {
-        json::printOn( this, out );
+        eoserial::printOn( this, out );
     }
 
     void readFrom(std::istream& _is)
     {
-        json::readFrom( this, _is );
+        eoserial::readFrom( this, _is );
     }
 
-    json::Object* toJson() const
+    eoserial::Object* pack() const
     {
-        json::Object* obj = new json::Object;
-        obj->addPair( "start_time", json::String::make(_earliest_start_time) );
-        obj->addPair( "fluent_index", json::String::make(_fluentIndex) );
+        eoserial::Object* obj = new eoserial::Object;
+        obj->addPair( "start_time", eoserial::String::make(_earliest_start_time) );
+        obj->addPair( "fluent_index", eoserial::String::make(_fluentIndex) );
         return obj;
     }
 
-    void fromJson( const json::Object* json )
+    void unpack( const eoserial::Object* json )
     {
-        _earliest_start_time = json->get<TimeVal>( "start_time" );
-        _fluentIndex = json->get<unsigned int>( "fluent_index" );
+        json->unpack( "start_time", _earliest_start_time );
+        json->unpack( "fluent_index", _fluentIndex );
     }
 };
 

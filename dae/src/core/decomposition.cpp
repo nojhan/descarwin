@@ -57,12 +57,12 @@ void Decomposition::plans_sub_reset()
 
 void Decomposition::printOn( std::ostream & os ) const
 {
-    json::printOn( this, os );
+    eoserial::printOn( this, os );
 }
 
 void Decomposition::readFrom( std::istream & is )
 {
-    json::readFrom( this, is );
+    eoserial::readFrom( this, is );
 }
 
 Decomposition::iterator Decomposition::iter_at( unsigned int i )

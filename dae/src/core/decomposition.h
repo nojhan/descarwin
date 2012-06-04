@@ -26,7 +26,7 @@ namespace daex
 {
 
 //! A decomposition is a list of Goal objects, and we are trying to minimize a scalar fitness (e.g. time or number of actions)
-class Decomposition : public std::list<Goal>  , public EO< eoMinimizingFitness >, public json::Serializable
+class Decomposition : public std::list<Goal>  , public EO< eoMinimizingFitness >, public eoserial::Persistent
 {
 public:
 
@@ -219,90 +219,96 @@ protected:
     unsigned int _B;
 
 public:
-    json::Object* toJson(void) const
+    eoserial::Object* pack(void) const
     {
-        json::Object* json = new json::Object;
+        eoserial::Object* json = new eoserial::Object;
 
         // list<Goal>
-        json::Array* listGoal = new json::Array;
+        eoserial::Array* listGoal = new eoserial::Array;
         for ( std::list<Goal>::const_iterator it = this->begin(),
                 end = this->end();
               it != end;
               ++it)
         {
-            listGoal->push_back( it->toJson() );
+            listGoal->push_back( it->pack() );
         }
         json->addPair( "goals", listGoal );
 
         // eoFitness
         bool invalidFitness = EO< eoMinimizingFitness >::invalid();
-        json->addPair( "invalidFitness", json::String::make(invalidFitness) );
+        json->addPair( "invalidFitness", eoserial::String::make(invalidFitness) );
 
         if ( !invalidFitness )
         {
             eoMinimizingFitness fitness = EO< eoMinimizingFitness >::fitness();
             float fitnessValue = fitness; // implicit operator cast
-            json->addPair( "fitnessValue", json::String::make(fitnessValue) );
+            json->addPair( "fitnessValue", eoserial::String::make(fitnessValue) );
         }
         
         // specific members
         json->addPair( "plan_global", &_plan_global );
         // subplans
-        json::Array* subplans = new json::Array;
+        eoserial::Array* subplans = new eoserial::Array;
         for ( std::vector< daex::Plan >::const_iterator it = _plans_sub.begin(),
                 end = _plans_sub.end();
               it != end;
               ++it)
         {
-            subplans->push_back( it->toJson() );
+            subplans->push_back( it->pack() );
         }
         json->addPair( "subplans", subplans );
-        json->addPair( "b_max", json::String::make(_b_max) );
-        json->addPair( "goal_count", json::String::make(_k) );
-        json->addPair( "useful_goals", json::String::make(_u) );
-        json->addPair( "attempts", json::String::make(_B) );
+        json->addPair( "b_max", eoserial::String::make(_b_max) );
+        json->addPair( "goal_count", eoserial::String::make(_k) );
+        json->addPair( "useful_goals", eoserial::String::make(_u) );
+        json->addPair( "attempts", eoserial::String::make(_B) );
 
         return json;
     }
 
-    void fromJson( const json::Object* json )
+    void unpack( const eoserial::Object* json )
     {
         // list<Goal>
-        const json::Array* listGoal = json->getArray( "goals" );
+        const eoserial::Array* listGoal = static_cast<eoserial::Array*>( json->find( "goals" )->second );
         for(unsigned int i = 0, size = listGoal->size();
                 i < size;
                 ++i)
         {
-            this->push_back( listGoal->getObject< Goal >( i ) );
+            Goal g;
+            listGoal->unpackObject( i, g );
+            this->push_back( g );
         }
 
         // EO fitness
-        bool invalidFitness = json->get<bool>( "invalidFitness" );
+        bool invalidFitness;
+        json->unpack( "invalidFitness", invalidFitness );
         if (invalidFitness) 
         {
             EO< eoMinimizingFitness >::invalidate();
         } else
         {
             eoMinimizingFitness fitness;
-            float fitnessValue = json->get<float>( "fitnessValue" );
+            float fitnessValue;
+            json->unpack( "fitnessValue", fitnessValue );
             fitness = fitnessValue;
             EO< eoMinimizingFitness >::fitness( fitness );
         }
         
         // specific members
-        _plan_global = json->getObject< daex::Plan >( "plan_global" );
+        json->unpackObject( "plan_global", _plan_global );
         // _plans_sub
-        const json::Array* subplans = json->getArray( "subplans" );
+        const eoserial::Array* subplans = static_cast<eoserial::Array*>( json->find( "subplans" )->second );
         for (unsigned int i = 0, size = subplans->size();
                 i < size;
                 ++i)
         {
-            _plans_sub.push_back( subplans->getObject< daex::Plan >( i ) );
+            daex::Plan p;
+            subplans->unpackObject(i, p);
+            _plans_sub.push_back( p );
         }
-        _b_max = json->get<unsigned int>( "b_max" );
-        _k = json->get<unsigned int>( "goal_count" );
-        _u = json->get<unsigned int>( "useful_goals" );
-        _B = json->get<unsigned int>( "attempts" );
+        json->unpack( "b_max", _b_max );
+        json->unpack( "goal_count", _k );
+        json->unpack( "useful_goals", _u );
+        json->unpack( "attempts", _B );
     }
 }; // class Decomposition
 

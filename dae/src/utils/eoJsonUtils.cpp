@@ -5,17 +5,17 @@
 
 # include <string>
 
-namespace json
+namespace eoserial
 {
 
-void printOn(const json::Serializable* obj, std::ostream& out)
+void printOn(const eoserial::Persistent* obj, std::ostream& out)
 {
-    json::Object* jsonThis = obj->toJson();
+    eoserial::Object* jsonThis = obj->pack();
     out << jsonThis;
     delete jsonThis;
 }
 
-void readFrom(json::Serializable* obj, std::istream& _is)
+void readFrom(eoserial::Persistent* obj, std::istream& _is)
 {
     std::string str;
     char temp[1024]; // FIXME taille max de buffer
@@ -25,10 +25,10 @@ void readFrom(json::Serializable* obj, std::istream& _is)
         str += temp;
         str += '\n';
     }
-    json::Object* read = json::Parser::parse( str );
-    obj->fromJson( read );
+    eoserial::Object* read = eoserial::Parser::parse( str );
+    obj->unpack( read );
     delete read;
 }
 
-} // namespace json
+} // namespace eoserial
 

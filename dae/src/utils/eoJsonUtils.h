@@ -4,10 +4,10 @@
 # include "utils/json/Serializable.h"
 # include <iostream>
 
-namespace json
+namespace eoserial
 {
-    void printOn(const json::Serializable* obj, std::ostream& out);
-    void readFrom(json::Serializable* obj, std::istream& _is);
+    void printOn(const eoserial::Persistent* obj, std::ostream& out);
+    void readFrom(eoserial::Persistent* obj, std::istream& _is);
 }
 
 #endif //__EO_JSON_UTILS_H__
