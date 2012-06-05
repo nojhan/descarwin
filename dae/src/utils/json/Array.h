@@ -13,6 +13,22 @@
 namespace eoserial
 {
 
+// Forward declaration for below declarations.
+class Array;
+
+/*
+ * Declarations of functions present in Utils.h
+ * These are put here to avoid instead of including the file Utils.h, which would
+ * cause a circular inclusion.
+ */
+template< class T >
+void unpack( const Array & array, unsigned int index, T & value );
+
+void unpackObject( const Array & array, unsigned int index, Persistent & value );
+
+template< class Container, template<class> class UnpackAlgorithm >
+void unpackArray( const Array & array, unsigned int index, Container & container );
+
 /**
  * @brief Represents a JSON array.
  *
@@ -20,97 +36,111 @@ namespace eoserial
  */
 class Array : public eoserial::Entity, public std::vector< eoserial::Entity* >
 {
-    protected:
-        typedef std::vector< eoserial::Entity* > ArrayChildren;
+protected:
+    typedef std::vector< eoserial::Entity* > ArrayChildren;
 
-    public:
+public:
+    /**
+     * @brief Adds the serializable object as a JSON object.
+     * @param obj Object which implemnets JsonSerializable.
+     */
+    void push_back( eoserial::Printable* obj )
+    {
+        ArrayChildren::push_back( obj->pack() );
+    }
+
+    /**
+     * @brief Proxy for vector::push_back.
+     */
+    void push_back( eoserial::Entity* json )
+    {
+        ArrayChildren::push_back( json );
+    }
+
+    /**
+     * @brief Prints the JSON array into the given stream.
+     * @param out The stream
+     */
+    virtual std::ostream& print( std::ostream& out ) const;
+
+    /**
+     * @brief Dtor
+     */
+    ~Array();
+
+    /*
+     * The following parts allows the user to automatically deserialize an eoserial::Array into a
+     * standard container, by giving the algorithm which will be used to deserialize contained entities.
+     */
+
+    /**
+     * @brief Functor which determines how to retrieve the real value contained in a eoserial::Entity at
+     * a given place.
+     *
+     * It will be applied for each contained variable in the array.
+     */
+    template<class Container>
+    struct BaseAlgorithm
+    {
         /**
-         * @brief Adds the serializable object as a JSON object.
-         * @param obj Object which implemnets JsonSerializable.
+         * @brief Main operator.
+         *
+         * @param array The eoserial::Array from which we're reading.
+         * @param i The index of the contained value.
+         * @param container The standard (STL) container in which we'll push back the read value.
          */
-        void push_back( eoserial::Printable* obj )
+        virtual void operator()( const eoserial::Array& array, unsigned int i, Container & container ) const = 0;
+    };
+
+    /**
+     * @brief BaseAlgorithm for retrieving primitive variables.
+     *
+     * This one should be used to retrieve primitive (and types which implement operator>>) variables, for instance
+     * int, double, std::string, etc...
+     */
+    template<typename C>
+    struct UnpackAlgorithm : public BaseAlgorithm<C>
+    {
+        void operator()( const eoserial::Array& array, unsigned int i, C & container ) const
         {
-            ArrayChildren::push_back( obj->pack() );
+            typename C::value_type t;
+            unpack( array, i, t );
+            container.push_back( t );
         }
+    };
 
-        /**
-         * @brief Proxy for vector::push_back.
-         */
-        void push_back( eoserial::Entity* json )
+    /**
+     * @brief BaseAlgorithm for retrieving eoserial::Persistent objects.
+     *
+     * This one should be used to retrieve objects which implement eoserial::Persistent.
+     */
+    template<typename C>
+    struct UnpackObjectAlgorithm : public BaseAlgorithm<C>
+    {
+        void operator()( const eoserial::Array& array, unsigned int i, C & container ) const
         {
-            ArrayChildren::push_back( json );
+            typename C::value_type t;
+            unpackObject( array, i, t );
+            container.push_back( t );
         }
+    };
 
-        /**
-         * @brief Prints the JSON array into the given stream.
-         * @param out The stream
-         */
-        virtual std::ostream& print( std::ostream& out ) const;
-
-        /**
-         * @brief Dtor
-         */
-        ~Array();
-
-         /**
-         * @brief Unpack primitive type stocked in the given index.
-         * @param index The index in the array
-         * @param value Instance of the primitive type in which will be written the value.
-         */
-        template<class T>
-        void unpack( unsigned int index, T & value ) const
+    /**
+     * @brief General algorithm for array deserialization.
+     *
+     * Applies the BaseAlgorithm to each contained variable in the eoserial::Array.
+     */
+    template<class Container, template<class T> class UnpackAlgorithm>
+    inline void deserialize( Container & array )
+    {
+        UnpackAlgorithm< Container > algo;
+        for( unsigned int i = 0, size = this->size();
+                i < size;
+                ++i)
         {
-            static_cast<String*>( (*this)[ index ] )->deserialize( value );
+            algo( *this, i, array );
         }
-
-        /**
-         * @brief Unpack Serializable type stocked in the given index.
-         * @param index The index in the array
-         * @param value Instance object that we'll rebuild
-         */
-        void unpackObject( unsigned int index, eoserial::Persistent & value ) const
-        {
-            static_cast<Object*>( (*this)[ index ] )->deserialize( value );
-        }
-
-        /*
-        // TODO see if it's useful to have generic algorithms for retrieval
-        template<typename T>
-        struct BaseAlgorithm
-        {
-            virtual void operator()( const eoserial::Array* array, unsigned int i, T & value ) const = 0;
-            virtual void operator()( const eoserial::Object* obj, const std::string& key, T & value ) const = 0;
-        };
-
-        template<typename T, typename JsonEntity>
-        struct UnpackAlgorithm : public BaseAlgorithm<T>
-        {
-            void operator()( const eoserial::Array* array, unsigned int i, T & value ) const
-            {
-                array->unpack( i, value );
-            }
-
-            void operator()( const eoserial::Object* obj, const std::string& key, T & value ) const
-            {
-                obj->unpack( key, value );
-            }
-        };
-
-        template<typename Type, template <typename T, typename alloc = std::allocator<T> > class Container>
-        inline Container<Type>* deserialize( const eoserial::Array* json, const BaseAlgorithm<Type> & algo )
-        {
-            Container<Type>* array = new Container<Type>( eoserial->size() );
-            for( unsigned int i = 0, size = eoserial->size();
-                    i < size;
-                    ++i)
-            {
-                Type t;
-                algo( eoserial, 
-                array->push_back( t );
-            }
-            return array;
-        }
-        */
+    }
 };
 
 } // namespace eoserial

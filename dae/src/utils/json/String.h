@@ -30,19 +30,6 @@ class String : public eoserial::Entity, public std::string
         String( ) {}
 
         /**
-         * @brief Casts a value of a stream-serializable type (i.e, which implements
-         * operator <<) into a JsonString.
-         *
-         * This is used when serializing the objects : all primitives types should be
-         * converted into strings to get more easily manipulated.
-         *
-         * @param value The value we're converting.
-         * @return JsonString wrapper for the value.
-         */
-        template<typename T>
-        static String* make( const T & value );
-
-        /**
          * @brief Prints out the string.
          */
         virtual std::ostream& print( std::ostream& out ) const;
@@ -60,6 +47,15 @@ class String : public eoserial::Entity, public std::string
         String& operator=( const String& _ );
 };
 
+/**
+ * @brief Casts a eoserial::String into a primitive value, or in a type which at
+ * least overload operator>>.
+ *
+ * @param value A reference to the variable we're writing into.
+ *
+ * It's not necessary to specify the variable type, which can be infered by compiler when
+ * invoking.
+ */
 template<class T>
 inline void String::deserialize( T & value )
 {
@@ -76,24 +72,6 @@ template<>
 inline void String::deserialize( std::string & value )
 {
     value = *this;
-}
-
-template <typename T>
-String* String::make( const T & value )
-{
-    std::stringstream ss;
-    ss << value;
-    return new String( ss.str() );
-}
-
-/**
- * @brief Specialization for strings : no need to convert as they're still
- * usable as strings.
- */
-template<>
-inline String* String::make( const std::string & value )
-{
-    return new String( value );
 }
 
 } // namespace eoserial

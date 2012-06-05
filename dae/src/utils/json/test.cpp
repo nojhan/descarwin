@@ -14,13 +14,13 @@ struct MySubObj : public Persistent {
     Object* pack() const
     {
         Object* obj = new Object;
-        obj->addPair( "id", String::make( id ) );
+        obj->add( "id", make( id ) );
         return obj;
     }
 
     void unpack(const Object* json)
     {
-        json->unpack( "id" , id );
+        eoserial::unpack( *json, "id" , id );
     }
 };
 
@@ -65,42 +65,45 @@ int main (int argc, char **argv)
 
     Object jo;
 
-    jo.addPair( "integer",  String::make( o.integer ) );
-    jo.addPair( "boolean",  String::make( o.boolean ) );
-    jo.addPair( "str",      String::make( o.str ) );
-    jo.addPair( "sub", &so );
+    jo.add( "integer",  make( o.integer ) );
+    jo.add( "boolean",  make( o.boolean ) );
+    jo.add( "str",      make( o.str ) );
+    jo.add( "sub", &so );
 
+    /*
+    // Line 81 is equivalent to the following commented lines
     Array* ja = new Array;
     for (unsigned int i = 0; i < o.array.size(); ++i)
     {
-        ja->push_back( String::make( o.array[i] ) );
+        ja->push_back( make( o.array[i] ) );
     }
-    jo.addPair( "array", ja );
+    */
+    Array* ja = makeArray< vector<int>, MakeAlgorithm >( o.array );
+    jo.add( "array", ja );
+
 
     // Test of JsonObject.print()
-    cout << "Encoded object : \n" << &jo << '\n' << endl;
+    cout << "Encoded object : \n";
+    jo.print( cout );
+    cout << '\n' << endl;
 
     // Test of parser
     stringstream ss;
-    ss << &jo;
+    jo.print( ss );
     Object* parsed = Parser::parse( ss.str() );
 
-    cout << "Parsed object : \n" << parsed << endl;
+    cout << "Parsed object : \n";
+    parsed->print( cout );
+    cout << endl;
 
     // Retrieval and reconstruction
     MyObject anotherO;
-    
-    parsed->unpack( "integer",  anotherO.integer );
-    parsed->unpack( "boolean", anotherO.boolean );
-    parsed->unpack( "str", anotherO.str );
-    parsed->unpackObject( "sub", anotherO.sub );
-
-    // Another way to do the same thing
-    // anotherO.integer = JsonUtils::get<int>( (*parsed)["integer"] );
-    // anotherO.boolean = JsonUtils::get<bool>( (*parsed)["boolean"] );
-    // anotherO.str = JsonUtils::get<std::string>( (*parsed)["str"] );
-    // anotherO.sub = JsonUtils::getObject<MySubObj>( (*parsed)["sub"] );
-
+    unpack( *parsed, "integer", anotherO.integer );
+    unpack( *parsed, "boolean", anotherO.boolean );
+    unpack( *parsed, "str", anotherO.str );
+    unpackObject( *parsed, "sub", anotherO.sub );
+    /*
+    // Line 115 is equivalent to the following commented lines.
     const Array* array = static_cast<Array*>( (*parsed)[ "array" ] );
     for (unsigned int i = 0; i < array->size(); ++i)
     {
@@ -108,14 +111,9 @@ int main (int argc, char **argv)
         array->unpack( i, integer );
         anotherO.array.push_back( integer );
     }
-
-    /*
-    // TODO no more doable, see Array.h
-    vector<int>* parray = 
-    parsed->getCompletedArray<int, vector>( "array", JsonUtils::GetAlgorithm<int, String>()  );
-    anotherO.array = *parray;
-    delete parray;
     */
+    unpackArray< vector<int>, Array::UnpackAlgorithm >( *parsed, "array", anotherO.array );    
+
 
     cout    << "\nAnother object...\n"
             << "Integer : " << anotherO.integer << "\n"

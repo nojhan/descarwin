@@ -15,7 +15,6 @@ namespace eoserial
  */
 class Entity
 {
-
 public:
 
     /**
@@ -28,17 +27,8 @@ public:
      * @param out The stream in which we're printing.
      */
     virtual std::ostream& print( std::ostream& out ) const = 0;
-
-protected:
 };
 
 } // namespace eoserial
-
-/**
- * @brief Prints the content of the eoserial object into the stream.
- * @param out The stream in which we're printing
- * @param json The json object (as a pointer) we want to print
- */
-std::ostream& operator<< ( std::ostream& out, const eoserial::Entity * json );
 
 # endif // __ENTITY_H__

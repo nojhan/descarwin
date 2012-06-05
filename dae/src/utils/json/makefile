@@ -1,7 +1,7 @@
 # This makefile is here to unit test the JSON serialization module.
 # Don't use it if your will is to compile DAE with it.
 
-OBJ=Entity.o Array.o String.o Object.o Parser.o test.o
+OBJ=Array.o String.o Object.o Parser.o test.o
 CXX=g++
 CXXFLAGS=-Wall -ggdb
 EXEC=json
