@@ -15,10 +15,9 @@ SET (DAEX_SOURCES
   utils/cli.cpp
   core/decomposition.cpp
   core/goal.cpp
-  # JSON sources
+  # EoSerial sources
   # TODO TODOB mettre à part ?
   utils/json/Array.cpp
-  utils/json/Entity.cpp
   utils/json/Object.cpp
   utils/json/Parser.cpp
   utils/json/String.cpp
