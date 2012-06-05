@@ -123,6 +123,14 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
     TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common cpt_yahsp_library-dae)
     # TODO check if correct
 
+    SET( EOSERIAL_TEST_SOURCES
+          src/utils/json/Array.cpp
+          src/utils/json/Object.cpp
+          src/utils/json/Parser.cpp
+          src/utils/json/String.cpp
+        )
+    ADD_EXECUTABLE(test_eoserial src/utils/json/test.cpp
+        ${EOSERIAL_TEST_SOURCES})
     
 ENDIF()
 
