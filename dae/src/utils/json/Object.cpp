@@ -23,7 +23,7 @@ std::ostream& Object::print( std::ostream& out ) const
         out << '"' << it->first << "\":";   // key
         it->second->print( out );           // value
         }
-    out << '}';
+    out << "}\n";
     return out;
 }
 

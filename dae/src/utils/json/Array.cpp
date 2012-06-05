@@ -20,7 +20,7 @@ std::ostream& Array::print( std::ostream& out ) const
         }
         (*it)->print( out );
     }
-    out << ']';
+    out << "]\n";
     return out;
 }
 
