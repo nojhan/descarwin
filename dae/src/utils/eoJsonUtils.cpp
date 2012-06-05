@@ -8,17 +8,17 @@
 namespace eoserial
 {
 
-void printOn(const eoserial::Persistent* obj, std::ostream& out)
+void printOn(const eoserial::Persistent& obj, std::ostream& out)
 {
-    eoserial::Object* jsonThis = obj->pack();
-    out << jsonThis;
+    eoserial::Object* jsonThis = obj.pack();
+    jsonThis->print( out );
     delete jsonThis;
 }
 
-void readFrom(eoserial::Persistent* obj, std::istream& _is)
+void readFrom(eoserial::Persistent& obj, std::istream& _is)
 {
     std::string str;
-    char temp[1024]; // FIXME taille max de buffer
+    char temp[1024];
     while( _is )
     {
         _is.getline( temp, 1024, '\n' );
@@ -26,7 +26,7 @@ void readFrom(eoserial::Persistent* obj, std::istream& _is)
         str += '\n';
     }
     eoserial::Object* read = eoserial::Parser::parse( str );
-    obj->unpack( read );
+    obj.unpack( read );
     delete read;
 }
 

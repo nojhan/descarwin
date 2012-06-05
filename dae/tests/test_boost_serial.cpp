@@ -249,15 +249,15 @@ int main ( int argc, char* argv[] )
     int benchNb = 1000;
 
     std::stringstream ss;
-    json::Object* jsonBest;
+    eoserial::Object* jsonBest;
     time_t before_serialize = time(0);
     for (int i = 0; i < benchNb; ++i)
     {
-        jsonBest = best.toJson();
+        jsonBest = best.pack();
 
         ss.clear();
         ss.str(std::string());
-        ss << jsonBest;
+        jsonBest->print( ss );
     }
     // std::cout<< "\n\n" << jsonBest << std::endl;
     time_t after_serialize = time(0);
@@ -268,10 +268,10 @@ int main ( int argc, char* argv[] )
     time_t before_deserialize = time(0);
     for (int i = 0; i < benchNb; ++i)
     {
-        json::Object* received = json::Parser::parse( ss.str() );
+        eoserial::Object* received = eoserial::Parser::parse( ss.str() );
 
         // Deserializes from json
-        read.fromJson( received );
+        read.unpack( received );
     }
     time_t after_deserialize = time(0);
     

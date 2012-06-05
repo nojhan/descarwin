@@ -64,48 +64,65 @@ protected:
 
 public:
 
+    /**
+     * @brief Specific push algorithm used by makeArray, for pointers.
+     */
+    template< class T>
+    struct PointerPushAlgorithm : public eoserial::PushAlgorithm<T>
+    {
+        void operator()( eoserial::Array & array, const T& obj )
+        {
+            // as obj is a pointer, just pushes the pointer
+            array.push_back( obj );
+        }
+    };
+
     eoserial::Object* pack() const
     {
         // begin with list members
-        eoserial::Array* members = new eoserial::Array;
-        for( std::list<Atom*>::const_iterator it = this->begin(),
-                end = this->end();
-            it != end;
-            ++it)
-        {
-            members->push_back( *it );
-        }
+        eoserial::Array* members = eoserial::makeArray
+            < std::list<Atom*>, PointerPushAlgorithm >
+            ( *this );
+
         // continues with self
         eoserial::Object* obj = new eoserial::Object;
-        obj->addPair( "start_time", eoserial::String::make(_earliest_start_time) );
-        obj->addPair( "members", members );
+        obj->add( "start_time", eoserial::make(_earliest_start_time) );
+        obj->add( "members", members );
         return obj;
     }
+
+    /**
+     * @brief Specific UnpackAlgorithm, used by unpackArray, to create objects before
+     * handling them.
+     */
+    template <class C>
+    struct UnpackNewAlgorithm : public eoserial::Array::BaseAlgorithm<C>
+    {
+        void operator()( const eoserial::Array& array, unsigned int i, C & container ) const
+        {
+            Atom* atom = new Atom;
+            eoserial::unpackObject( array, i, *atom );
+            container.push_back( atom );
+        }
+    };
 
     void unpack( const eoserial::Object* obj )
     {
         // begin with list members
-        const eoserial::Array* members = static_cast<eoserial::Array*>( obj->find( "members" )->second );
-        for (unsigned int i = 0, end = members->size();
-                i < end;
-                ++i)
-        {
-            Atom* atom = new Atom;
-            members->unpackObject( i, *atom );
-            this->push_back( atom );
-        }
+        eoserial::unpackArray< std::list<Atom*>, UnpackNewAlgorithm >
+            ( *obj, "members", *this);
         // continues with self
-        obj->unpack( "start_time", _earliest_start_time );
+        eoserial::unpack( *obj, "start_time", _earliest_start_time );
     }
 
     void printOn(std::ostream& out) const
     {
-        eoserial::printOn( this, out );
+        eoserial::printOn( *this, out );
     }
 
     void readFrom(std::istream& _is)
     {
-        eoserial::readFrom( this, _is );
+        eoserial::readFrom( *this, _is );
     }
 };
 

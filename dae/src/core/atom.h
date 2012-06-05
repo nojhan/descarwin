@@ -64,26 +64,26 @@ public:
 
     void printOn(std::ostream& out) const
     {
-        eoserial::printOn( this, out );
+        eoserial::printOn( *this, out );
     }
 
     void readFrom(std::istream& _is)
     {
-        eoserial::readFrom( this, _is );
+        eoserial::readFrom( *this, _is );
     }
 
     eoserial::Object* pack() const
     {
         eoserial::Object* obj = new eoserial::Object;
-        obj->addPair( "start_time", eoserial::String::make(_earliest_start_time) );
-        obj->addPair( "fluent_index", eoserial::String::make(_fluentIndex) );
+        obj->add( "start_time", eoserial::make(_earliest_start_time) );
+        obj->add( "fluent_index", eoserial::make(_fluentIndex) );
         return obj;
     }
 
     void unpack( const eoserial::Object* json )
     {
-        json->unpack( "start_time", _earliest_start_time );
-        json->unpack( "fluent_index", _fluentIndex );
+        eoserial::unpack( *json, "start_time", _earliest_start_time );
+        eoserial::unpack( *json, "fluent_index", _fluentIndex );
     }
 };
 

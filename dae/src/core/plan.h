@@ -133,33 +133,33 @@ public:
     eoserial::Object* pack(void) const
     {
         eoserial::Object* json = new eoserial::Object;
-        json->addPair( "makespan", eoserial::String::make(_makespan) );
-        json->addPair( "cost_add", eoserial::String::make(_cost_add) );
-        json->addPair( "cost_max", eoserial::String::make(_cost_max) );
-        json->addPair( "search_steps", eoserial::String::make(_search_steps) );
-        json->addPair( "is_valid", eoserial::String::make(_is_valid) );
-        json->addPair( "plan_rep", eoserial::String::make(_plan_rep) );
+        json->add( "makespan", eoserial::make(_makespan) );
+        json->add( "cost_add", eoserial::make(_cost_add) );
+        json->add( "cost_max", eoserial::make(_cost_max) );
+        json->add( "search_steps", eoserial::make(_search_steps) );
+        json->add( "is_valid", eoserial::make(_is_valid) );
+        json->add( "plan_rep", eoserial::make(_plan_rep) );
         return json;
     }
 
     void unpack( const eoserial::Object* json )
     {
-        json->unpack< TimeVal >( "makespan", _makespan );
-        json->unpack< TimeVal >( "cost_add", _cost_add );
-        json->unpack< TimeVal >( "cost_max", _cost_max );
-        json->unpack< unsigned int >( "search_steps", _search_steps );
-        json->unpack< bool >( "is_valid", _is_valid );
-        json->unpack< std::string >( "plan_rep", _plan_rep );
+        eoserial::unpack( *json, "makespan", _makespan );
+        eoserial::unpack( *json, "cost_add", _cost_add );
+        eoserial::unpack( *json, "cost_max", _cost_max );
+        eoserial::unpack( *json, "search_steps", _search_steps );
+        eoserial::unpack( *json, "is_valid", _is_valid );
+        eoserial::unpack( *json, "plan_rep", _plan_rep );
     } 
     
     void printOn(std::ostream& out) const
     {
-        eoserial::printOn( this, out );
+        eoserial::printOn( *this, out );
     }
 
     void readFrom(std::istream& _is)
     {
-        eoserial::readFrom( this, _is );
+        eoserial::readFrom( *this, _is );
     }
 };
 
