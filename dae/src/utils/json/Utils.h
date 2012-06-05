@@ -21,35 +21,35 @@ namespace eoserial
     */
 
     template< class T >
-    void unpack( const Object & obj, const std::string & key, T & value )
+    inline void unpack( const Object & obj, const std::string & key, T & value )
     {
         static_cast<String*>( obj.find( key )->second )->deserialize( value );
     }
 
-    void unpackObject( const Object & obj, const std::string & key, Persistent & value )
+    inline void unpackObject( const Object & obj, const std::string & key, Persistent & value )
     {
         static_cast<Object*>( obj.find( key )->second )->deserialize( value );
     }
 
     template< class Container, template<class> class UnpackAlgorithm >
-    void unpackArray( const Object & obj, const std::string & key, Container & array )
+    inline void unpackArray( const Object & obj, const std::string & key, Container & array )
     {
         static_cast<Array*>( obj.find( key )->second )->deserialize< Container, UnpackAlgorithm >( array );
     }
 
     template< class T >
-    void unpack( const Array & array, unsigned int index, T & value )
+    inline void unpack( const Array & array, unsigned int index, T & value )
     {
         static_cast<String*>( array[ index ] )->deserialize( value );
     }
 
-    void unpackObject( const Array & array, unsigned int index, Persistent & value )
+    inline void unpackObject( const Array & array, unsigned int index, Persistent & value )
     {
         static_cast<Object*>( array[ index ] )->deserialize( value );
     }
 
     template< class Container, template<class> class UnpackAlgorithm >
-    void unpackArray( const Array & array, unsigned int index, Container & container )
+    inline void unpackArray( const Array & array, unsigned int index, Container & container )
     {
         static_cast<Array*>( array[ index ] )->deserialize< Container, UnpackAlgorithm >( container );
     }
@@ -107,7 +107,7 @@ namespace eoserial
          * @param array The eoserial::array in which we're writing.
          * @param value The variable we are writing.
          */
-        virtual void operator()( Array & array, T & value ) = 0;
+        virtual void operator()( Array & array, const T & value ) = 0;
     };
 
     /**
@@ -117,9 +117,9 @@ namespace eoserial
      * operator<<) variables.
      */
     template< class T >
-    struct MakeAlgorithm : PushAlgorithm<T>
+    struct MakeAlgorithm : public PushAlgorithm<T>
     {
-        void operator()( Array & array, T & value )
+        void operator()( Array & array, const T & value )
         {
             array.push_back( make( value ) );
         }
@@ -128,9 +128,10 @@ namespace eoserial
     /**
      * @brief Push algorithm for eoserial::Persistent variables.
      */
-    struct SerializablePushAlgorithm : PushAlgorithm< Persistent >
+    template< class T >
+    struct SerializablePushAlgorithm : public PushAlgorithm<T>
     {
-        void operator()( Array & array, Persistent & obj )
+        void operator()( Array & array, const T & obj )
         {
             // obj address is not saved into array.push_back.
             array.push_back( &obj );
@@ -146,12 +147,12 @@ namespace eoserial
      * eoserial::Array.
      */
     template< class Container, template<class> class PushAlgorithm >
-    Array* makeArray( Container & array )
+    Array* makeArray( const Container & array )
     {
         Array* returned_array = new Array;
-        typedef typename Container::iterator iterator;
-        typedef typename Container::value_type type;
-        PushAlgorithm< type > algo;
+        typedef typename Container::const_iterator iterator;
+        typedef typename Container::value_type Type;
+        PushAlgorithm< Type > algo;
         for (
                 iterator it = array.begin(), end = array.end();
                 it != end;

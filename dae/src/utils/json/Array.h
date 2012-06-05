@@ -44,7 +44,7 @@ public:
      * @brief Adds the serializable object as a JSON object.
      * @param obj Object which implemnets JsonSerializable.
      */
-    void push_back( eoserial::Printable* obj )
+    void push_back( const eoserial::Printable* obj )
     {
         ArrayChildren::push_back( obj->pack() );
     }
