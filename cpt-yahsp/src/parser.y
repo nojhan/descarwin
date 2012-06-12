@@ -197,11 +197,28 @@ expression { $$ = token_add_head(NULL, NULL, $1); }
 void parser_read_pddl_file(PDDLDomain *domain, char *file, int pipefd)
 {
   if (file != NULL) {
-    if ((pddl_in = fopen("/bin/bzcat", "r")) == NULL) error(no_file, "Command 'bzcat' not found");
+    // Parade to find where is bzcat...
+    char bzcat[512];
+    short usrBzcat = 0;
+    if ((pddl_in = fopen("/bin/bzcat", "r")) == NULL) 
+    {
+        if((pddl_in = fopen("/usr/bin/bzcat", "r")) == NULL)
+            error(no_file, "Command 'bzcat' not found");
+        else
+        usrBzcat = 1;
+    }
+
+    if (usrBzcat)
+    {
+        strcpy( bzcat, "/usr/bin/bzcat -qf %s 2>/dev/null" );
+    } else {
+        strcpy( bzcat, "/bin/bzcat -qf %s 2>/dev/null" );
+    }
+
     fclose(pddl_in);
     if ((pddl_in = fopen(file, "r")) == NULL) error(no_file, "File '%s' cannot be opened", file);
     fclose(pddl_in);
-    char bzcat[] = "/bin/bzcat -qf %s 2>/dev/null";
+    // char bzcat[] = "/bin/bzcat -qf %s 2>/dev/null";
     char cmd[strlen(bzcat) + strlen(file)];
     sprintf(cmd, bzcat, file);
     pddl_in = popen(cmd, "r");
