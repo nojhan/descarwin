@@ -10,6 +10,9 @@ namespace MpiMessage
 {
     const int WRK_NEW_RESULT = 0;
     const int WRK_NO_RESULT = 1;
+
+    const int MSTR_NO_MORE_ATTRIBUTIONS = 2;
+    const int MSTR_CONTINUE = 3;
 }
 
 namespace MpiChannel
@@ -147,10 +150,19 @@ public:
             eo::log << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
         }
 
+        // Sends the orders the first time
         for (int i = 0; i < size-1; ++i)
         {
+            int order = 0;
             // rank of worker is i+1, as i begins from 0
-            world.send( i+1, MpiChannel::COMMANDS, attributions[i] );
+            if ( attributions[i] == 0 )
+            {
+                order = MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS;
+            } else
+            {
+                order = MpiMessage::MSTR_CONTINUE;
+            }
+            world.send( i+1, MpiChannel::COMMANDS, order );
         }
 
         workersWorking = size - 1;
@@ -204,14 +216,19 @@ public:
                 eo::log << "[Master] Unknown answer received : " << answer << std::endl;
             }
 
+            // TODO place assignment here
+            //
+
             --( attributions[wrkReqNb] );
             if( attributions[wrkReqNb] == 0U )
             {
                 eo::log << "[Master] worker " << wrkRank << " has finished all its requests." << std::endl ;
+                world.send( wrkRank, MpiChannel::COMMANDS, MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS );
                 --workersWorking;
             } else
             {
                 eo::log << "[Master] worker " << wrkRank << " has still " << attributions[wrkReqNb] << " requests to do." << std::endl ;
+                world.send( wrkRank, MpiChannel::COMMANDS, MpiMessage::MSTR_CONTINUE );
             }
             
             if ( workersWorking > 0 )
@@ -247,20 +264,13 @@ public:
         eoState& state = _state;
         std::string& plan_file = _plan_file;
         int rank = _rank;
-
-        int maxruns = 0;
-        world.recv( 0, MpiChannel::COMMANDS, maxruns );
-
-        if ( maxruns > 0 )
-        {
-            eo::log << "[Worker " << rank << "] I have to launch " << maxruns << " run(s) !" << std::endl;
-        } else if ( maxruns == 0 )
+        
+        int order = 0;
+        world.recv( 0, MpiChannel::COMMANDS, order );
+        if ( order == MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS )
         {
             eo::log << "[Worker " << rank << "] Nothing to do here, quits !" << std::endl ;
             return 0;
-        } else
-        {
-            eo::log << "[Worker " << rank << "] Infinite run asked." ;
         }
 
         // TODO param runs-max is not used by workers. But if param is not created, parser complains about receiving an
@@ -489,8 +499,12 @@ public:
                 // TODO use previous searches to re-estimate a better b_max?
 
                 // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
+
                 run++;
-                if( run >= maxruns && maxruns != -1 ) {
+                int order = 0;
+                world.recv( 0, MpiChannel::COMMANDS, order );
+                if ( order == MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS )
+                {
                     break;
                 }
 
