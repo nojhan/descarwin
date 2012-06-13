@@ -125,13 +125,19 @@ public:
         // This is static assignment // TODO TODOB Laisser le choix entre statique et dynamique
         unsigned int nbWorkers = size - 1;
         attributions = new unsigned int[ nbWorkers ]; // TODO what if size == 1 ?
+
+        // Let be the euclidean division of maxruns by nbWorkers :
+        // maxruns == q * nbWorkers + r
+        // This one liner affects q requests to each worker
         for (unsigned int i = 0; i < nbWorkers; attributions[i++] = maxruns / nbWorkers) ;
+        // The first line computes r and the one liner affects the remaining 
+        // r requests to workers, in ascending order
         unsigned int diff = maxruns - (maxruns / nbWorkers) * nbWorkers;
         for (unsigned int i = 0; i < diff; ++attributions[i++]);
 
         for (int i = 0; i < size-1; ++i)
         {
-            std::cout << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
+            eo::log << "[Master] Assignments for process " << i+1 << " : " << attributions[i] ;
         }
 
         for (int i = 0; i < size-1; ++i)
@@ -142,24 +148,23 @@ public:
 
         workersWorking = size - 1;
 
-
         int i;
         // computes real number of workers
         for (i = 0; i < size - 1; ++i )
         {
             if ( attributions[i] == 0 ) { --workersWorking; }
         }
-        std::cout << "[Master] I have " << workersWorking << " workers at my feet, let's start the show !" << std::endl;
+        eo::log << "[Master] " << workersWorking << " workers available !" ;
 
         while( workersWorking > 0 )
         {
             mpi::status status = world.probe(mpi::any_source, MpiChannel::COMMANDS);
             int wrkRank = status.source();
 
-            std::cout << "Showing status :\nError : " << status.error()
+            eo::log << "Showing status :\nError : " << status.error()
                       << "\nTag : " << status.tag()
                       <<"\nSource : " << status.source()
-                      << std::endl;
+                      ;
 
             int wrkReqNb = wrkRank - 1;
             //
@@ -168,40 +173,45 @@ public:
             world.recv( wrkRank, MpiChannel::COMMANDS, answer );
             // 0 == nothing better
             // 1 == better fitness found, I send it to you.
-            std::cout << "[Master] Node " << wrkRank << " tells : " << answer << std::endl;
+            eo::log << "[Master] Node " << wrkRank << " tells : " << answer ;
 
             if ( answer == MpiMessage::WRK_NO_RESULT)
             {
-                std::cout << "[Master] Nothing better.\n";
+                eo::log << "[Master] Nothing better.\n";
             } else if ( answer == MpiMessage::WRK_NEW_RESULT)
             {
-                std::cout << "[Master] Better solution to come...\n";
+                eo::log << "[Master] Brace yourself, solution is coming...\n";
                 daex::Decomposition received;
                 world.recv( wrkRank, MpiChannel::DATA, received );
                 if (received.fitness() > best.fitness())
                 {
                     best = received;
                     double fitnessValue = best.fitness();
-                    std::cout << "[Master] Better solution found ! Now fitness is " << fitnessValue << std::endl;
+                    eo::log << "[Master] Better solution found ! Now best fitness is " << fitnessValue ;
+                } else {
+                    eo::log << "[Master] Solution sent from " << wrkRank << " was not as good as the one I had." ;
                 }
             } else
             {
-                std::cout << "[Master] Unknown answer received : " << answer << std::endl;
+                eo::log << "[Master] Unknown answer received : " << answer ;
             }
-
-            std::cout << "[Master] Request from " << wrkRank << "r just finished. We are at " << attributions[wrkReqNb] << " requests for this worker." << std::endl;
 
             --( attributions[wrkReqNb] );
             if( attributions[wrkReqNb] == 0U )
             {
+                eo::log << "[Master] worker " << wrkRank << " has finished all its requests." ;
                 --workersWorking;
             } else
             {
-                std::cout << "[Master] worker " << wrkRank << " has still " << attributions[wrkReqNb] << " requests to do, let's give him one more." << std::endl;
+                eo::log << "[Master] worker " << wrkRank << " has still " << attributions[wrkReqNb] << " requests to do, let's give him one more." ;
             }
             
-            std::cout << "[Master] Still remains " << workersWorking << " at work. Let's wait..." << std::endl;
+            if ( workersWorking > 0 )
+            {
+                eo::log << "[Master] Still remains " << workersWorking << " at work. Let's wait..." ;
+            }
         }
+        eo::log << "[Master] Global process is over." ;
 
         // TODO should write best solution here
 
@@ -248,8 +258,9 @@ public:
           //        param_seed.value( time(0) );
           param_seed.value() = time(0); // EO compatibility fixed by CC on 2010.12.24
         }
-        param_seed.value() *= (1+rank); // to avoid having the same seed for each process
-        std::cout << "[Seed] Process " << rank << " has seed : " << param_seed.value() << std::endl;
+        param_seed.value() *= rank; // to avoid having the same seed for each process
+        // no multiplication by zero as workers processes are strictly higher than 0
+        eo::log << "[Worker " << rank << "] Seed : " << param_seed.value() ;
 
         unsigned int seed = param_seed.value();
         rng.reseed( seed );
@@ -276,15 +287,15 @@ public:
 
         // PDDL
 #ifndef NDEBUG
-        eo::log << eo::progress << "Load the instance..." << std::endl;
+        eo::log << eo::progress << "[Worker " << rank << "] Load the instance...";
         eo::log.flush();
 #endif
         
         daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, eo::parallel.nthreads(), std::vector<std::string>());
        
 #ifndef NDEBUG
-        eo::log << eo::progress << "Load the instance...OK" << std::endl;
-        eo::log << eo::progress << "Initialization...";
+        eo::log << eo::progress << "[Worker " << rank << "] Load the instance...OK";
+        eo::log << eo::progress << "[Worker " << rank << "] Initialization...";
         eo::log.flush();
 #endif
 
@@ -395,7 +406,6 @@ public:
         );
 
         // SELECTION AND VARIATION
-        // daex::MutationDelGoal<daex::Decomposition> delgoal; // FIXME delgoal devrait être un pointeur alloué sur le tas
         daex::MutationDelGoal<daex::Decomposition>* delgoal = new daex::MutationDelGoal<daex::Decomposition>;
         eoGeneralBreeder<daex::Decomposition> & breed = daex::do_make_variation_op<daex::Decomposition>( parser, state, pddl, delgoal );
 
@@ -424,7 +434,7 @@ public:
 
         unsigned int runsAsked;
         world.recv( 0, MpiChannel::COMMANDS, runsAsked );
-        std::cout << "[Worker " << rank << "] I have to work " << runsAsked << " times ! Diz iz too much, seriously !" << std::endl;
+        eo::log << "[Worker " << rank << "] I have to launch " << runsAsked << " runs !" ;
         unsigned int maxruns = runsAsked;
         
         if (maxruns == 0)
@@ -433,16 +443,15 @@ public:
         try {
             while( true ) {
 #ifndef NDEBUG
-                eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
+                eo::log << eo::progress << "[Worker " << rank << "] Start the " << run << "th run..." ;
 
                 // call the checkpoint (log and stats output) on the pop from the init
                 checkpoint( pop );
 #endif
-                std::cout << "Starting search..." << std::endl;
                 // start a search
                 dae( pop );
 
-                std::cout << "After dae search..." << std::endl;
+                eo::log << "[Worker " << rank << "] After dae search..." ;
 
                 // remember the best of all runs
                 daex::Decomposition best_of_run = pop.best_element();
@@ -450,12 +459,12 @@ public:
                 // note: operator> is overloaded in EO, don't be afraid: we are minimizing
                 if( best_of_run.fitness() > best.fitness() ) { 
                    best = best_of_run;
-                   std::cout << "[Worker " << rank << "] Telling master I've found a solution with fitness equals to " << best.fitness() << std::endl;
+                   eo::log << "[Worker " << rank << "] Telling master I've found a solution with fitness equals to " << best.fitness() ;
 
                    world.send( 0, MpiChannel::COMMANDS, MpiMessage::WRK_NEW_RESULT );
                    world.send( 0, MpiChannel::DATA, best );
                 } else {
-                    std::cout << "[Worker " << rank << "] Didn't find any better..." << std::endl;
+                    eo::log << "[Worker " << rank << "] Didn't find something better..." ;
                     world.send( 0, MpiChannel::COMMANDS, MpiMessage::WRK_NO_RESULT);
                 }
 
@@ -481,12 +490,12 @@ public:
                 steadyfit.totalGenerations( mingen, steadygen );
                 maxgen.totalGenerations( maxgens );
             }
+            eo::log << "[Worker " << rank << "] I'm free ! (finished)" ;
         } catch( std::exception& e ) {
 #ifndef NDEBUG
             eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
             eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
 #endif
-
 
             // push the best result, in case it was not in the last run
             pop.push_back( best );
@@ -499,7 +508,6 @@ public:
             // Added an evaluated decomposition, in case it would be better than a decomposed one
             pop.push_back( empty_decompo );
             pop_eval( pop, pop ); // FIXME normalement inutile
-            // print_results( pop, time_start, run ); // TODO TODOB temporaire
             return 0;
         }
 
@@ -511,7 +519,6 @@ public:
         // push the best result, in case it was not in the last run
         pop.push_back( best );
         pop_eval( pop, pop ); // FIXME normalement inutile
-        // print_results( pop, time_start, run ); // TODO TODOB temporaire
         return 0;
     }
 };
