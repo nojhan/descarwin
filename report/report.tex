@@ -1,0 +1,150 @@
+\documentclass{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+
+\title{Parallelization of DAE and EO}
+\author{Benjamin BOUVIER}
+
+\begin{document}
+
+\maketitle
+
+\chapter{Introduction}
+\section{Context}
+The program DAE (acronym for Divide And Evolve) is a temporal scheduler which uses evolutionnary algorithms so as to
+solve scheduling problems.
+
+As a reminder, let's correctly define a scheduling problem :
+\begin{itemize}
+\item An \textit{initial state}.
+\item A \textit{final state}.
+\item A set of \textit{actions}, which allow to move from one state to another, and have a length.
+\item A set of \textit{constraints}, bound to states and actions (for instance, precedence constraints : an action can be
+performed if, and only if, we are in a subset of states).
+\end{itemize}
+
+Because DAE is a planner, it allows, for a given input (description of these items in a text file), to generate a plan,
+describing how to move from the initial state to the final state, indicating all the required actions, and this, by
+lowering the total execution length of the plan (which is called \textit{makespan}). Actions can be performed simultaneously,
+generalizing the classical problem of scheduling.
+
+In order to enhance the quality of solutions (i.e by lowering makespan), DAE uses a smarter system. Let's precise DAE
+vocabulary : a state becomes a \textit{goal} and is described with atomic elements, which are called \textit{atoms}. A set of
+states from the initial to another is called a \textit{decomposition}. A decomposition is \textit{feasible} when the
+last state of this decomposition is the expected final state.
+
+DAE tries to find feasible decompositions which have the lowest makespan, by generating them from an evolutionary
+algorithm. The population is then composed of decompositions, for which fitness is the makespan. Decompositions are generated, giving a set of states, and actions are found
+by the solver
+\textit{cpt-yahsp}, which fastly returns a plan, that may be non-optimal. As a evolutionary algorithm is used,
+decompositions tend to improve themselves.
+
+\section{Parallel Computing}
+Parallel computing basically consists in launching a program on several processors, so as to enhance performance. There
+are a lot of parallelization models, which are more or less efficient. The one we used is the master / slave model (also
+called master / workers, or MapReduce by Google) :
+\begin{itemize}
+\item A processor is called the \textit{master} and supervizes all the launch, partitioning the tasks between the
+different workers, receiving the results and eventually aggregating them (for example, by summing them).
+\item All the other processors are called \textit{workers}, as they perform the task, i.e the real computing. They take
+an input and give back results to the master, which will handle them.
+\end{itemize}
+This is one of the simplest parallelization models. You can readily imagine how to design a more hierarchical model, by
+using one master master, whose workers would be another second-level masters, and any second-level masters would have
+workers. Direct communication between all the nodes (peer-to-peer) could be useful too, if results are very dependant
+each other.
+
+The expected value of parallelization is to enhance performance or compute the same thing under different conditions,
+for instance. When you try to enhance performance, you can easily suppose that as you have 10 computers, the global
+performance will be multiplied by a ten factor. There is an objective measure which helps you to mesure this gain of
+performance, the \textit{speedup} :
+\[ S_p = \frac{T_1}{T_p} \]
+where $p$ is the number of processors, \
+
+$S_p$ is the speedup, \
+
+$T_1$ is the execution time of the sequential algorithm, \
+
+$T_p$ is the execution time of the
+parallel algorithm\footnote{http://en.wikipedia.org/wiki/Speedup}.
+\
+These execution times are measured for the same input. So when we have 10 computers, we could expect a speedup of 10.
+But thinking back to the master / worker models, we already know that one processor, the master, is used for
+synchronization ; we could expect a best speedup of 9, at this moment. However, everything in a program may not be
+candidate to parallelization, so there can only be a little part of the program which can be parallelized. Amdahl's
+law\footnote{http://en.wikipedia.org/wiki/Amdahl\%27s\_law} suggeres that there is a limit of effective speedup. If $P$
+is the proportion of the program which can be parallelized, and supposing that we could have an infinite number of
+processors, this limit is equal to
+\[ \frac{1}{1-P} \]
+See Wikipedia's page on the subject to get more details. The most important thing to remember is that parallelization
+isn't a miracle solution and that performances can be not multiplied by the number of workers. As a consequence, speedup
+can be non linear in the number of workers.
+
+\section{Parallelization in DAE}
+There is a lot of ways to parallelize a program. The easiest way is to launch the same program several times, by only
+changing parameters : we'll talk about \textit{multi-starts}. It is very understandably too that the master splits input data in
+several parts which will be processed by the workers.
+\
+
+In DAE, as we use an evolutionary algorithm, the given seed to the pseudo-random numbers generator will affect the found
+decompositions, for an identical set of other parameters. Hence it has sense to make a multi-started processing, as
+results will be different. The master node will wait for new results, and saves the best solutions so as to give them back
+to the user.
+\
+
+In the other hand, the evolutionary algorithm contains an evaluation stage, in which all the decompositions of a
+population are evaluated. These evaluations could be parallelized, as one evaluation concerns a single decomposition and
+is also totally independant from the other evaluations.
+
+These paralellizations are not specific to DAE and can be generalized to EO, which is the evolutionary algorithm
+framework behind DAE. EO is a generic C++ framework used to implement evolutionary algorithms : the user just needs to
+define the different stages of the algorithm (initialization, evaluation, selection,...) and the framework runs these steps in the
+right order.
+
+\chapter{Preparation}
+\section{Used tools}
+\subsection{SGE}
+SGE, for \textit{Sun Grid Engine}, is an program which handles a cluster, launching jobs on connected nodes and helps
+supervising them. It makes it easy for sysadmins to group processors in queues, manage queues,...
+
+\subsection{MPI}
+
+MPI is an API allowing the user to set up a cluster, giving each node a \textit{rank} and handling communications
+between nodes.
+MPI allows to run the same program on different nodes (mode SPMD
+single program, multiple data), or to run different programs on nodes (mode MPMD, multiple program, multiple data). The
+second mode can easily be emulated by the first one, as each processor programmatically knows its rank. We can
+distinguish nodes with their rank, and run a part a program if rank is in a subset or another part else. MPI 2 is used
+in this project.
+
+As MPI is only an API, we had to choose an implementation. After some web searches, we have found 2 main
+implementations : \textit{OpenMPI} and \textit{MPICH}. Because OpenMPI seems to be more oftenly updated and well
+documented, we've chosen
+this one. Moreover, launching it with grid engine \textit{SGE} seems easier. Finally, community is very active through
+mailing lists, which can be helping (and has actually been, see network section).
+
+\section{Serialization}
+\paragraph{Why serialization ?}
+In order to send user data over the network, it is mandatory to have a way to \textit{serialize} them, i.e transform the
+in-memory data representation in a socket transmissible data. This raises the problem of endianess between different
+nodes that could have different architectures, or different numerical representations. Moreover, MPI basically knows how
+to send primitive types (eg: strings, numbers, chars,...), but more complex types have to be packed into MPI archives
+and user-handled. An easy solution to all those constraints is to send text over network, as it is
+architecture-independant and MPI manipulates them easily. The problem is now to choose a solution which can convert user
+objects into strings, easily.
+
+\paragraph{JSON}
+
+\section{Network}
+
+\chapter{Multi-starts}
+\section{Context}
+
+\section{Parallelization}
+
+\section{Alternatives}
+
+\end{document}
+
