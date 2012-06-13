@@ -21,6 +21,107 @@ namespace MpiChannel
     const int DATA = 1;
 }
 
+struct AssignmentAlgorithm
+{
+    AssignmentAlgorithm( int runs, mpi::communicator & world ) :
+        _runs( runs ),
+        _world( world )
+    {
+    }
+
+    virtual void operator()( int wrkRank ) = 0;
+    
+    bool finished()
+    {
+        return _runs == 0;
+    }
+
+protected:
+    int _runs;
+    mpi::communicator & _world;
+};
+
+struct StaticAssignmentAlgorithm : public AssignmentAlgorithm
+{
+    StaticAssignmentAlgorithm( int runs, mpi::communicator & world ) : AssignmentAlgorithm( runs, world )
+    {
+        unsigned int nbWorkers = world.size() - 1;
+        attributions = new int[ nbWorkers ]; // TODO What if nbWorkers == 0 ?
+
+        if ( runs > 0 )
+        {
+            // Let be the euclidean division of runs by nbWorkers :
+            // runs == q * nbWorkers + r, 0 <= r < nbWorkers
+            // This one liner affects q requests to each worker
+            for (unsigned int i = 0; i < nbWorkers; attributions[i++] = runs / nbWorkers) ;
+            // The first line computes r and the one liner affects the remaining 
+            // r requests to workers, in ascending order
+            unsigned int diff = runs - (runs / nbWorkers) * nbWorkers;
+            for (unsigned int i = 0; i < diff; ++attributions[i++]);
+        } else
+        {
+            // if maxruns is negative or null, infinite runs.
+            for (unsigned int i = 0; i < nbWorkers; attributions[i++] = -1 ) ;
+        }
+
+        // Sends the orders the first time
+        for (unsigned int i = 0; i < nbWorkers; ++i)
+        {
+            // rank is i+1, as 0 is the master.
+            eo::log << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
+            operator()( i+1 );
+        }
+    }
+
+    void operator()( int wrkRank )
+    {
+        int order = 0;
+        if ( attributions[wrkRank - 1] == 0 )
+        {
+            order = MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS;
+            eo::log << "[Master] No more attributions for worker " << wrkRank << std::endl;
+        } else
+        {
+            order = MpiMessage::MSTR_CONTINUE;
+            eo::log << "[Master] Worker has still " << attributions[ wrkRank - 1 ] << " runs to launch." << std::endl;
+            --attributions[ wrkRank - 1 ];
+        }
+        _world.send( wrkRank, MpiChannel::COMMANDS, order );
+        --_runs;
+    }
+
+    ~StaticAssignmentAlgorithm()
+    {
+        delete attributions;
+    }
+
+private:
+    int* attributions;
+};
+
+struct DynamicAssignmentAlgorithm : public AssignmentAlgorithm
+{
+    DynamicAssignmentAlgorithm( int runs, mpi::communicator & world ) :
+        AssignmentAlgorithm( runs, world )
+    {
+        // empty
+    }
+
+    void operator()( int wrkRank )
+    {
+        int order;
+        if ( _runs > 0 )
+        {
+            order = MpiMessage::MSTR_CONTINUE;
+        } else
+        {
+            order = MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS;
+        }
+        _world.send( wrkRank, MpiChannel::COMMANDS, order );
+        --_runs;
+    }
+};
+
 class MpiNode
 {
 protected:
@@ -120,12 +221,12 @@ public:
         unsigned int maxruns = parser.createParam( (unsigned int)0, "runs-max", 
                 "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
 
-        int* attributions;
-        unsigned int workersWorking;
         daex::Decomposition best;
         best.fitness( 200000. ); // TODO put a dirty high value
 
         // This is static assignment // TODO TODOB Laisser le choix entre statique et dynamique
+        /*
+        int* attributions;
         unsigned int nbWorkers = size - 1;
         attributions = new int[ nbWorkers ]; // TODO what if size == 1 ?
 
@@ -164,18 +265,14 @@ public:
             }
             world.send( i+1, MpiChannel::COMMANDS, order );
         }
+        */
 
-        workersWorking = size - 1;
+        AssignmentAlgorithm* assignmentAlgorithm =
+            new StaticAssignmentAlgorithm( maxruns, world );
 
         int i;
-        // computes real number of workers
-        for (i = 0; i < size - 1; ++i )
-        {
-            if ( attributions[i] == 0 ) { --workersWorking; }
-        }
-        eo::log << "[Master] " << workersWorking << " workers available !" << std::endl ;
 
-        while( workersWorking > 0 )
+        while( true )
         {
             mpi::status status = world.probe(mpi::any_source, MpiChannel::COMMANDS);
             int wrkRank = status.source();
@@ -186,9 +283,6 @@ public:
                       << std::endl
                       ;
 
-            int wrkReqNb = wrkRank - 1;
-            //
-            // stocker le message
             int answer = -1;
             world.recv( wrkRank, MpiChannel::COMMANDS, answer );
             // 0 == nothing better
@@ -216,31 +310,17 @@ public:
                 eo::log << "[Master] Unknown answer received : " << answer << std::endl;
             }
 
-            // TODO place assignment here
-            //
+            if ( assignmentAlgorithm->finished() )
+            {
+                delete assignmentAlgorithm;
+                break;
+            }
 
-            --( attributions[wrkReqNb] );
-            if( attributions[wrkReqNb] == 0U )
-            {
-                eo::log << "[Master] worker " << wrkRank << " has finished all its requests." << std::endl ;
-                world.send( wrkRank, MpiChannel::COMMANDS, MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS );
-                --workersWorking;
-            } else
-            {
-                eo::log << "[Master] worker " << wrkRank << " has still " << attributions[wrkReqNb] << " requests to do." << std::endl ;
-                world.send( wrkRank, MpiChannel::COMMANDS, MpiMessage::MSTR_CONTINUE );
-            }
-            
-            if ( workersWorking > 0 )
-            {
-                eo::log << "[Master] Still remains " << workersWorking << " at work. Let's wait..." << std::endl ;
-            }
+            (*assignmentAlgorithm)( wrkRank );
         }
         eo::log << "[Master] Global process is over." << std::endl ;
 
         // TODO should write best solution here
-
-        delete attributions;
 
         return 0;
     }
@@ -506,6 +586,9 @@ public:
                 if ( order == MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS )
                 {
                     break;
+                } else
+                {
+                    eo::log << "[Worker " << rank << "] My work is not finished." << std::endl;
                 }
 
                 // Once the bmax is known, there is no need to re-estimate it,
