@@ -117,27 +117,34 @@ public:
         unsigned int maxruns = parser.createParam( (unsigned int)0, "runs-max", 
                 "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" ).value();
 
-        unsigned int* attributions;
+        int* attributions;
         unsigned int workersWorking;
         daex::Decomposition best;
         best.fitness( 200000. ); // TODO put a dirty high value
 
         // This is static assignment // TODO TODOB Laisser le choix entre statique et dynamique
         unsigned int nbWorkers = size - 1;
-        attributions = new unsigned int[ nbWorkers ]; // TODO what if size == 1 ?
+        attributions = new int[ nbWorkers ]; // TODO what if size == 1 ?
 
-        // Let be the euclidean division of maxruns by nbWorkers :
-        // maxruns == q * nbWorkers + r
-        // This one liner affects q requests to each worker
-        for (unsigned int i = 0; i < nbWorkers; attributions[i++] = maxruns / nbWorkers) ;
-        // The first line computes r and the one liner affects the remaining 
-        // r requests to workers, in ascending order
-        unsigned int diff = maxruns - (maxruns / nbWorkers) * nbWorkers;
-        for (unsigned int i = 0; i < diff; ++attributions[i++]);
-
+        if ( maxruns > 0 )
+        {
+            // Let be the euclidean division of maxruns by nbWorkers :
+            // maxruns == q * nbWorkers + r, 0 <= r < nbWorkers
+            // This one liner affects q requests to each worker
+            for (unsigned int i = 0; i < nbWorkers; attributions[i++] = maxruns / nbWorkers) ;
+            // The first line computes r and the one liner affects the remaining 
+            // r requests to workers, in ascending order
+            unsigned int diff = maxruns - (maxruns / nbWorkers) * nbWorkers;
+            for (unsigned int i = 0; i < diff; ++attributions[i++]);
+        } else
+        {
+            // if maxruns is negative or null, infinite runs.
+            for (unsigned int i = 0; i < nbWorkers; attributions[i++] = -1 ) ;
+        }
+        
         for (int i = 0; i < size-1; ++i)
         {
-            eo::log << "[Master] Assignments for process " << i+1 << " : " << attributions[i] ;
+            eo::log << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
         }
 
         for (int i = 0; i < size-1; ++i)
@@ -154,7 +161,7 @@ public:
         {
             if ( attributions[i] == 0 ) { --workersWorking; }
         }
-        eo::log << "[Master] " << workersWorking << " workers available !" ;
+        eo::log << "[Master] " << workersWorking << " workers available !" << std::endl ;
 
         while( workersWorking > 0 )
         {
@@ -164,6 +171,7 @@ public:
             eo::log << "Showing status :\nError : " << status.error()
                       << "\nTag : " << status.tag()
                       <<"\nSource : " << status.source()
+                      << std::endl
                       ;
 
             int wrkReqNb = wrkRank - 1;
@@ -173,45 +181,45 @@ public:
             world.recv( wrkRank, MpiChannel::COMMANDS, answer );
             // 0 == nothing better
             // 1 == better fitness found, I send it to you.
-            eo::log << "[Master] Node " << wrkRank << " tells : " << answer ;
+            eo::log << "[Master] Node " << wrkRank << " tells : " << answer << std::endl;
 
             if ( answer == MpiMessage::WRK_NO_RESULT)
             {
-                eo::log << "[Master] Nothing better.\n";
+                eo::log << "[Master] Nothing better.\n" << std::endl ;
             } else if ( answer == MpiMessage::WRK_NEW_RESULT)
             {
-                eo::log << "[Master] Brace yourself, solution is coming...\n";
+                eo::log << "[Master] Brace yourself, solution is coming...\n" << std::endl ;
                 daex::Decomposition received;
                 world.recv( wrkRank, MpiChannel::DATA, received );
                 if (received.fitness() > best.fitness())
                 {
                     best = received;
                     double fitnessValue = best.fitness();
-                    eo::log << "[Master] Better solution found ! Now best fitness is " << fitnessValue ;
+                    eo::log << "[Master] Better solution found ! Now best fitness is " << fitnessValue << std::endl ;
                 } else {
-                    eo::log << "[Master] Solution sent from " << wrkRank << " was not as good as the one I had." ;
+                    eo::log << "[Master] Solution sent from " << wrkRank << " was not as good as the one I had." << std::endl ;
                 }
             } else
             {
-                eo::log << "[Master] Unknown answer received : " << answer ;
+                eo::log << "[Master] Unknown answer received : " << answer << std::endl;
             }
 
             --( attributions[wrkReqNb] );
             if( attributions[wrkReqNb] == 0U )
             {
-                eo::log << "[Master] worker " << wrkRank << " has finished all its requests." ;
+                eo::log << "[Master] worker " << wrkRank << " has finished all its requests." << std::endl ;
                 --workersWorking;
             } else
             {
-                eo::log << "[Master] worker " << wrkRank << " has still " << attributions[wrkReqNb] << " requests to do, let's give him one more." ;
+                eo::log << "[Master] worker " << wrkRank << " has still " << attributions[wrkReqNb] << " requests to do." << std::endl ;
             }
             
             if ( workersWorking > 0 )
             {
-                eo::log << "[Master] Still remains " << workersWorking << " at work. Let's wait..." ;
+                eo::log << "[Master] Still remains " << workersWorking << " at work. Let's wait..." << std::endl ;
             }
         }
-        eo::log << "[Master] Global process is over." ;
+        eo::log << "[Master] Global process is over." << std::endl ;
 
         // TODO should write best solution here
 
@@ -240,6 +248,23 @@ public:
         std::string& plan_file = _plan_file;
         int rank = _rank;
 
+        int maxruns = 0;
+        world.recv( 0, MpiChannel::COMMANDS, maxruns );
+
+        if ( maxruns > 0 )
+        {
+            eo::log << "[Worker " << rank << "] I have to launch " << maxruns << " run(s) !" << std::endl;
+        } else if ( maxruns == 0 )
+        {
+            eo::log << "[Worker " << rank << "] Nothing to do here, quits !" << std::endl ;
+            return 0;
+        } else
+        {
+            eo::log << "[Worker " << rank << "] Infinite run asked." ;
+        }
+
+        // TODO param runs-max is not used by workers. But if param is not created, parser complains about receiving an
+        // unknown parameter.
         parser.createParam( (unsigned int)0, "runs-max", "Maximum number of runs, if x==0: unlimited multi-starts, if x>1: will do <x> multi-start", 'r', "Stopping criterions" );
 
         std::string domain = parser.createParam( (std::string)"domain-zeno-time.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
@@ -260,7 +285,7 @@ public:
         }
         param_seed.value() *= rank; // to avoid having the same seed for each process
         // no multiplication by zero as workers processes are strictly higher than 0
-        eo::log << "[Worker " << rank << "] Seed : " << param_seed.value() ;
+        eo::log << "[Worker " << rank << "] Seed : " << param_seed.value() << std::endl ;
 
         unsigned int seed = param_seed.value();
         rng.reseed( seed );
@@ -287,15 +312,15 @@ public:
 
         // PDDL
 #ifndef NDEBUG
-        eo::log << eo::progress << "[Worker " << rank << "] Load the instance...";
+        eo::log << eo::progress << "[Worker " << rank << "] Load the instance..." << std::endl;
         eo::log.flush();
 #endif
         
         daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, eo::parallel.nthreads(), std::vector<std::string>());
        
 #ifndef NDEBUG
-        eo::log << eo::progress << "[Worker " << rank << "] Load the instance...OK";
-        eo::log << eo::progress << "[Worker " << rank << "] Initialization...";
+        eo::log << eo::progress << "[Worker " << rank << "] Load the instance...OK" << std::endl;
+        eo::log << eo::progress << "[Worker " << rank << "] Initialization..." << std::endl;
         eo::log.flush();
 #endif
 
@@ -348,7 +373,7 @@ public:
          **************/
 
 #ifndef NDEBUG
-        eo::log << eo::progress << "Creating evaluators...";
+        eo::log << eo::progress << "Creating evaluators..." << std::endl;
         eo::log.flush();
 #endif
 
@@ -367,7 +392,7 @@ public:
 
         eo::log << eo::progress << "OK" << std::endl;
         
-        eo::log << eo::progress << "Evaluating the first population...";
+        eo::log << eo::progress << "Evaluating the first population..." << std::endl;
         eo::log.flush();
 #endif
 
@@ -384,7 +409,7 @@ public:
          ********************/
 
 #ifndef NDEBUG
-        eo::log << eo::progress << "Algorithm instanciation...";
+        eo::log << eo::progress << "Algorithm instanciation..." << std::endl;
         eo::log.flush();
 #endif
 
@@ -426,24 +451,16 @@ public:
         // best decomposition of all the runs, in case of multi-start
         // start at the best element of the init
         daex::Decomposition best = pop.best_element();
-        unsigned int run = 0;
+        int run = 0;
 
         // evaluate an empty decomposition, for comparison with decomposed solutions
         daex::Decomposition empty_decompo;
         eval( empty_decompo );
 
-        unsigned int runsAsked;
-        world.recv( 0, MpiChannel::COMMANDS, runsAsked );
-        eo::log << "[Worker " << rank << "] I have to launch " << runsAsked << " runs !" ;
-        unsigned int maxruns = runsAsked;
-        
-        if (maxruns == 0)
-            return 0;
-
         try {
             while( true ) {
 #ifndef NDEBUG
-                eo::log << eo::progress << "[Worker " << rank << "] Start the " << run << "th run..." ;
+                eo::log << eo::progress << "[Worker " << rank << "] Start the " << run << "th run..."  << std::endl;
 
                 // call the checkpoint (log and stats output) on the pop from the init
                 checkpoint( pop );
@@ -451,7 +468,7 @@ public:
                 // start a search
                 dae( pop );
 
-                eo::log << "[Worker " << rank << "] After dae search..." ;
+                eo::log << "[Worker " << rank << "] After dae search..." << std::endl ;
 
                 // remember the best of all runs
                 daex::Decomposition best_of_run = pop.best_element();
@@ -459,12 +476,12 @@ public:
                 // note: operator> is overloaded in EO, don't be afraid: we are minimizing
                 if( best_of_run.fitness() > best.fitness() ) { 
                    best = best_of_run;
-                   eo::log << "[Worker " << rank << "] Telling master I've found a solution with fitness equals to " << best.fitness() ;
+                   eo::log << "[Worker " << rank << "] Telling master I've found a solution with fitness equals to " << best.fitness() << std::endl ;
 
                    world.send( 0, MpiChannel::COMMANDS, MpiMessage::WRK_NEW_RESULT );
                    world.send( 0, MpiChannel::DATA, best );
                 } else {
-                    eo::log << "[Worker " << rank << "] Didn't find something better..." ;
+                    eo::log << "[Worker " << rank << "] Didn't find something better..." << std::endl ;
                     world.send( 0, MpiChannel::COMMANDS, MpiMessage::WRK_NO_RESULT);
                 }
 
@@ -473,7 +490,7 @@ public:
 
                 // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
                 run++;
-                if( run >= maxruns && maxruns != 0 ) {
+                if( run >= maxruns && maxruns != -1 ) {
                     break;
                 }
 
@@ -490,7 +507,7 @@ public:
                 steadyfit.totalGenerations( mingen, steadygen );
                 maxgen.totalGenerations( maxgens );
             }
-            eo::log << "[Worker " << rank << "] I'm free ! (finished)" ;
+            eo::log << "[Worker " << rank << "] I'm free ! (finished)" << std::endl ;
         } catch( std::exception& e ) {
 #ifndef NDEBUG
             eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
