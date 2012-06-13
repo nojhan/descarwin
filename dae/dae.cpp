@@ -1,11 +1,6 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-# ifdef WITH_MPI
-# include <boost/mpi.hpp>
-namespace mpi = boost::mpi;
-# endif // WITH_MPI
-
 #include <iostream>
 #include <stdexcept>
 #include <iomanip>
@@ -22,7 +17,9 @@ namespace mpi = boost::mpi;
 #include "evaluation/cpt-yahsp.h"
 #include "evaluation/yahsp.h"
 
-#undef error // FIXME il y a un define error très embêtant quelque part là haut...
+#ifdef WITH_MPI
+#include "mpi.h" // TODO nom temporaire.
+#endif
 
 /*
 #ifndef NDEBUG
@@ -33,33 +30,12 @@ inline void LOG_LOCATION( eo::Levels level )
 #endif
 */
 
-namespace MpiMessage
-{
-    const int WRK_NEW_RESULT = 0;
-    const int WRK_NO_RESULT = 1;
-}
-
-namespace MpiChannel
-{
-    const int COMMANDS = 0;
-    const int DATA = 1;
-}
-
 int main ( int argc, char* argv[] )
 {
-    // WALLOCK TIME COUNTER
-    time_t time_start = std::time(NULL);
-
-    /************
-     * MPI INIT *
-     ***********/
 #ifdef WITH_MPI
-    mpi::environment env(argc, argv); // copies argc and argv to each node
-    mpi::communicator world;
-
-    unsigned int rank = world.rank();
-    unsigned int size = world.size();
-#endif
+    MpiAlgorithm algo(argc, argv);
+    return algo.run();
+#else
 
     // SYSTEM
 #ifndef NDEBUG
@@ -114,12 +90,6 @@ int main ( int argc, char* argv[] )
 
     std::string plan_file = parser.createParam( (std::string)"plan.soln", "plan-file", "Plan file backup", 'F', "Misc" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "plan-file" << plan_file << std::endl;
-# ifdef WITH_MPI
-    // Redefining file name by adding rank number in front of it.
-    std::stringstream ss;
-    ss << "process" << rank << plan_file;
-    plan_file = ss.str();
-# endif
 
     // pop size
     unsigned int pop_size = parser.createParam( (unsigned int)100, "popSize", "Population Size", 'P', "Evolution Engine").value();
@@ -141,10 +111,6 @@ int main ( int argc, char* argv[] )
       //        param_seed.value( time(0) );
       param_seed.value() = time(0); // EO compatibility fixed by CC on 2010.12.24
     }
-# ifdef WITH_MPI
-        param_seed.value() *= (1+rank); // to avoid having the same seed for each process
-        std::cout << "[Seed] Process " << rank << " has seed : " << param_seed.value() << std::endl;
-# endif
 
     unsigned int seed = param_seed.value();
     rng.reseed( seed );
@@ -325,120 +291,7 @@ int main ( int argc, char* argv[] )
     daex::Decomposition empty_decompo;
     eval( empty_decompo );
 
-# ifdef WITH_MPI
-    //
-    daex::Decomposition empty;
-    
-    // TODO trouver un moyen de mieux segmenter les variables
-    unsigned int* attributions;
-    unsigned int workersWorking;
-
-    // master send orders
-    if ( rank == 0 )
-    {
-        // This is static assignment
-        unsigned int nbWorkers = size - 1;
-        attributions = new unsigned int[ nbWorkers ]; // TODO what if size == 1 ?
-        for (unsigned int i = 0; i < nbWorkers; attributions[i++] = maxruns / nbWorkers) ;
-        unsigned int diff = maxruns - (maxruns / nbWorkers) * nbWorkers;
-        for (unsigned int i = 0; i < diff; ++attributions[i++]);
-
-        for (unsigned int i = 0; i < size-1; ++i)
-        {
-            std::cout << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
-        }
-
-        for (unsigned int i = 0; i < size-1; ++i)
-        {
-            // rank of worker is i+1, as i begins from 0
-            world.send( i+1, MpiChannel::COMMANDS, attributions[i] );
-        }
-
-        workersWorking = size - 1;
-    } else
-    // workers receive orders
-    {
-        unsigned int runsAsked;
-        world.recv( 0, MpiChannel::COMMANDS, runsAsked );
-        std::cout << "[Worker " << rank << "] I have to work " << runsAsked << " times ! Diz iz too much, seriously !" << std::endl;
-        maxruns = runsAsked;
-    }
-# endif
-
     try { 
-
-// TODO TODOB placer distinction WITH_MPI à rajouter
-        if ( rank == 0 )
-        {
-            unsigned int i;
-            // computes real number of workers
-            for (i = 0; i < size - 1; ++i )
-            {
-                if ( attributions[i] == 0 ) { --workersWorking; }
-            }
-            std::cout << "[Master] I have " << workersWorking << " workers at my feet, let's start the show !" << std::endl;
-
-            while( workersWorking > 0 )
-            {
-                mpi::status status = world.probe(mpi::any_source, MpiChannel::COMMANDS);
-                int wrkRank = status.source();
-
-                std::cout << "Showing status :\nError : " << status.error()
-                          << "\nTag : " << status.tag()
-                          <<"\nSource : " << status.source()
-                          << std::endl;
-
-                int wrkReqNb = wrkRank - 1;
-                //
-                // stocker le message
-                int answer = -1;
-                world.recv( wrkRank, MpiChannel::COMMANDS, answer );
-                // 0 == nothing better
-                // 1 == better fitness found, I send it to you.
-                std::cout << "[Master] Node " << wrkRank << " tells : " << answer << std::endl;
-
-                if ( answer == MpiMessage::WRK_NO_RESULT)
-                {
-                    std::cout << "[Master] Nothing better.\n";
-                } else if ( answer == MpiMessage::WRK_NEW_RESULT)
-                {
-                    std::cout << "[Master] Better solution to come...\n";
-                    daex::Decomposition received;
-                    world.recv( wrkRank, MpiChannel::DATA, received );
-                    if (received.fitness() > best.fitness())
-                    {
-                        best = received;
-                        double fitnessValue = best.fitness();
-                        std::cout << "[Master] Better solution found ! Now fitness is " << fitnessValue << std::endl;
-                    }
-                } else
-                {
-                    std::cout << "[Master] Unknown answer received : " << answer << std::endl;
-                }
-
-                std::cout << "[Master] Request from " << wrkRank << "r just finished. We are at " << attributions[wrkReqNb] << " requests for this worker." << std::endl;
-
-                --( attributions[wrkReqNb] );
-                if( attributions[wrkReqNb] == 0U )
-                {
-                    --workersWorking;
-                } else
-                {
-                    std::cout << "[Master] worker " << wrkRank << " has still " << attributions[wrkReqNb] << " requests to do, let's give him one more." << std::endl;
-                }
-                
-                std::cout << "[Master] Still remains " << workersWorking << " at work. Let's wait..." << std::endl;
-            }
-
-            delete attributions;
-
-        } else 
-        // Workers
-        {        
-            // TODO TODOB gérer le fait de n'avoir rien à faire...
-            if (maxruns == 0)
-                return 0;
-
             while( true ) {
 #ifndef NDEBUG
                 eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
@@ -455,24 +308,10 @@ int main ( int argc, char* argv[] )
                 // remember the best of all runs
                 daex::Decomposition best_of_run = pop.best_element();
 
-# ifdef WITH_MPI
-                // note: operator> is overloaded in EO, don't be afraid: we are minimizing
-                if( best_of_run.fitness() > best.fitness() ) { 
-                   best = best_of_run;
-                   std::cout << "[Worker " << rank << "] Telling master I've found a solution with fitness equals to " << best.fitness() << std::endl;
-
-                   world.send( 0, MpiChannel::COMMANDS, MpiMessage::WRK_NEW_RESULT );
-                   world.send( 0, MpiChannel::DATA, best );
-                } else {
-                    std::cout << "[Worker " << rank << "] Didn't find any better..." << std::endl;
-                    world.send( 0, MpiChannel::COMMANDS, MpiMessage::WRK_NO_RESULT);
-                }
-# else
                 // note: operator> is overloaded in EO, don't be afraid: we are minimizing
                 if( best_of_run.fitness() > best.fitness() ) { 
                    best = best_of_run;
                 }
-# endif
 
                 // TODO handle the case when we have several best decomposition with the same fitness but different plans?
                 // TODO use previous searches to re-estimate a better b_max?
@@ -496,9 +335,6 @@ int main ( int argc, char* argv[] )
                 steadyfit.totalGenerations( mingen, steadygen );
                 maxgen.totalGenerations( maxgens );
             }
-        }
-        std::cout << "[Worker " << rank << "] I've finished my work !..." << std::endl; // TODO TODOB distinction WITH MPI + worker/master
-
     } catch( std::exception& e ) {
 #ifndef NDEBUG
         eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
@@ -530,6 +366,8 @@ int main ( int argc, char* argv[] )
     pop.push_back( best );
     pop_eval( pop, pop ); // FIXME normalement inutile
     // print_results( pop, time_start, run ); // TODO TODOB temporaire
+    //
+# endif // WITH_MPI
 
     return 0;
 }
