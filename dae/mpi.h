@@ -62,7 +62,7 @@ struct StaticAssignmentAlgorithm : public AssignmentAlgorithm
     StaticAssignmentAlgorithm( int runs, mpi::communicator & world ) : AssignmentAlgorithm( runs, world )
     {
         unsigned int nbWorkers = world.size() - 1;
-        attributions = new int[ nbWorkers ]; // TODO What if nbWorkers == 0 ?
+        attributions = new int[ nbWorkers ];
 
         if ( runs > 0 )
         {
@@ -237,6 +237,12 @@ public:
         // Retrieving parent variables
         eoParser& parser = *_parser;
         int size = _size;
+
+        if ( world.size() < 2 )
+        {
+            eo::log << "[Master] Error : no worker found. Aborting." << std::endl;
+            return 1;
+        }
 
         // multi-start
         unsigned int maxruns = parser.createParam( (unsigned int)0, "runs-max", 
