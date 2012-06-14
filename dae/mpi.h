@@ -25,19 +25,35 @@ struct AssignmentAlgorithm
 {
     AssignmentAlgorithm( int runs, mpi::communicator & world ) :
         _runs( runs ),
-        _world( world )
+        _world( world ),
+        _confirmedRuns( 0 )
     {
+        _infiniteRuns = runs == 0;
     }
 
-    virtual void operator()( int wrkRank ) = 0;
-    
-    bool finished()
+    virtual void assign( int wrkRank ) = 0;
+
+    virtual void confirm( int wrkRank )
     {
-        return _runs == 0;
+        ++_confirmedRuns;
+    }
+
+    void operator()( int wrkRank )
+    {
+        confirm( wrkRank );
+        assign( wrkRank );
+    }
+    
+    virtual bool finished()
+    {
+        return !_infiniteRuns && _confirmedRuns == _runs;
     }
 
 protected:
     int _runs;
+    int _confirmedRuns;
+
+    bool _infiniteRuns;
     mpi::communicator & _world;
 };
 
@@ -58,36 +74,36 @@ struct StaticAssignmentAlgorithm : public AssignmentAlgorithm
             // r requests to workers, in ascending order
             unsigned int diff = runs - (runs / nbWorkers) * nbWorkers;
             for (unsigned int i = 0; i < diff; ++attributions[i++]);
-        } else
-        {
-            // if maxruns is negative or null, infinite runs.
-            for (unsigned int i = 0; i < nbWorkers; attributions[i++] = -1 ) ;
         }
 
-        // Sends the orders the first time
         for (unsigned int i = 0; i < nbWorkers; ++i)
         {
-            // rank is i+1, as 0 is the master.
+            // rank of node is i+1, as workers' ranks begin at 1.
             eo::log << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
-            operator()( i+1 );
         }
     }
 
-    void operator()( int wrkRank )
+    void confirm( int wrkRank )
     {
-        int order = 0;
-        if ( attributions[wrkRank - 1] == 0 )
+        AssignmentAlgorithm::confirm( wrkRank );
+        --attributions[ wrkRank - 1 ];
+    }
+
+    void assign( int wrkRank )
+    {
+        int order;
+
+        if ( _infiniteRuns || attributions[ wrkRank - 1 ] > 0 )
+        {
+            order = MpiMessage::MSTR_CONTINUE;
+            eo::log << "[Master] Worker " << wrkRank << " has still " << attributions[ wrkRank - 1 ] << " runs to launch." << std::endl;
+        } else
         {
             order = MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS;
             eo::log << "[Master] No more attributions for worker " << wrkRank << std::endl;
-        } else
-        {
-            order = MpiMessage::MSTR_CONTINUE;
-            eo::log << "[Master] Worker has still " << attributions[ wrkRank - 1 ] << " runs to launch." << std::endl;
-            --attributions[ wrkRank - 1 ];
         }
+
         _world.send( wrkRank, MpiChannel::COMMANDS, order );
-        --_runs;
     }
 
     ~StaticAssignmentAlgorithm()
@@ -102,24 +118,29 @@ private:
 struct DynamicAssignmentAlgorithm : public AssignmentAlgorithm
 {
     DynamicAssignmentAlgorithm( int runs, mpi::communicator & world ) :
-        AssignmentAlgorithm( runs, world )
+        AssignmentAlgorithm( runs, world ),
+        _assignedRuns( 0 )
     {
         // empty
     }
 
-    void operator()( int wrkRank )
+    void assign( int wrkRank )
     {
         int order;
-        if ( _runs > 0 )
+        if ( _infiniteRuns || _assignedRuns < _runs )
         {
             order = MpiMessage::MSTR_CONTINUE;
+            ++_assignedRuns;
+            eo::log << "[DynamicAssignmentAlgorithm] Run assigned to " << wrkRank << std::endl;
         } else
         {
             order = MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS;
         }
         _world.send( wrkRank, MpiChannel::COMMANDS, order );
-        --_runs;
     }
+
+private:
+    int _assignedRuns;
 };
 
 class MpiNode
@@ -224,53 +245,13 @@ public:
         daex::Decomposition best;
         best.fitness( 200000. ); // TODO put a dirty high value
 
-        // This is static assignment // TODO TODOB Laisser le choix entre statique et dynamique
-        /*
-        int* attributions;
-        unsigned int nbWorkers = size - 1;
-        attributions = new int[ nbWorkers ]; // TODO what if size == 1 ?
-
-        if ( maxruns > 0 )
-        {
-            // Let be the euclidean division of maxruns by nbWorkers :
-            // maxruns == q * nbWorkers + r, 0 <= r < nbWorkers
-            // This one liner affects q requests to each worker
-            for (unsigned int i = 0; i < nbWorkers; attributions[i++] = maxruns / nbWorkers) ;
-            // The first line computes r and the one liner affects the remaining 
-            // r requests to workers, in ascending order
-            unsigned int diff = maxruns - (maxruns / nbWorkers) * nbWorkers;
-            for (unsigned int i = 0; i < diff; ++attributions[i++]);
-        } else
-        {
-            // if maxruns is negative or null, infinite runs.
-            for (unsigned int i = 0; i < nbWorkers; attributions[i++] = -1 ) ;
-        }
-        
-        for (int i = 0; i < size-1; ++i)
-        {
-            eo::log << "[Master] Assignments for process " << i+1 << " : " << attributions[i] << std::endl;
-        }
-
-        // Sends the orders the first time
-        for (int i = 0; i < size-1; ++i)
-        {
-            int order = 0;
-            // rank of worker is i+1, as i begins from 0
-            if ( attributions[i] == 0 )
-            {
-                order = MpiMessage::MSTR_NO_MORE_ATTRIBUTIONS;
-            } else
-            {
-                order = MpiMessage::MSTR_CONTINUE;
-            }
-            world.send( i+1, MpiChannel::COMMANDS, order );
-        }
-        */
-
         AssignmentAlgorithm* assignmentAlgorithm =
             new StaticAssignmentAlgorithm( maxruns, world );
 
-        int i;
+        for( int i = 1; i < world.size(); ++i )
+        {
+            assignmentAlgorithm->assign( i );
+        }
 
         while( true )
         {
@@ -310,13 +291,12 @@ public:
                 eo::log << "[Master] Unknown answer received : " << answer << std::endl;
             }
 
+            (*assignmentAlgorithm)( wrkRank );
             if ( assignmentAlgorithm->finished() )
             {
                 delete assignmentAlgorithm;
                 break;
             }
-
-            (*assignmentAlgorithm)( wrkRank );
         }
         eo::log << "[Master] Global process is over." << std::endl ;
 
