@@ -189,7 +189,7 @@ void pddlLoad::compute_chrono_partition()
     // il existe donc au moins cette date dans la partition
     assert( _chrono_partition_atom.count( 0 ) != 0 );
 
-    // FIXME supprimer la date 0 et vérifier que ça ne pète rien
+    // supprimer la date 0 ? (et vérifier que ça ne pète rien). En fait non : on veut pouvoir traiter des actions de coût nul
 
     _chrono_partition_atom.compute_goal_max_date();
 }
