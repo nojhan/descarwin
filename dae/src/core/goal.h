@@ -6,7 +6,6 @@
 
 #include <eo>
 
-#include "utils/json/Json.h"
 #include "utils/eoJsonUtils.h"
 #include "atom.h"
 
@@ -77,11 +76,27 @@ public:
         }
     };
 
+    template< class T >
+    struct IndexPushAlgorithm : public eoserial::PushAlgorithm<T>
+    {
+        void operator()( eoserial::Array & array, const T& obj )
+        {
+            array.push_back( eoserial::make( obj->fluentIndex() ) );
+        }
+    };
+
     eoserial::Object* pack() const
     {
         // begin with list members
+        /*
         eoserial::Array* members = eoserial::makeArray
             < std::list<Atom*>, PointerPushAlgorithm >
+            ( *this );
+        */
+
+        // FIXME enregistrer la liste des fluent index plutôt que les atom*
+        eoserial::Array* members = eoserial::makeArray
+            < std::list<Atom*>, IndexPushAlgorithm >
             ( *this );
 
         // continues with self
@@ -91,26 +106,41 @@ public:
         return obj;
     }
 
+protected:
     /**
-     * @brief Specific UnpackAlgorithm, used by unpackArray, to create objects before
-     * handling them.
+     * Static pointer to "global" vector of atoms (the ones contained in the object
+     * pddl), used to retrieve atoms on deserialization.
      */
-    template <class C>
-    struct UnpackNewAlgorithm : public eoserial::Array::BaseAlgorithm<C>
+    static const std::vector< daex::Atom* > * _atoms;
+
+public:
+    /**
+     * Static setter to above described pointer.
+     */
+    static void atoms( const std::vector<daex::Atom*> * a )
     {
-        void operator()( const eoserial::Array& array, unsigned int i, C & container ) const
+        _atoms = a;
+    }
+
+protected:
+    template< class T >
+    struct UnpackByIndex : public eoserial::Array::BaseAlgorithm< T >
+    {
+        void operator()( const eoserial::Array& array, unsigned int i, T & container ) const
         {
-            Atom* atom = new Atom;
-            eoserial::unpackObject( array, i, *atom );
-            container.push_back( atom );
+            int atomIndex;
+            eoserial::unpack( array, i, atomIndex );
+            container.push_back( _atoms->at( atomIndex ) );
         }
     };
 
+public:
     void unpack( const eoserial::Object* obj )
     {
         // begin with list members
-        eoserial::unpackArray< std::list<Atom*>, UnpackNewAlgorithm >
-            ( *obj, "members", *this);
+        eoserial::unpackArray< std::list<Atom*>, UnpackByIndex >
+            ( *obj, "members", *this );
+        
         // continues with self
         eoserial::unpack( *obj, "start_time", _earliest_start_time );
     }
