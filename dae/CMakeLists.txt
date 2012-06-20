@@ -22,19 +22,24 @@ IF(OPENMP_FOUND)
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 ENDIF()
 
+# Mpi Addons
 IF(DAE_WITH_MPI)
-	MESSAGE("[DAE] Compilation with MPI.")
+    MESSAGE("[DAE] Compilation with MPI and BoostMPI.")
 
-	# for conditional compilation in code
-	LINK_DIRECTORIES(${BOOST_LIB_DIR})
-    LINK_DIRECTORIES(${MPI_DIR}/lib)
+    SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
 
-	INCLUDE_DIRECTORIES(${BOOST_INC_DIR})
+    # headers location
     INCLUDE_DIRECTORIES(${MPI_DIR}/include)
+    INCLUDE_DIRECTORIES(${BOOST_DIR}/include)
 
-	SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
+    # lib location
+    LINK_DIRECTORIES(${MPI_DIR}/lib)
+    LINK_DIRECTORIES(${BOOST_DIR}/lib)
 
-	ADD_DEFINITIONS(-DWITH_MPI)
+    # for conditional compilation in code
+    ADD_DEFINITIONS(-DWITH_MPI)
+
+    LINK_LIBRARIES(boost_mpi boost_serialization)
 ENDIF()
 
 # include the sources
@@ -64,17 +69,12 @@ ENDIF()
 # target + link libraries
 LINK_LIBRARIES(eoutils gmp eo rt gcov gdsl termcap)
 
-IF (DAE_WITH_MPI)
-    LINK_LIBRARIES(boost_mpi boost_serialization)
-ENDIF()
-
 # VV  : cpt_yahsp_library-common-dae-omp and  cpt_yahsp_library-dae are  no more
 # factorized because dae + yahsp-mt need  to be completely recompiled due to TLS
 # global references that differ from the ones needed by dae-mt + yahsp.
 
 ADD_EXECUTABLE(dae dae.cpp)
 ADD_DEPENDENCIES(dae daex)
-
 
 # TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp
 # cpt_yahsp_library-dae) # TODO check if correct
@@ -122,15 +122,6 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
     # TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
     TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common cpt_yahsp_library-dae)
     # TODO check if correct
-
-    SET( EOSERIAL_TEST_SOURCES
-          src/utils/json/Array.cpp
-          src/utils/json/Object.cpp
-          src/utils/json/Parser.cpp
-          src/utils/json/String.cpp
-        )
-    ADD_EXECUTABLE(test_eoserial src/utils/json/test.cpp
-        ${EOSERIAL_TEST_SOURCES})
     
 ENDIF()
 

@@ -1,7 +1,7 @@
 #ifndef __EO_JSON_UTILS_H__
 #define __EO_JSON_UTILS_H__
 
-# include "utils/json/Serializable.h"
+# include <serial/eoSerial.h>
 # include <iostream>
 
 namespace eoserial

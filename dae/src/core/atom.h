@@ -20,7 +20,6 @@
 //}
 
 #include "utils/pddl.h"
-#include "utils/json/Json.h"
 #include "utils/eoJsonUtils.h"
 
 // Definitions used in cpt-yahsp can break Boost or STL.
@@ -50,6 +49,7 @@ public:
     //! Accesseurs
     TimeVal                     earliest_start_time() const { return _earliest_start_time; }
     Fluent *                    fluent()              const { return fluents[ _fluentIndex ]; }
+    unsigned int                fluentIndex()         const { return _fluentIndex; }
 
 protected:
     unsigned int 				_fluentIndex;

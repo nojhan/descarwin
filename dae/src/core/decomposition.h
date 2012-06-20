@@ -14,8 +14,6 @@
 #include <src/globs.h>
 #include <src/yahsp.h>
 
-#include "utils/json/Json.h"
-
 #ifdef WITH_MPI
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/string.hpp>

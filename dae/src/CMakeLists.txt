@@ -15,17 +15,14 @@ SET (DAEX_SOURCES
   utils/cli.cpp
   core/decomposition.cpp
   core/goal.cpp
-  # EoSerial sources
-  # TODO TODOB mettre à part ?
-  utils/json/Array.cpp
-  utils/json/Object.cpp
-  utils/json/Parser.cpp
-  utils/json/String.cpp
+
   utils/eoJsonUtils.cpp
   )
 
 ADD_LIBRARY(daex STATIC ${DAEX_SOURCES})
+TARGET_LINK_LIBRARIES(daex eoserial)
 ADD_LIBRARY(daex-yahsp-mt STATIC ${DAEX_SOURCES})
+TARGET_LINK_LIBRARIES(daex eoserial)
 
 SET_TARGET_PROPERTIES(
   daex-yahsp-mt

@@ -1,7 +1,7 @@
 # include "eoJsonUtils.h"
 
-# include "utils/json/Object.h"
-# include "utils/json/Parser.h"
+# include <serial/Object.h>
+# include <serial/Parser.h>
 
 # include <string>
 
