@@ -121,6 +121,7 @@ int main ( int argc, char* argv[] )
      ******************/
 
     daex::Init<daex::Decomposition>& init = daex::do_make_init_op<daex::Decomposition>( parser, state, pddl );
+    daex::Goal::atoms( & pddl.atoms() );
 
     // randomly generate the population with the init operator
     eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
