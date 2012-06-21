@@ -182,8 +182,7 @@ int main ( int argc, char* argv[] )
         // Heuristics for the estimation of an optimal b_max
         if( insemination ) {
             b_max_fixed = daex::estimate_bmax_insemination( parser, pddl, pop, init.l_max() );
-
-        } else { 
+        } else {
             // if not insemination, incremental search strategy
             b_max_fixed  = daex::estimate_bmax_incremental<daex::Decomposition>( 
                 pop, parser, init.l_max(), eval_count, plan_file, best_makespan, dump_sep, dump_file_count, metadata 
@@ -229,9 +228,18 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
 
+    bool parallelLoopEval = parser.valueOf<bool>( "parallelize-loop" );
+    eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
+    if( parallelLoopEval )
+    {
+        p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>( eval );
+    } else
+    {
+        p_pop_eval = new eoPopLoopEval<daex::Decomposition>( eval );
+    }
+    eoPopEvalFunc<daex::Decomposition>& pop_eval = *p_pop_eval;
+
     // a first evaluation of generated pop
-    eoParallelPopLoopEval<daex::Decomposition> pop_eval( eval );
-    // eoPopLoopEval<daex::Decomposition> pop_eval( eval );
     pop_eval( pop, pop );
 
 #ifndef NDEBUG
@@ -397,6 +405,7 @@ int main ( int argc, char* argv[] )
     // print_results( pop, time_start, run ); // TODO TODOB temporaire
     //
     */
+    delete p_pop_eval;
 
     return 0;
 }
