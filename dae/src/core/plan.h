@@ -53,21 +53,6 @@ public:
 #pragma omp critical
         _plan_rep = plan_to_str( p_plan );
       }
-    
-    //! Construct a invalid plan from scratch
-    /*
-      Plan  & operator=(const daex::Plan  & other){
-       if (this != &other) {
-            _makespan = other._makespan;
-            _cost_add = other._cost_add; 
-            _cost_max = other._cost_max;
-             _search_steps = other._search_steps;
-             _is_valid = other._is_valid;
-	     _plan_rep  = other._plan_rep;
-        }
-        return *this;
-    }
-    */
 
     void search_steps( unsigned int steps ) { _search_steps = steps; }
     unsigned int search_steps() const { return _search_steps; }

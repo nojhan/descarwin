@@ -36,22 +36,6 @@ public:
 
      virtual ~Decomposition(){}
     
-    /*
-    Decomposition & operator=(const Decomposition & other){
-       if (this != &other) {
-             std::list<Goal>::operator=(other);
-             EO<eoMinimizingFitness>::operator=(other);
-             _plan_global = other.plan_copy();
-             _plans_sub = other.subplans(); 
-             _b_max = other.b_max();
-             _k = other.get_number_evaluated_goals();
-             _u = other.get_number_useful_goals();
-             _B = other.get_number_evaluated_nodes();            
-        }
-        return *this;
-    }
-    */
-    
 #ifdef WITH_MPI
     // Gives access to boost serialization
 	friend class boost::serialization::access;
@@ -263,8 +247,6 @@ public:
         eoserial::unpackArray
             < std::list< Goal >, eoserial::Array::UnpackObjectAlgorithm >
             ( *json, "goals", *this );
-
-        // std::cout << "Goals : " << size() << '/' << "json goals : " << static_cast<eoserial::Array*>(json->find("goals")->second)->size() << std::endl;
 
         // EO fitness
         bool invalidFitness;
