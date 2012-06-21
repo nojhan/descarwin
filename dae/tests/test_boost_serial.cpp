@@ -242,12 +242,14 @@ int main ( int argc, char* argv[] )
     // best decomposition of all the runs, in case of multi-start
     // start at the best element of the init
     daex::Decomposition best = pop.best_element();
+
+    std::cout << "[Bench] Beginning serialization..." << std::endl;
+
     daex::Decomposition read;
 
     // /*
     // Serializes in json
-    //
-    int benchNb = 1000;
+    int benchNb = 10;
 
     std::stringstream ss;
     eoserial::Object* jsonBest;
@@ -259,6 +261,8 @@ int main ( int argc, char* argv[] )
         ss.clear();
         ss.str(std::string());
         jsonBest->print( ss );
+
+        delete jsonBest;
     }
     // std::cout<< "\n\n" << jsonBest << std::endl;
     time_t after_serialize = time(0);
@@ -273,13 +277,15 @@ int main ( int argc, char* argv[] )
 
         // Deserializes from json
         read.unpack( received );
+
+        delete received;
     }
     time_t after_deserialize = time(0);
     
     // std::cout<<"\n\nParsing finished, this is what I read :" << std::endl;
     // std::cout << received << std::endl;
     std::cout << "[Bench] Deserialization took " << after_deserialize - before_deserialize << " seconds." << std::endl;
-    delete jsonBest;
+
     // */
 
      /*
