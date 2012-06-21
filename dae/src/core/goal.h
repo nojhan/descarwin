@@ -138,6 +138,7 @@ public:
     void unpack( const eoserial::Object* obj )
     {
         // begin with list members
+        clear();
         eoserial::unpackArray< std::list<Atom*>, UnpackByIndex >
             ( *obj, "members", *this );
         

@@ -36,6 +36,7 @@ public:
 
      virtual ~Decomposition(){}
     
+    /*
     Decomposition & operator=(const Decomposition & other){
        if (this != &other) {
              std::list<Goal>::operator=(other);
@@ -49,6 +50,7 @@ public:
         }
         return *this;
     }
+    */
     
 #ifdef WITH_MPI
     // Gives access to boost serialization
@@ -237,7 +239,7 @@ public:
             float fitnessValue = fitness; // implicit operator cast
             json->add( "fitnessValue", eoserial::make(fitnessValue) );
         }
-        
+
         // specific members
         json->add( "plan_global", &_plan_global );
         // subplans
@@ -257,14 +259,17 @@ public:
     void unpack( const eoserial::Object* json )
     {
         // list<Goal>
+        clear();
         eoserial::unpackArray
             < std::list< Goal >, eoserial::Array::UnpackObjectAlgorithm >
             ( *json, "goals", *this );
 
+        // std::cout << "Goals : " << size() << '/' << "json goals : " << static_cast<eoserial::Array*>(json->find("goals")->second)->size() << std::endl;
+
         // EO fitness
         bool invalidFitness;
         eoserial::unpack( *json, "invalidFitness", invalidFitness );
-        if (invalidFitness) 
+        if (invalidFitness)
         {
             EO< eoMinimizingFitness >::invalidate();
         } else
@@ -279,6 +284,7 @@ public:
         // specific members
         eoserial::unpackObject( *json, "plan_global", _plan_global );
         // _plans_sub
+        _plans_sub.clear();
         eoserial::unpackArray
             < std::vector< daex::Plan >, eoserial::Array::UnpackObjectAlgorithm >
             ( *json, "subplans", _plans_sub );
