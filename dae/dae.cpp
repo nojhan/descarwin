@@ -18,9 +18,8 @@
 #include "evaluation/yahsp.h"
 
 #ifdef WITH_MPI
-// #include "mpi.h" // TODO nom temporaire.
-#include <eompi.h>
-#include <eoParallelApply.h>
+#include <mpi/eoMpi.h>
+#include <mpi/eoTerminateJob.h>
 #endif
 
 /*
@@ -35,9 +34,7 @@ inline void LOG_LOCATION( eo::Levels level )
 int main ( int argc, char* argv[] )
 {
 #ifdef WITH_MPI
-    MpiSingletonFactory::init( argc, argv );
-    // MpiAlgorithm algo(argc, argv);
-    // return algo.run();
+    eo::mpi::Node::init( argc, argv );
 #endif
 
     // SYSTEM
@@ -199,7 +196,6 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging              << "\tb_max for        final goal,  b_max_last: " << b_max_last << std::endl;
 #endif
 
-
     /**************
      * EVALUATION *
      **************/
@@ -230,15 +226,49 @@ int main ( int argc, char* argv[] )
 
     bool parallelLoopEval = parser.valueOf<bool>( "parallelize-loop" );
     eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
+#ifdef WITH_MPI
+    eo::mpi::DynamicAssignmentAlgorithm* assign = new eo::mpi::DynamicAssignmentAlgorithm;
     if( parallelLoopEval )
     {
-        p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>( eval );
+        unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
+        p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>( eval, *assign, 0 /* master rank */, 1 /* size of packet */, max_seconds );
     } else
     {
+# endif
         p_pop_eval = new eoPopLoopEval<daex::Decomposition>( eval );
+# ifdef WITH_MPI
     }
+# endif
     eoPopEvalFunc<daex::Decomposition>& pop_eval = *p_pop_eval;
 
+# ifdef WITH_MPI
+    int rank = eo::mpi::Node::comm().rank();
+    if( rank != 0 )
+    {
+        // workers just perform evaluation
+        /*
+        try
+        {
+        */
+        
+        pop_eval( pop, pop );
+        
+        int recv = -1;
+        eo::mpi::Node().comm().recv( 0, 0, recv );
+        std::cout << "Slave " << rank << " recv: " << recv << std::endl;
+
+        /*
+        } catch (std::exception& e)
+        {
+            std::cout << "STOP: " << e.what() << std::endl;
+            return 0;
+        }
+        */
+        return 0;
+    }
+# endif
+
+    eo::log << eo::setlevel( eo::progress );
     // a first evaluation of generated pop
     pop_eval( pop, pop );
 
@@ -292,7 +322,6 @@ int main ( int argc, char* argv[] )
     eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
 #endif
 
-
     /********************
      * MULTI-START RUNS *
      ********************/
@@ -306,76 +335,72 @@ int main ( int argc, char* argv[] )
     daex::Decomposition empty_decompo;
     eval( empty_decompo );
 
-    MpiNode* node = MpiNodeStore::instance();
-    int rank = node->comm().rank();
     try {
-        if ( rank == 0 )
+        while( true )
         {
-            while( true )
-            {
-                // master
 #ifndef NDEBUG
-                eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
+            eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
 
-                // call the checkpoint (log and stats output) on the pop from the init
-                checkpoint( pop );
+            // call the checkpoint (log and stats output) on the pop from the init
+            checkpoint( pop );
 #endif
-                std::cout << "Starting search..." << std::endl;
-                // start a search
-                dae( pop );
-                std::cout << "After dae search..." << std::endl;
+            std::cout << "Starting search..." << std::endl;
+            // start a search
+            dae( pop );
+            std::cout << "After dae search..." << std::endl;
 
-                // remember the best of all runs
-                daex::Decomposition best_of_run = pop.best_element();
+            // remember the best of all runs
+            daex::Decomposition best_of_run = pop.best_element();
 
-                // note: operator> is overloaded in EO, don't be afraid: we are minimizing
-                if( best_of_run.fitness() > best.fitness() ) { 
-                    best = best_of_run;
-                }
-
-                // TODO handle the case when we have several best decomposition with the same fitness but different plans?
-                // TODO use previous searches to re-estimate a better b_max?
-
-                // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
-                run++;
-                if( run >= maxruns && maxruns != 0 ) {
-                    break;
-                }
-
-                // Once the bmax is known, there is no need to re-estimate it,
-                // thus we re-init ater the first search, because the pop has already been created before,
-                // when we were trying to estimate the b_max.
-                pop = eoPop<daex::Decomposition>( pop_size, init );
-
-                eo::log << "[Master] After re init of population, evaluating population." << std::endl;
-
-                // evaluate
-                // eoPopLoopEval<daex::Decomposition> pop_eval( eval ); // FIXME useful ??
-                pop_eval( pop, pop );
-
-                // reset run's continuator counters
-                steadyfit.totalGenerations( mingen, steadygen );
-                maxgen.totalGenerations( maxgens );
+            // note: operator> is overloaded in EO, don't be afraid: we are minimizing
+            if( best_of_run.fitness() > best.fitness() ) {
+                best = best_of_run;
             }
+
+            // TODO handle the case when we have several best decomposition with the same fitness but different plans?
+            // TODO use previous searches to re-estimate a better b_max?
+
+            // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
+            run++;
+            if( run >= maxruns && maxruns != 0 ) {
+#ifdef WITH_MPI
+                    if( parallelLoopEval )
+                    {
+                        std::cout << "[Master] launching terminate job." << std::endl;
+                        eo::mpi::TerminateJob job( *assign, 0 );
+                        job.run();
+                        delete assign;
+                    }
+#endif
+                break;
+            }
+
+            // Once the bmax is known, there is no need to re-estimate it,
+            // thus we re-init ater the first search, because the pop has already been created before,
+            // when we were trying to estimate the b_max.
+            pop = eoPop<daex::Decomposition>( pop_size, init );
+
+            eo::log << "[Master] After re init of population, evaluating population." << std::endl;
+
+            // evaluate
+            // eoPopLoopEval<daex::Decomposition> pop_eval( eval ); // FIXME useful ??
+            pop_eval( pop, pop );
+
+            // reset run's continuator counters
+            steadyfit.totalGenerations( mingen, steadygen );
+            maxgen.totalGenerations( maxgens );
         }
-        else // worker
-        {
-            while (true)
-            {
-                std::cout << "Worker: before" << std::endl;
-
-                // inside eoEasyEA loop
-                pop_eval( pop, pop );
-
-                // FIXME how to stop the workers ?
-
-                std::cout << "Worker: after" << std::endl;
-            }
-        } // else
-    } catch( std::exception& e ) {
+    } catch( std::exception const& e ) {
+        std::cout << "Leaving (living?) after an exception : " << e.what() << std::endl;
 #ifndef NDEBUG
         eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
         eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
+#endif
+
+#ifdef WITH_MPI
+        eo::mpi::TerminateJob job( *assign, 0 );
+        job.run();
+        delete assign;
 #endif
 
         // push the best result, in case it was not in the last run
@@ -388,8 +413,9 @@ int main ( int argc, char* argv[] )
 
         // Added an evaluated decomposition, in case it would be better than a decomposed one
         pop.push_back( empty_decompo );
-        pop_eval( pop, pop ); // FIXME normalement inutile
+        // pop_eval( pop, pop ); // FIXME normalement inutile
         // print_results( pop, time_start, run ); // TODO TODOB temporaire
+
         return 0;
     }
 
@@ -405,6 +431,7 @@ int main ( int argc, char* argv[] )
     // print_results( pop, time_start, run ); // TODO TODOB temporaire
     //
     */
+    std::cout << "End of main!" << std::endl;
     delete p_pop_eval;
 
     return 0;

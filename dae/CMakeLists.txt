@@ -39,7 +39,7 @@ IF(DAE_WITH_MPI)
     # for conditional compilation in code
     ADD_DEFINITIONS(-DWITH_MPI)
 
-    LINK_LIBRARIES(boost_mpi boost_serialization)
+    LINK_LIBRARIES(boost_mpi boost_serialization eompi)
 ENDIF()
 
 # include the sources

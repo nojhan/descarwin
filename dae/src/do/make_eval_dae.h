@@ -89,12 +89,21 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
     //#ifdef SINGLE_EVAL_ITER_DUMP
     //        p_eval = & eval_yahsp;
     //#else // ifndef SINGLE_EVAL_ITER_DUMP
+# ifdef WITH_MPI
+// TODO TODOB commenter
+#ifndef NDEBUG
+        p_eval = eval_counter;
+#else
+        p_eval = eval_bestfile;
+#endif // NDEBUG
+
+# else // WITH_MPI
     if( max_seconds == 0 ) {
 #ifndef NDEBUG
         p_eval = eval_counter;
 #else
         p_eval = eval_bestfile;
-#endif
+#endif // NDEBUG
     } else {
         // an eval that raises an exception if maxtime is reached
         /* eoEvalTimeThrowException<EOT> * p_eval_maxtime 
@@ -104,10 +113,12 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
             = new eoEvalUserTimeThrowException<EOT>( *eval_counter,  max_seconds );
 #else
             = new eoEvalUserTimeThrowException<EOT>( *eval_bestfile, max_seconds );
-#endif
+#endif // NDEBUG
+
         state.storeFunctor( p_eval_maxtime );
         p_eval = p_eval_maxtime;
     }
+# endif // WITH_MPI
     //#endif // SINGLE_EVAL_ITER_DUMP
     
 #ifndef NDEBUG
