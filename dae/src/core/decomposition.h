@@ -8,6 +8,7 @@
 #include <functional>
 
 #include <eo>
+#include <utils/eoTimer.h>
 
 #include "goal.h"
 #include "plan.h"
@@ -46,10 +47,13 @@ public:
     template <class Archive>
 	void save( Archive & ar, const unsigned int version ) const
 	{
+        eoTimerStat & t = eo::mpi::timerStat;
+        t.start("decomposition_save");
         std::stringstream ss;
         printOn( ss );
         std::string asStr = ss.str();
         ar & asStr;
+        t.stop("decomposition_save");
 
         (void) version; // avoid compilation warning
 	}
@@ -60,11 +64,14 @@ public:
     template <class Archive>
     void load( Archive & ar, const unsigned int version )
     {
+        eoTimerStat & t = eo::mpi::timerStat;
+        t.start("decomposition_load");
         std::string asStr;
         ar & asStr;
         std::stringstream ss;
         ss << asStr;
         readFrom( ss );
+        t.stop("decomposition_load");
 
         (void) version; // avoid compilation warning
     }

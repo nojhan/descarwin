@@ -22,6 +22,8 @@
 #include <mpi/eoTerminateJob.h>
 #endif
 
+#include <utils/eoTimer.h>
+
 /*
 #ifndef NDEBUG
 inline void LOG_LOCATION( eo::Levels level )
@@ -33,6 +35,9 @@ inline void LOG_LOCATION( eo::Levels level )
 
 int main ( int argc, char* argv[] )
 {
+    using eo::mpi::timerStat;
+    timerStat.start("dae_main");
+
 #ifdef WITH_MPI
     eo::mpi::Node::init( argc, argv );
 #endif
@@ -67,9 +72,9 @@ int main ( int argc, char* argv[] )
     eoParser parser(argc, argv);
     make_verbose(parser);
     make_parallel(parser);
-    
+
     eoState state;
-    
+
     // log some EO parameters
     // TODO TODOB seul le master log.
     eo::log << eo::logging << "Parameters:" << std::endl;
@@ -107,9 +112,9 @@ int main ( int argc, char* argv[] )
     eoValueParam<unsigned int> & param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' );
     // if one want to initialize on current time
     if ( param_seed.value() == 0) {
-      // change the parameter itself, that will be dumped in the status file
-      //        param_seed.value( time(0) );
-      param_seed.value() = time(0); // EO compatibility fixed by CC on 2010.12.24
+        // change the parameter itself, that will be dumped in the status file
+        //        param_seed.value( time(0) );
+        param_seed.value() = time(0); // EO compatibility fixed by CC on 2010.12.24
     }
 
     unsigned int seed = param_seed.value();
@@ -142,10 +147,10 @@ int main ( int argc, char* argv[] )
     eo::log << eo::progress << "Load the instance..." << std::endl;
     eo::log.flush();
 #endif
-    
+
     daex::pddlLoad pddl( domain, instance, SOLVER_YAHSP, HEURISTIC_H1, eo::parallel.nthreads(), std::vector<std::string>());
     daex::Goal::atoms( & pddl.atoms() );
-   
+
 #ifndef NDEBUG
     eo::log << eo::progress << "Load the instance...OK" << std::endl;
     eo::log << eo::progress << "Initialization...";
@@ -165,7 +170,7 @@ int main ( int argc, char* argv[] )
 
     // used to pass the eval count through the several eoEvalFuncCounter evaluators
     unsigned int eval_count = 0;
-    
+
     TimeVal best_makespan = MAXTIME;
 
 #ifndef SINGLE_EVAL_ITER_DUMP
@@ -182,8 +187,8 @@ int main ( int argc, char* argv[] )
         } else {
             // if not insemination, incremental search strategy
             b_max_fixed  = daex::estimate_bmax_incremental<daex::Decomposition>( 
-                pop, parser, init.l_max(), eval_count, plan_file, best_makespan, dump_sep, dump_file_count, metadata 
-            ); // FIXME bug here when retrieving bmax-last-weight
+                    pop, parser, init.l_max(), eval_count, plan_file, best_makespan, dump_sep, dump_file_count, metadata 
+                    ); // FIXME bug here when retrieving bmax-last-weight
         }
     }
 
@@ -210,7 +215,7 @@ int main ( int argc, char* argv[] )
     std::pair< eoEvalFunc<daex::Decomposition>&, eoEvalFuncCounter<daex::Decomposition>* > eval_pair
         = daex::do_make_eval_op<daex::Decomposition>(
                 parser, state, init.l_max(), eval_count, b_max_in, b_max_last, plan_file, best_makespan, dump_sep, dump_file_count, metadata
-            );
+                );
     eoEvalFunc<daex::Decomposition>& eval = eval_pair.first;
 
 #ifndef NDEBUG
@@ -219,7 +224,7 @@ int main ( int argc, char* argv[] )
     eoEvalFuncCounter<daex::Decomposition>& eval_counter = * eval_pair.second;
 
     eo::log << eo::progress << "OK" << std::endl;
-    
+
     eo::log << eo::progress << "Evaluating the first population...";
     eo::log.flush();
 #endif
@@ -246,24 +251,18 @@ int main ( int argc, char* argv[] )
     if( rank != 0 )
     {
         // workers just perform evaluation
-        /*
-        try
-        {
-        */
-        
         pop_eval( pop, pop );
-        
-        int recv = -1;
-        eo::mpi::Node().comm().recv( 0, 0, recv );
-        std::cout << "Slave " << rank << " recv: " << recv << std::endl;
+        timerStat.stop("dae_main");
+
+        eo::mpi::Node::comm().send( 0, 0, timerStat );
 
         /*
-        } catch (std::exception& e)
-        {
-            std::cout << "STOP: " << e.what() << std::endl;
-            return 0;
-        }
-        */
+           long int utime = timer.usertime();
+           long int stime = timer.systime();
+           eo::mpi::Node::comm().send( 0, 0, utime );
+           eo::mpi::Node::comm().send( 0, 0, stime );
+           */
+
         return 0;
     }
 # endif
@@ -287,7 +286,7 @@ int main ( int argc, char* argv[] )
 
     // STOPPING CRITERIA
     eoCombinedContinue<daex::Decomposition> continuator = daex::do_make_continue_op<daex::Decomposition>( parser, state );
-    
+
     // Direct access to continuators are needed during restarts (see below)
     eoSteadyFitContinue<daex::Decomposition> & steadyfit 
         = *( dynamic_cast<eoSteadyFitContinue<daex::Decomposition>* >( continuator[0] ) );
@@ -298,9 +297,9 @@ int main ( int argc, char* argv[] )
     // CHECKPOINTING
     eoCheckPoint<daex::Decomposition> & checkpoint = daex::do_make_checkpoint_op( continuator, parser, state, pop
 #ifndef NDEBUG
-        , eval_counter
+            , eval_counter
 #endif
-    );
+            );
 
     // SELECTION AND VARIATION
     // daex::MutationDelGoal<daex::Decomposition> delgoal; // FIXME delgoal devrait être un pointeur alloué sur le tas
@@ -344,6 +343,7 @@ int main ( int argc, char* argv[] )
             // call the checkpoint (log and stats output) on the pop from the init
             checkpoint( pop );
 #endif
+            timerStat.start("main_run");
             std::cout << "Starting search..." << std::endl;
             // start a search
             dae( pop );
@@ -363,15 +363,7 @@ int main ( int argc, char* argv[] )
             // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
             run++;
             if( run >= maxruns && maxruns != 0 ) {
-#ifdef WITH_MPI
-                    if( parallelLoopEval )
-                    {
-                        std::cout << "[Master] launching terminate job." << std::endl;
-                        eo::mpi::TerminateJob job( *assign, 0 );
-                        job.run();
-                        delete assign;
-                    }
-#endif
+                timerStat.stop("main_run");
                 break;
             }
 
@@ -389,6 +381,7 @@ int main ( int argc, char* argv[] )
             // reset run's continuator counters
             steadyfit.totalGenerations( mingen, steadygen );
             maxgen.totalGenerations( maxgens );
+            timerStat.stop("main_run");
         }
     } catch( std::exception const& e ) {
         std::cout << "Leaving (living?) after an exception : " << e.what() << std::endl;
@@ -401,6 +394,47 @@ int main ( int argc, char* argv[] )
         eo::mpi::TerminateJob job( *assign, 0 );
         job.run();
         delete assign;
+
+        timerStat.stop("dae_main");
+
+        /*
+           std::vector<long int> utimes;
+           long int masterUtime = timer.usertime();
+           long int masterStime = timer.systime();
+           long int masterTtime = masterUtime + masterStime;
+
+           utimes.push_back( masterUtime );
+
+           std::vector<long int> stimes;
+           stimes.push_back( masterStime );
+           for(int i = 1; i < eo::mpi::Node::comm().size(); ++i)
+           {
+           long int utime, stime;
+           eo::mpi::Node::comm().recv( i, 0, utime );
+           eo::mpi::Node::comm().recv( i, 0, stime );
+           utimes.push_back( utime );
+           stimes.push_back( stime );
+           }
+
+           long int usum = 0, ssum = 0, tsum = 0;
+           std::cout << "Timers for nodes : " << std::endl;
+           for(int i = 0; i < utimes.size(); ++i)
+           {
+           long int total = utimes[i] + stimes[i];
+
+           std::cout << i << ") U: " << utimes[i] << " / S: " << stimes[i] 
+           << " / T: " << total
+           << std::endl;
+
+           usum += utimes[i];
+           ssum += stimes[i];
+           }
+           tsum = usum + ssum;
+           std::cout << "Speedup : U: " << static_cast<double>( usum ) / masterUtime
+           << " S: " << static_cast<double>( ssum ) / masterStime
+           << " T: " << static_cast<double>( tsum ) / masterTtime
+           << std::endl;
+           */
 #endif
 
         // push the best result, in case it was not in the last run
@@ -423,8 +457,73 @@ int main ( int argc, char* argv[] )
     eo::log << eo::progress << "... end of search" << std::endl;
 #endif
 
+#ifdef WITH_MPI
+    eo::mpi::TerminateJob job( *assign, 0 );
+    job.run();
+    delete assign;
+
+    timerStat.stop("dae_main");
+
+    std::ostream & ss = std::cout;
+
+    typedef std::map<std::string, eoTimerStat::Stat> statsMap;
+    statsMap stats = timerStat.stats();
+    for( statsMap::iterator it = stats.begin(), end = stats.end();
+            it != end;
+            ++it)
+    {
+        ss << "0 " << it->first << " S: ";
+        for(unsigned j = 0; j < it->second.stime.size(); ++j)
+        {
+            ss << it->second.stime[j] << " ";
+        }
+        ss << std::endl << "0 " << it->first << " U: ";
+
+        for(unsigned j = 0; j < it->second.utime.size(); ++j)
+        {
+            ss << it->second.utime[j] << " ";
+        }
+        ss << std::endl << "0 " << it->first << " W: ";
+        for(unsigned j = 0; j < it->second.wtime.size(); ++j)
+        {
+            ss << it->second.wtime[j] << " ";
+        }
+        ss << std::endl;
+    }
+
+    for(int i = 1; i < eo::mpi::Node::comm().size(); ++i)
+    {
+        eoTimerStat otherTimerStat;
+        eo::mpi::Node::comm().recv( i, 0, otherTimerStat );
+        statsMap stats = otherTimerStat.stats();
+        for( statsMap::iterator it = stats.begin(), end = stats.end();
+                it != end;
+                ++it)
+        {
+            ss << i << " " << it->first << " S: ";
+            for(unsigned j = 0; j < it->second.stime.size(); ++j)
+            {
+                ss << it->second.stime[j] << " ";
+            }
+            ss << std::endl << i << " " << it->first << " U: ";
+
+            for(unsigned j = 0; j < it->second.utime.size(); ++j)
+            {
+                ss << it->second.utime[j] << " ";
+            }
+            ss << std::endl << i << " " << it->first << " W: ";
+            for(unsigned j = 0; j < it->second.wtime.size(); ++j)
+            {
+                ss << it->second.wtime[j] << " ";
+            }
+            ss << std::endl;
+        }
+    }
+#endif
+
+
     /*
-    pop.push_back( empty_decompo );
+       pop.push_back( empty_decompo );
     // push the best result, in case it was not in the last run
     pop.push_back( best );
     pop_eval( pop, pop ); // FIXME normalement inutile
