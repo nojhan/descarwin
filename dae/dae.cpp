@@ -108,6 +108,9 @@ int main ( int argc, char* argv[] )
     // b_max estimation
     bool insemination = parser.createParam(true, "insemination", "Use the insemination heuristic to estimate b_max at init", '\0', "Initialization").value();
 
+    // TODO TODOB peut être bouger ça dans eo ?
+    int packet_size = parser.createParam( (int)1, "parallelize-packet-size", "Parallelizing packet size", 'Z', "Parallelization").value();
+
     // seed
     eoValueParam<unsigned int> & param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' );
     // if one want to initialize on current time
@@ -236,7 +239,7 @@ int main ( int argc, char* argv[] )
     if( parallelLoopEval )
     {
         unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
-        p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>( eval, *assign, 0 /* master rank */, 1 /* size of packet */, max_seconds );
+        p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>( eval, *assign, 0 /* master rank */, packet_size /* size of packet */, max_seconds );
     } else
     {
 # endif
@@ -338,7 +341,7 @@ int main ( int argc, char* argv[] )
     {
         public:
 
-        FinallyBlock( eo::mpi::DynamicAssignmentAlgorithm* _assign,
+        FinallyBlock( eo::mpi::AssignmentAlgorithm* _assign,
                 eoPopEvalFunc<daex::Decomposition> * _p_pop_eval,
                 eoPop<daex::Decomposition> & _pop,
                 daex::Decomposition & _best,
@@ -456,7 +459,7 @@ int main ( int argc, char* argv[] )
         private:
 
         eoPopEvalFunc<daex::Decomposition> * p_pop_eval;
-        eo::mpi::DynamicAssignmentAlgorithm* assign;
+        eo::mpi::AssignmentAlgorithm* assign;
         daex::Decomposition & best;
         daex::Decomposition & empty_decompo;
         eoPop<daex::Decomposition> pop;
