@@ -334,7 +334,137 @@ int main ( int argc, char* argv[] )
     daex::Decomposition empty_decompo;
     eval( empty_decompo );
 
+    class FinallyBlock
+    {
+        public:
+
+        FinallyBlock( eo::mpi::DynamicAssignmentAlgorithm* _assign,
+                eoPopEvalFunc<daex::Decomposition> * _p_pop_eval,
+                eoPop<daex::Decomposition> & _pop,
+                daex::Decomposition & _best,
+                daex::Decomposition & _empty_decompo
+                ) :
+            assign( _assign),
+            p_pop_eval( _p_pop_eval ),
+            pop( _pop),
+            best( _best),
+            empty_decompo( _empty_decompo )
+        {
+            // empty
+        }
+
+        ~FinallyBlock()
+        {
+#ifndef NDEBUG
+        eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
+        eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
+#endif
+        // push the best result, in case it was not in the last run
+        pop.push_back( best );
+
+#ifndef NDEBUG
+        // call the checkpoint, as if it was ending a generation
+        checkpoint( pop );
+#endif
+
+        // Added an evaluated decomposition, in case it would be better than a decomposed one
+        pop.push_back( empty_decompo );
+        // pop_eval( pop, pop ); // FIXME normalement inutile
+        // print_results( pop, time_start, run ); // TODO TODOB temporaire
+
+
+#ifndef NDEBUG
+            eo::log << eo::progress << "... end of search" << std::endl;
+#endif
+
+#ifdef WITH_MPI
+            eo::mpi::TerminateJob job( *assign, 0 );
+            job.run();
+            delete assign;
+
+            timerStat.stop("dae_main");
+
+            std::ostream & ss = std::cout;
+
+            typedef std::map<std::string, eoTimerStat::Stat> statsMap;
+            statsMap stats = timerStat.stats();
+            for( statsMap::iterator it = stats.begin(), end = stats.end();
+                    it != end;
+                    ++it)
+            {
+                ss << "0 " << it->first << " S: ";
+                for(unsigned j = 0; j < it->second.stime.size(); ++j)
+                {
+                    ss << it->second.stime[j] << " ";
+                }
+                ss << std::endl << "0 " << it->first << " U: ";
+
+                for(unsigned j = 0; j < it->second.utime.size(); ++j)
+                {
+                    ss << it->second.utime[j] << " ";
+                }
+                ss << std::endl << "0 " << it->first << " W: ";
+                for(unsigned j = 0; j < it->second.wtime.size(); ++j)
+                {
+                    ss << it->second.wtime[j] << " ";
+                }
+                ss << std::endl;
+            }
+
+            for(int i = 1; i < eo::mpi::Node::comm().size(); ++i)
+            {
+                eoTimerStat otherTimerStat;
+                eo::mpi::Node::comm().recv( i, 0, otherTimerStat );
+                statsMap stats = otherTimerStat.stats();
+                for( statsMap::iterator it = stats.begin(), end = stats.end();
+                        it != end;
+                        ++it)
+                {
+                    ss << i << " " << it->first << " S: ";
+                    for(unsigned j = 0; j < it->second.stime.size(); ++j)
+                    {
+                        ss << it->second.stime[j] << " ";
+                    }
+                    ss << std::endl << i << " " << it->first << " U: ";
+
+                    for(unsigned j = 0; j < it->second.utime.size(); ++j)
+                    {
+                        ss << it->second.utime[j] << " ";
+                    }
+                    ss << std::endl << i << " " << it->first << " W: ";
+                    for(unsigned j = 0; j < it->second.wtime.size(); ++j)
+                    {
+                        ss << it->second.wtime[j] << " ";
+                    }
+                    ss << std::endl;
+                }
+            }
+#endif
+
+            /*
+               pop.push_back( empty_decompo );
+            // push the best result, in case it was not in the last run
+            pop.push_back( best );
+            pop_eval( pop, pop ); // FIXME normalement inutile
+            // print_results( pop, time_start, run ); // TODO TODOB temporaire
+            //
+            */
+            std::cout << "End of main!" << std::endl;
+            delete p_pop_eval;
+        }
+
+        private:
+
+        eoPopEvalFunc<daex::Decomposition> * p_pop_eval;
+        eo::mpi::DynamicAssignmentAlgorithm* assign;
+        daex::Decomposition & best;
+        daex::Decomposition & empty_decompo;
+        eoPop<daex::Decomposition> pop;
+
+    };
+
     try {
+        FinallyBlock finallyBlock( assign, p_pop_eval, pop, best, empty_decompo );
         while( true )
         {
 #ifndef NDEBUG
@@ -385,153 +515,9 @@ int main ( int argc, char* argv[] )
         }
     } catch( std::exception const& e ) {
         std::cout << "Leaving (living?) after an exception : " << e.what() << std::endl;
-#ifndef NDEBUG
-        eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
-        eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
-#endif
-
-#ifdef WITH_MPI
-        eo::mpi::TerminateJob job( *assign, 0 );
-        job.run();
-        delete assign;
-
-        timerStat.stop("dae_main");
-
-        /*
-           std::vector<long int> utimes;
-           long int masterUtime = timer.usertime();
-           long int masterStime = timer.systime();
-           long int masterTtime = masterUtime + masterStime;
-
-           utimes.push_back( masterUtime );
-
-           std::vector<long int> stimes;
-           stimes.push_back( masterStime );
-           for(int i = 1; i < eo::mpi::Node::comm().size(); ++i)
-           {
-           long int utime, stime;
-           eo::mpi::Node::comm().recv( i, 0, utime );
-           eo::mpi::Node::comm().recv( i, 0, stime );
-           utimes.push_back( utime );
-           stimes.push_back( stime );
-           }
-
-           long int usum = 0, ssum = 0, tsum = 0;
-           std::cout << "Timers for nodes : " << std::endl;
-           for(int i = 0; i < utimes.size(); ++i)
-           {
-           long int total = utimes[i] + stimes[i];
-
-           std::cout << i << ") U: " << utimes[i] << " / S: " << stimes[i] 
-           << " / T: " << total
-           << std::endl;
-
-           usum += utimes[i];
-           ssum += stimes[i];
-           }
-           tsum = usum + ssum;
-           std::cout << "Speedup : U: " << static_cast<double>( usum ) / masterUtime
-           << " S: " << static_cast<double>( ssum ) / masterStime
-           << " T: " << static_cast<double>( tsum ) / masterTtime
-           << std::endl;
-           */
-#endif
-
-        // push the best result, in case it was not in the last run
-        pop.push_back( best );
-
-#ifndef NDEBUG
-        // call the checkpoint, as if it was ending a generation
-        checkpoint( pop );
-#endif
-
-        // Added an evaluated decomposition, in case it would be better than a decomposed one
-        pop.push_back( empty_decompo );
-        // pop_eval( pop, pop ); // FIXME normalement inutile
-        // print_results( pop, time_start, run ); // TODO TODOB temporaire
-
         return 0;
     }
 
-#ifndef NDEBUG
-    eo::log << eo::progress << "... end of search" << std::endl;
-#endif
-
-#ifdef WITH_MPI
-    eo::mpi::TerminateJob job( *assign, 0 );
-    job.run();
-    delete assign;
-
-    timerStat.stop("dae_main");
-
-    std::ostream & ss = std::cout;
-
-    typedef std::map<std::string, eoTimerStat::Stat> statsMap;
-    statsMap stats = timerStat.stats();
-    for( statsMap::iterator it = stats.begin(), end = stats.end();
-            it != end;
-            ++it)
-    {
-        ss << "0 " << it->first << " S: ";
-        for(unsigned j = 0; j < it->second.stime.size(); ++j)
-        {
-            ss << it->second.stime[j] << " ";
-        }
-        ss << std::endl << "0 " << it->first << " U: ";
-
-        for(unsigned j = 0; j < it->second.utime.size(); ++j)
-        {
-            ss << it->second.utime[j] << " ";
-        }
-        ss << std::endl << "0 " << it->first << " W: ";
-        for(unsigned j = 0; j < it->second.wtime.size(); ++j)
-        {
-            ss << it->second.wtime[j] << " ";
-        }
-        ss << std::endl;
-    }
-
-    for(int i = 1; i < eo::mpi::Node::comm().size(); ++i)
-    {
-        eoTimerStat otherTimerStat;
-        eo::mpi::Node::comm().recv( i, 0, otherTimerStat );
-        statsMap stats = otherTimerStat.stats();
-        for( statsMap::iterator it = stats.begin(), end = stats.end();
-                it != end;
-                ++it)
-        {
-            ss << i << " " << it->first << " S: ";
-            for(unsigned j = 0; j < it->second.stime.size(); ++j)
-            {
-                ss << it->second.stime[j] << " ";
-            }
-            ss << std::endl << i << " " << it->first << " U: ";
-
-            for(unsigned j = 0; j < it->second.utime.size(); ++j)
-            {
-                ss << it->second.utime[j] << " ";
-            }
-            ss << std::endl << i << " " << it->first << " W: ";
-            for(unsigned j = 0; j < it->second.wtime.size(); ++j)
-            {
-                ss << it->second.wtime[j] << " ";
-            }
-            ss << std::endl;
-        }
-    }
-#endif
-
-
-    /*
-       pop.push_back( empty_decompo );
-    // push the best result, in case it was not in the last run
-    pop.push_back( best );
-    pop_eval( pop, pop ); // FIXME normalement inutile
-    // print_results( pop, time_start, run ); // TODO TODOB temporaire
-    //
-    */
-    std::cout << "End of main!" << std::endl;
-    delete p_pop_eval;
 
     return 0;
 }
