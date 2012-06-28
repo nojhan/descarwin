@@ -163,12 +163,12 @@ unsigned int estimate_bmax_incremental(
     double b_max_increase_coef = parser.valueOf<double>("bmax-increase-coef");
     double b_max_ratio = parser.valueOf<double>("bmax-ratio");
     unsigned int b_max_init = parser.valueOf<unsigned int>("bmax-init");
-    unsigned int b_max_last_weight = parser.valueOf<unsigned int>("bmax-last-weight");
+    double b_max_last_weight = parser.valueOf<double>("bmax-last-weight");
     unsigned int b_max_fixed = parser.valueOf<unsigned int>("bmax-fixed");
 
-    bool found;
-    unsigned int goodguys = 1;
-    unsigned int b_max_in=1, b_max_last=1;
+    bool found = false;
+    unsigned int goodguys = 0;
+    unsigned int b_max_in=1, b_max_last;
     EOT empty_decompo;
 
 #ifndef NDEBUG
@@ -275,7 +275,7 @@ unsigned int estimate_bmax_incremental(
 #endif
     eval_pop( pop, pop );
 
-    return b_max_in;
+    return b_max_fixed;
 }
 
 } // namespace daex

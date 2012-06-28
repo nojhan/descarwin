@@ -96,7 +96,7 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
     // b_max estimation
-    bool insemination = parser.createParam(true, "insemination", "Use the insemination heuristic to estimate b_max at init", '\0', "Initialization").value();
+    bool insemination = parser.createParam(false, "insemination", "Use the insemination heuristic to estimate b_max at init", '\0', "Initialization").value();
 
     // seed
     eoValueParam<unsigned int> & param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' );
@@ -158,7 +158,7 @@ int main ( int argc, char* argv[] )
     // used to pass the eval count through the several eoEvalFuncCounter evaluators
     unsigned int eval_count = 0;
     
-    TimeVal best_makespan = MAXTIME;
+    TimeVal best_makespan = INT_MAX;
 
 #ifndef SINGLE_EVAL_ITER_DUMP
     std::string dump_sep = ".";
