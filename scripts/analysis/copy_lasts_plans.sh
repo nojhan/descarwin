@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+
 rmax=11 
 
 domains=`ls -1|awk -F _p[0-9] '{print $1}'|uniq `
