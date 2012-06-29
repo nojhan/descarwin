@@ -295,15 +295,16 @@ static void create_structures(void)
       a->produces = bitarray_create(fluents_nb);
       a->deletes = bitarray_create(fluents_nb);
       a->edeletes = bitarray_create(fluents_nb);
-      if (opt.fluent_mutexes) a->mutex = bitarray_create(a->id + 1);
+      if (opt.fluent_mutexes && pass > 1) a->mutex = bitarray_create(a->id + 1);
       if (!opt.optimal) a->deletes_included = bitarray_create(actions_nb);
     }
   } EFOR;
-
+  
   FORi(f, i, fluents) {
     f->id = i;
     bitarray_set_index(f);
-    if (pass == 2 && opt.fluent_mutexes) f->mutex = bitarray_create(f->id + 1);
+    cpt_free(f->mutex);
+    if (pass > 1 && opt.fluent_mutexes) f->mutex = bitarray_create(f->id + 1);
   } EFOR;
 
   init_state = start_action->add;
@@ -341,7 +342,7 @@ static void create_structures(void)
     FOR(f, a->prec) { f->consumers[f->consumers_nb++] = a; set_consumes(a, f); } EFOR;
     FOR(f, a->add) { f->producers[f->producers_nb++] = a; set_produces(a, f); } EFOR;
     FOR(f, a->del) { f->deleters[f->deleters_nb++] = a; set_deletes(a, f); } EFOR;
-    FOR(f, a->edel) { f->edeleters[f->edeleters_nb++] = a; set_edeletes(a, f); } EFOR;
+    if (!opt.yahsp) FOR(f, a->edel) { f->edeleters[f->edeleters_nb++] = a; set_edeletes(a, f); } EFOR;
   } EFOR;
 
   if (pass > 1 && opt.fluent_mutexes) {
@@ -658,7 +659,7 @@ void create_problem(void)
     end_monitor();
   }
   
-  if (opt.fluent_mutexes || opt.initial_heuristic == 2) {
+  if (!opt.yahsp && opt.fluent_mutexes || opt.initial_heuristic == 2) {
     begin_monitor("Finalizing e-deleters");
     create_edeletes();
     end_monitor();
