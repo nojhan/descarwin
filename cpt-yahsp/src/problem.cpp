@@ -659,7 +659,7 @@ void create_problem(void)
     end_monitor();
   }
   
-  if (!opt.yahsp && opt.fluent_mutexes || opt.initial_heuristic == 2) {
+  if (!opt.yahsp && (opt.fluent_mutexes || opt.initial_heuristic == 2)) {
     begin_monitor("Finalizing e-deleters");
     create_edeletes();
     end_monitor();

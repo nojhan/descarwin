@@ -44,9 +44,8 @@ static Comparison open_list_cmp(Node *node1, Node *node2)
   if (yahsp_optimize_makespan)
     GREATER(node1->makespan, node2->makespan);
   else if (yahsp_optimize_cost)
-    GREATER(node1->cost, node2->cost);
-  else
-    GREATER(node1->length, node2->length);
+    LESS(node1->cost, node2->cost);
+  else GREATER(node1->length, node2->length);
   GREATER(node1->id, node2->id);
   return Equal;
 }
@@ -136,7 +135,8 @@ void yahsp_init()
   FOR(f, init_state) { state_add(initial_bitstate, f); } EFOR;
   yahsp_reset();
   cpt_srand(opt.seed);
-  //yahsp_set_optimize_makespan_max();
+  //yahsp_set_optimize_cost();
+  yahsp_set_weight(3);
 }
 
 

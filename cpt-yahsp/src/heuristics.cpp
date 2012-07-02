@@ -163,8 +163,8 @@ double ch5(Action *a, Action *b)
   TimeVal Tmax_a = mini(last_start(a), last_start(b) - delta_aa(a, b));
   TimeVal Tmin_b = maxi(first_start(b), first_start(a) + delta_aa(a, b));
   // return maxi(Tmax_a - first_start(a), last_start(b) - Tmin_b);
-  double da = duration(a);
-  double db = duration(b);
+  // double da = duration(a);
+  // double db = duration(b);
   return maxi((Tmax_a - first_start(a)+1)/wdeg3(a), (last_start(b) - Tmin_b+1)/wdeg3(b));
 }
 
@@ -173,8 +173,8 @@ double ch6(Action *a, Action *b)
   TimeVal Tmax_a = mini(last_start(a), last_start(b) - delta_aa(a, b));
   TimeVal Tmin_b = maxi(first_start(b), first_start(a) + delta_aa(a, b));
   // return mini(Tmax_a - first_start(a), last_start(b) - Tmin_b);
-  double da = duration(a);
-  double db = duration(b);
+  // double da = duration(a);
+  // double db = duration(b);
   return mini((Tmax_a - first_start(a)+1)/wdeg3(a), (last_start(b) - Tmin_b+1)/wdeg3(b));
 }
 

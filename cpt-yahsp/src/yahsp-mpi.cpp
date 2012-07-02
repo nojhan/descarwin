@@ -321,7 +321,7 @@ Node *mpi_synchronize_solution(Node *node, TimeVal *best_makespan, bool *stop_on
     MPI_Recv(NULL, 0, BYTE, ANY_SOURCE, EXCH, COMM, NO_STATUS);
     // problem here for int64_t on 32 bits machines
     //struct { TimeVal makespan; int rank; } in = {(node == NULL ? MAXTIME : node->makespan), rank}, out;
-    struct { long makespan; int rank; } in = {(node == NULL ? LONG_MAX : node->makespan), rank}, out;
+    struct { long makespan; int rank; } in = {(node == NULL ? LONG_MAX : (long) node->makespan), rank}, out;
     MPI_Allreduce(&in, &out, 1, LONG_INT, MPI_MINLOC, COMM);
     int stop = *stop_on_timer;
     MPI_Allreduce(&stop, stop_on_timer, 1, INT, MPI_LOR, COMM);
