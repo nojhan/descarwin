@@ -20,7 +20,7 @@ namespace daex
 {
 
 //! A decomposition is a list of Goal objects, and we are trying to minimize a scalar fitness (e.g. time or number of actions)
-class Decomposition : public std::list<Goal>  ,  public EO< eoMinimizingFitness >
+class Decomposition : public std::list<Goal>,  public EO< eoMinimizingFitness >
 {
 public:
 
@@ -152,9 +152,38 @@ public:
     void incr_number_evaluated_nodes(unsigned int B) { _B += B; }
     void setFeasible(bool  b){	_is_feasible = b; }
     bool is_feasible() const { return _is_feasible; }
-   
+
+    /** Reimplement comparisons, as feasibility changes the meaning of it.
+     * In EO, "this < other" is read "other is better than this".
+     */
+    bool operator<(const Decomposition& other) const 
+    {
+        if( this->is_feasible() && !other.is_feasible() ) { // only this is feasible
+            return false;
+
+        } else if( !this->is_feasible() && other.is_feasible() ) { // only other is feasible
+            return true;
+
+        } else {
+        /* Similar to:
+        if( ( this->is_feasible() && other.is_feasible() ) // both feasible
+            ||
+            ( !this->is_feasible() && !other.is_feasible() ) // both unfeasible
+          ) {
+        */
+            return this->fitness() < other.fitness(); // fallback to fitness
+        }
+    }
+
+    //! Counterpart, <= and >= are derived from < and > and thus do not need to be modified
+    bool operator>(const Decomposition& other) const 
+    { 
+        return !(this->fitness() <= other.fitness()); 
+    }
+
+
 private:
-   
+
     bool _is_feasible;
 
 
@@ -179,8 +208,6 @@ protected:
 
     //! compteur des tentatives de recherche
     unsigned int _B;
-    
-    
 
 }; // class Decomposition
 
