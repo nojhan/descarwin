@@ -38,47 +38,20 @@ void Decomposition::plans_sub_reset()
     _plans_sub.reserve( this->size() + 1 );
 }
 
-// void Decomposition::printOn( std::ostream & out ) const 
-//{
-//    EO< eoMinimizingFitness >::printOn(out);
-//    out << " ";
-//
-//    out << "(Decomposition[" <<  this->size() << "]: ";
-//
-//    std::copy( this->begin(), this->end(), std::ostream_iterator<Goal>(out, " ") );
-//
-//    out << ")";
-// 
-//     //out << this->plan_copy(); 
-//  
-//}
-
-void Decomposition::printOn( std::ostream & os ) const
+ void Decomposition::printOn( std::ostream & out ) const 
 {
-    Plan plan = this->plan_copy();
+    EO< eoMinimizingFitness >::printOn(out);
+    out << " ";
 
-    // JSON formating
-    os << "{ "; 
-    os << "\"makespan\":\"" << plan.makespan() << "\", ";
-    os << "\"fitness\":\"";
-        EO< eoMinimizingFitness >::printOn(os);
-        os << "\",";
-    os << "\"is_feasible\":\"" << this->is_feasible() << "\", ";
-    os << "\"b_max\":\"" << this->b_max() << "\", ";
-    os << "\"expanded_nodes\":\"" << plan.search_steps() << "\", ";
-    os << "\"decomposition_size\":\"" << this->size() << "\", ";
-    os << "\"last_reached\":\"" << this->last_reached() << "\", ";
-    os << "\"useful_goals\":\"" << this->get_number_useful_goals() << "\", ";
-    os << std::endl;
-    os << "\"plan\":\"" << plan << "\", ";
-    os << std::endl;
-    os << "\"decomposition\":\"";
-        os << "(Decomposition[" <<  this->size() << "]: ";
-        std::copy( this->begin(), this->end(), std::ostream_iterator<Goal>(os, "\n") );
-        os << "\"";
-    os << " }" << std::endl;
+    out << "(Decomposition[" <<  this->size() << "]: ";
+
+    std::copy( this->begin(), this->end(), std::ostream_iterator<Goal>(out, " ") );
+
+    out << ")";
+ 
+     //out << this->plan_copy(); 
+  
 }
-
 
 Decomposition::iterator Decomposition::iter_at( unsigned int i )
 {
