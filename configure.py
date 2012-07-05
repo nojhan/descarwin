@@ -36,16 +36,16 @@ options=[
             ["-DCPT_WITH_OMP=1", ""]
         ]
     ),
-    ("Voulez-vous utiliser OpenMP avec DAE ?",
+    ("Voulez-vous utiliser MPI (OpenMPI) avec DAE ?",
         ["oui", "non"],
-        ["DAE_OMP"],
+        ["DAE_MPI"],
         [
-            ["-DDAE_WITH_OMP=1", ""]
+            ["-DDAE_WITH_MPI=1", ""]
         ]
     )
 ]
 
-OPTIONS = "%(CPT_OMP)s %(DAE_OMP)s %(BUILD_FLAGS)s"
+OPTIONS = "%(CPT_OMP)s %(DAE_MPI)s %(BUILD_FLAGS)s"
 
 responses = {}
 
@@ -62,7 +62,7 @@ for question in options:
 
 responses[ "OPTIONS" ] = OPTIONS % responses
 del responses['CPT_OMP']
-del responses['DAE_OMP']
+del responses['DAE_MPI']
 del responses['BUILD_FLAGS']
 
 print "\n\nScript bash correspondant : "
