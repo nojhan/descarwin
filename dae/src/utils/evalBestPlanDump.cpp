@@ -1,17 +1,20 @@
 
 #include "evalBestPlanDump.h"
 
+#include <mpi/eoMpi.h>
+
 namespace daex {
 
 void evalBestMakespanPlanDump::call( Decomposition & eo )
 {
-    if( eo.plan().makespan() < _best ) {
-#pragma omp critical
+    if( eo::mpi::Node::comm().rank() == eo::mpi::DEFAULT_MASTER )
+    {
         if( eo.plan().makespan() < _best ) {
+#pragma omp critical
             _best = eo.plan().makespan();
             dump( eo );
-        }
-    } // if better
+        }// if better
+    }
 }
 
 void evalBestFitnessPlanDump::call( Decomposition & eo )

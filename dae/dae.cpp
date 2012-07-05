@@ -19,6 +19,7 @@
 
 #ifdef WITH_MPI
 #include <mpi/eoMpi.h>
+#include <mpi/eoParallelApply.h>
 #include <mpi/eoTerminateJob.h>
 #endif
 
@@ -32,6 +33,80 @@ inline void LOG_LOCATION( eo::Levels level )
 }
 #endif
 */
+
+template< class T >
+struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >
+{
+    using eo::mpi::HandleResponseParallelApply< daex::Decomposition >::d ;
+
+    HandleResponseBestPlanDump(
+            std::string afilename,
+            T worst,
+            bool single_file = false,
+            std::string sep = ".",
+            unsigned int file_count = 0,
+            std::string metadata = ""
+        ) :
+        _filename( afilename ), _single_file( single_file ), _file_count( file_count ), _sep( sep ), best( worst ), _metadata( metadata )
+    {
+        // empty
+    }
+
+    // TODO copié / collé de evalBestPlanDump.h
+    void dump( daex::Decomposition & eo )
+    {
+        std::ofstream _of;
+
+        if( _single_file ) {
+            // explicitely erase the file before writing in it
+            _of.open( _filename.c_str(), std::ios_base::out | std::ios_base::trunc );
+
+        } else {
+            std::ostringstream afilename;
+            afilename << _filename << _sep << _file_count;
+            _of.open( afilename.str().c_str() );
+        }
+
+#ifndef NDEBUG
+        if ( !_of.is_open() ) {
+            std::string str = "Error, eoEvalBestFileDump could not open: " + _filename;
+            throw std::runtime_error( str );
+        }
+        _of << IPC_PLAN_COMMENT << _metadata << std::endl;
+        _of << IPC_PLAN_COMMENT << eo << std::endl;
+#endif
+        // here, in release mode, we assume that the file could be opened
+        // thus, we avoid a supplementary test in this costly evaluator
+        _of << eo.plan() << std::endl;
+        _of.close();
+
+        _file_count++;
+    }
+
+    void operator()( int wrkRank )
+    {
+        (*_wrapped)( wrkRank );
+        int index = d->assignedTasks[ wrkRank ].index;
+        int size = d->assignedTasks[ wrkRank ].size;
+        for( int i = 0; i < size; ++i )
+        {
+            daex::Decomposition & decompo = d->data()[ index + i ];
+            if( decompo.plan().makespan() < best )
+            {
+                best = decompo.plan().makespan() ;
+                dump( decompo );
+            }
+        }
+    }
+
+    protected:
+    std::string _filename;
+    bool _single_file;
+    unsigned int _file_count;
+    std::string _sep;
+    std::string _metadata;
+    T best;
+};
 
 int main ( int argc, char* argv[] )
 {
@@ -106,7 +181,8 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxruns" << maxruns << std::endl;
 
     // b_max estimation
-    bool insemination = parser.createParam(true, "insemination", "Use the insemination heuristic to estimate b_max at init", '\0', "Initialization").value();
+    bool insemination = parser.createParam(false, "insemination", "Use the insemination heuristic to estimate b_max at init", '\0', "Initialization").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "insemination" << insemination << std::endl;
 
     // TODO TODOB peut être bouger ça dans eo ?
     int packet_size = parser.createParam( (int)1, "parallelize-packet-size", "Parallelizing packet size", 'Z', "Parallelization").value();
@@ -161,20 +237,22 @@ int main ( int argc, char* argv[] )
 #endif
 
 
+# ifdef WITH_MPI
+    int rank = eo::mpi::Node::comm().rank();
+# endif
     /******************
      * INITIALIZATION *
      ******************/
 
     daex::Init<daex::Decomposition>& init = daex::do_make_init_op<daex::Decomposition>( parser, state, pddl );
 
-
     // randomly generate the population with the init operator
-    eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init );
+    eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init ) ;
 
     // used to pass the eval count through the several eoEvalFuncCounter evaluators
     unsigned int eval_count = 0;
 
-    TimeVal best_makespan = MAXTIME;
+    TimeVal best_makespan = INT_MAX;
 
 #ifndef SINGLE_EVAL_ITER_DUMP
     std::string dump_sep = ".";
@@ -236,10 +314,23 @@ int main ( int argc, char* argv[] )
     eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
 #ifdef WITH_MPI
     eo::mpi::DynamicAssignmentAlgorithm* assign = new eo::mpi::DynamicAssignmentAlgorithm;
+
+    eo::mpi::ParallelEvalStore<daex::Decomposition> store( eval, eo::mpi::DEFAULT_MASTER, packet_size );
+    store.wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>("plan", best_makespan) );
+
     if( parallelLoopEval )
     {
         unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
-        p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>( eval, *assign, 0 /* master rank */, packet_size /* size of packet */, max_seconds );
+
+        // Add wrappers
+        // TODO TODOB mettre ça dans un do_make_eval_parallel.h
+        p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>(
+                eval,
+                *assign,
+                &store,
+                eo::mpi::DEFAULT_MASTER /* master rank */,
+                packet_size /* size of packet */
+            );
     } else
     {
 # endif
@@ -250,21 +341,14 @@ int main ( int argc, char* argv[] )
     eoPopEvalFunc<daex::Decomposition>& pop_eval = *p_pop_eval;
 
 # ifdef WITH_MPI
-    int rank = eo::mpi::Node::comm().rank();
     if( rank != 0 )
     {
         // workers just perform evaluation
+        eoPop<daex::Decomposition> pop;
         pop_eval( pop, pop );
         timerStat.stop("dae_main");
 
         eo::mpi::Node::comm().send( 0, 0, timerStat );
-
-        /*
-           long int utime = timer.usertime();
-           long int stime = timer.systime();
-           eo::mpi::Node::comm().send( 0, 0, utime );
-           eo::mpi::Node::comm().send( 0, 0, stime );
-           */
 
         return 0;
     }
@@ -358,22 +442,19 @@ int main ( int argc, char* argv[] )
 
         ~FinallyBlock()
         {
-#ifndef NDEBUG
-        eo::log << eo::warnings << "STOP: " << e.what() << std::endl;
-        eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
-#endif
-        // push the best result, in case it was not in the last run
-        pop.push_back( best );
+
+            // push the best result, in case it was not in the last run
+            pop.push_back( best );
 
 #ifndef NDEBUG
-        // call the checkpoint, as if it was ending a generation
-        checkpoint( pop );
+            // call the checkpoint, as if it was ending a generation
+            // checkpoint( pop );
 #endif
 
-        // Added an evaluated decomposition, in case it would be better than a decomposed one
-        pop.push_back( empty_decompo );
-        // pop_eval( pop, pop ); // FIXME normalement inutile
-        // print_results( pop, time_start, run ); // TODO TODOB temporaire
+            // Added an evaluated decomposition, in case it would be better than a decomposed one
+            pop.push_back( empty_decompo );
+            // pop_eval( pop, pop ); // FIXME normalement inutile
+            // print_results( pop, time_start, run ); // TODO TODOB temporaire
 
 
 #ifndef NDEBUG
@@ -381,10 +462,13 @@ int main ( int argc, char* argv[] )
 #endif
 
 #ifdef WITH_MPI
+            /*
             eo::mpi::TerminateJob job( *assign, 0 );
             job.run();
             delete assign;
+            */
 
+            delete p_pop_eval;
             timerStat.stop("dae_main");
 
             std::ostream & ss = std::cout;
@@ -453,7 +537,6 @@ int main ( int argc, char* argv[] )
             //
             */
             std::cout << "End of main!" << std::endl;
-            delete p_pop_eval;
         }
 
         private:
@@ -517,7 +600,10 @@ int main ( int argc, char* argv[] )
             timerStat.stop("main_run");
         }
     } catch( std::exception const& e ) {
-        std::cout << "Leaving (living?) after an exception : " << e.what() << std::endl;
+#ifndef NDEBUG
+            eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
+#endif
+            eo::log << eo::progress << "Leaving (living?) after an exception : " << e.what() << std::endl;
         return 0;
     }
 
