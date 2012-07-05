@@ -18,13 +18,14 @@ void printOn(const eoserial::Persistent& obj, std::ostream& out)
 void readFrom(eoserial::Persistent& obj, std::istream& _is)
 {
     std::string str;
-    char temp[1024];
+    char temp[4096];
     while( _is )
     {
-        _is.getline( temp, 1024, '\n' );
+        _is.getline( temp, 4096, '\n' );
         str += temp;
         str += '\n';
     }
+
     eoserial::Object* read = eoserial::Parser::parse( str );
     obj.unpack( read );
     delete read;
