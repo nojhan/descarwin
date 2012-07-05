@@ -34,6 +34,7 @@ inline void LOG_LOCATION( eo::Levels level )
 #endif
 */
 
+#ifdef WITH_MPI
 template< class T >
 struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >
 {
@@ -52,7 +53,7 @@ struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply<
         // empty
     }
 
-    // TODO copié / collé de evalBestPlanDump.h
+    // TODO TODOB copié / collé de evalBestPlanDump.h
     void dump( daex::Decomposition & eo )
     {
         std::ofstream _of;
@@ -107,13 +108,13 @@ struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply<
     std::string _metadata;
     T best;
 };
+#endif // WITH_MPI
 
 int main ( int argc, char* argv[] )
 {
+#ifdef WITH_MPI
     using eo::mpi::timerStat;
     timerStat.start("dae_main");
-
-#ifdef WITH_MPI
     eo::mpi::Node::init( argc, argv );
 #endif
 
@@ -269,7 +270,7 @@ int main ( int argc, char* argv[] )
             // if not insemination, incremental search strategy
             b_max_fixed  = daex::estimate_bmax_incremental<daex::Decomposition>( 
                     pop, parser, init.l_max(), eval_count, plan_file, best_makespan, dump_sep, dump_file_count, metadata 
-                    ); // FIXME bug here when retrieving bmax-last-weight
+                    );
         }
     }
 
@@ -333,12 +334,12 @@ int main ( int argc, char* argv[] )
             );
     } else
     {
-# endif
         p_pop_eval = new eoPopLoopEval<daex::Decomposition>( eval );
-# ifdef WITH_MPI
     }
-# endif
     eoPopEvalFunc<daex::Decomposition>& pop_eval = *p_pop_eval;
+# else
+    eoPopLoopEval<daex::Decomposition> pop_eval( eval );
+# endif // WITH_MPI
 
 # ifdef WITH_MPI
     if( rank != 0 )
@@ -425,14 +426,19 @@ int main ( int argc, char* argv[] )
     {
         public:
 
-        FinallyBlock( eo::mpi::AssignmentAlgorithm* _assign,
+        FinallyBlock(
+# ifdef WITH_MPI
+                eo::mpi::AssignmentAlgorithm* _assign,
                 eoPopEvalFunc<daex::Decomposition> * _p_pop_eval,
+# endif // WITH_MPI
                 eoPop<daex::Decomposition> & _pop,
                 daex::Decomposition & _best,
                 daex::Decomposition & _empty_decompo
                 ) :
+# ifdef WITH_MPI
             assign( _assign),
             p_pop_eval( _p_pop_eval ),
+# endif // WITH_MPI
             pop( _pop),
             best( _best),
             empty_decompo( _empty_decompo )
@@ -449,25 +455,10 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
             // call the checkpoint, as if it was ending a generation
             // checkpoint( pop );
-#endif
-
-            // Added an evaluated decomposition, in case it would be better than a decomposed one
-            pop.push_back( empty_decompo );
-            // pop_eval( pop, pop ); // FIXME normalement inutile
-            // print_results( pop, time_start, run ); // TODO TODOB temporaire
-
-
-#ifndef NDEBUG
             eo::log << eo::progress << "... end of search" << std::endl;
 #endif
 
 #ifdef WITH_MPI
-            /*
-            eo::mpi::TerminateJob job( *assign, 0 );
-            job.run();
-            delete assign;
-            */
-
             delete p_pop_eval;
             timerStat.stop("dae_main");
 
@@ -541,16 +532,22 @@ int main ( int argc, char* argv[] )
 
         private:
 
+# ifdef WITH_MPI
         eoPopEvalFunc<daex::Decomposition> * p_pop_eval;
         eo::mpi::AssignmentAlgorithm* assign;
+# endif // WITH_MPI
         daex::Decomposition & best;
         daex::Decomposition & empty_decompo;
-        eoPop<daex::Decomposition> pop;
+        eoPop<daex::Decomposition>& pop;
 
     };
 
     try {
-        FinallyBlock finallyBlock( assign, p_pop_eval, pop, best, empty_decompo );
+        FinallyBlock finallyBlock(
+# ifdef WITH_MPI
+                assign, p_pop_eval,
+# endif
+                pop, best, empty_decompo );
         while( true )
         {
 #ifndef NDEBUG
@@ -559,11 +556,14 @@ int main ( int argc, char* argv[] )
             // call the checkpoint (log and stats output) on the pop from the init
             checkpoint( pop );
 #endif
+
+# ifdef WITH_MPI
             timerStat.start("main_run");
-            std::cout << "Starting search..." << std::endl;
+# endif
+            eo::log << "Starting search..." << std::endl;
             // start a search
             dae( pop );
-            std::cout << "After dae search..." << std::endl;
+            eo::log << "After dae search..." << std::endl;
 
             // remember the best of all runs
             daex::Decomposition best_of_run = pop.best_element();
@@ -579,7 +579,9 @@ int main ( int argc, char* argv[] )
             // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
             run++;
             if( run >= maxruns && maxruns != 0 ) {
+# ifdef WITH_MPI
                 timerStat.stop("main_run");
+# endif
                 break;
             }
 
@@ -597,7 +599,9 @@ int main ( int argc, char* argv[] )
             // reset run's continuator counters
             steadyfit.totalGenerations( mingen, steadygen );
             maxgen.totalGenerations( maxgens );
+# ifdef WITH_MPI
             timerStat.stop("main_run");
+# endif
         }
     } catch( std::exception const& e ) {
 #ifndef NDEBUG
