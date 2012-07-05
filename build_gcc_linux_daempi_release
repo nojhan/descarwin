@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-
-mkdir -p release
-cd release
-cmake -DDAE_WITH_MPI=yes -DCPT_WITH_OMP=1 ..
-make
-cd ..
