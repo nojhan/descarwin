@@ -1,1 +1,2 @@
+#!/bin/sh
 ./dae_yahsp --domain=$1 --instance=$2 --plan-file=$3 --seed=2011

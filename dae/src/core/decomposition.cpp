@@ -40,29 +40,14 @@ void Decomposition::plans_sub_reset()
     _plans_sub.reserve( this->size() + 1 );
 }
 
-// void Decomposition::printOn( std::ostream & out ) const 
-//{
-//    EO< eoMinimizingFitness >::printOn(out);
-//    out << " ";
-//
-//    out << "(Decomposition[" <<  this->size() << "]: ";
-//
-//    std::copy( this->begin(), this->end(), std::ostream_iterator<Goal>(out, " ") );
-//
-//    out << ")";
-// 
-//     //out << this->plan_copy(); 
-//  
-//}
-
-void Decomposition::printOn( std::ostream & os ) const
-{
-    eoserial::printOn( *this, os );
-}
-
 void Decomposition::readFrom( std::istream & is )
 {
     eoserial::readFrom( *this, is );
+}
+
+void Decomposition::printOn( std::ostream & out ) const
+{
+    eoserial::printOn( *this, out );
 }
 
 Decomposition::iterator Decomposition::iter_at( unsigned int i )

@@ -2,13 +2,9 @@
 
 here=`pwd`
 
-echo "BUILD GDSL"
-cd $here/daeyahsp/cpt/src/gdsl/
-./configure && make
-
 echo "BUILD YAHSP"
-cd $here/daeyahsp/cpt/src/
-make
+cd $here/daeyahsp/cpt-yahsp
+./build_gcc_linux_release
 
 echo "BUILD EO"
 cd $here/eo
@@ -17,8 +13,8 @@ cd $here/eo
 echo "BUILD DAE"
 cd $here/daeyahsp/dae
 cat install-dist.cmake | sed "s,<<PATH_TO_EO>>,$here/eo," > install.tmp
-cat install.tmp | sed "s,<<PATH_TO_CPT>>,$here/daeyahsp/cpt," > install.cmake
-./make_ipc.sh
+cat install.tmp | sed "s,<<PATH_TO_CPT_YAHSP>>,$here/daeyahsp/cpt-yahsp," > install.cmake
+./build_ipc.sh
 
 echo "COPY THE BINARY"
 cp ./ipc/dae $here/dae_yahsp

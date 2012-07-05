@@ -169,7 +169,7 @@ void cmd_line(int argc, const char **argv)
   opt.distance_boosting = true;
   opt.distances = 1;
   opt.computing_distances = false;
-  opt.fluent_mutexes = true;
+  opt.fluent_mutexes = false;
   opt.global_mutex_sets = false;
   opt.initial_heuristic = 0;
   opt.limit_initial_propagation = false;

@@ -640,7 +640,6 @@ void yahsp_trace_anytime(Node *node)
 int yahsp_compress_plans()
 {
   SolutionPlan *plan = cpt_calloc(plan, 1);
-
   FOR(p, plans) { plan->steps_nb += p->steps_nb; } EFOR;
   cpt_malloc(plan->steps, plan->steps_nb);
   plan->steps_nb = 0;
@@ -648,14 +647,19 @@ int yahsp_compress_plans()
     FOR(s, p->steps) {
       *cpt_calloc(plan->steps[plan->steps_nb], 1) = *s;
       s = plan->steps[plan->steps_nb++];
-      s->init = 0;
-      RFOR(s2, plan->steps) {
-        if (action_must_precede(s2->action, s->action)) {
-          maximize(s->init, s2->end);
-          if (s->init == plan->makespan) break;
-        }
-      } EFOR;
-      s->end = s->init + duration(s->action);
+      if (opt.sequential) {
+	s->init = plan->steps_nb;
+	s->end = s->init + 1;
+      } else {
+	s->init = 0;
+	RFOR(s2, plan->steps) {
+	  if (opt.sequential || action_must_precede(s2->action, s->action)) {
+	    maximize(s->init, s2->end);
+	    if (s->init == plan->makespan) break;
+	  }
+	} EFOR;
+	s->end = s->init + duration(s->action);
+      }
       maximize(plan->makespan, s->end);
     } EFOR;
   } EFOR;

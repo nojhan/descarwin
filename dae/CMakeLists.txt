@@ -13,13 +13,12 @@ PROJECT(DAEX)
 # include useful features for cmake
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
-FIND_PACKAGE(OpenMP REQUIRED)
-
-IF(OPENMP_FOUND)
-# TODO correct this part, which depends whether we want to compile with openMP
-# or not.
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+IF( DAE_WITH_OMP )
+    FIND_PACKAGE(OpenMP REQUIRED)
+    IF(OPENMP_FOUND)
+      SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+      SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    ENDIF()
 ENDIF()
 
 # Mpi Addons
@@ -75,13 +74,14 @@ LINK_LIBRARIES(eoutils gmp eo rt gcov gdsl termcap)
 
 ADD_EXECUTABLE(dae dae.cpp)
 ADD_DEPENDENCIES(dae daex)
-
-# TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp
-# cpt_yahsp_library-dae) # TODO check if correct
-TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+IF( CPT_WITH_OMP )
+    TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+ELSE()
+    TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+ENDIF()
 
 # only if OpenMP on yahsp is activated
-IF (CPT_WITH_MP)
+IF (CPT_WITH_OMP AND DAE_WITH_OMP )
     ADD_EXECUTABLE(dae-sm dae.cpp)
     ADD_DEPENDENCIES(dae-sm daex)
     TARGET_LINK_LIBRARIES(dae-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae-sm)
@@ -97,32 +97,41 @@ IF (CPT_WITH_MP)
 ENDIF()
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
-        # TODO TODOB vérifier que toutes les librairies indiquées sont nécessaires
-    # pour chacun des exécutables.
+    # Debug + OMP
+    IF( CPT_WITH_OMP )
+        ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
+        ADD_DEPENDENCIES(test_chronopartition daex)
+        TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 
-    ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
-    ADD_DEPENDENCIES(test_chronopartition daex)
-    # TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-    TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common cpt_yahsp_library-dae)
-    # TODO check if correct
+        ADD_EXECUTABLE(test_b_max test_b_max.cpp)
+        ADD_DEPENDENCIES(test_b_max daex)
+        TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 
-    ADD_EXECUTABLE(test_stats test_stats.cpp)
-    ADD_DEPENDENCIES(test_stats daex)
-    # TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-    TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common cpt_yahsp_library-dae)
-    # TODO check if correct
+        ADD_EXECUTABLE(test_stats test_stats.cpp)
+        ADD_DEPENDENCIES(test_stats daex)
+        TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 
-    ADD_EXECUTABLE(test_b_max test_b_max.cpp)
-    ADD_DEPENDENCIES(test_b_max daex)
-    # TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-    TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+        ADD_EXECUTABLE(featureselector featureselector.cpp)
+        ADD_DEPENDENCIES(featureselector daex)
+        TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    ELSE()
+    # Debug without OMP
+        ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
+        ADD_DEPENDENCIES(test_chronopartition daex)
+        TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common cpt_yahsp_library-dae)
 
-    ADD_EXECUTABLE(featureselector featureselector.cpp)
-    ADD_DEPENDENCIES(featureselector daex)
-    # TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-    TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common cpt_yahsp_library-dae)
-    # TODO check if correct
-    
+        ADD_EXECUTABLE(test_b_max test_b_max.cpp)
+        ADD_DEPENDENCIES(test_b_max daex)
+        TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+
+        ADD_EXECUTABLE(test_stats test_stats.cpp)
+        ADD_DEPENDENCIES(test_stats daex)
+        TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+
+        ADD_EXECUTABLE(featureselector featureselector.cpp)
+        ADD_DEPENDENCIES(featureselector daex)
+        TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+    ENDIF()
 ENDIF()
 
 IF(DAE_WITH_MPI)

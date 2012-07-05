@@ -290,7 +290,7 @@ PDDLDomain *parse_domain(char *dom_name, char *prob_name)
     if (opt.precision) cpt_free(opt.precision); 
     if (opt.precision2) cpt_free(opt.precision2); 
   }
-  opt.fluent_mutexes = (!opt.yahsp || opt.dae);
+  opt.fluent_mutexes = (!opt.yahsp || opt.dae || opt.fluent_mutexes);
   
   parse_domain_types(domain);
   parse_domain_constants(domain, domain->token_constants, &domain->constants_domain, &domain->constants_domain_nb);

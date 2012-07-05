@@ -49,10 +49,12 @@ public:
     //! Accesseurs
     TimeVal                     earliest_start_time() const { return _earliest_start_time; }
     Fluent *                    fluent()              const { return fluents[ _fluentIndex ]; }
+    // Fluent* fluent() const { return _fluent; }
     unsigned int                fluentIndex()         const { return _fluentIndex; }
 
 protected:
     unsigned int 				_fluentIndex;
+    // Fluent* _fluent;
     TimeVal                     _earliest_start_time;
 
 public:

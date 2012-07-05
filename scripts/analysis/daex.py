@@ -743,7 +743,7 @@ Comparing the distributions of several runs for 3 algorithms, by instance and sh
     for f in av_funcs:
         available_functions[f.__name__] = f
 
-    parser.add_option("-u", "--function", dest="function", metavar="FUNC", 
+    parser.add_option("-u", "--function", dest="function", metavar="FUNC", default="median",
             help="display result of the call of a function on the data, among %s" % available_functions.keys())
 
     (opts, filepatterns) = parser.parse_args()
