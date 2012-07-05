@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+mkdir -p debug
+cd debug
+cmake -DDAE_WITH_OMP=1 -DCPT_WITH_OMP=1 -DCMAKE_BUILD_TYPE=Debug ..
+make
+cd ..
