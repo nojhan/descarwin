@@ -141,6 +141,8 @@ int main ( int argc, char* argv[] )
     using eo::mpi::timerStat;
     timerStat.start("dae_main");
     eo::mpi::Node::init( argc, argv );
+
+    int rank = eo::mpi::Node::comm().rank();
 #endif
 
     // SYSTEM
@@ -222,7 +224,18 @@ int main ( int argc, char* argv[] )
         param_seed.value() = time(0); // EO compatibility fixed by CC on 2010.12.24
     }
 
-    unsigned int seed = param_seed.value();
+    unsigned int seed;
+# ifdef WITH_MPI
+    // Sending the seed to everyone
+    if( rank == eo::mpi::DEFAULT_MASTER )
+    {
+# endif // WITH_MPI
+        seed = param_seed.value();
+    }
+# ifdef WITH_MPI
+    bmpi::broadcast( eo::mpi::Node::comm(), seed, eo::mpi::DEFAULT_MASTER );
+# endif // WITH_MPI
+
     rng.reseed( seed );
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "seed" << seed << std::endl;
 
@@ -262,10 +275,6 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
 
-
-# ifdef WITH_MPI
-    int rank = eo::mpi::Node::comm().rank();
-# endif
     /******************
      * INITIALIZATION *
      ******************/
@@ -604,6 +613,7 @@ int main ( int argc, char* argv[] )
 # ifdef WITH_MPI
             timerStat.start("main_run");
 # endif
+            eo::log << progress;
             eo::log << "Starting search..." << std::endl;
             // start a search
             dae( pop );
