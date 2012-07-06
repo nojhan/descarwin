@@ -38,8 +38,6 @@ inline void LOG_LOCATION( eo::Levels level )
 template< class T >
 struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >
 {
-    using eo::mpi::HandleResponseParallelApply< daex::Decomposition >::d ;
-
     HandleResponseBestPlanDump(
             std::string afilename,
             T worst,
@@ -108,6 +106,33 @@ struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply<
     std::string _metadata;
     T best;
 };
+
+struct IsFinishedBeforeTime : public eo::mpi::IsFinishedParallelApply< daex::Decomposition >
+{
+    IsFinishedBeforeTime( long maxTime ) : _maxTime( maxTime )
+    {
+        getrusage( RUSAGE_SELF , &_usage );
+        _current = _usage.ru_utime.tv_sec + _usage.ru_stime.tv_sec;
+    }
+
+    bool operator()()
+    {
+        getrusage( RUSAGE_SELF , &_usage );
+        _current = _usage.ru_utime.tv_sec + _usage.ru_stime.tv_sec;
+        if ( _current > _maxTime )
+        {
+            throw eoMaxTimeException( _current );
+        }
+        return (*_wrapped)();
+    }
+
+protected:
+    const long _maxTime;
+    long _current;
+
+    struct rusage _usage;
+};
+
 #endif // WITH_MPI
 
 int main ( int argc, char* argv[] )
@@ -314,17 +339,29 @@ int main ( int argc, char* argv[] )
     bool parallelLoopEval = parser.valueOf<bool>( "parallelize-loop" );
     eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
 #ifdef WITH_MPI
-    eo::mpi::DynamicAssignmentAlgorithm* assign = new eo::mpi::DynamicAssignmentAlgorithm;
+    // eo::mpi::DynamicAssignmentAlgorithm* assign = new eo::mpi::DynamicAssignmentAlgorithm;
+    eo::mpi::AssignmentAlgorithm * assign = new eo::mpi::StaticAssignmentAlgorithm( 0 );
 
+    // TODO TODOB mettre ça dans un do_make_eval_parallel.h
     eo::mpi::ParallelEvalStore<daex::Decomposition> store( eval, eo::mpi::DEFAULT_MASTER, packet_size );
-    store.wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>("plan", best_makespan) );
+    store.wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
+                plan_file,
+                best_makespan,
+                false,
+                dump_sep,
+                dump_file_count,
+                metadata
+            ) );
+
+    unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
+    if( max_seconds > 0 )
+    {
+        store.wrapIsFinished( new IsFinishedBeforeTime( max_seconds ) );
+    }
 
     if( parallelLoopEval )
     {
-        unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
-
         // Add wrappers
-        // TODO TODOB mettre ça dans un do_make_eval_parallel.h
         p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>(
                 eval,
                 *assign,
@@ -355,7 +392,6 @@ int main ( int argc, char* argv[] )
     }
 # endif
 
-    eo::log << eo::setlevel( eo::progress );
     // a first evaluation of generated pop
     pop_eval( pop, pop );
 
@@ -420,7 +456,15 @@ int main ( int argc, char* argv[] )
 
     // evaluate an empty decomposition, for comparison with decomposed solutions
     daex::Decomposition empty_decompo;
+# ifdef WITH_MPI
+    {
+        eoPop<daex::Decomposition> tempPop;
+        tempPop.push_back( empty_decompo );
+        pop_eval( tempPop, tempPop );
+    }
+# else // WITH_MPI
     eval( empty_decompo );
+# endif // WITH_MPI
 
     class FinallyBlock
     {

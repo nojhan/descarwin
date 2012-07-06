@@ -9,6 +9,10 @@
 
 #include "core/decomposition.h"
 
+# ifdef WITH_MPI
+# include <mpi/eoMpi.h>
+# endif // WITH_mpi
+
 #define IPC_PLAN_COMMENT "; "
 
 namespace daex {
@@ -78,6 +82,11 @@ public:
 
             if( eo.is_feasible() ) {
 //#pragma omp critical
+# ifdef WITH_MPI
+                // FIXME TODO Benjamin: the correct condition is in fact
+                // if( !parallelized loop OR is master )
+                if( eo::mpi::Node::comm().rank() == eo::mpi::DEFAULT_MASTER )
+# endif
                 call( eo );
             } // if feasible
         } // if invalid
@@ -153,8 +162,8 @@ class evalBestFitnessPlanDump  : public evalBestPlanDump<Decomposition::Fitness>
 {
 public:
     evalBestFitnessPlanDump(
-            eoEvalFunc<Decomposition>& func, 
-            std::string afilename, 
+            eoEvalFunc<Decomposition>& func,
+            std::string afilename,
             Decomposition::Fitness worst,
             bool single_file = false,
             std::string sep = ".",

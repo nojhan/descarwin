@@ -153,8 +153,8 @@ template<class EOT>
 unsigned int estimate_bmax_incremental( 
             eoPop<EOT>& pop,
             eoParser & parser, unsigned int l_max, unsigned int eval_count,
-            std::string plan_file, TimeVal best_makespan, 
-            std::string dump_sep, unsigned int dump_file_count, std::string metadata
+            std::string plan_file, TimeVal & best_makespan, 
+            std::string dump_sep, unsigned int & dump_file_count, std::string metadata
         )
 {
     unsigned int popsize = parser.valueOf<unsigned int>("popSize");
@@ -274,6 +274,9 @@ unsigned int estimate_bmax_incremental(
     eoPopLoopEval<EOT> eval_pop( eval_bestfile );
 #endif
     eval_pop( pop, pop );
+
+    best_makespan = eval_bestfile.best();
+    dump_file_count = eval_bestfile.file_count();
 
     return b_max_fixed;
 }
