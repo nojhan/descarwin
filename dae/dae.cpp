@@ -42,11 +42,16 @@ struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply<
             std::string afilename,
             T worst,
             bool single_file = false,
-            std::string sep = ".",
             unsigned int file_count = 0,
+            std::string sep = ".",
             std::string metadata = ""
         ) :
-        _filename( afilename ), _single_file( single_file ), _file_count( file_count ), _sep( sep ), best( worst ), _metadata( metadata )
+        _filename( afilename ),
+        best( worst ), // The best at initialization is in fact the worst value we can have.
+        _single_file( single_file ),
+        _file_count( file_count ),
+        _sep( sep ),
+        _metadata( metadata )
     {
         // empty
     }
@@ -100,11 +105,11 @@ struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply<
 
     protected:
     std::string _filename;
+    T best;
     bool _single_file;
     unsigned int _file_count;
     std::string _sep;
     std::string _metadata;
-    T best;
 };
 
 struct IsFinishedBeforeTime : public eo::mpi::IsFinishedParallelApply< daex::Decomposition >
@@ -357,8 +362,8 @@ int main ( int argc, char* argv[] )
                 plan_file,
                 best_makespan,
                 false,
-                dump_sep,
                 dump_file_count,
+                dump_sep,
                 metadata
             ) );
 
@@ -372,11 +377,9 @@ int main ( int argc, char* argv[] )
     {
         // Add wrappers
         p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>(
-                eval,
                 *assign,
-                &store,
                 eo::mpi::DEFAULT_MASTER /* master rank */,
-                packet_size /* size of packet */
+                &store
             );
     } else
     {
@@ -586,12 +589,12 @@ int main ( int argc, char* argv[] )
         private:
 
 # ifdef WITH_MPI
-        eoPopEvalFunc<daex::Decomposition> * p_pop_eval;
         eo::mpi::AssignmentAlgorithm* assign;
+        eoPopEvalFunc<daex::Decomposition> * p_pop_eval;
 # endif // WITH_MPI
+        eoPop<daex::Decomposition>& pop;
         daex::Decomposition & best;
         daex::Decomposition & empty_decompo;
-        eoPop<daex::Decomposition>& pop;
 
     };
 
