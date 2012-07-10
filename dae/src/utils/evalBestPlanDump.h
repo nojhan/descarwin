@@ -83,8 +83,6 @@ public:
             if( eo.is_feasible() ) {
 //#pragma omp critical
 # ifdef WITH_MPI
-                // FIXME TODO Benjamin: the correct condition is in fact
-                // if( !parallelized loop OR is master )
                 if( eo::mpi::Node::comm().rank() == eo::mpi::DEFAULT_MASTER )
 # endif
                 call( eo );
