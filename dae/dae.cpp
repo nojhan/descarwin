@@ -90,7 +90,7 @@ struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply<
         for( int i = 0; i < size; ++i )
         {
             daex::Decomposition & decompo = d->data()[ index + i ];
-            if( decompo.plan().makespan() < best )
+            if( decompo.is_feasible() && decompo.plan().makespan() < best )
             {
                 best = decompo.plan().makespan() ;
                 dump( decompo );
@@ -348,8 +348,8 @@ int main ( int argc, char* argv[] )
     bool parallelLoopEval = parser.valueOf<bool>( "parallelize-loop" );
     eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
 #ifdef WITH_MPI
-    // eo::mpi::DynamicAssignmentAlgorithm* assign = new eo::mpi::DynamicAssignmentAlgorithm;
-    eo::mpi::AssignmentAlgorithm * assign = new eo::mpi::StaticAssignmentAlgorithm( 0 );
+    eo::mpi::DynamicAssignmentAlgorithm* assign = new eo::mpi::DynamicAssignmentAlgorithm;
+    // eo::mpi::AssignmentAlgorithm * assign = new eo::mpi::StaticAssignmentAlgorithm( 0 );
 
     // TODO TODOB mettre ça dans un do_make_eval_parallel.h
     eo::mpi::ParallelEvalStore<daex::Decomposition> store( eval, eo::mpi::DEFAULT_MASTER, packet_size );
@@ -613,7 +613,7 @@ int main ( int argc, char* argv[] )
 # ifdef WITH_MPI
             timerStat.start("main_run");
 # endif
-            eo::log << progress;
+            eo::log << eo::progress;
             eo::log << "Starting search..." << std::endl;
             // start a search
             dae( pop );

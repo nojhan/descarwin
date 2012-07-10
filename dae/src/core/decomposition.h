@@ -256,7 +256,7 @@ public:
         if ( !invalidFitness )
         {
             eoMinimizingFitness fitness = EO< eoMinimizingFitness >::fitness();
-            float fitnessValue = fitness; // implicit operator cast
+            double fitnessValue = fitness; // implicit operator cast
             json->add( "fitnessValue", eoserial::make(fitnessValue) );
         }
 
@@ -272,6 +272,7 @@ public:
         json->add( "goal_count", eoserial::make(_k) );
         json->add( "useful_goals", eoserial::make(_u) );
         json->add( "attempts", eoserial::make(_B) );
+        json->add( "is_feasible", eoserial::make(_is_feasible) );
 
         return json;
     }
@@ -293,7 +294,7 @@ public:
         } else
         {
             eoMinimizingFitness fitness;
-            float fitnessValue;
+            double fitnessValue;
             eoserial::unpack( *json, "fitnessValue", fitnessValue );
             fitness = fitnessValue;
             EO< eoMinimizingFitness >::fitness( fitness );
@@ -311,6 +312,7 @@ public:
         eoserial::unpack( *json, "goal_count", _k );
         eoserial::unpack( *json, "useful_goals", _u );
         eoserial::unpack( *json, "attempts", _B );
+        eoserial::unpack( *json, "is_feasible", _is_feasible );
     }
 }; // class Decomposition
 
