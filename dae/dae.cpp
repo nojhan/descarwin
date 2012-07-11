@@ -184,7 +184,6 @@ int main ( int argc, char* argv[] )
     eoState state;
 
     // log some EO parameters
-    // TODO TODOB seul le master log.
     eo::log << eo::logging << "Parameters:" << std::endl;
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "verbose" << eo::log.getLevelSelected() << std::endl;
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-loop" << eo::parallel.isEnabled() << std::endl;
@@ -216,9 +215,6 @@ int main ( int argc, char* argv[] )
     // b_max estimation
     bool insemination = parser.createParam(false, "insemination", "Use the insemination heuristic to estimate b_max at init", '\0', "Initialization").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "insemination" << insemination << std::endl;
-
-    // TODO TODOB peut être bouger ça dans eo ?
-    int packet_size = parser.createParam( (int)1, "parallelize-packet-size", "Parallelizing packet size", 'Z', "Parallelization").value();
 
     // seed
     eoValueParam<unsigned int> & param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' );
@@ -350,13 +346,23 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
 
-    bool parallelLoopEval = parser.valueOf<bool>( "parallelize-loop" );
     eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
 #ifdef WITH_MPI
-    eo::mpi::DynamicAssignmentAlgorithm* assign = new eo::mpi::DynamicAssignmentAlgorithm;
-    // eo::mpi::AssignmentAlgorithm * assign = new eo::mpi::StaticAssignmentAlgorithm( 0 );
 
     // TODO TODOB mettre ça dans un do_make_eval_parallel.h
+    bool parallelLoopEval = eo::parallel.isEnabled();
+
+    eo::mpi::AssignmentAlgorithm* assign;
+    if ( eo::parallel.isDynamic() )
+    {
+        assign = new eo::mpi::DynamicAssignmentAlgorithm ;
+    } else
+    {
+        assign = new eo::mpi::StaticAssignmentAlgorithm ;
+    }
+
+    unsigned int packet_size = eo::parallel.packetSize();
+
     eo::mpi::ParallelEvalStore<daex::Decomposition> store( eval, eo::mpi::DEFAULT_MASTER, packet_size );
     store.wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
                 plan_file,
