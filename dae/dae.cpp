@@ -142,14 +142,6 @@ protected:
 
 int main ( int argc, char* argv[] )
 {
-#ifdef WITH_MPI
-    using eo::mpi::timerStat;
-    timerStat.start("dae_main");
-    eo::mpi::Node::init( argc, argv );
-
-    int rank = eo::mpi::Node::comm().rank();
-#endif
-
     // SYSTEM
 #ifndef NDEBUG
     struct rlimit limit;
@@ -180,6 +172,14 @@ int main ( int argc, char* argv[] )
     eoParser parser(argc, argv);
     make_verbose(parser);
     make_parallel(parser);
+
+#ifdef WITH_MPI
+    using eo::mpi::timerStat;
+    timerStat.start("dae_main");
+    eo::mpi::Node::init( argc, argv );
+
+    int rank = eo::mpi::Node::comm().rank();
+#endif
 
     eoState state;
 
@@ -346,47 +346,49 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
 
-    eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
 #ifdef WITH_MPI
 
     // TODO TODOB mettre ça dans un do_make_eval_parallel.h
+    eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
+
     bool parallelLoopEval = eo::parallel.isEnabled();
-
-    eo::mpi::AssignmentAlgorithm* assign;
-    if ( eo::parallel.isDynamic() )
-    {
-        assign = new eo::mpi::DynamicAssignmentAlgorithm ;
-    } else
-    {
-        assign = new eo::mpi::StaticAssignmentAlgorithm ;
-    }
-
-    unsigned int packet_size = eo::parallel.packetSize();
-
-    eo::mpi::ParallelEvalStore<daex::Decomposition> store( eval, eo::mpi::DEFAULT_MASTER, packet_size );
-    store.wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
-                plan_file,
-                best_makespan,
-                false,
-                dump_file_count,
-                dump_sep,
-                metadata
-            ) );
-
-    unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
-    if( max_seconds > 0 )
-    {
-        store.wrapIsFinished( new IsFinishedBeforeTime( max_seconds ) );
-    }
-
     if( parallelLoopEval )
     {
+        eo::mpi::AssignmentAlgorithm* assign;
+        if ( eo::parallel.isDynamic() )
+        {
+            assign = new eo::mpi::DynamicAssignmentAlgorithm ;
+        } else
+        {
+            assign = new eo::mpi::StaticAssignmentAlgorithm ;
+        }
+
+        unsigned int packet_size = eo::parallel.packetSize();
+
+        eo::mpi::ParallelApplyStore<daex::Decomposition>* store
+            = new eo::mpi::ParallelApplyStore<daex::Decomposition>( eval, eo::mpi::DEFAULT_MASTER, packet_size );
+        store->wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
+                    plan_file,
+                    best_makespan,
+                    false,
+                    dump_file_count,
+                    dump_sep,
+                    metadata
+                    )
+                );
+
+        unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
+        if( max_seconds > 0 )
+        {
+            store->wrapIsFinished( new IsFinishedBeforeTime( max_seconds ) );
+        }
+
         // Add wrappers
         p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>(
                 *assign,
                 eo::mpi::DEFAULT_MASTER /* master rank */,
-                &store
-            );
+                store
+                );
     } else
     {
         p_pop_eval = new eoPopLoopEval<daex::Decomposition>( eval );
@@ -490,7 +492,6 @@ int main ( int argc, char* argv[] )
 
         FinallyBlock(
 # ifdef WITH_MPI
-                eo::mpi::AssignmentAlgorithm* _assign,
                 eoPopEvalFunc<daex::Decomposition> * _p_pop_eval,
 # endif // WITH_MPI
                 eoPop<daex::Decomposition> & _pop,
@@ -498,7 +499,6 @@ int main ( int argc, char* argv[] )
                 daex::Decomposition & _empty_decompo
                 ) :
 # ifdef WITH_MPI
-            assign( _assign),
             p_pop_eval( _p_pop_eval ),
 # endif // WITH_MPI
             pop( _pop),
@@ -595,7 +595,6 @@ int main ( int argc, char* argv[] )
         private:
 
 # ifdef WITH_MPI
-        eo::mpi::AssignmentAlgorithm* assign;
         eoPopEvalFunc<daex::Decomposition> * p_pop_eval;
 # endif // WITH_MPI
         eoPop<daex::Decomposition>& pop;
@@ -607,7 +606,7 @@ int main ( int argc, char* argv[] )
     try {
         FinallyBlock finallyBlock(
 # ifdef WITH_MPI
-                assign, p_pop_eval,
+                p_pop_eval,
 # endif
                 pop, best, empty_decompo );
         while( true )
