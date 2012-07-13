@@ -90,14 +90,16 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
     //        p_eval = & eval_yahsp;
     //#else // ifndef SINGLE_EVAL_ITER_DUMP
 # ifdef WITH_MPI
-// TODO TODOB commenter
+    // When using MPI, we don't want the workers to brutally terminate by launching an exception, as it causes deadlock.
+    // Master could wait forever for a response which won't ever come. When using MPI parallelization, the termination
+    // test is made in the Job loop (see make_parallel_eval_dae.h).
 #ifndef NDEBUG
         p_eval = eval_counter;
-#else
+#else // NDEBUG
         p_eval = eval_bestfile;
 #endif // NDEBUG
 
-# else // WITH_MPI
+# else // not WITH_MPI
     if( max_seconds == 0 ) {
 #ifndef NDEBUG
         p_eval = eval_counter;

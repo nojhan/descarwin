@@ -5,15 +5,33 @@
 # include <mpi/eoParallelApply.h>
 # include <mpi/eoTerminateJob.h>
 
-# include <string>
-# include <fstream>
+# include <string> // std::string
+# include <fstream> // std::ofstream
 
-// TODO TODOB comment
 namespace daex
 {
+    /**
+     * @brief Handle response wrapper which saves the best solution's plan into a file, after receving it.
+     *
+     * Dump of the best solution should be done by the master, and only by the master, otherwise workers would erase the
+     * solution files by replacing them, and the files would possibly not contain the best solutions.
+     *
+     * Filename follow the same configuration that the present one in make_eval :
+     * <afilename><sep><file_count>
+     */
     template< class T >
         struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >
     {
+        /**
+         * @brief Main constructor.
+         *
+         * @param afilename Base filename
+         * @param worst Worst value possible for makespan
+         * @param single_file Do we have to save the solutions in a single file ?
+         * @param file_count At how many solutions are we ?
+         * @param sep Separator between parts of the file name.
+         * @param metadata Metadata which will be written at top of the dump files.
+         */
         HandleResponseBestPlanDump(
                 std::string afilename,
                 T worst,
@@ -32,7 +50,7 @@ namespace daex
             // empty
         }
 
-        // TODO TODOB copié / collé de evalBestPlanDump.h
+        // TODO This part is in common with evalBestPlanDump.h
         void dump( daex::Decomposition & eo )
         {
             std::ofstream _of;
@@ -63,6 +81,12 @@ namespace daex
             _file_count++;
         }
 
+        /**
+         * @brief Reimplementation of operator()
+         *
+         * After having applied the wrapped functor, which will effectively retrieve the response, we have to look at
+         * the evaluated individuals to see if one of them has a better makespan than the former best solution.
+         */
         void operator()( int wrkRank )
         {
             (*_wrapped)( wrkRank );
@@ -88,14 +112,30 @@ namespace daex
         std::string _metadata;
     };
 
+    /**
+     * @brief Wrapper to stop the execution if a set amount of time is reached.
+     *
+     * Don't forget that once the exception is thrown, the master will wait for the last responses, which could take
+     * time. The real termination time could be slightly bigger than the given one.
+     */
     struct IsFinishedBeforeTime : public eo::mpi::IsFinishedParallelApply< daex::Decomposition >
     {
+        /**
+         * @brief Main ctor
+         *
+         * @param maxTime Time (in seconds) after which we want to stop the process.
+         */
         IsFinishedBeforeTime( long maxTime ) : _maxTime( maxTime )
         {
             getrusage( RUSAGE_SELF , &_usage );
             _current = _usage.ru_utime.tv_sec + _usage.ru_stime.tv_sec;
         }
 
+        /**
+         * @brief Reimplementation of operator()()
+         *
+         * If we've reached the time limit, throw an exception. Otherwise, returns wrapped result.
+         */
         bool operator()()
         {
             getrusage( RUSAGE_SELF , &_usage );
@@ -128,6 +168,7 @@ namespace daex
         bool parallelLoopEval = eo::parallel.isEnabled();
         if( parallelLoopEval )
         {
+            // Type of scheduling
             eo::mpi::AssignmentAlgorithm* assign;
             if ( eo::parallel.isDynamic() )
             {
@@ -141,6 +182,7 @@ namespace daex
 
             eo::mpi::ParallelApplyStore<daex::Decomposition>* store
                 = new eo::mpi::ParallelApplyStore<daex::Decomposition>( eval, eo::mpi::DEFAULT_MASTER, packet_size );
+            // Wrap handle response to include the dump file saving.
             store->wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
                         plan_file,
                         best_makespan,

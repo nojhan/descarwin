@@ -20,7 +20,6 @@
 #ifdef WITH_MPI
 #include <mpi/eoMpi.h>
 #include <mpi/eoParallelApply.h>
-#include <mpi/eoTerminateJob.h>
 #include "do/make_parallel_eval_dae.h"
 #endif
 
@@ -244,6 +243,8 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
 
+    // Make pop eval function. Uses the do_make_parallel_eval function, which produces a simple eoPopLoopEval if the option
+    // parallelize-loop is not set, and a MPI based parallelized version, otherwise.
 #ifdef WITH_MPI
     unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
     eoPopEvalFunc<daex::Decomposition>* p_pop_eval = daex::do_make_parallel_eval(
@@ -258,7 +259,7 @@ int main ( int argc, char* argv[] )
     {
         // workers just perform evaluation
         eoPop<daex::Decomposition> pop;
-        pop_eval( pop, pop );
+        pop_eval( pop, pop ); // Just one call is necessary, as ParallelApply is a MultiJob (see eo doc).
         timerStat.stop("dae_main");
 
         eo::mpi::Node::comm().send( 0, 0, timerStat );
@@ -341,6 +342,12 @@ int main ( int argc, char* argv[] )
     eval( empty_decompo );
 # endif // WITH_MPI
 
+    /**
+     * @brief Herb Sutter's trick to have a finally block in a try / catch section.
+     *
+     * By creating a FinallyBlock into the try section, the destructor will be called in every cases: this will be our
+     * finally block.
+     */
     class FinallyBlock
     {
         public:
@@ -381,6 +388,7 @@ int main ( int argc, char* argv[] )
 
             std::ostream & ss = std::cout;
 
+            // Computes statistics of self.
             typedef std::map<std::string, eoTimerStat::Stat> statsMap;
             statsMap stats = timerStat.stats();
             for( statsMap::iterator it = stats.begin(), end = stats.end();
@@ -406,6 +414,7 @@ int main ( int argc, char* argv[] )
                 ss << std::endl;
             }
 
+            // Receives statistics from other nodes.
             for(int i = 1; i < eo::mpi::Node::comm().size(); ++i)
             {
                 eoTimerStat otherTimerStat;
@@ -441,7 +450,7 @@ int main ( int argc, char* argv[] )
             // push the best result, in case it was not in the last run
             pop.push_back( best );
             pop_eval( pop, pop ); // FIXME normalement inutile
-            // print_results( pop, time_start, run ); // TODO TODOB temporaire
+            // print_results( pop, time_start, run );
             //
             */
             std::cout << "End of main!" << std::endl;
