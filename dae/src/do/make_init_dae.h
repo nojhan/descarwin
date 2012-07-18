@@ -2,6 +2,10 @@
 #ifndef _MAKE_INIT_DAE_H_
 #define _MAKE_INIT_DAE_H_
 
+/** FIXME essai d'évaluation du temps d'un individu pour limiter le temps total d'exécution du programme, dans la version parallèle (Pierre et Benjamin)
+# include <sys/resource.h> // rusage()
+*/
+
 namespace daex {
 
 void do_make_init_param( eoParser & parser )
@@ -174,6 +178,9 @@ unsigned int estimate_bmax_incremental(
 #ifndef NDEBUG
     eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
 #endif
+    /* FIXME essai d'évaluation du temps d'un individu pour limiter le temps total d'exécution du programme, dans la version parallèle (Pierre et Benjamin)
+    bool hasTimedEval = false;
+    */
     while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
         goodguys=0;
         b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
@@ -215,7 +222,34 @@ unsigned int estimate_bmax_incremental(
         for (size_t i = 0; i < popsize; ++i) {
             // unfeasible individuals are invalidated in order to be re-evaluated 
             // with a larger bmax at the next iteration but we keep the good guys.
-            if (pop[i].is_feasible()) goodguys++;
+            if (pop[i].is_feasible()) 
+            {
+                goodguys++;
+                //FIXME essai d'évaluation du temps d'un individu pour limiter le temps total d'exécution du programme, dans la version parallèle (Pierre et Benjamin)
+                /*
+                if( ! hasTimedEval )
+                {
+                    hasTimedEval = true;
+                    pop[i].invalidate();
+                    struct rusage _start;
+                    struct rusage _stop;
+                    getrusage( RUSAGE_SELF, &_start );
+                    eval_bestfile( pop[i] );
+                    getrusage( RUSAGE_SELF, &_stop );
+                    std::cout << "[Estimating eval time] "
+                        << "User time (s / ms): "
+                            << _start.ru_utime.tv_sec - _stop.ru_utime.tv_sec
+                            << " / "
+                            << _start.ru_utime.tv_usec - _stop.ru_utime.tv_usec
+                        << "\n"
+                        << "System time (s / ms): "
+                        << _start.ru_stime.tv_sec - _stop.ru_stime.tv_sec
+                            << " / "
+                            << _start.ru_stime.tv_usec - _stop.ru_stime.tv_usec
+                        << std::endl;
+                }
+                */
+            }
             else pop[i].invalidate();
         }
         // If no individual haven't yet been found, then try a direct call to YAHSP (i.e. the empty decomposition evaluation)
