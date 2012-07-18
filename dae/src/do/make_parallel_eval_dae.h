@@ -90,11 +90,11 @@ namespace daex
         void operator()( int wrkRank )
         {
             (*_wrapped)( wrkRank );
-            int index = d->assignedTasks[ wrkRank ].index;
-            int size = d->assignedTasks[ wrkRank ].size;
+            int index = _data->assignedTasks[ wrkRank ].index;
+            int size = _data->assignedTasks[ wrkRank ].size;
             for( int i = 0; i < size; ++i )
             {
-                daex::Decomposition & decompo = d->data()[ index + i ];
+                daex::Decomposition & decompo = _data->table()[ index + i ];
                 if( decompo.is_feasible() && decompo.plan().makespan() < best )
                 {
                     best = decompo.plan().makespan() ;
