@@ -21,7 +21,7 @@
 #include <mpi/eoMpi.h>
 #include <mpi/eoParallelApply.h>
 #include "do/make_parallel_eval_dae.h"
-#endif
+#endif // WITH_MPI
 
 #include <utils/eoTimer.h>
 
@@ -33,9 +33,6 @@ inline void LOG_LOCATION( eo::Levels level )
 }
 #endif
 */
-
-#ifdef WITH_MPI
-#endif // WITH_MPI
 
 int main ( int argc, char* argv[] )
 {
@@ -76,7 +73,7 @@ int main ( int argc, char* argv[] )
     eo::mpi::Node::init( argc, argv );
 
     int rank = eo::mpi::Node::comm().rank();
-#endif
+#endif // WITH_MPI
 
     eoState state;
 
@@ -129,8 +126,8 @@ int main ( int argc, char* argv[] )
     {
 # endif // WITH_MPI
         seed = param_seed.value();
-    }
 # ifdef WITH_MPI
+    }
     bmpi::broadcast( eo::mpi::Node::comm(), seed, eo::mpi::DEFAULT_MASTER );
 # endif // WITH_MPI
 
