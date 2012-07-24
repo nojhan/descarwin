@@ -23,22 +23,20 @@ ENDIF()
 
 # Mpi Addons
 IF(DAE_WITH_MPI)
-    MESSAGE("[DAE] Compilation with MPI and BoostMPI.")
+    MESSAGE("[DAE] Compilation with MPI.")
 
     SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
 
     # headers location
     INCLUDE_DIRECTORIES(${MPI_DIR}/include)
-    INCLUDE_DIRECTORIES(${BOOST_DIR}/include)
 
     # lib location
     LINK_DIRECTORIES(${MPI_DIR}/lib)
-    LINK_DIRECTORIES(${BOOST_DIR}/lib)
 
     # for conditional compilation in code
     ADD_DEFINITIONS(-DWITH_MPI)
 
-    LINK_LIBRARIES(boost_mpi boost_serialization eompi)
+    LINK_LIBRARIES(eompi)
 ENDIF()
 
 # include the sources
@@ -135,10 +133,10 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
 ENDIF()
 
 IF(DAE_WITH_MPI)
-    ADD_EXECUTABLE(test_boost_serial tests/test_boost_serial.cpp)
-    ADD_DEPENDENCIES(test_boost_serial daex)
-    TARGET_LINK_LIBRARIES(test_boost_serial daex cpt_yahsp_library-common
-            cpt_yahsp_library-dae boost_serialization)
+    ADD_EXECUTABLE(test_serial tests/test_serialization.cpp)
+    ADD_DEPENDENCIES(test_serial daex)
+    TARGET_LINK_LIBRARIES(test_serial daex cpt_yahsp_library-common
+            cpt_yahsp_library-dae)
 ENDIF()
 
 # process to sources

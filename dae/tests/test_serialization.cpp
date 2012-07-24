@@ -1,6 +1,3 @@
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-
 #include <sys/time.h>
 #include <sys/resource.h>
 
@@ -23,6 +20,7 @@
 int main ( int argc, char* argv[] )
 {
     // WALLOCK TIME COUNTER
+    eo::mpi::Node::init( argc, argv );
     time_t time_start = std::time(NULL);
 
     /**************
@@ -245,9 +243,8 @@ int main ( int argc, char* argv[] )
 
     std::cout << "[Bench] Beginning serialization..." << std::endl;
 
-    daex::Decomposition read;
 
-    // /*
+    daex::Decomposition read;
     // Serializes in json
     int benchNb = 10;
 
@@ -285,34 +282,6 @@ int main ( int argc, char* argv[] )
     // std::cout<<"\n\nParsing finished, this is what I read :" << std::endl;
     // std::cout << received << std::endl;
     std::cout << "[Bench] Deserialization took " << after_deserialize - before_deserialize << " seconds." << std::endl;
-
-    // */
-
-     /*
-    // Shows decomposition found in cout.
-    best.printOn( std::cout );
-
-
-    std::ofstream ofile("decomposition.dump.eo");
-    boost::archive::text_oarchive oa(ofile);
-    oa << best;
-    ofile.close();
-
-    std::ifstream ifile("decomposition.dump.eo");
-    boost::archive::text_iarchive oi(ifile);
-    oi >> read;
-    ifile.close();
-
-    // Shows decomposition read in cout.
-    std::ofstream ofile2("decomposition.new.dump.eo");
-    boost::archive::text_oarchive oa2(ofile2);
-    oa2 << read;
-    ofile2.close();
-
-    std::cout << std::endl;
-    read.printOn( std::cout );
-     */
-    
     std::cout << "\n\nEnd of main, test is finished.\n" << std::endl;
 }
 

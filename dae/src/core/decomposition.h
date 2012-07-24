@@ -15,12 +15,6 @@
 #include <src/globs.h>
 #include <src/yahsp.h>
 
-#ifdef WITH_MPI
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/string.hpp>
-#include <boost/serialization/split_member.hpp>
-#endif // WITH_MPI
-
 namespace daex
 {
 
@@ -36,50 +30,6 @@ public:
      Decomposition() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}  
 
      virtual ~Decomposition(){}
-    
-#ifdef WITH_MPI
-    // Gives access to boost serialization
-	friend class boost::serialization::access;
-
-    /**
-     * Serializes the decomposition in a boost archive (useful for boost::mpi)
-     */
-    template <class Archive>
-	void save( Archive & ar, const unsigned int version ) const
-	{
-        eoTimerStat & t = eo::mpi::timerStat;
-        t.start("decomposition_save");
-        std::stringstream ss;
-        printOn( ss );
-        std::string asStr = ss.str();
-        ar & asStr;
-        t.stop("decomposition_save");
-
-        (void) version; // avoid compilation warning
-	}
-
-    /**
-     * Deserializes the decomposition from a boost archive (useful for boost:mpi)
-     */
-    template <class Archive>
-    void load( Archive & ar, const unsigned int version )
-    {
-        eoTimerStat & t = eo::mpi::timerStat;
-        t.start("decomposition_load");
-        std::string asStr;
-        ar & asStr;
-        std::stringstream ss;
-        ss << asStr;
-        readFrom( ss );
-        t.stop("decomposition_load");
-
-        (void) version; // avoid compilation warning
-    }
-    
-    // Indicates that boost save and load operations are not the same.
-    BOOST_SERIALIZATION_SPLIT_MEMBER()
-
-#endif // WITH_MPI
 
      //! After a modification of the decomposition, it needs to be re-evaluated
     //! Variation operator should use this method to indicate it

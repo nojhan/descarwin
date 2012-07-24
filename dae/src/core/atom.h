@@ -22,9 +22,9 @@
 #include "utils/pddl.h"
 #include "utils/eoJsonUtils.h"
 
-// Definitions used in cpt-yahsp can break Boost or STL.
+// Definitions used in cpt-yahsp can break STL.
 // FIXME These undef are inelegant, another solution should be used
-// (eg : rename all cpt-yahsp definitions, or not use Boost, or...)
+// (eg : rename all cpt-yahsp definitions, or not use STL, or...)
 #include "undef_yahsp.h"
 
 #include <eo>

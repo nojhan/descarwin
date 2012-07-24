@@ -259,7 +259,7 @@ int main ( int argc, char* argv[] )
         pop_eval( pop, pop ); // Just one call is necessary, as ParallelApply is a MultiJob (see eo doc).
         timerStat.stop("dae_main");
 
-        eo::mpi::Node::comm().send( 0, 0, timerStat );
+        // eo::mpi::Node::comm().send( 0, 0, timerStat );
 
         return 0;
     }
@@ -383,6 +383,7 @@ int main ( int argc, char* argv[] )
             delete p_pop_eval;
             timerStat.stop("dae_main");
 
+            /*
             std::ostream & ss = std::cout;
 
             // Computes statistics of self.
@@ -440,6 +441,7 @@ int main ( int argc, char* argv[] )
                     ss << std::endl;
                 }
             }
+            */
 #endif
 
             /*
