@@ -93,35 +93,39 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
     // When using MPI, we don't want the workers to brutally terminate by launching an exception, as it causes deadlock.
     // Master could wait forever for a response which won't ever come. When using MPI parallelization, the termination
     // test is made in the Job loop (see make_parallel_eval_dae.h).
+    if( eo::parallel.isEnabled() )
+    {
 #ifndef NDEBUG
         p_eval = eval_counter;
 #else // NDEBUG
         p_eval = eval_bestfile;
 #endif // NDEBUG
-
-# else // not WITH_MPI
-    if( max_seconds == 0 ) {
+    } else // ( eo::parallel.isEnabled() )
+    {
+# endif // WITH_MPI
+        if( max_seconds == 0 ) {
 #ifndef NDEBUG
-        p_eval = eval_counter;
-#else
-        p_eval = eval_bestfile;
+            p_eval = eval_counter;
+#else // NDEBUG
+            p_eval = eval_bestfile;
 #endif // NDEBUG
-    } else {
-        // an eval that raises an exception if maxtime is reached
-        /* eoEvalTimeThrowException<EOT> * p_eval_maxtime 
-           = new eoEvalTimeThrowException<EOT>( eval_counter, max_seconds ); */
-        eoEvalUserTimeThrowException<EOT> * p_eval_maxtime
+        } else { // max_seconds == 0
+            // an eval that raises an exception if maxtime is reached
+            /* eoEvalTimeThrowException<EOT> * p_eval_maxtime 
+               = new eoEvalTimeThrowException<EOT>( eval_counter, max_seconds ); */
+            eoEvalUserTimeThrowException<EOT> * p_eval_maxtime
 #ifndef NDEBUG
-            = new eoEvalUserTimeThrowException<EOT>( *eval_counter,  max_seconds );
+                = new eoEvalUserTimeThrowException<EOT>( *eval_counter,  max_seconds );
 #else
             = new eoEvalUserTimeThrowException<EOT>( *eval_bestfile, max_seconds );
 #endif // NDEBUG
 
-        state.storeFunctor( p_eval_maxtime );
-        p_eval = p_eval_maxtime;
-    }
+            state.storeFunctor( p_eval_maxtime );
+            p_eval = p_eval_maxtime;
+        } // max_seconds == 0
+# ifdef WITH_MPI
+    } // eo::parallel.isEnabled()
 # endif // WITH_MPI
-    //#endif // SINGLE_EVAL_ITER_DUMP
     
 #ifndef NDEBUG
     return std::make_pair<eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*>( *p_eval, eval_counter );
