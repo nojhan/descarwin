@@ -1,0 +1,291 @@
+\documentclass[english]{DESCARWINreport}
+
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage{graphicx}
+\usepackage{multirow}
+%\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{subfigure}
+\usepackage{lscape}
+
+\algsetup{indent=1.8em}
+\renewcommand{\algorithmiccomment}[1]{// #1}
+\newcommand{\pp}{planning tasks}
+\newcommand{\PP}{planning task}
+\newcommand{\dae}{{\em Divide-and-Evolve}}
+\newcommand{\DAEI}{{\sc D\&E}}
+\newcommand{\DAEII}{{\sc DaE2}}
+\newcommand{\DAE}{{\sc DaE}}
+\newcommand{\DAEX}{{\sc DaE$_{\text{X}}$}}
+\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
+\newcommand{\CPT}{{\sc CPT}}
+\newcommand{\LPG}{{\sc LPG}}
+\newcommand{\LAMA}{{\sc LAMA}}
+\newcommand{\TFD}{{\sc TFD}}
+\newcommand{\YAHSP}{{\sc YAHSP}}
+\newcommand{\OPENSTACKS}{{\sc Openstacks}}
+\newcommand{\ELEVATORS}{{\sc Elevators}}
+\newcommand{\CREWPLANNING}{{\sc CrewPlanning}}
+\newcommand{\FLOORTILE}{{\sc Floortile}}
+\newcommand{\PARCPRINTER}{{\sc ParcPrinter}}
+
+
+\def\UU{{\mathbb{U}}}
+
+%\title{DESCARWIN\\\bigskip {\em \LARGE The Marriage of Descartes and Darwin}\\\bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip {\LARGE WP1: the \DAEX\ Planning System}}
+\title{DESCARWIN\\\bigskip {\em \LARGE The Marriage of Descartes and Darwin}\\\vspace{8cm} {\LARGE D3.1: Design of a Benchmark Test Suite for Multi-Objective Evolutionary Planning}}
+%ANR-09-COSI-002
+%\author{Pierre Savéant}
+\date{\today}
+\laboratory{TRT - INRIA - ONERA}
+\docref{62 441 217-179-1}
+
+\revision{-}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+
+
+% Pour réduire globalement l'espace entre les items d'une liste
+% on peut également utiliser le bout de code suivant de M. Wooding
+% Les paramètres utilisés pour définir cette mise en page
+% sont les suivants :
+% \topsep espace vertical supplémentaire (ajoute à \parskip)
+% 	inséré entre le texte précédant la liste et le 1er objet
+% 	de la liste
+% \partosep espace vertical supplémentaire inséré devant la liste
+% 	si celle-ci est précédée d'une ligne blanche
+% \itemsep espace vertical supplémentaire (ajouté à \parsep)
+% 	inséré entre les éléments d'une liste.
+
+%%%% debut macro %%%%
+% \makeatletter
+% \toks@\expandafter{\@listI}
+% \edef\@listI{\the\toks@\setlength{\parsep}{0pt}}
+% \edef\@listI{\the\toks@\setlength{\topsep}{0pt}}
+% \makeatother
+%%%% fin macro %%%%
+
+
+\begin{document}
+
+\maketitle
+
+%\cleardoublepage
+
+\begin{revisions}
+\begin{revtable}
+\dates{JUNE. 30, 2012}{}{}{}
+\writers{Mostepha R. Khouadjia\\Marc Schoenauer\\Pierre Sav\'eant}{}{}{}
+\approvers{P. Sav\'eant}{}{}{}
+\end{revtable}
+\begin{revisionlabels}
+\revlabel{initial version}
+\revlabel{}
+\end{revisionlabels}
+\end{revisions}
+
+\begin{abstract}
+This document provides the description of the multi-objective test suite that has been designed in the DESCARWIN project. Two goals were envisioned: on the one hand, because no such suite exists in the multi-objective context (whereas the successive International Planning Competitions (IPC) have lead to numerous recognized test suites for the single-objective case), it was necessary to have some problems on which to validate the multi-objective version of the  \DAEX\ planning system. On the other hand, we aim at starting for the multi-objective setting what has been achieved in the single-objective one, and established some recognized benchmarks in order to be able to compare different approaches to multi-objective planning. Ultimately, we would like to propose a new ``multi-objective track'' in the forthcoming IPCs, and stimulate research in that direction, as we are convinced that many real-world applications in fact require multi-objective techniques.
+
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\chapter{Introduction}
+\section{Multi-objective planning}
+Most real-world applications are multi-objective by nature. XXX
+
+
+\section{Survey of proposed approaches}
+Two different approaches have been used to design a first benchmark suite for multi-objective AI planning. Firstly, starting from a very simple toy problem inspired by the {\tt zeno} logisitic domain of all IPCs (probably the most widely used domain, including 30 instances of increasing difficulty), a series of problems have been design, with parameterized complexity, and for which the exact Pareto front can be easily exactly known (at least for the simplest instances). Because the domain pertains to logistic, the first (main?) objective remains the total duration of the resulting plan. A second objective has been introduced, and two different types of objectives have been proposed: a ``cost'', for which every segment of transportation has a given cost, and the total cost is the sum of all costs, and a ``risk'' for which every segment has a given risk, and the total risk is the maximum encountered risk during the execution of the plan.
+
+Secondly, the huge reservoir of domains that have been carefully tuned over the years by the IPC competitions contains many good candidate domains for ``multi-objectivization``, and based on the semantics of those domains, we have proposed ad hoc extensions of these domains to multi-objective setting.
+
+\section{PPDL, a quick introduction}
+XXX
+
+\chapter{Zeno-based 'toy' problems}
+
+This Section describes the simple problems derived from the {\tt zeno} single-objective domain, probably the most well-know domain of AI planning after the STRIP block world, that has been present in all IPC competitions since the beginning. 
+
+The {\tt zeno} domain involves persons, cities and planes. States describe in which city each person and each plane is located (predicate {\tt at} with two arguments, a city and a person or a plane), and the fuel-level of each plane. Actions allow persons to bord/unboard a plane, planes to travel from one city to another (with whoever is on-board), either fast (and consuming a lot of fuel) or slowly (with low fuel consumption), and planes to refuel. All actions have a duration. See Annex \ref{XXX} for the domain file.
+
+
+
+\chapter{Multi-Objectivization of IPC domains}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\label{testbench}
+This section presents the test bench use to drive the experiments on the multi-objective release of \DAEX.
+
+% MINI ZENO
+
+
+
+
+\section{IPC-7 Origin}
+Two satisficing tracks were open at IPC-7: sequential satisficing (which is cost planning) and temporal satisficing.
+From these two domains, we have built new multi-objective domains which mixed the 2 metrics: cost and time.
+These and the corresponding problems were generated by a Python script.
+
+
+First we selected the domains that exist in both tracks. Then we rejected domains where action duration or cost equals one.
+
+The remaining domains are:
+
+\begin{itemize}
+\item \ELEVATORS\
+\item \CREWPLANNING\
+\item \FLOORTILE\
+\item \OPENSTACKS\
+\item \PARCPRINTER\
+\end{itemize}
+
+and are presented in details in the following sections.
+
+In order to get non-trivial Pareto fronts we enforce the two objectives to be conflicting (i.e. no one dominates).
+
+For \ELEVATORS\ a simple mixing is possible: fast moves are more costly than slow moves. So we can keep the original values of the objectives.(we simply add the cost increasing/decreasing effect on actions of the temporal domain). A typical action looks like:
+
+\begin{verbatim}
+(:action move-up-slow
+   :parameters (?lift - slow-elevator ?f1 - count ?f2 - count)
+   :duration (= ?duration (travel-slow-temp ?f1 ?f2))
+   :precondition (and (lift-at ?lift ?f1) 
+                      (above ?f1 ?f2 )
+                      (reachable-floor ?lift ?f2) )
+   :effect (and (lift-at ?lift ?f2) 
+                (not (lift-at ?lift ?f1)) 
+                (increase (total-cost) (travel-slow-cost ?f1 ?f2))))
+\end{verbatim}
+
+For \CREWPLANNING, \FLOORTILE\ and \PARCPRINTER\ we fixed the cost equals 1/duration so that the two objectives are conflicting (i.e. no one dominates).
+A typical action from the \CREWPLANNING\ domain looks like:
+
+\begin{verbatim}
+(:durative-action change_filter
+  :parameters (?fs - FilterState ?c - CrewMember ?d - Day)
+  :duration (= ?duration 60)
+  :condition (and (at start (available ?c))
+                  (over all (currentday ?c ?d)))
+  :effect (and (at start (not (available ?c)))
+               (at end (available ?c))
+               (at end (changed ?fs ?d))
+               (increase (total-cost) (/ 1 60))))
+\end{verbatim}
+
+For \OPENSTACKS, the temporal version starts from a stack with a fixed size and try to find the shortest trip whereas the cost version does not limit the size of the stack but add an action of cost 1 for each stack opening. This action was simply added to the temporal version:
+
+\begin{verbatim}
+(:action open-new-stack
+  :duration (= ?duration 1)
+  :parameters (?open ?new-open - count)
+  :precondition (and (stacks-avail ?open)
+                     (next-count ?open ?new-open))
+  :effect (and (not (stacks-avail ?open))
+               (stacks-avail ?new-open) 
+               (increase (total-cost) 1)))
+\end{verbatim}
+
+Note that this scheme is very general (more resource makes things get faster but more costly).
+
+
+Of course we could generate easily other problems.
+
+Syntaxically the two objectives are declared in the domain within the requirements slot:
+\begin{verbatim}
+(:requirements :typing :durative-actions :action-costs)
+\end{verbatim}
+
+The bi-objective metrics is specified in the problem with the following syntax:
+\begin{verbatim}
+(:metric (and (minimize (total-time)) (minimize (total-cost))))
+\end{verbatim}
+
+
+\section{Elevators}
+
+%The \ELEVATORS\ domain is stated as follows: there is a building with $N+1$ floors,
+%numbered from $0$ to $N$. The building can be separated in blocks of size $M+1$, where
+%$M$ divides $N$. Adjacent blocks have a common floor. The building has $K$ fast
+%(accelerating) elevators that stop only in floors that are multiple of $M/2$. 
+%Each fast elevator has a capacity of $X$ persons.
+%Furthermore, within each block, there are $L$ slow elevators, that stop at every
+%floor of the block. Each slow elevator has a capacity of $Y$ persons (usually
+%$Y<X$). There are costs associated with each elevator starting/stopping and
+%moving. There are several passengers, for which their current location and their
+%destination are given. The objective function is to minimize the total cost of
+%moving the passengers to their destinations. The total cost is increased each
+%time an elevator starts/stops or moves.
+
+
+The idea for this domain came up from the Miconic domain of IPC2, however the domain has been designed from scratch. The scenario is the following: There is a building with N+1 floors, numbered from 0 to N. The building can be separated in blocks of size M+1, where M divides N. Adjacent blocks have a common floor. For example, suppose N=12 and M=4, then we have 13 floors in total (ranging from 0 to 12), which form 3 blocks of 5 floors each, being 0 to 4, 4 to 8 and 8 to 12.
+
+The building has K fast (accelerating) elevators that stop only in floors that are multiple of M/2 (so M has to be an even number). Each fast elevator has a capacity of X persons. Furthermore, within each block, there are L slow elevators, that stop at every floor of the block. Each slow elevator has a capacity of Y persons (usually Y<X).
+
+There are costs associated with each elevator starting/stopping and moving. In particular, fast (accelerating) elevators have negligible cost of starting/stopping but have significant cost while moving. On the other hand, slow (constant speed) elevators have significant cost when starting/stopping and negligible cost while moving.
+
+Traveling times between floors are given for any type of elevator, taking into account the constant speed of the slow elevators and the constant acceleration of the fast elevators.
+
+There are several passengers, for which their current location (i.e. the floor they are) and their destination are given. The planning problem is to find a plan that moves the passengers to their destinations while it maximizes some criterion.
+
+In the sequential tracks the objective function is to minimize the total cost of moving the passengers to their destinations. The total cost is increased each time an elevator starts/stops or moves.
+
+For the satisficing track, in the 2008 competition, problems ranged from 9 floors, 4 passengers, and 4 elevators (2 fast, 2 slow) to 25 floors, 39 passengers, and 5 elevators (2 fast, 3 slow). Initial capacity of fast elevators is 3 and of slow ones is 2. The 10 first problems of IPC 2008 increased the number of passengers by one from the previous problem. The number 11, doubled the floors and made passenger = 8, while increasing in one the elevators' capacity. From it, 2 passengers were added till problem 20. From problem 21, a slow elevator was added, the capacity was increased to 6 for fast lifts and to 4 for slow ones, the number of floors was raised to 25 and the number of passengers was 12 an was increased by 3 in each problem. In IPC 2008 planners either only solved the 4-5 first problems or did not have trouble until the last ten.
+
+For IPC 2011 the last 9 problems were reused, plus problem 14 (only solved by one planner like a bunch of other ones). The remaining 10 problems start from characteristics of old problem 30 (current problem 10), adding 2 fast elevators, 1 slow and 1 passenger. The next 4 increase the number of passengers by 3. From problem 16 floors are 40, 4 fast lifts with capacity for 6 passengers, 4 slow ones for 4 passengers, and 40 passengers, increasing the number of passengers in 5 per problem. 
+
+\section{Floortile}
+A set of robots use different colors to paint patterns in floor tiles. The robots can move around the floor tiles in four directions (up, down, left and right). Robots paint with one color at a time, but can change their spray guns to any available color. However, robots can only paint the tile that is in front (up) and behind (down) them, and once a tile has been painted no robot can stand on it.
+
+For the IPC set, robots need to paint a grid with black and white, where the cell color is alternated always. This particular configuration makes the domain hard because robots should only paint tiles in front of them, since painting tiles behind make the search to reach a dead-end.
+
+\section{Openstacks}
+
+The \OPENSTACKS\ domain is based on the ``minimum maximum simultaneous open stacks''
+combinatorial optimization problem, which can be stated as follows: a
+manufacturer has a number of orders, each for a combination of different
+products, and can only make one product at a time. The problem is to order the
+making of the different products so that the maximum number of stacks that are
+in use simultaneously, or equivalently the number of orders that are in
+simultaneous production, is minimized. The problem is NP-hard and known to be
+equivalent to several other problems. In the temporal case a maximum number of
+stacks is given and the goal is to find the plan with the minimum makespan,
+without violating the maximum number of stacks constraints.
+
+\section{Parc Printer}
+This domain models the operation of the multi-engine printer, for which one prototype is developed at the Palo Alto Research Center (PARC). This type of printer can handle multiple print jobs simultaneously. Multiple sheets, belonging to the same job or different jobs, can be printed simultaneously using multiple Image Marking Engines (IME). Each IME can either be color, which can print both color and black\&white images, or mono, which can only print black\&white image. Each sheet needs to go through multiple printer components such as feeder, transporter, IME, inverter, finisher and need to arrive at the finisher in order. Thus, sheet (n+1) needs to be stacked in the same finisher with sheet n of the same job, but needs to arrive at the finisher right after sheet n (no other sheet stacked in between those two consecutive sheets). Given that the IMEs are heterogeneous (mixture of color and mono) and can run at different speeds, optimizing the operation of this printer for a mixture of print jobs, each of them is an arbitrary mixture of color/b\&w pages that are either simplex (one-sided print) or duplex (two-sided print) is a hard problem. For the detail description of this domain and the continual online planner controlling it, please refer to the references listed at the end of this page.
+
+This domain is used in two tracks: sequential and temporal. The temporal track is the most natural fit due to the default objective function for the printer of maximizing its productivity, which equals to finish printing all print job requests as quickly as possible. For the sequential track, we use a more seldom used objective function of minimizing printing cost. For example, using a more expensive color IME to print a black\&white page costs more than using a mono IME. However, the cost tradeoff may not be clearcut if the feeder, where the blank sheets originally reside at is closer to the mono IME than to the color IME.
+
+Overall, three different printers have been modeled, two with 2 IMEs (one color and one mono) and one with 4 IMEs (two colors and two monos). Two with rather symmetric design and a third one is asymmetric. Even those the printers are hypothetical, the hardware that can be used to make those printers are real.
+
+For the problem files, to reduce complexity, print request of a single job with multiple sheets have been created. The sheets are randomly set to be either simplex (one-sided print) or duplex (two-sided print) and each image is also randomly selected to be either mono or color. The number of sheets varies from 1 to 20. Given this print job request and a particular printer configuration, the competing planner needs to find a plan with lowest total printing cost in the sequential track (matching well between image requirement and IME capabilities) and smallest makespan in the temporal track (synchronize well different IMEs).
+
+There is no generator for this domain, so new problems will be by-hand generated using IPC 2008 ones. New problems will add some sheets to old problems or will make two-sided some of them. As in the IPC 2008, three different printers are used, one for problems 1-10, another for 11-20, and another for 21-30.
+
+Remark: Printer 1 is not able to turn a page once printed, so if a problem prints something in the back side, the sheet needs to finish with back side up.
+
+For the satisficing track, in the IPC 2008 the first problem had 1 sheet, second one 2 sheets and so on until problem 10. The same applies for problems 11-20 (changing the printer) and 21-30.
+
+
+\chapter{Conclusion}
+\label{conclusion}
+
+
+\chapter{References}
+\bibliographystyle{plain}
+\bibliography{icaps10}
+
+\end{document}
+
+/trunk/experiments/MultiObjective/Examples/IPC7/
