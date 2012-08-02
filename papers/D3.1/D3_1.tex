@@ -108,12 +108,12 @@ This document provides the description of the multi-objective test suite that ha
 \section{Multi-objective planning}
 Most real-world applications are multi-objective by nature. Typical situations in real-life involve some quality criterion associated with some cost -- and quality and cost are always contradictory objectives. In temporal planning for instance, the goal is to minimize the duration of a given plan: the quality is the makespan. But in real life, going fast has a cost, and very often it is possible to decrease the cost only at the expense of the duration. In such situations, the goal of optimization is not to find the best solution: only the decision-maker can decide what is best: going very fast at a very high cost, or going a little slower, but at a much lower cost. The name of the game then becomes {\em multi-objective optimization} and the goal is to provide the decision-maker with the best set of options from which to choose from, what is called Pareto-optimal solutions, i.e. such solutions that no other solution is better on all objectives.
 
-However, very little attention has been paid in the AI Planning community to multi-objective  -- despite the fact that most real-life planning problems are, like other real problems, multi-objective by nature. One reason for that proably comes from the history of planners, that have been derived from AI methods like constraint programming, graph theory, and the like - domains where a single objective is mandatory. As a consequence, even though multi-objective planning problems begin to raise some interest, there exist to-date no benchmark of multi-objective AI planning problems. This is in high constrast with the single-objective case: due to the very high success of the International Planning Competitions (IPC) over the years, a very large body of benchmark problems has been validated and adopted by the whole AI Planning community.
+However, very little attention has been paid in the AI Planning community to multi-objective  -- despite the fact that most real-life planning problems are, like other real problems, multi-objective by nature. One reason for that probably comes from the history of planners, that have been derived from AI methods like constraint programming, graph theory, and the like - domains where a single objective is mandatory. As a consequence, even though multi-objective planning problems begin to raise some interest, there exist to-date no benchmark of multi-objective AI planning problems. This is in high contrast with the single-objective case: due to the very high success of the International Planning Competitions (IPC) over the years, a very large body of benchmark problems has been validated and adopted by the whole AI Planning community.
 
 One of the goals of the DESCARWIN project is to provide the first bricks of a similar testbed for multi-objective planning optimization -- and this deliverable is a first step in that direction.
 
 \section{Survey of proposed approaches}
-Two different approaches have been used to design a first benchmark suite for multi-objective AI planning. Firstly, starting from a very simple toy problem inspired by the {\tt zeno} logisitic domain of all IPCs (probably the most widely used domain, including 30 instances of increasing difficulty), a series of problems have been design, with parameterized complexity, and for which the exact Pareto front can be easily exactly known (at least for the simplest instances). Because the domain pertains to logistic, the first (main?) objective remains the total duration of the resulting plan. A second objective has been introduced, and two different types of objectives have been proposed: a ``cost'', for which every segment of transportation has a given cost, and the total cost is the sum of all costs, and a ``risk'' for which every segment has a given risk, and the total risk is the maximum encountered risk during the execution of the plan.
+Two different approaches have been used to design a first benchmark suite for multi-objective AI planning. Firstly, starting from a very simple toy problem inspired by the {\tt zeno} logistic domain of all IPCs (probably the most widely used domain, including 30 instances of increasing difficulty), a series of problems have been design, with parameterized complexity, and for which the exact Pareto front can be easily exactly known (at least for the simplest instances). Because the domain pertains to logistic, the first (main?) objective remains the total duration of the resulting plan. A second objective has been introduced, and two different types of objectives have been proposed: a ``cost'', for which every segment of transportation has a given cost, and the total cost is the sum of all costs, and a ``risk'' for which every segment has a given risk, and the total risk is the maximum encountered risk during the execution of the plan.
 
 Secondly, the huge reservoir of domains that have been carefully tuned over the years by the IPC competitions contains many good candidate domains for ``multi-objectivization``, and based on the semantics of those domains, we have proposed ad hoc extensions of these domains to multi-objective setting.
 
@@ -122,7 +122,7 @@ Secondly, the huge reservoir of domains that have been carefully tuned over the 
 \section{The (single-objective) zeno domain}
 This Section describes the simple problems derived from the {\tt zeno} single-objective domain, probably the most well-know domain of AI planning after the STRIP block world, that has been present in all IPC competitions since the beginning. 
 
-The {\tt zeno} domain involves persons, cities and planes. States describe in which city each person and each plane is located (predicate {\tt at} with two arguments, a city and a person or a plane), and the fuel-level of each plane. Actions allow persons to bord/unboard a plane, planes to travel from one city to another (with whoever is on-board), either fast (and consuming a lot of fuel) or slowly (with low fuel consumption), and planes to refuel. All actions have a duration. See Annex \ref{zenoMultiDomain} for the domain file.
+The {\tt zeno} domain involves persons, cities and planes. States describe in which city each person and each plane is located (predicate {\tt at} with two arguments, a city and a person or a plane), and the fuel-level of each plane. Actions allow persons to board/unboard a plane, planes to travel from one city to another (with whoever is on-board), either fast (and consuming a lot of fuel) or slowly (with low fuel consumption), and planes to refuel. All actions have a duration. See Annex \ref{zenoMultiDomain} for the domain file.
 
 We will use here a simplified {\tt zeno} domain, where there is no fuel level, no boarding/unboarding actions. This simple domain (for single objective optimization) is written in PPDL as follows. There are only 2 actions, {\tt fly} and {\tt flyVide} that move the planes with or without a passenger, and the preconditions and effects of the actions are rather straightforward.
 
@@ -237,7 +237,7 @@ In the instance file, the initial state must initialize the {\tt total-cost}, an
     (= (citythreat city4) 0)
 \end{verbatim}
 
-The complete resulting files for zeno3 (i.e. the simplest instance with 3 persons) can be seen in the Annex, and the corresponding two Pareto fronts are represented on Figure \ref{fig:zeno3Fronts}.
+The complete resulting files for zeno3 (i.e. the simplest instance with 3 persons) can be seen in Annex \ref{zenoMultiInstance}, and the corresponding two Pareto fronts are represented on Figure \ref{fig:zeno3Fronts}.
 
 \subsection{Cost or Risk?}
 \label{costOrRisk}
@@ -263,24 +263,41 @@ Of course, the number of planes could also be increased, but the number of passe
 Another way to modify the difficulty of the problem without increasing its complexity is to tune the different values of the flight times and the cost/risk at each city. such changes will not modify the number of points on the Pareto Front, but will certainly change its shape in the objective space. For instance, simply modifying the cost $\alpha$ of {\tt city2}, the central city in Figure \ref{fig:multiZeno}, between 1 and 3 (the costs of respectively {\tt city1} and {\tt city3}), the Pareto Front, which is linear for $\alpha=2$ becomes strictly convex for $\alpha < 2$ and strictly concave for $\alpha > 2$, as can be seen on Figure \ref{fig:ParetoFronts}.
 
 
-\chapter{Multi-Objectivization of IPC domains}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Multi-Objectivization of IPC7 domains}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{testbench}
 This section presents the family of benchmark problems that have derived from the IPC single-objective domains. 
 
 % MINI ZENO
 
-\section{IPC-7 Domains}
+\section{Background}
+\subsection{Rationale}
 Two satisficing tracks were open at IPC-7: sequential satisficing, i.e., sequential STRIPS planning in which actions have a cost and the total cost is to me minimized, and temporal satisficing, where actions have a duration and can be run in parallel if all resources are available at the same time -- and the total makespan is to be minimized. 
 Some domains appeared in both tracks, with the same instances (i.e. instances with the same objects), and from these domains, we could generate problems with 2 objectives, the duration (makespan) and the cost (or risk, as in Section \ref{costOrRisk}). Note that domains where action durations or costs were uniformly equal to one were rejected outright.
 
-The domain PPDL files were generated by hand, while the PDDF for the instances were automatically generated by some Python script from both corresponding instances of tht two domains (sequential with costs and temporal).
+The domain PPDL files were generated by hand, while the PDDL for the instances were automatically generated by some Python script from both corresponding instances of tht two domains (sequential with costs and temporal).
 
+Syntaxically the two objectives are declared in the domain PDDL file within the {\tt requirements} slot:
+\begin{verbatim}
+(:requirements :typing :durative-actions :action-costs)
+\end{verbatim}
+
+The bi-objective metrics is specified in the PDDL problem file with the {\tt metric} directive:
+\begin{verbatim}
+(:metric (and (minimize (total-time)) (minimize (total-cost))))
+\end{verbatim}
+
+\subsection{The retained domains}
 Five domains were handled that way: \ELEVATORS, \CREWPLANNING, \FLOORTILE, \OPENSTACKS, and \PARCPRINTER.
 They are detailed in turn in the following Sections, as the way the actual multi-objectivization is done slightly varies from one domain to another, despite the fact that all had sequential and temporal instances.
 
 
-Indeed, though the underlying rationale for multi-objectivization is always something around ''withmore resource,  things get done faster, but cost more``, it turned out that in order to get non-trivial Pareto fronts, some modifications to the ''direct-product`` of the sequential and the temporal domains had to be done.
+Indeed, though the underlying rationale for multi-objectivization is always something around ''with more resource, things get done faster, but this will cost more``, it turned out that in order to get non-trivial Pareto fronts, some modifications to the ''direct-product`` of the sequential and the temporal domains had to be done.
 
 Note also that more domains could be ''multi-objectivized'' using similar techniques, even those without that do not already have sequential and temporal instances. 
 
@@ -332,7 +349,7 @@ For \ELEVATORS\ a simple mixing of both sequential and temporal domains is strai
                 (not (lift-at ?lift ?f1)) 
                 (increase (total-cost) (travel-slow-cost ?f1 ?f2))))
 \end{verbatim}
-See details in the complete listings in the Annex.
+See details in the complete listing of \ELEVATORS\ domain in Annex \ref{elevatorMultiDomain}, and a simple sample instances with 2 fast and 2 slow elevators, for 25 passengers and 16 floors, in Annex \ref{elevatorMultiInstance}.
 
 \section{\CREWPLANNING, \FLOORTILE, and \PARCPRINTER}
 
@@ -399,18 +416,7 @@ For \OPENSTACKS, the temporal version starts from a stack with a fixed size and 
                (stacks-avail ?new-open) 
                (increase (total-cost) 1)))
 \end{verbatim}
-
-
-Syntaxically the two objectives are declared in the domain within the requirements slot:
-\begin{verbatim}
-(:requirements :typing :durative-actions :action-costs)
-\end{verbatim}
-
-The bi-objective metrics is specified in the problem with the following syntax:
-\begin{verbatim}
-(:metric (and (minimize (total-time)) (minimize (total-cost))))
-\end{verbatim}
-
+As in the single-objective case, the complete domain file, however, cannot apply for all instances, and Annex \ref{openstackMultiDomain} and a (slightly) specific problem file must be  \ref{openstackMultiInstance} show the two PDDL files for the simplest instance of \OPENSTACKS\ domain, with 24 products and 24 orders.
 
 \chapter{Conclusion}
 \label{conclusion}
@@ -419,23 +425,21 @@ This deliverable has introduced the benchmark test suite that has been designed 
 The proposed suite contains two types of problems.
 First, for a simplified logistics domain inspired by the single-objective {\tt zeno} domain (i.e., transporting passengers between cities with limited number of planes), a set of 'toy' problems of parameterized complexity has been defined. They are toy problems because the exact Pareto front, or large parts of the exact Pareto fronts, can be theoretically identified (even if this becomes tedious as the complexity increases). But they can be made arbitrarily difficult by increasing the number of cities and/or the number of passengers, and tuning the values of the partial objective values.
 
-The second set of problems comes from IPC-7 (single-objective) domains. For several of them, two series of almost identical instances existed, one in the temporal track, and one in the 'action-with-costs' track. Whenever possible, these were merged into multi-objective instances. For some other domaines, a secondary objective was arbitrarily set to a decreasing function of the makespan for each action, ensuring contradictory objectives. 
+The second set of problems comes from IPC-7 (single-objective) domains. For several of them, two series of almost identical instances existed, one in the temporal track, and one in the 'action-with-costs' track. Whenever possible, these were merged into multi-objective instances. For some other domaines, a secondary objective had to be set to a decreasing function of the makespan for each action, in order to ensure contradictory objectives. 
 
-In both cases, XXXX
-
-
+In both cases, the resulting suites comprise several problems of increasing complexity that will hopefully be useful for comparing different approaches of multi-objective AI planners. 
 
 
-
+\newpage
 % \chapter{References}
 % \bibliographystyle{plain}
 % \bibliography{icaps10}
 \begin{tiny}
 
 \Roman{section}    
-\setcounter{chapter}{6}
-\chapter*{Annexes: PDDL files}
-\section{\MULTIZENO\ PDDL domain file}
+% \setcounter{chapter}{6}
+\chapter{Annexes: PDDL files}
+\section{Multi-Zeno-Travel PDDL domain file}
 \label{zenoMultiDomain}
 \begin{verbatim}(define (domain zeno-travel)
 (:requirements :strips :durative-actions :action-costs)
@@ -474,8 +478,8 @@ In both cases, XXXX
 )
 \end{verbatim}
 
-\section{A simple \MULTIZENO\ PDDL instance file}
-\label{zeno3-123-instance}
+\section{A simple Multi-Zeno-Travel PDDL instance file}
+\label{zenoMultiInstance}
 This instance is a very simple exemple of a \MULTIZENO\ instance, with 3 passengers, 3 intermediate sities, 2 planes, and a linear Pareto Front (see Section \ref{sec:simpleZenoMulti}).
 \begin{verbatim}
 (define (problem ZTRAVEL-3-8)
@@ -548,7 +552,8 @@ This instance is a very simple exemple of a \MULTIZENO\ instance, with 3 passeng
 )
 \end{verbatim}
 
-\section{\ELEVATORS\ PDDL domain file}
+\section{Multi-ELEVATORS PDDL domain file}
+\label{elevatorMultiDomain}
 \begin{verbatim}
 ; Sémantique temporelle conservative : on omet les modalités temporelles du bench original (YAHSP ne les traite pas)
 
@@ -617,7 +622,8 @@ This instance is a very simple exemple of a \MULTIZENO\ instance, with 3 passeng
 ) 
 \end{verbatim}
 
-\section{\ELEVATORS\ PDDL instance file {\tt p01-p04-temp-cost.pddl}}
+\section{Multi-ELEVATORS PDDL instance file {\tt p01-p04-temp-cost.pddl}}
+\label{elevatorMultiInstance}
 % This is one of the simplest instances of the \ELEVATORS\ domain -- 2 fast and 2 slow elevators, for 25 passengers and 16 floors.
 \begin{tt}
 (define (problem elevators-time-cost-p01-p04)
@@ -762,7 +768,502 @@ slow0-0 slow1-0 - slow-elevator
 )
 \end{tt}
 
-  
+\section{Multi-OPENSTACKS PDDL domain file {\tt p01-domain.pddl}}
+\label{openstackMultiDomain}
+
+
+\begin{tt}
+(define (domain openstacks-time-nonADL-nonNegated)
+(:requirements :typing :durative-actions :action-costs)
+(:types order product count)
+(:constants 
+ p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15 p16 p17 p18 p19 p20 p21 p22 p23 p24 - product
+ o1 o2 o3 o4 o5 o6 o7 o8 o9 o10 o11 o12 o13 o14 o15 o16 o17 o18 o19 o20 o21 o22 o23 o24 - order
+)
+
+(:predicates 
+	(includes ?o - order ?p - product)
+	(waiting ?o - order)
+	(started ?o - order)
+	(shipped ?o - order)
+	(made ?p - product)
+	(not-made ?p - product)
+	(stacks-avail ?s - count)
+	(next-count ?s ?ns - count)
+)
+
+(:functions (total-cost))
+
+(:action open-new-stack
+ :duration (= ?duration 1)
+ :parameters (?open ?new-open - count)
+ :precondition (and (stacks-avail ?open)(next-count ?open ?new-open))
+ :effect (and (not (stacks-avail ?open))(stacks-avail ?new-open) (increase (total-cost) 1)))
+
+(:durative-action start-order
+:parameters (?o - order ?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (waiting ?o))(at start (stacks-avail ?avail))(at start (next-count ?new-avail ?avail)))
+:effect (and (at start (not (waiting ?o)))(at end (started ?o))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail)))
+)
+
+(:durative-action make-product-p1
+:parameters ()
+:duration (= ?duration 40)
+:condition (and (at start (not-made p1))(at start (started o8))(at start (started o21)))
+:effect (and (at start (not (not-made p1))) (at end (made p1)))
+)
+
+(:durative-action make-product-p2
+:parameters ()
+:duration (= ?duration 30)
+:condition (and (at start (not-made p2))(at start (started o6)))
+:effect (and (at start (not (not-made p2))) (at end (made p2)))
+)
+
+(:durative-action make-product-p3
+:parameters ()
+:duration (= ?duration 20)
+:condition (and (at start (not-made p3))(at start (started o6)))
+:effect (and (at start (not (not-made p3))) (at end (made p3)))
+)
+
+(:durative-action make-product-p4
+:parameters ()
+:duration (= ?duration 10)
+:condition (and (at start (not-made p4))(at start (started o5))(at start (started o16)))
+:effect (and (at start (not (not-made p4))) (at end (made p4)))
+)
+
+(:durative-action make-product-p5
+:parameters ()
+:duration (= ?duration 70)
+:condition (and (at start (not-made p5))(at start (started o12)))
+:effect (and (at start (not (not-made p5))) (at end (made p5)))
+)
+
+(:durative-action make-product-p6
+:parameters ()
+:duration (= ?duration 70)
+:condition (and (at start (not-made p6))(at start (started o2)))
+:effect (and (at start (not (not-made p6))) (at end (made p6)))
+)
+
+(:durative-action make-product-p7
+:parameters ()
+:duration (= ?duration 10)
+:condition (and (at start (not-made p7))(at start (started o2)))
+:effect (and (at start (not (not-made p7))) (at end (made p7)))
+)
+
+(:durative-action make-product-p8
+:parameters ()
+:duration (= ?duration 50)
+:condition (and (at start (not-made p8))(at start (started o22)))
+:effect (and (at start (not (not-made p8))) (at end (made p8)))
+)
+
+(:durative-action make-product-p9
+:parameters ()
+:duration (= ?duration 60)
+:condition (and (at start (not-made p9))(at start (started o7)))
+:effect (and (at start (not (not-made p9))) (at end (made p9)))
+)
+
+(:durative-action make-product-p10
+:parameters ()
+:duration (= ?duration 40)
+:condition (and (at start (not-made p10))(at start (started o1))(at start (started o20)))
+:effect (and (at start (not (not-made p10))) (at end (made p10)))
+)
+
+(:durative-action make-product-p11
+:parameters ()
+:duration (= ?duration 100)
+:condition (and (at start (not-made p11))(at start (started o10)))
+:effect (and (at start (not (not-made p11))) (at end (made p11)))
+)
+
+(:durative-action make-product-p12
+:parameters ()
+:duration (= ?duration 100)
+:condition (and (at start (not-made p12))(at start (started o9))(at start (started o11))(at start (started o22)))
+:effect (and (at start (not (not-made p12))) (at end (made p12)))
+)
+
+(:durative-action make-product-p13
+:parameters ()
+:duration (= ?duration 30)
+:condition (and (at start (not-made p13))(at start (started o1))(at start (started o4))(at start (started o19)))
+:effect (and (at start (not (not-made p13))) (at end (made p13)))
+)
+
+(:durative-action make-product-p14
+:parameters ()
+:duration (= ?duration 70)
+:condition (and (at start (not-made p14))(at start (started o4))(at start (started o22)))
+:effect (and (at start (not (not-made p14))) (at end (made p14)))
+)
+
+(:durative-action make-product-p15
+:parameters ()
+:duration (= ?duration 40)
+:condition (and (at start (not-made p15))(at start (started o9)))
+:effect (and (at start (not (not-made p15))) (at end (made p15)))
+)
+
+(:durative-action make-product-p16
+:parameters ()
+:duration (= ?duration 50)
+:condition (and (at start (not-made p16))(at start (started o15))(at start (started o23)))
+:effect (and (at start (not (not-made p16))) (at end (made p16)))
+)
+
+(:durative-action make-product-p17
+:parameters ()
+:duration (= ?duration 80)
+:condition (and (at start (not-made p17))(at start (started o18)))
+:effect (and (at start (not (not-made p17))) (at end (made p17)))
+)
+
+(:durative-action make-product-p18
+:parameters ()
+:duration (= ?duration 10)
+:condition (and (at start (not-made p18))(at start (started o7))(at start (started o9))(at start (started o19)))
+:effect (and (at start (not (not-made p18))) (at end (made p18)))
+)
+
+(:durative-action make-product-p19
+:parameters ()
+:duration (= ?duration 80)
+:condition (and (at start (not-made p19))(at start (started o13))(at start (started o18))(at start (started o24)))
+:effect (and (at start (not (not-made p19))) (at end (made p19)))
+)
+
+(:durative-action make-product-p20
+:parameters ()
+:duration (= ?duration 60)
+:condition (and (at start (not-made p20))(at start (started o17)))
+:effect (and (at start (not (not-made p20))) (at end (made p20)))
+)
+
+(:durative-action make-product-p21
+:parameters ()
+:duration (= ?duration 50)
+:condition (and (at start (not-made p21))(at start (started o3))(at start (started o7))(at start (started o13)))
+:effect (and (at start (not (not-made p21))) (at end (made p21)))
+)
+
+(:durative-action make-product-p22
+:parameters ()
+:duration (= ?duration 30)
+:condition (and (at start (not-made p22))(at start (started o16)))
+:effect (and (at start (not (not-made p22))) (at end (made p22)))
+)
+
+(:durative-action make-product-p23
+:parameters ()
+:duration (= ?duration 100)
+:condition (and (at start (not-made p23))(at start (started o14)))
+:effect (and (at start (not (not-made p23))) (at end (made p23)))
+)
+
+(:durative-action make-product-p24
+:parameters ()
+:duration (= ?duration 90)
+:condition (and (at start (not-made p24))(at start (started o13)))
+:effect (and (at start (not (not-made p24))) (at end (made p24)))
+)
+
+(:durative-action ship-order-o1
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o1))(at start (made p10))(at start (made p13))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o1)))(at end (shipped o1))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o2
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o2))(at start (made p6))(at start (made p7))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o2)))(at end (shipped o2))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o3
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o3))(at start (made p21))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o3)))(at end (shipped o3))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o4
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o4))(at start (made p13))(at start (made p14))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o4)))(at end (shipped o4))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o5
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o5))(at start (made p4))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o5)))(at end (shipped o5))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o6
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o6))(at start (made p2))(at start (made p3))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o6)))(at end (shipped o6))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o7
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o7))(at start (made p9))(at start (made p18))(at start (made p21))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o7)))(at end (shipped o7))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o8
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o8))(at start (made p1))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o8)))(at end (shipped o8))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o9
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o9))(at start (made p12))(at start (made p15))(at start (made p18))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o9)))(at end (shipped o9))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o10
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o10))(at start (made p11))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o10)))(at end (shipped o10))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o11
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o11))(at start (made p12))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o11)))(at end (shipped o11))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o12
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o12))(at start (made p5))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o12)))(at end (shipped o12))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o13
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o13))(at start (made p19))(at start (made p21))(at start (made p24))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o13)))(at end (shipped o13))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o14
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o14))(at start (made p23))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o14)))(at end (shipped o14))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o15
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o15))(at start (made p16))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o15)))(at end (shipped o15))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o16
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o16))(at start (made p4))(at start (made p22))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o16)))(at end (shipped o16))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o17
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o17))(at start (made p20))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o17)))(at end (shipped o17))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o18
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o18))(at start (made p17))(at start (made p19))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o18)))(at end (shipped o18))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o19
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o19))(at start (made p13))(at start (made p18))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o19)))(at end (shipped o19))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o20
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o20))(at start (made p10))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o20)))(at end (shipped o20))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o21
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o21))(at start (made p1))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o21)))(at end (shipped o21))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o22
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o22))(at start (made p8))(at start (made p12))(at start (made p14))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o22)))(at end (shipped o22))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o23
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o23))(at start (made p16))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o23)))(at end (shipped o23))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+
+(:durative-action ship-order-o24
+:parameters (?avail ?new-avail - count)
+:duration (= ?duration 1)
+:condition (and (at start (started o24))(at start (made p19))(at start (stacks-avail ?avail))(at start (next-count ?avail ?new-avail)))
+:effect (and (at start (not (started o24)))(at end (shipped o24))(at start (not (stacks-avail ?avail)))(at end (stacks-avail ?new-avail))))
+)
+\end{tt}
+
+\section{Multi-OPENSTACKS PDDL instance file {\tt p01.pddl}}
+\label{openstackMultiInstance}
+
+\begin{tt}
+(define (problem os-time-p24-1)
+(:domain openstacks-time-nonADL-nonNegated)
+(:objects 
+n0 n1 n2 n3 n4 n5 n6 n7 n8 n9 n10 n11 n12 n13 n14 n15 n16 n17 n18 n19 n20 n21  - count
+)
+
+(:init
+(next-count n0 n1) (next-count n1 n2) (next-count n2 n3) (next-count n3 n4) (next-count n4 n5) (next-count n5 n6) (next-count n6 n7) (next-count n7 n8) (next-count n8 n9) (next-count n9 n10) (next-count n10 n11) (next-count n11 n12) (next-count n12 n13) (next-count n13 n14) (next-count n14 n15) (next-count n15 n16) (next-count n16 n17) (next-count n17 n18) (next-count n18 n19) (next-count n19 n20) (next-count n20 n21) 
+(stacks-avail n0)
+(waiting o1)
+(includes o1 p10)(includes o1 p13)
+
+(waiting o2)
+(includes o2 p6)(includes o2 p7)
+
+(waiting o3)
+(includes o3 p21)
+
+(waiting o4)
+(includes o4 p13)(includes o4 p14)
+
+(waiting o5)
+(includes o5 p4)
+
+(waiting o6)
+(includes o6 p2)(includes o6 p3)
+
+(waiting o7)
+(includes o7 p9)(includes o7 p18)(includes o7 p21)
+
+(waiting o8)
+(includes o8 p1)
+
+(waiting o9)
+(includes o9 p12)(includes o9 p15)(includes o9 p18)
+
+(waiting o10)
+(includes o10 p11)
+
+(waiting o11)
+(includes o11 p12)
+
+(waiting o12)
+(includes o12 p5)
+
+(waiting o13)
+(includes o13 p19)(includes o13 p21)(includes o13 p24)
+
+(waiting o14)
+(includes o14 p23)
+
+(waiting o15)
+(includes o15 p16)
+
+(waiting o16)
+(includes o16 p4)(includes o16 p22)
+
+(waiting o17)
+(includes o17 p20)
+
+(waiting o18)
+(includes o18 p17)(includes o18 p19)
+
+(waiting o19)
+(includes o19 p13)(includes o19 p18)
+
+(waiting o20)
+(includes o20 p10)
+
+(waiting o21)
+(includes o21 p1)
+
+(waiting o22)
+(includes o22 p8)(includes o22 p12)(includes o22 p14)
+
+(waiting o23)
+(includes o23 p16)
+
+(waiting o24)
+(includes o24 p19)
+
+(not-made p1)
+(not-made p2)
+(not-made p3)
+(not-made p4)
+(not-made p5)
+(not-made p6)
+(not-made p7)
+(not-made p8)
+(not-made p9)
+(not-made p10)
+(not-made p11)
+(not-made p12)
+(not-made p13)
+(not-made p14)
+(not-made p15)
+(not-made p16)
+(not-made p17)
+(not-made p18)
+(not-made p19)
+(not-made p20)
+(not-made p21)
+(not-made p22)
+(not-made p23)
+(not-made p24)
+)
+
+(:goal
+(and
+(shipped o1)
+(shipped o2)
+(shipped o3)
+(shipped o4)
+(shipped o5)
+(shipped o6)
+(shipped o7)
+(shipped o8)
+(shipped o9)
+(shipped o10)
+(shipped o11)
+(shipped o12)
+(shipped o13)
+(shipped o14)
+(shipped o15)
+(shipped o16)
+(shipped o17)
+(shipped o18)
+(shipped o19)
+(shipped o20)
+(shipped o21)
+(shipped o22)
+(shipped o23)
+(shipped o24)
+))
+
+(:metric (and (minimize (total-time)) (minimize (total-cost))))
+)
+\end{tt}
+
 \end{tiny}
 \end{document}
 
