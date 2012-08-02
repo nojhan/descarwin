@@ -161,7 +161,11 @@ namespace daex
             unsigned int dump_file_count,
             std::string & dump_sep,
             std::string & metadata,
-            unsigned int max_seconds )
+            unsigned int max_seconds,
+            /* multistart parameters */
+            bool with_multistart,
+            int masterRank,
+            std::vector<int> workers )
     {
         eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
 
@@ -170,18 +174,28 @@ namespace daex
         {
             // Type of scheduling
             eo::mpi::AssignmentAlgorithm* assign;
+
+            if( ! with_multistart )
+            {
+                workers.clear();
+                for( int i = 1, size = eo::mpi::Node::comm().size(); i < size; ++i )
+                {
+                    workers.push_back( i );
+                }
+            }
+
             if ( eo::parallel.isDynamic() )
             {
-                assign = new eo::mpi::DynamicAssignmentAlgorithm ;
+                assign = new eo::mpi::DynamicAssignmentAlgorithm( workers ) ;
             } else
             {
-                assign = new eo::mpi::StaticAssignmentAlgorithm ;
+                assign = new eo::mpi::StaticAssignmentAlgorithm( workers, 0 ) ; // remark: second parameter doesn't mean anything here.
             }
 
             unsigned int packet_size = eo::parallel.packetSize();
 
             eo::mpi::ParallelApplyStore<daex::Decomposition>* store
-                = new eo::mpi::ParallelApplyStore<daex::Decomposition>( eval, eo::mpi::DEFAULT_MASTER, packet_size );
+                = new eo::mpi::ParallelApplyStore<daex::Decomposition>( eval, masterRank, packet_size );
             // Wrap handle response to include the dump file saving.
             store->wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
                         plan_file,
@@ -193,7 +207,7 @@ namespace daex
                         )
                     );
 
-            if( max_seconds > 0 )
+            if( !with_multistart && max_seconds > 0 )
             {
                 store->wrapIsFinished( new IsFinishedBeforeTime( max_seconds ) );
             }
@@ -201,7 +215,7 @@ namespace daex
             // Add wrappers
             p_pop_eval = new eoParallelPopLoopEval<daex::Decomposition>(
                     *assign,
-                    eo::mpi::DEFAULT_MASTER /* master rank */,
+                    masterRank,
                     store
                     );
         } else

@@ -20,10 +20,45 @@
 #ifdef WITH_MPI
 #include <mpi/eoMpi.h>
 #include <mpi/eoParallelApply.h>
+#include <mpi/eoMultiStart.h>
 #include "do/make_parallel_eval_dae.h"
 #endif // WITH_MPI
 
 #include <utils/eoTimer.h>
+
+# ifdef WITH_MPI
+struct MultiHandleResponse : public eo::mpi::HandleResponseMultiStart< daex::Decomposition >
+{
+    void operator()( int wrkRank )
+    {
+        (*_wrapped)( wrkRank );
+        std::cout << "Received a response with fit " << _data->bests.back().fitness() << " ! " << std::endl;
+    }
+};
+
+template< class EOT >
+struct DaeResetter : public eo::mpi::ReuseSamePopEA< EOT >
+{
+    DaeResetter( eoCountContinue<EOT>& gen,
+                    const eoPop<EOT>& originalPop,
+                    eoEvalFunc<EOT>& eval,
+                    eoCountContinue<EOT>& steadyfit
+                    ) :
+        eo::mpi::ReuseSamePopEA< EOT >( gen, originalPop, eval ),
+        _steadyfit( steadyfit )
+    {}
+
+    void operator()( eoPop< EOT >& pop )
+    {
+        eo::mpi::ReuseSamePopEA< EOT >::operator()( pop );
+        _steadyfit.reset();
+    }
+
+    protected:
+
+    eoCountContinue< EOT >& _steadyfit;
+};
+# endif // WITH_MPI
 
 /*
 #ifndef NDEBUG
@@ -129,6 +164,23 @@ int main ( int argc, char* argv[] )
 # ifdef WITH_MPI
     }
     bmpi::broadcast( eo::mpi::Node::comm(), seed, eo::mpi::DEFAULT_MASTER );
+
+    // Parallel hierarchy params
+    unsigned int multistart_workers = parser.createParam( (unsigned int)0, "multistart-workers", "Number of workers for multi-start", '\0', "Parallelization").value();
+    unsigned int eval_workers = parser.createParam( (unsigned int)0, "eval-workers", "Number of evaluators workers for each multi-start worker", '\0', "Parallelization").value();
+
+    bool with_multistart = false;
+    if( multistart_workers > 0 && eval_workers > 0 )
+    {
+        if( 1 /* general master */
+            + multistart_workers /* multi starters */
+            + multistart_workers * eval_workers /* eval for each multi starter */
+            > eo::mpi::Node::comm().size() )
+        {
+            throw std::logic_error("Not enough hosts to launch the process with the given multistart-workers and eval-workers parameters!");
+        }
+        with_multistart = true;
+    }
 # endif // WITH_MPI
 
     rng.reseed( seed );
@@ -212,6 +264,33 @@ int main ( int argc, char* argv[] )
     eo::log << eo::logging              << "\tb_max for        final goal,  b_max_last: " << b_max_last << std::endl;
 #endif
 
+# ifdef WITH_MPI
+    /***********************
+     * PARALLEL MULTISTART *
+     **********************/
+
+    int eval_master = eo::mpi::DEFAULT_MASTER;
+    std::vector< std::vector<int> > evaluatorsAffectations;
+    if( with_multistart )
+    {
+        eval_master = rank;
+        int j = multistart_workers + 1;
+        for( int i = 1; i <= multistart_workers; ++i )
+        {
+            std::vector<int> evaluators;
+            for( int k = 0; k < eval_workers; ++k )
+            {
+                if( rank == j )
+                {
+                    eval_master = i;
+                }
+                evaluators.push_back( j++ );
+            }
+            evaluatorsAffectations.push_back( evaluators );
+        }
+    }
+# endif
+
     /**************
      * EVALUATION *
      **************/
@@ -221,7 +300,7 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
 
-    // do_make_eval returns a pair: the evaluator instance 
+    // do_make_eval returns a pair: the evaluator instance
     // and a pointer on a func counter that may be null of we are in release mode
     std::pair< eoEvalFunc<daex::Decomposition>&, eoEvalFuncCounter<daex::Decomposition>* > eval_pair
         = daex::do_make_eval_op<daex::Decomposition>(
@@ -245,28 +324,36 @@ int main ( int argc, char* argv[] )
 #ifdef WITH_MPI
     unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
     eoPopEvalFunc<daex::Decomposition>* p_pop_eval = daex::do_make_parallel_eval(
-            eval, plan_file, best_makespan, dump_file_count, dump_sep, metadata, max_seconds );
+            eval, plan_file, best_makespan, dump_file_count, dump_sep, metadata, max_seconds,
+            /* multistart parameters */
+            with_multistart,
+            eval_master,
+            (with_multistart && rank > 0 ) ? evaluatorsAffectations[ eval_master-1 ] : std::vector<int>() );
     eoPopEvalFunc<daex::Decomposition>& pop_eval = *p_pop_eval;
 # else
     eoPopLoopEval<daex::Decomposition> pop_eval( eval );
 # endif // WITH_MPI
 
 # ifdef WITH_MPI
-    if( rank != 0 )
+    if( rank != eo::mpi::DEFAULT_MASTER )
     {
-        // workers just perform evaluation
-        eoPop<daex::Decomposition> pop;
-        pop_eval( pop, pop ); // Just one call is necessary, as ParallelApply is a MultiJob (see eo doc).
-        timerStat.stop("dae_main");
+        if( ! with_multistart || ( rank >= multistart_workers + 1 ) )
+        {
+            eo::log << eo::progress << "[" << rank << " MPI ROLE ATTRIBUTION] I'll be an eval worker." << std::endl;
+            // eval workers just perform evaluation
+            eoPop<daex::Decomposition> pop;
+            pop_eval( pop, pop ); // Just one call is necessary, as ParallelApply is a MultiJob (see eo doc).
 
-        eo::mpi::Node::comm().send( 0, 0, timerStat );
-
-        return 0;
+            timerStat.stop("dae_main");
+            eo::mpi::Node::comm().send( eo::mpi::DEFAULT_MASTER, 0, timerStat );
+            return 0;
+        }
     }
-# endif
 
-    // a first evaluation of generated pop
-    pop_eval( pop, pop );
+    if( with_multistart && rank != eo::mpi::DEFAULT_MASTER )
+# endif // WITH_MPI
+        // a first evaluation of generated pop
+        pop_eval( pop, pop );
 
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
@@ -299,7 +386,6 @@ int main ( int argc, char* argv[] )
             );
 
     // SELECTION AND VARIATION
-    // daex::MutationDelGoal<daex::Decomposition> delgoal; // FIXME delgoal devrait être un pointeur alloué sur le tas
     daex::MutationDelGoal<daex::Decomposition>* delgoal = new daex::MutationDelGoal<daex::Decomposition>;
     eoGeneralBreeder<daex::Decomposition> & breed = daex::do_make_variation_op<daex::Decomposition>( parser, state, pddl, delgoal );
 
@@ -333,7 +419,8 @@ int main ( int argc, char* argv[] )
     {
         eoPop<daex::Decomposition> tempPop;
         tempPop.push_back( empty_decompo );
-        pop_eval( tempPop, tempPop );
+        if( !with_multistart || rank != eo::mpi::DEFAULT_MASTER )
+            pop_eval( tempPop, tempPop );
     }
 # else // WITH_MPI
     eval( empty_decompo );
@@ -369,6 +456,8 @@ int main ( int argc, char* argv[] )
 
         ~FinallyBlock()
         {
+            if( eo::mpi::Node::comm().rank() != eo::mpi::DEFAULT_MASTER )
+                return;
 
             // push the best result, in case it was not in the last run
             pop.push_back( best );
@@ -461,71 +550,108 @@ int main ( int argc, char* argv[] )
         eoPop<daex::Decomposition>& pop;
         daex::Decomposition & best;
         daex::Decomposition & empty_decompo;
-
     };
 
-    try {
+    try
+    {
         FinallyBlock finallyBlock(
 # ifdef WITH_MPI
-                p_pop_eval,
+            p_pop_eval,
 # endif
-                pop, best, empty_decompo );
-        while( true )
-        {
-#ifndef NDEBUG
-            eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
+            pop, best, empty_decompo );
 
-            // call the checkpoint (log and stats output) on the pop from the init
-            checkpoint( pop );
+# ifdef WITH_MPI
+        if( with_multistart )
+        {
+            // ms stands for multi-start
+            eo::mpi::DynamicAssignmentAlgorithm msAssign( 1, multistart_workers );
+            DaeResetter< daex::Decomposition > resetAlgo( maxgen, pop, eval, steadyfit );
+            eo::mpi::GetRandomSeeds< daex::Decomposition > seeds( eo::rng.rand() );
+            eo::mpi::MultiStartStore< daex::Decomposition > store(
+                dae,
+                eo::mpi::DEFAULT_MASTER,
+                resetAlgo,
+                seeds
+            );
+
+            MultiHandleResponse daeHR;
+            store.wrapHandleResponse( &daeHR );
+
+            eo::mpi::MultiStart< daex::Decomposition > msjob( msAssign, eo::mpi::DEFAULT_MASTER, store, maxruns );
+            eo::log << eo::progress << rank << ") Job created" << std::endl;
+            msjob.run();
+            if( ! msjob.isMaster() )
+            {
+                delete p_pop_eval;
+
+                timerStat.stop("dae_main");
+                eo::mpi::Node::comm().send( eo::mpi::DEFAULT_MASTER, 0, timerStat );
+                return 0;
+            } else
+            {
+                std::cout << "[MASTER] Best solution found has a makespan of " <<
+                    msjob.best_individuals().best_element().plan_copy().makespan() << std::endl;
+            }
+        } else
+# endif // WITH_MPI
+        {
+            while( true )
+            {
+#ifndef NDEBUG
+                eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
+
+                // call the checkpoint (log and stats output) on the pop from the init
+                checkpoint( pop );
 #endif
 
 # ifdef WITH_MPI
-            timerStat.start("main_run");
+                timerStat.start("main_run");
 # endif
-            eo::log << eo::progress;
-            eo::log << "Starting search..." << std::endl;
-            // start a search
-            dae( pop );
-            eo::log << "After dae search..." << std::endl;
+                eo::log << eo::progress;
+                eo::log << "Starting search..." << std::endl;
+                // start a search
+                dae( pop );
+                eo::log << "After dae search..." << std::endl;
 
-            // remember the best of all runs
-            daex::Decomposition best_of_run = pop.best_element();
+                // remember the best of all runs
+                daex::Decomposition best_of_run = pop.best_element();
 
-            // note: operator> is overloaded in EO, don't be afraid: we are minimizing
-            if( best_of_run.fitness() > best.fitness() ) {
-                best = best_of_run;
-            }
+                // note: operator> is overloaded in EO, don't be afraid: we are minimizing
+                if( best_of_run.fitness() > best.fitness() ) {
+                    best = best_of_run;
+                }
 
-            // TODO handle the case when we have several best decomposition with the same fitness but different plans?
-            // TODO use previous searches to re-estimate a better b_max?
+                // TODO handle the case when we have several best decomposition with the same fitness but different plans?
+                // TODO use previous searches to re-estimate a better b_max?
 
-            // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
-            run++;
-            if( run >= maxruns && maxruns != 0 ) {
+                // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
+                run++;
+                if( run >= maxruns && maxruns != 0 ) {
+# ifdef WITH_MPI
+                    timerStat.stop("main_run");
+# endif
+                    break;
+                }
+
+                // Once the bmax is known, there is no need to re-estimate it,
+                // thus we re-init ater the first search, because the pop has already been created before,
+                // when we were trying to estimate the b_max.
+                pop = eoPop<daex::Decomposition>( pop_size, init );
+
+                eo::log << "[Master] After re init of population, evaluating population." << std::endl;
+
+                // evaluate
+                // eoPopLoopEval<daex::Decomposition> pop_eval( eval ); // FIXME useful ??
+                pop_eval( pop, pop );
+
+                // reset run's continuator counters
+                steadyfit.totalGenerations( mingen, steadygen );
+                maxgen.totalGenerations( maxgens );
 # ifdef WITH_MPI
                 timerStat.stop("main_run");
 # endif
-                break;
-            }
-
-            // Once the bmax is known, there is no need to re-estimate it,
-            // thus we re-init ater the first search, because the pop has already been created before,
-            // when we were trying to estimate the b_max.
-            pop = eoPop<daex::Decomposition>( pop_size, init );
-
-            eo::log << "[Master] After re init of population, evaluating population." << std::endl;
-
-            // evaluate
-            // eoPopLoopEval<daex::Decomposition> pop_eval( eval ); // FIXME useful ??
-            pop_eval( pop, pop );
-
-            // reset run's continuator counters
-            steadyfit.totalGenerations( mingen, steadygen );
-            maxgen.totalGenerations( maxgens );
-# ifdef WITH_MPI
-            timerStat.stop("main_run");
-# endif
-        }
+            } // while
+        } // if with multistart
     } catch( std::exception const& e ) {
 #ifndef NDEBUG
             eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
