@@ -591,6 +591,11 @@ int main ( int argc, char* argv[] )
             MultiHandleResponse daeHR;
             store.wrapHandleResponse( &daeHR );
 
+            if( max_seconds > 0 )
+            {
+                store.wrapIsFinished( new daex::IsFinishedBeforeTime< eo::mpi::IsFinishedMultiStart< daex::Decomposition > >( max_seconds ) );
+            }
+
             eo::mpi::MultiStart< daex::Decomposition > msjob( msAssign, eo::mpi::DEFAULT_MASTER, store, maxruns );
             eo::log << eo::progress << rank << ") Job created" << std::endl;
             msjob.run();

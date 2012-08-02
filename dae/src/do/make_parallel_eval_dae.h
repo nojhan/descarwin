@@ -118,7 +118,8 @@ namespace daex
      * Don't forget that once the exception is thrown, the master will wait for the last responses, which could take
      * time. The real termination time could be slightly bigger than the given one.
      */
-    struct IsFinishedBeforeTime : public eo::mpi::IsFinishedParallelApply< daex::Decomposition >
+    template< class IsFinishedJob >
+    struct IsFinishedBeforeTime : public IsFinishedJob
     {
         /**
          * @brief Main ctor
@@ -144,7 +145,7 @@ namespace daex
             {
                 throw eoMaxTimeException( _current );
             }
-            return (*_wrapped)();
+            return (*this->_wrapped)();
         }
 
         protected:
@@ -197,19 +198,22 @@ namespace daex
             eo::mpi::ParallelApplyStore<daex::Decomposition>* store
                 = new eo::mpi::ParallelApplyStore<daex::Decomposition>( eval, masterRank, packet_size );
             // Wrap handle response to include the dump file saving.
-            store->wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
-                        plan_file,
-                        best_makespan,
-                        false,
-                        dump_file_count,
-                        dump_sep,
-                        metadata
-                        )
-                    );
-
-            if( !with_multistart && max_seconds > 0 )
+            if( !with_multistart )
             {
-                store->wrapIsFinished( new IsFinishedBeforeTime( max_seconds ) );
+                store->wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
+                            plan_file,
+                            best_makespan,
+                            false,
+                            dump_file_count,
+                            dump_sep,
+                            metadata
+                            )
+                        );
+
+                if( max_seconds > 0 )
+                {
+                    store->wrapIsFinished( new IsFinishedBeforeTime< eo::mpi::IsFinishedParallelApply< daex::Decomposition > >( max_seconds ) );
+                }
             }
 
             // Add wrappers
