@@ -169,15 +169,28 @@ int main ( int argc, char* argv[] )
     unsigned int multistart_workers = parser.createParam( (unsigned int)0, "multistart-workers", "Number of workers for multi-start", '\0', "Parallelization").value();
     unsigned int eval_workers = parser.createParam( (unsigned int)0, "eval-workers", "Number of evaluators workers for each multi-start worker", '\0', "Parallelization").value();
 
+    // In multistart, we have to check that the number of multi-starters and multi-workers fits the size of the cluster.
     bool with_multistart = false;
     if( multistart_workers > 0 && eval_workers > 0 )
     {
-        if( 1 /* general master */
+        unsigned int maxRank = 1 /* general master */
             + multistart_workers /* multi starters */
             + multistart_workers * eval_workers /* eval for each multi starter */
-            > eo::mpi::Node::comm().size() )
+            ;
+
+        // If there isn't hosts enough, we leave with an exception.
+        if( maxRank > eo::mpi::Node::comm().size() )
         {
             throw std::logic_error("Not enough hosts to launch the process with the given multistart-workers and eval-workers parameters!");
+        }
+
+        // If the current process is an host with the rank higher than the last forecast worker, it leaves with a message.
+        if( rank >= maxRank ) // ranks begin from 0
+        {
+            std::cout << "Warning: process " << rank << " has nothing to do. Leaving." << std::endl;
+            timerStat.stop("dae_main");
+            eo::mpi::Node::comm().send( eo::mpi::DEFAULT_MASTER, 0, timerStat );
+            return 0;
         }
         with_multistart = true;
     }
