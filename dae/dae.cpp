@@ -372,9 +372,9 @@ int main ( int argc, char* argv[] )
     eoCombinedContinue<daex::Decomposition> continuator = daex::do_make_continue_op<daex::Decomposition>( parser, state );
 
     // Direct access to continuators are needed during restarts (see below)
-    eoSteadyFitContinue<daex::Decomposition> & steadyfit 
+    eoSteadyFitContinue<daex::Decomposition> & steadyfit
         = *( dynamic_cast<eoSteadyFitContinue<daex::Decomposition>* >( continuator[0] ) );
-    eoGenContinue<daex::Decomposition> & maxgen 
+    eoGenContinue<daex::Decomposition> & maxgen
         = *( dynamic_cast< eoGenContinue<daex::Decomposition>* >( continuator[1] ) );
 
 
@@ -472,7 +472,8 @@ int main ( int argc, char* argv[] )
             delete p_pop_eval;
             timerStat.stop("dae_main");
 
-            std::ostream & ss = std::cout;
+            std::ofstream fd("stats.log");
+            std::ostream & ss = fd;
 
             // Computes statistics of self.
             typedef std::map<std::string, eoTimerStat::Stat> statsMap;
