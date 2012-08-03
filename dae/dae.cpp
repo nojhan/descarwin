@@ -68,10 +68,10 @@ struct DaeResetter : public eo::mpi::ReuseSamePopEA< EOT >
 {
     DaeResetter( eoCountContinue<EOT>& gen,
                     const eoPop<EOT>& originalPop,
-                    eoEvalFunc<EOT>& eval,
+                    eoPopEvalFunc<EOT>& pop_eval,
                     eoCountContinue<EOT>& steadyfit
                     ) :
-        eo::mpi::ReuseSamePopEA< EOT >( gen, originalPop, eval ),
+        eo::mpi::ReuseSamePopEA< EOT >( gen, originalPop, pop_eval ),
         _steadyfit( steadyfit )
     {}
 
@@ -606,7 +606,7 @@ int main ( int argc, char* argv[] )
         {
             // ms stands for multi-start
             eo::mpi::DynamicAssignmentAlgorithm msAssign( 1, multistart_workers );
-            DaeResetter< daex::Decomposition > resetAlgo( maxgen, pop, eval, steadyfit );
+            DaeResetter< daex::Decomposition > resetAlgo( maxgen, pop, pop_eval, steadyfit );
             eo::mpi::GetRandomSeeds< daex::Decomposition > seeds( eo::rng.rand() );
             eo::mpi::MultiStartStore< daex::Decomposition > store(
                 dae,
