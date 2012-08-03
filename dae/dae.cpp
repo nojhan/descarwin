@@ -271,7 +271,10 @@ int main ( int argc, char* argv[] )
             /* multistart parameters */
             with_multistart,
             eval_master,
-            (with_multistart && rank > 0 ) ? evaluatorsAffectations[ eval_master-1 ] : std::vector<int>() );
+            (with_multistart && rank > 0 ) ? 
+                evaluatorsAffectations[ eval_master-1 ]
+                : evaluatorsAffectations[ 0 ]
+    );
     eoPopEvalFunc<daex::Decomposition>& pop_eval = *p_pop_eval;
 # else
     eoPopLoopEval<daex::Decomposition> pop_eval( eval );
@@ -362,8 +365,7 @@ int main ( int argc, char* argv[] )
     {
         eoPop<daex::Decomposition> tempPop;
         tempPop.push_back( empty_decompo );
-        if( !with_multistart || rank != eo::mpi::DEFAULT_MASTER )
-            pop_eval( tempPop, tempPop );
+        pop_eval( tempPop, tempPop );
     }
 # else // WITH_MPI
     eval( empty_decompo );
