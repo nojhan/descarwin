@@ -75,6 +75,15 @@ struct DaeResetter : public eo::mpi::ReuseSamePopEA< EOT >
         _steadyfit( steadyfit )
     {}
 
+    DaeResetter(eoCountContinue<EOT>& gen,
+                    const eoPop<EOT>& originalPop,
+                    eoEvalFunc<EOT>& eval,
+                    eoCountContinue<EOT>& steadyfit
+                    ) :
+        eo::mpi::ReuseSamePopEA< EOT >( gen, originalPop, eval ),
+        _steadyfit( steadyfit )
+    {}
+
     void operator()( eoPop< EOT >& pop )
     {
         eo::mpi::ReuseSamePopEA< EOT >::operator()( pop );
@@ -181,7 +190,7 @@ int main ( int argc, char* argv[] )
         param_seed.value() = time(0); // EO compatibility fixed by CC on 2010.12.24
     }
 
-    unsigned int seed;
+    unsigned int seed = 0;
 # ifdef WITH_MPI
     // Sending the seed to everyone
     if( rank == eo::mpi::DEFAULT_MASTER )
@@ -606,14 +615,18 @@ int main ( int argc, char* argv[] )
         {
             // ms stands for multi-start
             eo::mpi::DynamicAssignmentAlgorithm msAssign( 1, multistart_workers );
-            DaeResetter< daex::Decomposition > resetAlgo( maxgen, pop, pop_eval, steadyfit );
+            DaeResetter< daex::Decomposition >* resetAlgo =
+                ( rank == eo::mpi::DEFAULT_MASTER ) ?
+                new DaeResetter< daex::Decomposition >( maxgen, pop, eval, steadyfit )
+                : new DaeResetter< daex::Decomposition >( maxgen, pop, pop_eval, steadyfit );
+
             eo::mpi::GetRandomSeeds< daex::Decomposition > seeds( eo::rng.rand() );
             eo::mpi::MultiStartStore< daex::Decomposition > store(
-                dae,
-                eo::mpi::DEFAULT_MASTER,
-                resetAlgo,
-                seeds
-            );
+                    dae,
+                    eo::mpi::DEFAULT_MASTER,
+                    *resetAlgo,
+                    seeds
+                    );
 
             MultiHandleResponse daeHR;
             store.wrapHandleResponse( &daeHR );
