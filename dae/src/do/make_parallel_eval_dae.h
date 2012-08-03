@@ -8,6 +8,8 @@
 # include <string> // std::string
 # include <fstream> // std::ofstream
 
+# include <utils/evalBestPlanDump.h>
+
 namespace daex
 {
     /**
@@ -19,8 +21,7 @@ namespace daex
      * Filename follow the same configuration that the present one in make_eval :
      * <afilename><sep><file_count>
      */
-    template< class T >
-        struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >
+    struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >, public BestPlanDumpper<daex::Decomposition::Fitness>
     {
         /**
          * @brief Main constructor.
@@ -34,51 +35,15 @@ namespace daex
          */
         HandleResponseBestPlanDump(
                 std::string afilename,
-                T worst,
+                daex::Decomposition::Fitness worst,
                 bool single_file = false,
                 unsigned int file_count = 0,
                 std::string sep = ".",
                 std::string metadata = ""
                 ) :
-            _filename( afilename ),
-            best( worst ), // The best at initialization is in fact the worst value we can have.
-            _single_file( single_file ),
-            _file_count( file_count ),
-            _sep( sep ),
-            _metadata( metadata )
+            BestPlanDumpper<daex::Decomposition::Fitness>( afilename, worst, single_file, file_count, sep, metadata )
         {
             // empty
-        }
-
-        // TODO This part is in common with evalBestPlanDump.h
-        void dump( daex::Decomposition & eo )
-        {
-            std::ofstream _of;
-
-            if( _single_file ) {
-                // explicitely erase the file before writing in it
-                _of.open( _filename.c_str(), std::ios_base::out | std::ios_base::trunc );
-
-            } else {
-                std::ostringstream afilename;
-                afilename << _filename << _sep << _file_count;
-                _of.open( afilename.str().c_str() );
-            }
-
-#ifndef NDEBUG
-            if ( !_of.is_open() ) {
-                std::string str = "Error, eoEvalBestFileDump could not open: " + _filename;
-                throw std::runtime_error( str );
-            }
-            _of << IPC_PLAN_COMMENT << _metadata << std::endl;
-            _of << IPC_PLAN_COMMENT << eo << std::endl;
-#endif
-            // here, in release mode, we assume that the file could be opened
-            // thus, we avoid a supplementary test in this costly evaluator
-            _of << eo.plan() << std::endl;
-            _of.close();
-
-            _file_count++;
         }
 
         /**
@@ -95,21 +60,13 @@ namespace daex
             for( int i = 0; i < size; ++i )
             {
                 daex::Decomposition & decompo = _data->table()[ index + i ];
-                if( decompo.is_feasible() && decompo.plan().makespan() < best )
+                if( decompo.is_feasible() && decompo.plan().makespan() < _best )
                 {
-                    best = decompo.plan().makespan() ;
+                    _best = decompo.plan().makespan() ;
                     dump( decompo );
                 }
             }
         }
-
-        protected:
-        std::string _filename;
-        T best;
-        bool _single_file;
-        unsigned int _file_count;
-        std::string _sep;
-        std::string _metadata;
     };
 
     /**
@@ -200,7 +157,7 @@ namespace daex
             // Wrap handle response to include the dump file saving.
             if( !with_multistart )
             {
-                store->wrapHandleResponse( new HandleResponseBestPlanDump<TimeVal>(
+                store->wrapHandleResponse( new HandleResponseBestPlanDump(
                             plan_file,
                             best_makespan,
                             false,
