@@ -36,6 +36,33 @@ struct MultiHandleResponse : public eo::mpi::HandleResponseMultiStart< daex::Dec
     }
 };
 
+struct MultiDumpBestDecompo : public eo::mpi::HandleResponseMultiStart< daex::Decomposition >, public daex::BestPlanDumpper< daex::Decomposition::Fitness >
+{
+    MultiDumpBestDecompo(
+            std::string afilename,
+            daex::Decomposition::Fitness worst,
+            bool single_file = false,
+            unsigned int file_count = 0,
+            std::string sep = ".",
+            std::string metadata = ""
+            )
+        : daex::BestPlanDumpper< daex::Decomposition::Fitness >( afilename, worst, single_file, file_count, sep, metadata)
+    {
+        // empty
+    }
+
+    void operator()( int wrkRank )
+    {
+        (*_wrapped)( wrkRank );
+        daex::Decomposition& last = _data->bests.back();
+        if( last.fitness() > _best )
+        {
+            _best = last.fitness();
+            dump( last );
+        }
+    }
+};
+
 template< class EOT >
 struct DaeResetter : public eo::mpi::ReuseSamePopEA< EOT >
 {
@@ -590,6 +617,15 @@ int main ( int argc, char* argv[] )
 
             MultiHandleResponse daeHR;
             store.wrapHandleResponse( &daeHR );
+            MultiDumpBestDecompo dumpBestDecompo(
+                    plan_file,
+                    best_makespan,
+                    false,
+                    dump_file_count,
+                    dump_sep,
+                    metadata
+                    );
+            store.wrapHandleResponse( &dumpBestDecompo );
 
             if( max_seconds > 0 )
             {
