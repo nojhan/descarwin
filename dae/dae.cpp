@@ -27,15 +27,6 @@
 #include <utils/eoTimer.h>
 
 # ifdef WITH_MPI
-struct MultiHandleResponse : public eo::mpi::HandleResponseMultiStart< daex::Decomposition >
-{
-    void operator()( int wrkRank )
-    {
-        (*_wrapped)( wrkRank );
-        std::cout << "Received a response with fit " << _data->bests.back().fitness() << " ! " << std::endl;
-    }
-};
-
 struct MultiDumpBestDecompo : public eo::mpi::HandleResponseMultiStart< daex::Decomposition >, public daex::BestPlanDumpper< daex::Decomposition::Fitness >
 {
     MultiDumpBestDecompo(
@@ -55,6 +46,8 @@ struct MultiDumpBestDecompo : public eo::mpi::HandleResponseMultiStart< daex::De
     {
         (*_wrapped)( wrkRank );
         daex::Decomposition& last = _data->bests.back();
+
+        eo::log << eo::progress << "[General] Received a response with fit " << _data->bests.back().fitness() << std::endl;
         if( last.fitness() > _best )
         {
             _best = last.fitness();
@@ -207,7 +200,7 @@ int main ( int argc, char* argv[] )
 
     // In multistart, we have to check that the number of multi-starters and multi-workers fits the size of the cluster.
     bool with_multistart = false;
-    if( multistart_workers > 0 && eval_workers > 0 )
+    if( multistart_workers > 0 && eval_workers > 0 && eo::parallel.isEnabled() )
     {
         unsigned int maxRank = 1 /* general master */
             + multistart_workers /* multi starters */
@@ -228,6 +221,7 @@ int main ( int argc, char* argv[] )
             eo::mpi::Node::comm().send( eo::mpi::DEFAULT_MASTER, 0, timerStat );
             return 0;
         }
+
         with_multistart = true;
     }
 # endif // WITH_MPI
@@ -318,6 +312,35 @@ int main ( int argc, char* argv[] )
      * PARALLEL MULTISTART *
      **********************/
 
+    /*
+     * In multistart mode, we need to compute how to map the different hosts to their
+     * roles. The general map is the following:
+     * - 0 ( == eo::mpi::DEFAULT_MASTER ) is the general master, i.e. the master of 
+     *   multi-starts. It's the only process which dumps the best solutions.
+     * - 1 to multistarts_workers (i.e. multistarts_workers processes) : workers of
+     *   multi-starts, master of evaluation. These processes launch the algorithm
+     *   with different seeds and compute the best solutions, that they send to the
+     *   general master.
+     * - multistarts_workers + 1 until rest of the world (i.e.
+     *   multistarts_workers * eval_workers processes) : they perform the evaluations
+     *   for each of the multistart workers.
+     *
+     * If multi-start isn't activated, all processes but general master are evaluators.
+     *
+     * Multistart worker i has eval_workers workers. In the following algorithm, i
+     * stands for the multistart worker's rank, k for a loop index and j is the rank
+     * of the last unaffected worker (which will become an eval_worker). Eval workers'
+     * ranks begin from multistart_workers + 1.
+     *
+     * Eval master stands for the master rank of the evaluation process. If there is no
+     * multistart, it's the default master. When using multi-start, there are 2 ways of
+     * finding it:
+     * - either the current process is a multistart worker, then it is the master of the
+     *   evaluation, and there is the affectation "eval_master = rank" for this case.
+     * - or the current process is an eval worker, then when we're computing the workers
+     *   used for each parallel eval, we can find the rank of the master by comparing
+     *   the current added worker to current process' rank (inner if).
+     */
     int eval_master = eo::mpi::DEFAULT_MASTER;
     std::vector< std::vector<int> > evaluatorsAffectations;
     if( with_multistart )
@@ -337,6 +360,14 @@ int main ( int argc, char* argv[] )
             }
             evaluatorsAffectations.push_back( evaluators );
         }
+    } else
+    {
+        std::vector<int> evaluators;
+        for( int i = 1; i < eo::mpi::Node::comm().size(); ++i )
+        {
+            evaluators.push_back( i );
+        }
+        evaluatorsAffectations.push_back( evaluators );
     }
 # endif
 
@@ -384,25 +415,26 @@ int main ( int argc, char* argv[] )
 # endif // WITH_MPI
 
 # ifdef WITH_MPI
-    if( rank != eo::mpi::DEFAULT_MASTER )
+    /*
+     * This affects the eval workers.
+     * In single start mode, they are the processes which are other than master.
+     * In multi start mode, they are all the processes whose ranks are higher than multistart_workers + 1.
+     */
+    if( ( ! with_multistart && rank != eo::mpi::DEFAULT_MASTER )
+        || ( with_multistart && rank >= multistart_workers + 1) )
     {
-        if( ! with_multistart || ( rank >= multistart_workers + 1 ) )
-        {
-            eo::log << eo::progress << "[" << rank << " MPI ROLE ATTRIBUTION] I'll be an eval worker." << std::endl;
-            // eval workers just perform evaluation
-            eoPop<daex::Decomposition> pop;
-            pop_eval( pop, pop ); // Just one call is necessary, as ParallelApply is a MultiJob (see eo doc).
+        // eval workers just perform evaluation
+        eoPop<daex::Decomposition> pop;
+        pop_eval( pop, pop ); // Just one call is necessary, as ParallelApply is a MultiJob (see eo doc).
 
-            timerStat.stop("dae_main");
-            eo::mpi::Node::comm().send( eo::mpi::DEFAULT_MASTER, 0, timerStat );
-            return 0;
-        }
+        timerStat.stop("dae_main");
+        eo::mpi::Node::comm().send( eo::mpi::DEFAULT_MASTER, 0, timerStat );
+        return 0;
     }
 
-    if( with_multistart && rank != eo::mpi::DEFAULT_MASTER )
 # endif // WITH_MPI
-        // a first evaluation of generated pop
-        pop_eval( pop, pop );
+    // a first evaluation of generated pop
+    pop_eval( pop, pop );
 
 #ifndef NDEBUG
     eo::log << eo::progress << "OK" << std::endl;
@@ -443,7 +475,6 @@ int main ( int argc, char* argv[] )
     unsigned int offsprings = parser.valueOf<unsigned int>("offsprings");
 
     // ALGORITHM
-    // eoEasyEA<daex::Decomposition> dae( checkpoint, eval, breed, replacor, offsprings );
     eoEasyEA<daex::Decomposition> dae( checkpoint, eval, pop_eval, breed, replacor, offsprings );
 
 #ifndef NDEBUG
@@ -505,9 +536,6 @@ int main ( int argc, char* argv[] )
 
         ~FinallyBlock()
         {
-            if( eo::mpi::Node::comm().rank() != eo::mpi::DEFAULT_MASTER )
-                return;
-
             // push the best result, in case it was not in the last run
             pop.push_back( best );
 
@@ -518,9 +546,18 @@ int main ( int argc, char* argv[] )
 #endif
 
 #ifdef WITH_MPI
+            // this part is done by both multistart workers and general master
             delete p_pop_eval;
             timerStat.stop("dae_main");
 
+            // Only multistart workers will do this part
+            if( eo::mpi::Node::comm().rank() != eo::mpi::DEFAULT_MASTER )
+            {
+                eo::mpi::Node::comm().send( eo::mpi::DEFAULT_MASTER, 0, timerStat );
+                return;
+            }
+
+            // Only general master applies this part of catch section, until the end.
             std::ofstream fd("stats.log");
             std::ostream & ss = fd;
 
@@ -613,31 +650,17 @@ int main ( int argc, char* argv[] )
 # ifdef WITH_MPI
         if( with_multistart )
         {
-            // ms stands for multi-start
+            /*
+             * Creation of the multi start job
+             * ms stands for MultiStart.
+             */
             eo::mpi::DynamicAssignmentAlgorithm msAssign( 1, multistart_workers );
-            DaeResetter< daex::Decomposition >* resetAlgo =
-                ( rank == eo::mpi::DEFAULT_MASTER ) ?
-                new DaeResetter< daex::Decomposition >( maxgen, pop, eval, steadyfit )
-                : new DaeResetter< daex::Decomposition >( maxgen, pop, pop_eval, steadyfit );
+            DaeResetter< daex::Decomposition > resetAlgo( maxgen, pop, pop_eval, steadyfit );
 
             eo::mpi::GetRandomSeeds< daex::Decomposition > seeds( eo::rng.rand() );
-            eo::mpi::MultiStartStore< daex::Decomposition > store(
-                    dae,
-                    eo::mpi::DEFAULT_MASTER,
-                    *resetAlgo,
-                    seeds
-                    );
+            eo::mpi::MultiStartStore< daex::Decomposition > store( dae, eo::mpi::DEFAULT_MASTER, resetAlgo, seeds );
 
-            MultiHandleResponse daeHR;
-            store.wrapHandleResponse( &daeHR );
-            MultiDumpBestDecompo dumpBestDecompo(
-                    plan_file,
-                    best_makespan,
-                    false,
-                    dump_file_count,
-                    dump_sep,
-                    metadata
-                    );
+            MultiDumpBestDecompo dumpBestDecompo( plan_file, best_makespan, false, dump_file_count, dump_sep, metadata );
             store.wrapHandleResponse( &dumpBestDecompo );
 
             if( max_seconds > 0 )
@@ -648,16 +671,9 @@ int main ( int argc, char* argv[] )
             eo::mpi::MultiStart< daex::Decomposition > msjob( msAssign, eo::mpi::DEFAULT_MASTER, store, maxruns );
             eo::log << eo::progress << rank << ") Job created" << std::endl;
             msjob.run();
-            if( ! msjob.isMaster() )
+            if( msjob.isMaster() )
             {
-                delete p_pop_eval;
-
-                timerStat.stop("dae_main");
-                eo::mpi::Node::comm().send( eo::mpi::DEFAULT_MASTER, 0, timerStat );
-                return 0;
-            } else
-            {
-                std::cout << "[MASTER] Best solution found has a makespan of " <<
+                std::cout << "[General] Best solution found has a makespan of " <<
                     msjob.best_individuals().best_element().plan_copy().makespan() << std::endl;
             }
         } else

@@ -121,26 +121,21 @@ namespace daex
             std::string & metadata,
             unsigned int max_seconds,
             /* multistart parameters */
-            bool with_multistart,
-            int masterRank,
-            std::vector<int> workers )
+            bool with_multistart,                       // do we use multi start?
+            int masterRank,                             // what is the master rank?
+            const std::vector<int>& workers )           // what are the workers for this parallel eval?
     {
         eoPopEvalFunc<daex::Decomposition>* p_pop_eval;
 
         bool parallelLoopEval = eo::parallel.isEnabled();
-        if( parallelLoopEval )
+        // We should return a parallel evaluation operator if:
+        // - parallel loop eval is activated
+        // and
+        // - in multistart mode, we're not the general master (all the other will use parallel evaluation).
+        if( parallelLoopEval && ( !with_multistart || eo::mpi::Node::comm().rank() != eo::mpi::DEFAULT_MASTER ) )
         {
             // Type of scheduling
             eo::mpi::AssignmentAlgorithm* assign;
-
-            if( ! with_multistart )
-            {
-                workers.clear();
-                for( int i = 1, size = eo::mpi::Node::comm().size(); i < size; ++i )
-                {
-                    workers.push_back( i );
-                }
-            }
 
             if ( eo::parallel.isDynamic() )
             {
@@ -154,9 +149,16 @@ namespace daex
 
             eo::mpi::ParallelApplyStore<daex::Decomposition>* store
                 = new eo::mpi::ParallelApplyStore<daex::Decomposition>( eval, masterRank, packet_size );
-            // Wrap handle response to include the dump file saving.
+
+            // In multistart mode, it's the general master who dumps the solution and stops after a certain amount of
+            // time.
+            // TODO: the master waits for the last responses to come. If a start has a long duration, the program will
+            // leave long after the max_seconds limit. The evaluators should also stop at this time and send their best
+            // solution to master at this moment: this would require an IsFinished handler which sends the solution if
+            // the limit of time is reached.
             if( !with_multistart )
             {
+                // Wrap handle response to include the dump file saving.
                 store->wrapHandleResponse( new HandleResponseBestPlanDump(
                             plan_file,
                             best_makespan,
