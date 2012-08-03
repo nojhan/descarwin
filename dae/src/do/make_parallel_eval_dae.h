@@ -1,16 +1,14 @@
 # ifndef __MAKE_PARALLEL_EVAL_DAE_H__
 # define __MAKE_PARALLEL_EVAL_DAE_H__
 
-# include <mpi/eoMpi.h>
 # include <mpi/eoParallelApply.h>
-# include <mpi/eoTerminateJob.h>
 
 # include <string> // std::string
 # include <fstream> // std::ofstream
 
 # include <utils/evalBestPlanDump.h>
 
-namespace daex
+namespace parallel
 {
     /**
      * @brief Handle response wrapper which saves the best solution's plan into a file, after receving it.
@@ -21,7 +19,7 @@ namespace daex
      * Filename follow the same configuration that the present one in make_eval :
      * <afilename><sep><file_count>
      */
-    struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >, public BestPlanDumpper<daex::Decomposition::Fitness>
+    struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >, public daex::BestPlanDumpper<daex::Decomposition::Fitness>
     {
         /**
          * @brief Main constructor.
@@ -41,7 +39,7 @@ namespace daex
                 std::string sep = ".",
                 std::string metadata = ""
                 ) :
-            BestPlanDumpper<daex::Decomposition::Fitness>( afilename, worst, single_file, file_count, sep, metadata )
+            daex::BestPlanDumpper<daex::Decomposition::Fitness>( afilename, worst, single_file, file_count, sep, metadata )
         {
             // empty
         }
