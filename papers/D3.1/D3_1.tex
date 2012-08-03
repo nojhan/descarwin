@@ -106,14 +106,12 @@ This document provides the description of the multi-objective test suite that ha
 
 \chapter{Introduction}
 \section{Multi-objective planning}
-Most real-world applications are multi-objective by nature. Typical situations in real-life involve some quality criterion associated with some cost -- and quality and cost are always contradictory objectives. In temporal planning for instance, the goal is to minimize the duration of a given plan: the quality is the makespan. But in real life, going fast has a cost, and very often it is possible to decrease the cost only at the expense of the duration. In such situations, the goal of optimization is not to find the best solution: only the decision-maker can decide what is best: going very fast at a very high cost, or going a little slower, but at a much lower cost. The name of the game then becomes {\em multi-objective optimization} and the goal is to provide the decision-maker with the best set of options from which to choose from, what is called Pareto-optimal solutions, i.e. such solutions that no other solution is better on all objectives.
-
-However, very little attention has been paid in the AI Planning community to multi-objective  -- despite the fact that most real-life planning problems are, like other real problems, multi-objective by nature. One reason for that probably comes from the history of planners, that have been derived from AI methods like constraint programming, graph theory, and the like - domains where a single objective is mandatory. As a consequence, even though multi-objective planning problems begin to raise some interest, there exist to-date no benchmark of multi-objective AI planning problems. This is in high contrast with the single-objective case: due to the very high success of the International Planning Competitions (IPC) over the years, a very large body of benchmark problems has been validated and adopted by the whole AI Planning community.
-
+Most real-world applications are multi-objective by nature. Typical situations in real-life involve some quality criterion associated with some cost -- and quality and cost are always contradictory objectives. In temporal planning for instance, the goal is to minimize the duration of a given plan: the quality is the makespan. But in real life, going fast has a cost, and very often it is possible to decrease the cost only at the expense of the duration. In such situations, the goal of optimization is not to find the best solution: only the decision-maker can decide what is best: going very fast at a very high cost, or going a little slower, but at a much lower cost. The name of the game then becomes {\em multi-objective optimization} and the goal is to provide the decision-maker with the best set of options from which to choose from, what is called Pareto-optimal solutions, i.e. such solutions that no other solution is better on all objectives.\\
+However, very little attention has been paid in the AI Planning community to multi-objective  -- despite the fact that most real-life planning problems are, like other real problems, multi-objective by nature. One reason for that probably comes from the history of planners, that have been derived from AI methods like constraint programming, graph theory, and the like - domains where a single objective is mandatory. As a consequence, even though multi-objective planning problems begin to raise some interest, there exist to-date no benchmark of multi-objective AI planning problems. This is in high contrast with the single-objective case: due to the very high success of the International Planning Competitions (IPC) over the years, a very large body of benchmark problems has been validated and adopted by the whole AI Planning community.\\
 One of the goals of the DESCARWIN project is to provide the first bricks of a similar testbed for multi-objective planning optimization -- and this deliverable is a first step in that direction.
 
 \section{Survey of proposed approaches}
-Two different approaches have been used to design a first benchmark suite for multi-objective AI planning. Firstly, starting from a very simple toy problem inspired by the {\tt zeno} logistic domain of all IPCs (probably the most widely used domain, including 30 instances of increasing difficulty), a series of problems have been design, with parameterized complexity, and for which the exact Pareto front can be easily exactly known (at least for the simplest instances). Because the domain pertains to logistic, the first (main?) objective remains the total duration of the resulting plan. A second objective has been introduced, and two different types of objectives have been proposed: a ``cost'', for which every segment of transportation has a given cost, and the total cost is the sum of all costs, and a ``risk'' for which every segment has a given risk, and the total risk is the maximum encountered risk during the execution of the plan.
+Two different approaches have been used to design a first benchmark suite for multi-objective AI planning. Firstly, starting from a very simple toy problem inspired by the {\tt zeno} logistic domain of all IPCs (probably the most widely used domain, including 30 instances of increasing difficulty), a series of problems have been design, with parameterized complexity, and for which the exact Pareto front can be easily exactly known. Because the domain pertains to logistic, the first (main?) objective remains the total duration of the resulting plan. A second objective has been introduced, and two different types of objectives have been proposed: a ``cost'', for which every segment of transportation has a given cost, and the total cost is the sum of all costs, and a ``risk'' for which every segment has a given risk, and the total risk is the maximum encountered risk during the execution of the plan.
 
 Secondly, the huge reservoir of domains that have been carefully tuned over the years by the IPC competitions contains many good candidate domains for ``multi-objectivization``, and based on the semantics of those domains, we have proposed ad hoc extensions of these domains to multi-objective setting.
 
@@ -153,8 +151,6 @@ We will use here a simplified {\tt zeno} domain, where there is no fuel level, n
 \end{verbatim}
 
 
-A given instance must instantiate all variables. The simplest non-trivial instance is symbolically represented on Figure \ref{fig:monoZeno}: it has 3 cities, and 3 persons must be transported from city0 to city2 using 2 planes that are in city0 in the initial state as well. Flights only exist from city0 to city1 and city1 to city2, and have the same duration of 2, not depending on whether the plane is full or empty. The advised reader will rapidly find the non-trivial solution with a total makespan of \ldots 8!
-
 
 \begin{figure}[tb!]
   \begin{center}
@@ -164,6 +160,26 @@ A given instance must instantiate all variables. The simplest non-trivial instan
 \label{fig:monoZeno}
 \end{center}
 \end{figure}
+
+\begin{figure}
+ \begin{center}
+  \parbox{0.5\textwidth}{\tt \footnotesize
+0.0: (fly plane1 city0 city1 person2) [2]\\
+0.0: (fly plane2 city0 city1 person1) [2]\\
+2.0: (fly plane1 city1 city4 person1) [2]\\
+2.0: (flyvide plane2 city1 city0) ~~~~[2]\\
+4.0: (fly plane2 city0 city1 person3) [2]\\
+4.0: (flyvide plane1 city4 city1) ~~~~[2]\\
+6.0: (fly plane1 city1 city4 person2) [2]\\
+6.0: (fly plane2 city1 city4 person3) [2]
+}
+ \end{center}
+\caption{The optimal solution for \MONOZENO3 problem. Starting times of actions are at beginning of the line, duration at end.}
+\label{solMonoZeno3}
+\end{figure}
+
+A given instance must instantiate all variables. The simplest non-trivial instance is symbolically represented on Figure \ref{fig:monoZeno}: it has 3 cities, and 3 persons must be transported from city0 to city2 using 2 planes that are in city0 in the initial state as well. Flights only exist from city0 to city1 and city1 to city2, and have the same duration of 2, not depending on whether the plane is full or empty. The advised reader will rapidly find the non-trivial solution with a total makespan of \ldots 8 (detailed in Figure \ref{solMonoZeno3}).
+
 
 This problem corresponds to the PDDL file containing as initial and final goal the following lines, that are self-explaining.
 \begin{verbatim}
@@ -207,7 +223,39 @@ This section will detail the simple domain for multi-objective temporal planning
 \subsection{The simple multi-objective zenoTravel3 problem}
 In order to turn this problem into a not-too-unrealistic multi-objective problem, there are now 3 possible intermediate cities, with different travel time to the two outer cities (0 and 4 in the example of Figure \ref{fig:multiZeno}), and another objective is added, that is increased when landing on any of the 3 central cities (cities 1 to 3 in the same example). In order to make the objective contradictory, this second objective varies inversely to the first one, being large for city1 that is fast to reach, and small for city3 to where travel takes more time. There are however (at least) two ways to take this objective into account during a complete plan, that lead to two types of problems: In the \MULTIZENO$_{Cost}$, the second objective is similar to a cost, i.e. is increased additively: each plane has to pay the corresponding tax every time it lands one of the taxed cities; In the \MULTIZENO$_{Risk}$, the second objective is similar to a risk, and the maximal value encountered during the complete execution of a plan is to be minimized. 
 
-In both cases however, there are 3 obvious points that belong to the Pareto Front: the solution with minimal makespan described in the single-objective case, going from city0 to city4 through city1, and the similar solutions that use respectively {\tt city2} and {\tt city3} in lieu of {\tt city1}. The values of the makespans are respectively 8, 16 and 24, and the values of the costs are, for each solution, 4 times the value of the single landing tax, and exactly the highest value in case of risk. For the risk case, there is no other point on the Pareto Front, as a single landing on a high-risk city sets the risk of the whole plan to that high risk. For the cost problem, however, there are other points on the Pareto Front, as different cities can be used for the different passengers. For instance, in the case of Figure \ref{fig:multiZeno}, this leads to a Pareto Front made of 5 points, (8,12), (16,8), and (24,4) (going only through {\tt city 1}, {\tt 2} and {\tt 3} respectively), plus (12,10) and (20,6). It should be noted that these two Pareto-optimal solutions, like the 3 first 'elementary' solutions already mentionned, also use some tricky way to use all available resources: 
+In both cases however, there are 3 obvious points that belong to the Pareto Front: the solution with minimal makespan described in the single-objective case, going from city0 to city4 through city1, and the similar solutions that use respectively {\tt city2} and {\tt city3} in lieu of {\tt city1}. The values of the makespans are respectively 8, 16 and 24, and the values of the costs are, for each solution, 4 times the value of the single landing tax, and exactly this value in case of risk. For the risk case, there is no other point on the Pareto Front, as a single landing on a high-risk city sets the risk of the whole plan to that high risk -- and the minimum makespan is then obtained using the single-objective problem limited to this city (as any city with lower makespan would set the risk to a higher value). For the cost problem, however, there are other points on the Pareto Front, as different cities can be used for the different passengers. For instance, in the case of Figure \ref{fig:multiZeno}, this leads to a Pareto Front made of 5 points, (8,12), (16,8), and (24,4) (going only through {\tt city 1}, {\tt 2} and {\tt 3} respectively), plus (12,10) and (20,6). It should be noted that these two Pareto-optimal solutions, like the 3 first 'elementary' solutions already mentionned, also use some tricky way to use all available resources, and no plane is ever left idle in the corresponding plans (see Figure \ref{solMultiZeno3}).
+
+\begin{figure}
+ \begin{tabular}{ll}
+\parbox{.5\textwidth}{\tt \footnotesize
+~0.0: (fly plane2 city0 city1 person2) [2] [3]\\
+~0.0: (fly plane1 city0 city3 person1) [6] [1]\\
+~2.0: (fly plane2 city1 city4 person2) [2] [0]\\
+~4.0: (flyvide plane2 city4 city1)~~~~ [2] [3]\\
+~6.0: (flyvide plane2 city1 city0)~~~~ [2] [0]\\
+~6.0: (fly plane1 city3 city4 person1) [6] [0]\\
+~8.0: (fly plane2 city0 city1 person3) [2] [3]\\
+10.0: (fly plane2 city1 city4 person3) [2] [0]
+}
+&
+\parbox{.5\textwidth}{\tt \footnotesize
+~0.0: (fly plane2 city0 city2 person2) [4] [2]\\
+~0.0: (fly plane1 city0 city3 person1) [6] [1]\\
+~4.0: (flyvide plane2 city2 city0)~~~~ [4] [0]\\
+~6.0: (fly plane1 city3 city4 person1) [6] [0]\\
+~8.0: (fly plane2 city0 city3 person3) [6] [1]\\
+12.0: (flyvide plane1 city4 city2)~~~~ [4] [2]\\
+14.0: (fly plane2 city3 city4 person3) [6] [0]\\
+16.0: (fly plane1 city2 city4 person2) [4] [0]
+}\\
+~\\
+\parbox{.5\textwidth}{\centerline {\em Plan for the (12 10) solution}} &
+\parbox{.5\textwidth}{\centerline {\em Plan for the (20 6) solution}}
+ \end{tabular}
+\caption{The two non-dominated solutions of \MULTIZENO3 problem using 2 different cities.}
+\label{solMultiZeno3}
+\end{figure}
+
 
 \subsection{Multi-objective PDDL files}
 The PDDL files are modified to take into account the second objective. Fortunately, within PDDL 2.0, there already exists a mechanism to handle ''actions with cost`` - one of the recognized types of AI planning problems, in which each action has a cost, and the total cost is to be minimized. This mechanism was used here, hence avoiding the need to redefine any part of the PDDL language.
@@ -261,6 +309,19 @@ Of course, the number of planes could also be increased, but the number of passe
 \subsection{Modifying the shape of the Pareto Front}
 
 Another way to modify the difficulty of the problem without increasing its complexity is to tune the different values of the flight times and the cost/risk at each city. such changes will not modify the number of points on the Pareto Front, but will certainly change its shape in the objective space. For instance, simply modifying the cost $\alpha$ of {\tt city2}, the central city in Figure \ref{fig:multiZeno}, between 1 and 3 (the costs of respectively {\tt city1} and {\tt city3}), the Pareto Front, which is linear for $\alpha=2$ becomes strictly convex for $\alpha < 2$ and strictly concave for $\alpha > 2$, as can be seen on Figure \ref{fig:ParetoFronts}.
+
+\begin{figure}
+ \begin{tabular}{ccc}
+  \includegraphics[width=0.32\textwidth]{zeno9i_Add_Exact-pareto.eps} &
+  \includegraphics[width=0.32\textwidth]{zeno9_Add_Exact-pareto.eps} &
+  \includegraphics[width=0.32\textwidth]{zeno9s_Add_Exact-pareto.eps}\\
+1 1.1 3 &
+1 2 3 &
+1 2.9 3
+ \end{tabular}
+\caption{The exact Pareto Fronts for the \MULTIZENO9 problem for different values of the cost of {\tt city2}}
+\label{zeno9ParetoFronts}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
