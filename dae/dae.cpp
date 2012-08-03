@@ -287,7 +287,7 @@ int main ( int argc, char* argv[] )
      * In multi start mode, they are all the processes whose ranks are higher than multistart_workers + 1.
      */
     if( ( ! with_multistart && rank != eo::mpi::DEFAULT_MASTER )
-        || ( with_multistart && rank >= multistart_workers + 1) )
+        || ( with_multistart && rank >= (int)multistart_workers + 1) )
     {
         // eval workers just perform evaluation
         eoPop<daex::Decomposition> pop;

@@ -34,7 +34,6 @@ daex::Init<EOT> & do_make_init_op( eoParser & parser, eoState & state, daex::pdd
 {
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
-    double b_max_increase_coef = parser.valueOf<double>("bmax-increase-coef");
 
     // l'initialisation se fait en fonction de la liste des dates au plus tot possibles (start time set)
     // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
@@ -172,7 +171,7 @@ unsigned int estimate_bmax_incremental(
 
     bool found = false;
     unsigned int goodguys = 0;
-    unsigned int b_max_in=1, b_max_last;
+    unsigned int b_max_in=1, b_max_last=0;
     EOT empty_decompo;
 
 #ifndef NDEBUG

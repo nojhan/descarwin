@@ -82,7 +82,9 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
     eoEvalFuncCounter<EOT>* eval_counter = new eoEvalFuncCounter<EOT>( *eval_bestfile, "Eval.\t" );
     eval_counter->value( eval_count );
     state.storeFunctor( eval_counter );
-#endif
+# else // NDEBUG
+    eval_count++; // used
+#endif // NDEBUG
     //#endif
 
     // if we do not want to add a time limit, do not add an EvalTime

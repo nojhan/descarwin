@@ -49,8 +49,9 @@ public:
      
      Plan( SolutionPlan * p_plan ) : _makespan(p_plan->makespan), _cost_add(p_plan ->cost_add), _cost_max(p_plan-> cost_max), _search_steps(0), _is_valid(true)
       {   // get the plan representation
-//FIXME OMP DIRTY
+# ifdef WITH_OMP
 #pragma omp critical
+# endif // WITH_OMP
         _plan_rep = plan_to_str( p_plan );
       }
 
