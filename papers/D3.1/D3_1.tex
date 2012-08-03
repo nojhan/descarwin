@@ -218,7 +218,7 @@ Note that the initial goal contains the definitions of the duration (through ''f
 \end{figure}
 
 
-This section will detail the simple domain for multi-objective temporal planning that is described in Figure \ref{fig.instance}. The reader will have by now solved the little puzzle set in previous Section, and found the solution with makespan 8 (flying 2 passengers to {\tt city1}, one plane continues with its passenger to {\tt city2} while the other plane flies back empty to {\tt city0}, the plane in {\tt city2} returns empty to {\tt city1} while the other plane brings the last passenger there, and the goal is reached after both planes bring the two remaining passengers to {\tt city2}). 
+This section will detail the simple domain for multi-objective temporal planning that is described in Figure \ref{fig:multiZeno}. The reader will have by now solved the little puzzle set in previous Section, and found the solution with makespan 8 (flying 2 passengers to {\tt city1}, one plane continues with its passenger to {\tt city2} while the other plane flies back empty to {\tt city0}, the plane in {\tt city2} returns empty to {\tt city1} while the other plane brings the last passenger there, and the goal is reached after both planes bring the two remaining passengers to {\tt city2}). 
 
 \subsection{The simple multi-objective zenoTravel3 problem}
 In order to turn this problem into a not-too-unrealistic multi-objective problem, there are now 3 possible intermediate cities, with different travel time to the two outer cities (0 and 4 in the example of Figure \ref{fig:multiZeno}), and another objective is added, that is increased when landing on any of the 3 central cities (cities 1 to 3 in the same example). In order to make the objective contradictory, this second objective varies inversely to the first one, being large for city1 that is fast to reach, and small for city3 to where travel takes more time. There are however (at least) two ways to take this objective into account during a complete plan, that lead to two types of problems: In the \MULTIZENO$_{Cost}$, the second objective is similar to a cost, i.e. is increased additively: each plane has to pay the corresponding tax every time it lands one of the taxed cities; In the \MULTIZENO$_{Risk}$, the second objective is similar to a risk, and the maximal value encountered during the complete execution of a plan is to be minimized. 
@@ -258,13 +258,19 @@ In both cases however, there are 3 obvious points that belong to the Pareto Fron
 
 
 \subsection{Multi-objective PDDL files}
+\label{PDDL-files}
 The PDDL files are modified to take into account the second objective. Fortunately, within PDDL 2.0, there already exists a mechanism to handle ''actions with cost`` - one of the recognized types of AI planning problems, in which each action has a cost, and the total cost is to be minimized. This mechanism was used here, hence avoiding the need to redefine any part of the PDDL language.
 
 In the domain file, one needs to first indicate in the header that actions will have a cost, with the line
 \begin{verbatim}
   (:requirements :strips :durative-actions :action-costs)
 \end{verbatim}
-Another line is used to indicate how this cost will be computed, using functions {\tt total-cost} to carry the cost along a plan, and function {\tt cityThreat} to compute the local 'cost' or 'risk'. This is done by adding these 2 functions to the function declaration
+Furthermore, the bi-objective metrics is specified in the PDDL problem file with the {\tt metric} directive:
+\begin{verbatim}
+(:metric (and (minimize (total-time)) (minimize (total-cost))))
+\end{verbatim}
+
+Another line in the domain file is used to indicate how the cost/risk will be computed, using functions {\tt total-cost} to carry the cost along a plan, and function {\tt cityThreat} to compute the local 'cost' or 'risk'. This is done by adding these 2 functions to the function declaration
 \begin{verbatim}
   (:functions (citythreat ?x) (timeTerre ?x ?y) (total-cost)
 \end{verbatim}
@@ -285,11 +291,11 @@ In the instance file, the initial state must initialize the {\tt total-cost}, an
     (= (citythreat city4) 0)
 \end{verbatim}
 
-The complete resulting files for zeno3 (i.e. the simplest instance with 3 persons) can be seen in Annex \ref{zenoMultiInstance}, and the corresponding two Pareto fronts are represented on Figure \ref{fig:zeno3Fronts}.
+The complete resulting files for zeno3 (i.e. the simplest instance with 3 persons) can be seen in Annex \ref{zenoMultiInstance}.
 
 \subsection{Cost or Risk?}
 \label{costOrRisk}
-Whether the secondary objective should be considered additive (partial costs are added over the complete plan) or ''maxitive`` (the risk of a plan is the maximum of all risk values encountered when executing an action of the plan) could not have been introduced in PPDL without extending the existing language - and adding new features unilaterally has the poor consequence that your PPDL files are not compatible with other people solvers any more. Hence we have chosen to let the embedded solver handle this: at the moment, the API for YASHP includes a switch between additive and maxitive total-cost.
+Whether the secondary objective should be considered additive (partial costs are added over the complete plan) or ''absorbing`` (the risk of a plan is the maximum of all risk values encountered when executing an action of the plan) could not have been introduced in PPDL without extending the existing language - and adding new features unilaterally has the poor consequence that your PPDL files are not compatible with other people solvers any more. Hence we have chosen to let the embedded solver handle this: at the moment, the API for YASHP includes a switch between additive and absorbing total-cost.
 
 It is also important to note that even though DaE is now multi-objective, the embedded solver remains single-objective, and is not aware that the problem is multi-objective. It can only be told that the objective (to minimize) is the makespan (or the total cost), and to simply propagate the other objective in the end -- which is what is done anyway to compute the overall makespan or cost. So here again, no overhead on the solver's side.
 But this will of course be much more detailed in the next deliverable, together with the results obtained by DaE.
@@ -300,7 +306,7 @@ But this will of course be much more detailed in the next deliverable, together 
 \subsection{Increasing the Complexity}
 There are several ways to make this first simple instance more or less complex. A first possibility is to modify the relative values of the taxes/risks on the central cities: for instance, the two sets of values that have been experimented with in the first experiments with this benchmark are the (3-2-1) case depicted on Figure \ref{fig:multiZeno}, and the (100-10-1) case, somehow representing another extreme of the spectrum of possible values.
 
-A second way is to add passengers. Sticking to bunches of 3 passengers in order to be able to easily derive some obvious Pareto-optimal solutions, it is easy to derive all the solutions for 6 and 9 passengers (see the corresponding Pareto fronts on Figure \ref{fig:zeno6} and \ref{fig:zeno9}).
+A second way is to add passengers. Sticking to bunches of 3 passengers in order to be able to easily derive some obvious Pareto-optimal solutions, it is easy to derive all the solutions for 6 and 9 passengers: these instances will be called \MULTIZENO6 and \MULTIZENO9 in the following.
 
 Finally, the number of central cities can also be increased: this creates more points on the Pareto front, be they plans in which a single city is used for all passengers or plans that use several different cities for different passengers (still using the same trick to ensure no plane ever stays idle).
 
@@ -308,18 +314,18 @@ Of course, the number of planes could also be increased, but the number of passe
 
 \subsection{Modifying the shape of the Pareto Front}
 
-Another way to modify the difficulty of the problem without increasing its complexity is to tune the different values of the flight times and the cost/risk at each city. such changes will not modify the number of points on the Pareto Front, but will certainly change its shape in the objective space. For instance, simply modifying the cost $\alpha$ of {\tt city2}, the central city in Figure \ref{fig:multiZeno}, between 1 and 3 (the costs of respectively {\tt city1} and {\tt city3}), the Pareto Front, which is linear for $\alpha=2$ becomes strictly convex for $\alpha < 2$ and strictly concave for $\alpha > 2$, as can be seen on Figure \ref{fig:ParetoFronts}.
+Another way to modify the difficulty of the problem without increasing its complexity is to tune the different values of the flight times and the cost/risk at each city. such changes will not modify the number of points on the Pareto Front, but will certainly change its shape in the objective space. For instance, simply modifying the cost $\alpha$ of {\tt city2}, the central city in Figure \ref{fig:multiZeno}, between 1 and 3 (the costs of respectively {\tt city1} and {\tt city3}), the Pareto Front, which is linear for $\alpha=2$ becomes strictly convex for $\alpha < 2$ and strictly concave for $\alpha > 2$, as can be seen on Figure \ref{zeno9ParetoFronts}.
 
 \begin{figure}
  \begin{tabular}{ccc}
   \includegraphics[width=0.32\textwidth]{zeno9i_Add_Exact-pareto.eps} &
-  \includegraphics[width=0.32\textwidth]{zeno9_Add_Exact-pareto.eps} &
-  \includegraphics[width=0.32\textwidth]{zeno9s_Add_Exact-pareto.eps}\\
-1 1.1 3 &
-1 2 3 &
-1 2.9 3
+  \includegraphics[width=0.33\textwidth]{zeno9_Add_Exact-pareto.eps} &
+  \includegraphics[width=0.31\textwidth]{zeno9s_Add_Exact-pareto.eps}\\
+cost({\tt city2}) = 1.1 &
+cost({\tt city2}) = 2  &
+cost({\tt city2}) = 2.9 
  \end{tabular}
-\caption{The exact Pareto Fronts for the \MULTIZENO9 problem for different values of the cost of {\tt city2}}
+\caption{The exact Pareto Fronts for the \MULTIZENO9 problem for different values of the cost of {\tt city2} (with cost({\tt city1}) = 1 and cost({\tt city3}) = 3). }
 \label{zeno9ParetoFronts}
 \end{figure}
 
@@ -341,17 +347,7 @@ This section presents the family of benchmark problems that have derived from th
 Two satisficing tracks were open at IPC-7: sequential satisficing, i.e., sequential STRIPS planning in which actions have a cost and the total cost is to me minimized, and temporal satisficing, where actions have a duration and can be run in parallel if all resources are available at the same time -- and the total makespan is to be minimized. 
 Some domains appeared in both tracks, with the same instances (i.e. instances with the same objects), and from these domains, we could generate problems with 2 objectives, the duration (makespan) and the cost (or risk, as in Section \ref{costOrRisk}). Note that domains where action durations or costs were uniformly equal to one were rejected outright.
 
-The domain PPDL files were generated by hand, while the PDDL for the instances were automatically generated by some Python script from both corresponding instances of tht two domains (sequential with costs and temporal).
-
-Syntaxically the two objectives are declared in the domain PDDL file within the {\tt requirements} slot:
-\begin{verbatim}
-(:requirements :typing :durative-actions :action-costs)
-\end{verbatim}
-
-The bi-objective metrics is specified in the PDDL problem file with the {\tt metric} directive:
-\begin{verbatim}
-(:metric (and (minimize (total-time)) (minimize (total-cost))))
-\end{verbatim}
+The domain PPDL files were generated by hand, while the PDDL for the instances were automatically generated by some Python script from both corresponding instances of tht two domains (sequential with costs and temporal) following the specifications described in Section \ref{PDDL-files}.
 
 \subsection{The retained domains}
 Five domains were handled that way: \ELEVATORS, \CREWPLANNING, \FLOORTILE, \OPENSTACKS, and \PARCPRINTER.
