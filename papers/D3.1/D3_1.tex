@@ -14,6 +14,7 @@
 \usepackage{array}
 \usepackage{subfigure}
 \usepackage{lscape}
+\usepackage{url}
 
 \algsetup{indent=1.8em}
 \renewcommand{\algorithmiccomment}[1]{// #1}
@@ -425,6 +426,19 @@ For \CREWPLANNING, \FLOORTILE, and \PARCPRINTER, the existing values of the cost
                (increase (total-cost) (/ 1 60))))
 \end{verbatim}
 
+\subsection{\CREWPLANNING\ domain}
+The Crew Planning Domain is part of the temporal satisficing track of the 6$^{th}$ International Planning Competition (IPC 2008).
+The benchmark stems from a Crew Planning problem for Space Missions faced by the US National Aeronautics and Space Administration\footnote{\url{http://ti.arc.nasa.gov/news/space-mission-crew-planning-domain-model-used}}.
+The domain is based on astronauts working on a space ship. A certain number of research projects has to be completed until a specified deadline. 
+Multiple crew members are available. 
+Each crew member can do only one task at a time. 
+Each crew member has a daily routine: every day he must sleep, eat and exercise.
+However, some activities require additional equipment, which places restrictions on how many crew members can do the corresponding activity at the same time.
+For IPC 2008, the Crew Planning Domain presented the contenders with 30 problem files with increasing complexity. 
+The first problem has only one crew member and a workload of 60\% for one day, while the 30$^{th}$ problem has three crew members working for three days at 100\% load.
+The Crew Planning Domain is represented solely with Boolean predicates.
+As stated above, a crew member can only execute a single action at a time. This is enforced by the predicate {\sc available}. 
+Before a crew member starts a new action, the {\sc available} predicate must have the value true for him. Once an action begins, the predicate is set to false. When the action finishes, the crew member is available once again.
 
 \subsection{\FLOORTILE\ domain}
 A set of robots use different colors to paint patterns in floor tiles. The robots can move around the floor tiles in four directions (up, down, left and right). Robots paint with one color at a time, but can change their spray guns to any available color. However, robots can only paint the tile that is in front (up) and behind (down) them, and once a tile has been painted no robot can stand on it.
