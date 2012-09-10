@@ -103,7 +103,6 @@ extern void print_plan_ipc_anytime(SolutionPlan *plan);
 extern SolutionPlan *plan_save(Action **actions, size_t actions_nb, double search_time);
 extern void plan_free(SolutionPlan *plan);
 extern void compress_plans(bool causals, bool orderings);
-extern Comparison precedes_in_plan(Step **s1, Step **s2);
 extern SolutionPlan *read_plan_from_file(char *filename);
 
 

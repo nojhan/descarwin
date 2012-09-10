@@ -6,8 +6,6 @@
  * Copyright (C) 2005-2011  Vincent Vidal <Vincent.Vidal@onera.fr>
  */
 
-#include <stdio.h>
-#include <gmp.h>
 
 #include "cpt.h"
 #include "options.h"
@@ -406,7 +404,7 @@ static void finalize_structures(void)
     FOR(f, init_state) { set_produces(start_action, f); } EFOR;
   }
 
-  // probl\E9matique avec h2 !!!!
+  // problématique avec h2 !!!!
   if (opt.fluent_mutexes)  {
     FORPAIR(f1, f2, fluents) {
       unset_fmutex(f1, f2);

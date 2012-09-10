@@ -7,18 +7,12 @@
  */
 
 
-
-#include <stdio.h>
-#include <gmp.h>
 #include "cpt.h"
 #include "options.h"
 #include "trace.h"
 #include "structs.h"
-#include "pddl.h"
-#include "structs.h"
-#include "plan.h"
-//#include "branching.h"
 #include "globs.h"
+
 
 /*---------------------------------------------------------------------------*/
 /* Local type definitions                                                    */

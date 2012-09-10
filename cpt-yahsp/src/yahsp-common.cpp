@@ -599,6 +599,16 @@ Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)
   return son;
 }
 
+Comparison precedes_in_plan(Step **s1, Step **s2)
+{
+  Step *a = *s1;
+  Step *b = *s2;
+  LESS(a->init, b->init);
+  LESS(duration(a->action), duration(b->action));
+  LESS(a->action->id, b->action->id);
+  return Equal;
+}
+
 SolutionPlan *create_solution_plan(Node *node)
 {
   SolutionPlan *plan = cpt_calloc(plan, 1);

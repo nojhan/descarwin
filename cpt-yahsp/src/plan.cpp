@@ -99,10 +99,11 @@ void print_plan_ipc_anytime(SolutionPlan *plan)
   fclose(file);
 }
 
-Comparison precedes_in_plan(Step **s1, Step **s2)
+static Comparison precedes_in_plan(Step **s1, Step **s2)
 {
   Step *a = *s1;
   Step *b = *s2;
+  PREFER(precedes(a->action, b->action), !precedes(b->action, a->action));
   LESS(a->init, b->init);
   LESS(duration(a->action), duration(b->action));
   LESS(a->action->id, b->action->id);
@@ -114,6 +115,7 @@ SolutionPlan *plan_save(Action **actions, size_t actions_nb, double search_time)
   SolutionPlan *plan = cpt_calloc(plan, 1);
   plan->search_time = search_time;
   cpt_malloc(plan->steps, actions_nb - 2);
+
   FOR(a, actions) {
     if (a->id > 1) {
       Step *step = cpt_malloc(plan->steps[plan->steps_nb++], 1);

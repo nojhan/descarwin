@@ -10,7 +10,6 @@
 #ifndef BRANCHING_H
 #define BRANCHING_H
 
-#include"globs.h"
 
 extern Causal *last_conflict_candidate;
 EVECTOR(Causal *, last_conflicts);
