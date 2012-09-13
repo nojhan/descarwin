@@ -129,7 +129,8 @@ SolutionPlan *plan_save(Action **actions, size_t actions_nb, double search_time)
       step->init = first_start(a);
       step->end = last_start(a);
       if (pddl_domain->action_costs) {
-	plan->cost_add += duration(a);
+	if (pddl_domain->durative_actions) plan->cost_add += a->cost;
+	else plan->cost_add += duration(a);
 	maximize(plan->cost_max, duration(a));
       }
     }
