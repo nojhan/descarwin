@@ -128,14 +128,16 @@ SolutionPlan *plan_save(Action **actions, size_t actions_nb, double search_time)
 #endif
       step->init = first_start(a);
       step->end = last_start(a);
-      maximize(plan->makespan,  first_start(a) + (opt.pddl21 ? a->rdur.t : duration(a)));
+      if (pddl_domain->action_costs) {
+	plan->cost_add += duration(a);
+	maximize(plan->cost_max, duration(a));
+      }
     }
   } EFOR;
-  if (opt.sequential && pddl_domain->action_costs) plan->makespan = total_plan_cost;
-  //plan->makespan = first_start(end_action);
+  if (!pddl_domain->durative_actions && pddl_domain->action_costs) plan->makespan = plan->cost_add;
   else plan->makespan = first_start(end_action) - (opt.pddl21 ? pddl_domain->precision.t : 0);
   vector_sort(plan->steps, precedes_in_plan);
-
+ 
   FOR(s, plan->steps) { 
     s->causals_nb = s->action->causals_nb;
     cpt_calloc(s->causals, s->causals_nb);
