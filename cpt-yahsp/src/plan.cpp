@@ -99,14 +99,13 @@ void print_plan_ipc_anytime(SolutionPlan *plan)
   fclose(file);
 }
 
-static Comparison precedes_in_plan(Step **s1, Step **s2)
+static Comparison precedes_in_plan(Step *a, Step *b)
 {
-  Step *a = *s1;
-  Step *b = *s2;
   PREFER(precedes(a->action, b->action), !precedes(b->action, a->action));
   LESS(a->init, b->init);
-  LESS(duration(a->action), duration(b->action));
-  LESS(a->action->id, b->action->id);
+  // actions MUST BE LEFT UNORDERED : avoid 2 lines after
+  //LESS(duration(a->action), duration(b->action));
+  //LESS(a->action->id, b->action->id);
   return Equal;
 }
 

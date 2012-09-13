@@ -260,11 +260,11 @@ void compute_h1(Node *node)
 #endif
 }
 
-static inline Comparison cmp_actions(Action **a1, Action **a2)
+static inline Comparison cmp_actions(Action *a1, Action *a2)
 {
-  LESS(get_ainit(*a1), get_ainit(*a2));
-  FOR(f, (*a1)->prec) { if (deletes(*a2, f)) return Better; } EFOR;
-  FOR(f, (*a2)->prec) { if (deletes(*a1, f)) return Worse; } EFOR;
+  LESS(get_ainit(a1), get_ainit(a2));
+  FOR(f, (a1)->prec) { if (deletes(a2, f)) return Better; } EFOR;
+  FOR(f, (a2)->prec) { if (deletes(a1, f)) return Worse; } EFOR;
   return Equal;
 }
 
@@ -599,10 +599,8 @@ Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)
   return son;
 }
 
-Comparison precedes_in_plan(Step **s1, Step **s2)
+Comparison precedes_in_plan(Step *a, Step *b)
 {
-  Step *a = *s1;
-  Step *b = *s2;
   LESS(a->init, b->init);
   LESS(duration(a->action), duration(b->action));
   LESS(a->action->id, b->action->id);

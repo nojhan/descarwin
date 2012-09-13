@@ -122,7 +122,7 @@ struct TimeStruct {
 #define SVECTOR(args...) _mkvector(args, static)
 #define _mkvector(type, name, kw...) kw type *name; kw size_t name##_nb
 #define vector_copy(dest, source) memcpy(cpt_malloc(dest, (dest##_nb = source##_nb)), source, source##_nb * sizeof(typeof(*dest)))
-#define vector_sort(name, cmp_func) qsort(name, name##_nb, sizeof(typeof(*name)), (int (*) (const void *, const void *)) cmp_func)
+#define vector_sort(name, cmp_func) NEST(typeof(name##_nb) _i, _j; bool _loop = true; while (_loop) { _loop = false; for(_i = 0; _i < name##_nb - 1; _i++) for(_j = _i + 1; _j < name##_nb; _j++) if (cmp_func(name[_j], name[_i]) < 0) { _loop = true; exchange(name[_i], name[_j]); } } )
 
 /* Bit arrays */
 

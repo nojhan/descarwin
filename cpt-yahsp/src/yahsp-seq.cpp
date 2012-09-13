@@ -135,7 +135,7 @@ void yahsp_init()
   FOR(f, init_state) { state_add(initial_bitstate, f); } EFOR;
   yahsp_reset();
   cpt_srand(opt.seed);
-  //yahsp_set_optimize_cost();
+  yahsp_set_optimize_length();
   yahsp_set_weight(3);
 }
 
