@@ -286,7 +286,7 @@ PDDLDomain *parse_domain(char *dom_name, char *prob_name)
     predicate_total_time.terms_nb = 0; 
     gdsl_rbtree_insert(domain->predicates_table, &predicate_total_time, &lost_int);
   } else {
-    if (opt.yahsp) opt.sequential = true;
+    if (opt.yahsp || domain->action_costs) opt.sequential = true;
     if (opt.precision) cpt_free(opt.precision); 
     if (opt.precision2) cpt_free(opt.precision2); 
   }
