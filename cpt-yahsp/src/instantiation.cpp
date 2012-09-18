@@ -247,7 +247,7 @@ static void read_actions_from_file(PDDLDomain *domain)
 
 #ifdef RESOURCES
 static bool compute_resource(PDDLDomain *domain, PDDLLitteral *litteral, Action *action, PDDLTerm **params, long params_nb)
-{
+{ 
   Resource *resource = instantiate_resource(domain, litteral->atom, params);
   ResourceLocal *rl;
   mpq_t val_tmp;
@@ -291,6 +291,8 @@ static bool compute_resources(PDDLDomain *domain, PDDLOperator *ope, Action *act
   FOR(litteral, ope->effect) {
     if (atomic(litteral) && function(litteral) && !compute_resource(domain, litteral, action, params, params_nb)) return false;
   } EFOR;
+  if (action->resources_nb == 0) cpt_free(action->resources);
+  else cpt_realloc(action->resources, action->resources_nb);
   return true;
 }
 #endif
@@ -531,14 +533,17 @@ static int compute_duration(const gdsl_element_t e, gdsl_location_t location, vo
   TimeStruct *ts = (TimeStruct *) e;
   PDDLDomain* domain = (PDDLDomain *) user_data;
   mpz_t tmp, tmp2;
-  mpz_init_set(tmp2, mpq_numref(ts->q));
-  mpz_mul(tmp2, tmp2, domain->time_lcm_rat);
-  mpz_init_set(tmp, mpq_denref(ts->q));
-  mpz_mul(tmp, tmp, domain->time_gcd_rat);
-  mpz_cdiv_q(tmp2, tmp2, tmp);
-  ts->t = mpz_get_timeval(tmp2);
-  mpz_clear(tmp2);
-  mpz_clear(tmp);
+  if (mpq_get_d(ts->q) == 0) ts->t = 0; 
+  else {
+    mpz_init_set(tmp2, mpq_numref(ts->q));
+    mpz_mul(tmp2, tmp2, domain->time_lcm_rat);
+    mpz_init_set(tmp, mpq_denref(ts->q));
+    mpz_mul(tmp, tmp, domain->time_gcd_rat);
+    mpz_cdiv_q(tmp2, tmp2, tmp);
+    ts->t = mpz_get_timeval(tmp2);
+    mpz_clear(tmp2);
+    mpz_clear(tmp);
+  }
   return GDSL_MAP_CONT;
 }
 
