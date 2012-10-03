@@ -4,7 +4,7 @@
 #include <functional>   // for less
 #include <string>
 #include "utils/pddl_load.h" 
-#include <utils/eoParserLogger.h> 
+#include <utils/eoParser.h> 
 #include "src_cpt/dae.h" 
 
 
@@ -297,7 +297,7 @@ cout<<" mutexlastquartile "<<thirdquartile;
 int main ( int argc, char* argv[] )
 {
 
-eoParserLogger parser(argc, argv);
+eoParser parser(argc, argv);
 
 std::string domain = parser.createParam( (std::string)"p01-domain.pddl", "domain", "PDDL domain file", 'D', "Problem", true ).value();
 std::string instance = parser.createParam( (std::string)"p01.pddl", "instance", "PDDL instance file", 'I', "Problem", true ).value();
