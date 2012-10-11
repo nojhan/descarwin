@@ -263,8 +263,11 @@ void compute_h1(Node *node)
 static inline Comparison cmp_actions(Action *a1, Action *a2)
 {
   LESS(get_ainit(a1), get_ainit(a2));
-  FOR(f, (a1)->prec) { if (deletes(a2, f)) return Better; } EFOR;
-  FOR(f, (a2)->prec) { if (deletes(a1, f)) return Worse; } EFOR;
+  bool d1 = false;
+  bool d2 = false;
+  FOR(f, (a1)->prec) { if (deletes(a2, f)) { d1 = true; break; } } EFOR;
+  FOR(f, (a2)->prec) { if (deletes(a1, f)) { d2 = true; break; } } EFOR;
+  PREFER(d1, !d2);
   return Equal;
 }
 
@@ -538,6 +541,7 @@ Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)
       }
     }
   } EFOR;
+
   /* FORi(a, i, relaxed_plan) { */
   /*   if (a != NULL && a != end_action) { */
   /*     Fluent *unsat = NULL; */
