@@ -113,9 +113,14 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     // FIXME insérer le compteur et le dump du meilleur plan
 
     // while the pop is largely feasible, try to del goals
-    double feasibility_ratio = 1.0;
+    //    double feasibility_ratio = 1.0;
+
+    unsigned int goodguys_feasible = pop_size;
+    unsigned int goodguys_min = b_max_ratio * pop_size;
+
     daex::MutationDelGoal<EOT> delgoal;
-    while( feasibility_ratio > b_max_ratio )  {
+    //    while( feasibility_ratio > b_max_ratio )  {
+    while( goodguys_feasible > goodguys_min )  {
         unsigned int feasibles = 0;
         for( unsigned int i = 0; i < pop_size; ++i ) {
             delgoal( pop[i] );
@@ -124,10 +129,12 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
                 feasibles++;
             }
         }
-        feasibility_ratio = static_cast<double>(feasibles) / pop_size;
+	//        feasibility_ratio = static_cast<double>(feasibles) / pop_size;
+	goodguys_feasible = feasibles;
 
         unsigned int iters = 0;
-        while( feasibility_ratio < b_max_ratio && iters <= bmax_iters && b_max_in <= b_max_init )  {
+	//        while( feasibility_ratio < b_max_ratio && iters <= bmax_iters && b_max_in <= b_max_init )  {
+        while( goodguys_feasible < goodguys_min && iters <= bmax_iters && b_max_in <= b_max_init )  {
             unsigned int feasibles = 0;
 
             for( unsigned int i = 0; i < pop_size; ++i ) {
@@ -139,9 +146,10 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
             b_max_in= b_max_in * b_max_increase_coef;
             iters++;
-            feasibility_ratio = static_cast<double>(feasibles) / pop_size;
+	    //            feasibility_ratio = static_cast<double>(feasibles) / pop_size;
+	    goodguys_feasible = feasibles;
         }
-    } // while feasibility_ratio > b_max_ratio
+    } // while goodguys_feasible > goodguys_min
 
     eo::log << eo::logging << "After insemination, b_max=" << b_max_in << std::endl;
 
@@ -170,11 +178,13 @@ unsigned int estimate_bmax_incremental(
     unsigned int goodguys = 0;
     unsigned int b_max_in=1, b_max_last;
     EOT empty_decompo;
+    unsigned int goodguys_min = b_max_ratio * popsize;
 
 #ifndef NDEBUG
-    eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax:" << std::endl;
+    eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax with a minimum of " << goodguys_min << " good individuals" << std::endl;
 #endif
-    while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
+    //    while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
+    while( (goodguys < goodguys_min) && (b_max_in < b_max_init) ) {
         goodguys=0;
         b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
