@@ -310,7 +310,7 @@ int main ( int argc, char* argv[] )
 
             // the loop test is here, because if we've reached the number of runs, we do not want to redraw a new pop
             run++;
-            if( run >= maxruns && maxruns != 0 ) {
+            if( run > maxruns && maxruns != 0 ) {
                 break;
             }
 
