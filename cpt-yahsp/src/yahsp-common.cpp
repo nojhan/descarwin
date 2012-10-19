@@ -603,7 +603,7 @@ Node *apply_relaxed_plan(Node *node, TimeVal best_makespan)
   return son;
 }
 
-Comparison precedes_in_plan(Step *a, Step *b)
+static Comparison precedes_in_plan(Step *a, Step *b)
 {
   LESS(a->init, b->init);
   LESS(duration(a->action), duration(b->action));
@@ -632,6 +632,8 @@ SolutionPlan *create_solution_plan(Node *node)
     plan->cost_add += s->action->cost; 
     maximize(plan->cost_max, s->action->cost);
   } EFOR;
+  if (pddl_domain->action_costs && !pddl_domain->durative_actions)
+    plan->makespan = plan->cost_add;
   return plan;
 }
 
@@ -681,6 +683,8 @@ int yahsp_compress_plans()
     plan->cost_add += s->action->cost; 
     maximize(plan->cost_max, s->action->cost);
   } EFOR;
+  if (pddl_domain->action_costs && !pddl_domain->durative_actions)
+    plan->makespan = plan->cost_add;
   return PLAN_FOUND;
 }
 

@@ -69,17 +69,11 @@ void print_plan_ipc(FILE *out, SolutionPlan *plan, double total_time)
   fprintf(out, "; Length %lu\n", plan->length);
   if (pddl_domain->action_costs) {
     fprintf(out, "; TotalCost ");
-#ifdef DAE
     if (pddl_domain->action_costs && pddl_domain->durative_actions) {
       fprintf(out, "%" TIMEP, plan->cost_add);
       fprintf(out, "\n; MaxCost ");
       fprintf(out, "%" TIMEP, plan->cost_max);
-    }
-    else
-      print_time(out, plan->makespan);
-#else
-    print_time(out, plan->makespan);
-#endif
+    } else print_time(out, plan->cost_add);
   } else {
   fprintf(out, "; Makespan ");
   print_time(out, plan->makespan);

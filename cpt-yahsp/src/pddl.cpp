@@ -527,7 +527,7 @@ static void parse_atom(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope
   gdsl_list_free(tokens);
 }
 
-static void parse_atom_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLLitteral ***litterals, size_t *litterals_nb) 
+static void parse_atom_list(PDDLDomain *domain, gdsl_list_t tokens, PDDLOperator *ope, PDDLLitteral ***litterals, size_t *litterals_nb)
 {
   Token *token;
   if (!tokens) return;

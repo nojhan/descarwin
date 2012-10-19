@@ -18,9 +18,6 @@
 #include "preprocess.h"
 #include "scheduling.h"
 #include "yahsp.h"
-#ifdef DAE
-#include "yahsp-dae.h"
-#endif
 #ifdef YAHSP_MPI
 #include "yahsp-mpi.h"
 #endif

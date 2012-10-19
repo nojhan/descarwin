@@ -57,7 +57,7 @@ ADD_DEPENDENCIES(dae daex)
 IF( CPT_WITH_OMP )
     TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 ELSE()
-    TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
 ENDIF()
 
 # only if OpenMP on yahsp is activated
@@ -98,19 +98,19 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
     # Debug without OMP
         ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
         ADD_DEPENDENCIES(test_chronopartition daex)
-        TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+        TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
 
         ADD_EXECUTABLE(test_b_max test_b_max.cpp)
         ADD_DEPENDENCIES(test_b_max daex)
-        TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+        TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
 
         ADD_EXECUTABLE(test_stats test_stats.cpp)
         ADD_DEPENDENCIES(test_stats daex)
-        TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+        TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
 
         ADD_EXECUTABLE(featureselector featureselector.cpp)
         ADD_DEPENDENCIES(featureselector daex)
-        TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common cpt_yahsp_library-dae)
+        TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
     ENDIF()
 ENDIF()
 
