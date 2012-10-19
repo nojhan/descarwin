@@ -30,11 +30,11 @@ public:
     /*!
      * Note: and is not feasible, @see eoDualFitness
      */
-     Decomposition() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}  
+ Decomposition() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}  
 
-     virtual ~Decomposition(){}
+  virtual ~Decomposition(){}
     
-    
+     /*
     Decomposition & operator=(const Decomposition & other){
        if (this != &other) {
              std::list<Goal>::operator=(other);
@@ -47,6 +47,7 @@ public:
         }
         return *this;
     }
+     */
     
      //! After a modification of the decomposition, it needs to be re-evaluated
     //! Variation operator should use this method to indicate it

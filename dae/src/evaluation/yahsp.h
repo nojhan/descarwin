@@ -77,7 +77,6 @@ class daeYahspEval : public daeCptYahspEval<EOT>
     // }
 };
 
-
     virtual ~daeYahspEval(){
   //free( _previous_state );
     //free( _intermediate_goal_state );
@@ -89,9 +88,6 @@ public:
 
 public:
    virtual void  call( EOT & decompo ){
-   
-   
-   
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "decompo.size=" << decompo.size() << std::endl;
                                  #endif

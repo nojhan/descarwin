@@ -6,7 +6,7 @@
 
 namespace daex {
 
-//! Modify decompo1 such that it is a cross-over of the two individuals, the choice of wether the first part comes from a decomposition or the other is made by looking at the earliest start time of the goal chosen as a cut limit.
+//! Modify decompo1 such that it is a cross-over of the two individuals, the choice of whether the first part comes from a decomposition or the other is made by looking at the earliest start time of the goal chosen as a cut limit.
 // Note : this version does not consider if goals are ordered on earliest start times or not
 
 template <class EOT> 
@@ -43,9 +43,9 @@ public:
         }
 
 
-        // TODO soit, comme ici, un reset des sous-plan (donc une éventuelle mutation ne considérera pas comme acquis le sous-plan précédemment évalué), soit autre chose ? (évaluation intermédiaire, min( d1, last_reached ), etc. ). La solution la plus évident parait de séparer le crossover de la mutation : soit l'un soit l'autre, mais pas les deux.
+        // TODO soit, comme ici, un reset des sous-plan (donc une éventuelle mutation ne considérera pas comme acquis le sous-plan précédemment évalué), soit autre chose ? (évaluation intermédiaire, min( d1, last_reached ), etc. ). La solution la plus évidente parait de séparer le crossover de la mutation : soit l'un soit l'autre, mais pas les deux.
         decompo1.plans_sub_reset();
-
+	decompo1.invalidate();
         return true;   
     }
 };
@@ -150,6 +150,7 @@ public:
 
         // TODO soit, comme ici, un reset des sous-plan (donc une éventuelle mutation ne considérera pas comme acquis le sous-plan précédemment évalué), soit autre chose ? (évaluation intermédiaire, min( d1, last_reached ), etc. ). La solution la plus évident parait de séparer le crossover de la mutation : soit l'un soit l'autre, mais pas les deux.
         decompo1.plans_sub_reset();
+	decompo1.invalidate();
         return true;   
     }
 };

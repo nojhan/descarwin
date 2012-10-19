@@ -54,6 +54,7 @@ public:
       }
     
     //! Construct a invalid plan from scratch
+      /*
       Plan  & operator=(const daex::Plan  & other){
        if (this != &other) {
             _makespan = other._makespan;
@@ -65,7 +66,7 @@ public:
         }
         return *this;
     }
-
+      */
 
     void search_steps( unsigned int steps ) { _search_steps = steps; }
     unsigned int search_steps() const { return _search_steps; }

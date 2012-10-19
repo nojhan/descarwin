@@ -294,7 +294,6 @@ int main ( int argc, char* argv[] )
             // call the checkpoint (log and stats output) on the pop from the init
             checkpoint( pop );
 #endif
-
             // start a search
             dae( pop );
 

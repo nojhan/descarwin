@@ -258,7 +258,6 @@ public:
                     decompo.insert( decompo.iter_at( j+1 ), new_goal );
                 }
                 */
-
             } // if last_reached == -1
         //} // if decompo.size == 0
     //} // if decompo.size == _l_max
@@ -279,10 +278,10 @@ public:
     eo::log << " ok" << std::endl;
     */
 #endif
-
+    decompo.invalidate();
     // un goal a été inséré
     return true;
-};
+    };
 
 protected:
 
@@ -396,7 +395,7 @@ protected:
     return random_subset( nomutex( candidate_atoms ) );
 #endif
 
-};
+    };
 
     const ChronoPartition & _times;
 

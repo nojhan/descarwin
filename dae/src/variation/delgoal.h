@@ -38,6 +38,8 @@ public:
         simplePrint( eo::log << eo::xdebug, decompo );
 #endif
 
+	decompo.invalidate();
+
         return true;
   }
 	};

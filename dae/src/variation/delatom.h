@@ -151,7 +151,9 @@ public:
         unsigned int a = rng.random( goal_i->size() );
     
         goal_i->erase( goal_i->iter_at( a ) );
-        
+
+	decompo.invalidate();
+
         return true;
     } // if decompo[i].size == 0
 };

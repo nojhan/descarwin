@@ -55,7 +55,7 @@ void Decomposition::plans_sub_reset()
 
 Decomposition::iterator Decomposition::iter_at( unsigned int i )
 {
-    if( i >= this->size() ) {
+   if( i >= this->size() ) { // FIXME : remplacer par un assert
         std::ostringstream msg;
         msg << "asked for element " << i << " but size of the Decomposition is " << this->size();
         throw( std::out_of_range( msg.str() ) );

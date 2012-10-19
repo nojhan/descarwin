@@ -117,6 +117,7 @@ public:
         eo::log << " ok" << std::endl;
         */
 #endif
+	decompo.invalidate();
         return is_modified;
     }
 
