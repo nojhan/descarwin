@@ -170,7 +170,7 @@ public:
               decompo.fitness(fitness_unfeasible(decompo, previous_state), false);
          decompo.setFeasible(false);
 #else
-              decompo.fitness(fitness_unfeasible_intermediate(decompo));
+              decompo.fitness(this->fitness_unfeasible_intermediate(decompo));
           decompo.setFeasible(false);
 #endif 
               break;
@@ -192,7 +192,7 @@ public:
                     std::cout << decompo.size() << " " << plans_nb << std::endl;
                 */
 
-                decompo.fitness(fitness_feasible( decompo ));
+                decompo.fitness(this->fitness_feasible( decompo ));
         decompo.setFeasible(true);
 
                                  #ifndef NDEBUG
@@ -204,7 +204,7 @@ public:
                 decompo.fitness(fitness_unfeasible(decompo, previous_state));
         decompo.setFeasible(false);
 #else
-                decompo.fitness(fitness_unfeasible_final(decompo) );
+                decompo.fitness(this->fitness_unfeasible_final(decompo) );
         decompo.setFeasible(false);
 #endif 
             } // if PLAN_FOUND for last goal
