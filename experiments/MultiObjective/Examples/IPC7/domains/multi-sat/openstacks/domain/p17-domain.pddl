@@ -17,10 +17,9 @@
 	(next-count ?s ?ns - count)
 )
 
-(:functions (total-cost)
-)
+(:functions (total-cost))
 
-(:action open-new-stack
+(:durative-action open-new-stack
  :duration (= ?duration 31)
  :parameters (?open ?new-open - count)
  :precondition (and (stacks-avail ?open)(next-count ?open ?new-open))
