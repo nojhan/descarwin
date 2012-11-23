@@ -20,6 +20,12 @@
 (:functions (total-cost)
 )
 
+(:action open-new-stack
+ :duration (= ?duration 11)
+ :parameters (?open ?new-open - count)
+ :precondition (and (stacks-avail ?open)(next-count ?open ?new-open))
+ :effect (and (not (stacks-avail ?open))(stacks-avail ?new-open) (increase (total-cost) 1)))
+
 (:durative-action start-order
 :parameters (?o - order ?avail ?new-avail - count)
 :duration (= ?duration 1)

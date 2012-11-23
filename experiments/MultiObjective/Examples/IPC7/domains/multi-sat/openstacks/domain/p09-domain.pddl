@@ -20,7 +20,7 @@
 (:functions (total-cost))
 
 (:action open-new-stack
- :duration (= ?duration 1)
+ :duration (= ?duration 12)
  :parameters (?open ?new-open - count)
  :precondition (and (stacks-avail ?open)(next-count ?open ?new-open))
  :effect (and (not (stacks-avail ?open))(stacks-avail ?new-open) (increase (total-cost) 1)))
