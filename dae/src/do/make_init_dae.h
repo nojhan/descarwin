@@ -66,17 +66,21 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
     eo::log << eo::logging << "Evaluate a first empty plan" << std::endl; 
 
+    //Let's find a feasible plan with default yashp parameter settings
     unsigned int return_code = cpt_basic_search();
     assert( return_code == PLAN_FOUND );
     eo::log << eo::debug << "Found a plan" << std::endl;
 
     eo::log << eo::logging << "Build Adam from the flat plan" << std::endl; 
+
     // get the flat plan from yahsp and build a complete decomposition with it
+    // we expect intermediate goals/states to be present
     Adam yahsp_adam = yahsp_create_adam( solution_plan );
 #ifndef NDEBUG
     eo::log << eo::debug << "YAHSP Adam:" << std::endl;
     yahsp_print_adam( yahsp_adam );
 #endif
+    //Data processing: from Yahsp to dae
     daex::Decomposition adam;
     for( unsigned int i=0; i < yahsp_adam.states_nb; ++i) {
 
@@ -100,6 +104,7 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     unsigned int pop_size = pop.size(); 
     pop.clear(); // FIXME si insémination, ne pas faire l'init plus haut
 
+    //Uniform initialization
     for( unsigned int i = 0; i < pop_size; ++i ) {
         pop.push_back( adam );
     }
@@ -118,38 +123,42 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     unsigned int goodguys_feasible = pop_size;
     unsigned int goodguys_min = b_max_ratio * pop_size;
 
-    daex::MutationDelGoal<EOT> delgoal;
-    //    while( feasibility_ratio > b_max_ratio )  {
-    while( goodguys_feasible > goodguys_min )  {
-        unsigned int feasibles = 0;
-        for( unsigned int i = 0; i < pop_size; ++i ) {
-            delgoal( pop[i] );
-            eval_yahsp( pop[i] );
-            if( pop[i].is_feasible() ) {
-                feasibles++;
-            }
-        }
-	//        feasibility_ratio = static_cast<double>(feasibles) / pop_size;
-	goodguys_feasible = feasibles;
+	daex::MutationDelGoal<EOT> delgoal;
+	//While too many feasible individuals:
+	//	Two steps :
+	//		1) perturbation with goal suppression
+	//  	2) fixing by increasing bmax
+	while (goodguys_feasible > goodguys_min) {
 
-        unsigned int iters = 0;
-	//        while( feasibility_ratio < b_max_ratio && iters <= bmax_iters && b_max_in <= b_max_init )  {
-        while( goodguys_feasible < goodguys_min && iters <= bmax_iters && b_max_in <= b_max_init )  {
-            unsigned int feasibles = 0;
+		//Step 1
+		unsigned int feasibles = 0;
+		for (unsigned int i = 0; i < pop_size; ++i) {
+			delgoal(pop[i]);
+			eval_yahsp(pop[i]);
+			if (pop[i].is_feasible()) {
+				feasibles++;
+			}
+		}
+		goodguys_feasible = feasibles;
 
-            for( unsigned int i = 0; i < pop_size; ++i ) {
-                eval_yahsp( pop[i] );
-                if( pop[i].is_feasible() ) {
-                    feasibles++;
-                }
-            }
+		//Step 2
+		unsigned int iters = 0;
+		while (goodguys_feasible < goodguys_min && iters <= bmax_iters
+				&& b_max_in <= b_max_init) {
+			unsigned int feasibles = 0;
 
-            b_max_in= b_max_in * b_max_increase_coef;
-            iters++;
-	    //            feasibility_ratio = static_cast<double>(feasibles) / pop_size;
-	    goodguys_feasible = feasibles;
-        }
-    } // while goodguys_feasible > goodguys_min
+			for (unsigned int i = 0; i < pop_size; ++i) {
+				eval_yahsp(pop[i]);
+				if (pop[i].is_feasible()) {
+					feasibles++;
+				}
+			}
+
+			b_max_in = b_max_in * b_max_increase_coef;
+			iters++;
+			goodguys_feasible = feasibles;
+		}// while feasible & iter & bmax
+	} // while goodguys_feasible > goodguys_min
 
     eo::log << eo::logging << "After insemination, b_max=" << b_max_in << std::endl;
 
