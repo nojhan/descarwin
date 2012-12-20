@@ -143,10 +143,15 @@ public:
         decompo.b_max(  daeCptYahspEval<EOT>::_b_max_in ); // VV : set b_max for the decomposition
 
         //parcourt les goals de la décomposition ///std::list<daex::Goal>
+		#ifndef NDEBUG
+        	unsigned int goalCounter = 0;
+        #endif
         for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
                                  #ifndef NDEBUG
+        									 eo::log << eo::xdebug << "\t goal #" << goalCounter++ << "/" << decompo.size() << std::endl;
                                              eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
                                              eo::log.flush();
+
                                  #endif
          //  copie des goals daex dans leur equivant YAHSP
 //           nouvelle allocation de tableau de goal
@@ -240,8 +245,11 @@ protected:
     unsigned int return_code = cpt_search( init_state, init_state_nb, next_state, next_state_nb, false, false, false, max_evaluated_nodes );
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "ok" << std::endl;
-                                     eo::log << eo::xdebug << "\t\treturn code: " << return_code << " ";
+                                     eo::log << eo::xdebug << "\t\treturn code : " << return_code << " " << std::endl;
+                                     eo::log << eo::xdebug << "\t\t\t PLAN_FOUND:" <<PLAN_FOUND<<" ; GOALS_MUTEX:"<<GOALS_MUTEX<<" ; INIT_PROP_FAILED:"<<INIT_PROP_FAILED<<" ; BACKTRACK_LIMIT:"<<BACKTRACK_LIMIT<<" ; BOUND_LIMIT:"<<BOUND_LIMIT<<" ; NO_PLAN:"<<NO_PLAN<<std::endl;
+                                     eo::log << eo::xdebug << "\t\t saving search data...";
                                      eo::log.flush();
+
                                  #endif
     if( return_code == NO_PLAN || return_code == GOALS_MUTEX ) {
         step_recorder_fail();
@@ -269,6 +277,7 @@ protected:
 
                                  #ifndef NDEBUG
                                          eo::log << eo::xdebug << "ok" << std::endl;
+                                         eo::log << eo::xdebug << "\t\t # evaluated nodes:" << solution_plan->backtracks << std::endl;
                                          eo::log << eo::xdebug << "\t\trecord steps...";
                                          eo::log.flush();
                                  #endif

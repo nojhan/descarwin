@@ -68,6 +68,7 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
     //Let's find a feasible plan with default yashp parameter settings
     unsigned int return_code = cpt_basic_search();
+    //std::cout << "return_code : " << return_code << std::endl;
     assert( return_code == PLAN_FOUND );
     eo::log << eo::debug << "Found a plan" << std::endl;
 
@@ -76,6 +77,7 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     // get the flat plan from yahsp and build a complete decomposition with it
     // we expect intermediate goals/states to be present
     Adam yahsp_adam = yahsp_create_adam( solution_plan );
+    //std::cout << "solution_plan->backtrack : " << solution_plan->backtracks << std::endl;
 #ifndef NDEBUG
     eo::log << eo::debug << "YAHSP Adam:" << std::endl;
     yahsp_print_adam( yahsp_adam );
@@ -99,6 +101,12 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     yahsp_free_adam(yahsp_adam);
     eo::log << eo::debug << "Adam:" << std::endl << adam << std::endl;
 
+	//daeYahspEval<daex::Decomposition> eval_yahsp(l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    daeYahspEval<daex::Decomposition> eval_yahsp(yahsp_adam.states_nb, solution_plan->backtracks, solution_plan->backtracks, fitness_weight, fitness_penalty );
+    eval_yahsp(adam);
+    //std::cout << "EVAL ADAM : " << adam.is_feasible() << std::endl;
+	assert(adam.is_feasible());
+
     eo::log << eo::logging << "Create a population of Adam" << std::endl; 
     // Remember the pop size before clearing it
     unsigned int pop_size = pop.size(); 
@@ -113,8 +121,7 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     // global parameters
     unsigned int bmax_iters = 10;
 
-    daeYahspEval<daex::Decomposition> eval_yahsp( 
-            l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
+
     // FIXME insérer le compteur et le dump du meilleur plan
 
     // while the pop is largely feasible, try to del goals
@@ -122,12 +129,16 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
     unsigned int goodguys_feasible = pop_size;
     unsigned int goodguys_min = b_max_ratio * pop_size;
-
 	daex::MutationDelGoal<EOT> delgoal;
 	//While too many feasible individuals:
 	//	Two steps :
 	//		1) perturbation with goal suppression
 	//  	2) fixing by increasing bmax
+	//std::cout << "BEFOORE : goodguys_feasible : " << goodguys_feasible << std::endl;
+	for (unsigned int i = 0; i < pop_size; ++i) {
+			eval_yahsp(pop[i]);
+			std::cout << pop[i].is_feasible() << pop[i].fitness();
+		}
 	while (goodguys_feasible > goodguys_min) {
 
 		//Step 1
@@ -140,6 +151,7 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 			}
 		}
 		goodguys_feasible = feasibles;
+		//std::cout << "STEP 1 : goodguys_feasible : " << goodguys_feasible << std::endl;
 
 		//Step 2
 		unsigned int iters = 0;
@@ -158,6 +170,8 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 			iters++;
 			goodguys_feasible = feasibles;
 		}// while feasible & iter & bmax
+		//std::cout << "STEP 2 : goodguys_feasible : " << goodguys_feasible << std::flush;
+		daeYahspEval<daex::Decomposition> eval_yahsp(l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
 	} // while goodguys_feasible > goodguys_min
 
     eo::log << eo::logging << "After insemination, b_max=" << b_max_in << std::endl;
