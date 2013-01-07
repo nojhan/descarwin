@@ -56,6 +56,16 @@
 	b4 - blevel
 	b5 - blevel
 	b6 - blevel
+        b7 - blevel
+	b8 - blevel
+	b9 - blevel
+	b10 - blevel
+	b11 - blevel
+	b12 - blevel
+	b13 - blevel
+	b14 - blevel
+	b15 - blevel
+	b16 - blevel
 
         k0 - klevel
 	k1 - klevel
@@ -165,6 +175,16 @@
 	(next b3 b4)
 	(next b4 b5)
 	(next b5 b6)
+        (next b6 b7)
+	(next b7 b8)
+	(next b8 b9)
+	(next b9 b10)
+	(next b10 b11)
+	(next b11 b12)
+	(next b12 b13)
+	(next b13 b14)
+	(next b14 b15)
+	(next b15 b16)
 
         (next k0 k1)
 	(next k1 k2)

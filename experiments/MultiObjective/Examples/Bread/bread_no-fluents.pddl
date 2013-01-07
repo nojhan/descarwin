@@ -233,7 +233,7 @@
 ;			      )
 ;	)
 
-(:action baking-charcoal-bun: parameters (?k - kitchen ?k1 ?k2 ?k3 - klevel ?c1 ?c2 ?c3 - clevel)
+(:action baking-charcoal-bun :parameters (?k - kitchen ?k1 ?k2 ?k3 - klevel ?c1 ?c2 ?c3 - clevel)
 		:precondition (and (breakfast-bun ?k ?k3) (next ?k1 ?k2) (next ?k2 ?k3)
 			            		 (cooked-bun ?k ?c1) (next ?c1 ?c2) (next ?c2 ?c3))
 		:effect (and (not (breakfast-bun ?k ?k3)) (breakfast-bun ?k ?k1)

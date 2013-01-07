@@ -114,7 +114,6 @@
 	(next c7 c8)
 	(next c8 c9)
 	(next c9 c10)
-	(next c10 c11)
 	
         (next o0 o1)
 	(next o1 o2)

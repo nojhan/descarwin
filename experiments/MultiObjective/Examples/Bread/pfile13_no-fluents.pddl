@@ -160,7 +160,6 @@
 	(next k2 k3)
 	(next k3 k4)
 	(next k4 k5)
-	(next k5 k6)
 
         (next c0 c1)
 	(next c1 c2)
@@ -195,7 +194,6 @@
 	(next o9 o10)
 	(next o10 o11)
 	(next o11 o12)
-	(next o12 o13)
 
 	(ready-to-use machine0)
 	(has-flour kitchen0 f15)
