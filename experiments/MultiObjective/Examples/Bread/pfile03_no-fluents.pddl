@@ -1,8 +1,10 @@
-(define (problem prob03_no-fluents)
+(define (problem prob03_no-fluents) 
 	(:domain bread_no-fluents)
-	(:objects
-		kitchen0 - kitchen
-		machine0 - machine
+
+   (:objects
+	kitchen0 - kitchen
+	machine0 - machine
+
 	f0 - flevel
 	f1 - flevel
 	f2 - flevel
@@ -15,7 +17,7 @@
 	f9 - flevel
 	f10 - flevel
 	
-  m0 - mlevel
+        m0 - mlevel
 	m1 - mlevel
 	m2 - mlevel
 	m3 - mlevel
@@ -37,7 +39,7 @@
 	m19 - mlevel
 	m20 - mlevel
 	
-  d0 - dlevel
+ 	d0 - dlevel
 	d1 - dlevel
 	d2 - dlevel
 	d3 - dlevel
@@ -49,7 +51,7 @@
 	d9 - dlevel
 	d10 - dlevel
 
-  b0 - blevel
+ 	b0 - blevel
 	b1 - blevel
 	b2 - blevel
 	b3 - blevel
@@ -57,7 +59,7 @@
 	b5 - blevel
 	b6 - blevel
 
-  k0 - klevel
+ 	k0 - klevel
 	k1 - klevel
 	k2 - klevel
 	k3 - klevel
@@ -76,12 +78,14 @@
 		
 	c0 - clevel
 	c1 - clevel
-		
+	c2 - clevel
+	
 	o0 - olevel
 	o1 - olevel
-	)
+	o2 - olevel
+   )
 
-	(:init
+   (:init
 	(next f0 f1)
 	(next f1 f2)
 	(next f2 f3)
@@ -93,13 +97,13 @@
 	(next f8 f9)
 	(next f9 f10)
 
-  (next m0 m1)
+  	(next m0 m1)
 	(next m1 m2)
 	(next m2 m3)
 	(next m3 m4)
 	(next m4 m5)
 	(next m5 m6)
-  (next m6 m7)
+  	(next m6 m7)
 	(next m7 m8)
 	(next m8 m9)
 	(next m9 m10)
@@ -114,7 +118,7 @@
 	(next m18 m19)
 	(next m19 m20)
 	
-  (next d0 d1)
+  	(next d0 d1)
 	(next d1 d2)
 	(next d2 d3)
 	(next d3 d4)
@@ -125,20 +129,20 @@
 	(next d8 d9)
 	(next d9 d10)
 	
-  (next b0 b1)
+  	(next b0 b1)
 	(next b1 b2)
 	(next b2 b3)
 	(next b3 b4)
 	(next b4 b5)
 	(next b5 b6)
 
-  (next k0 k1)
+  	(next k0 k1)
 	(next k1 k2)
 	(next k2 k3)
 	(next k3 k4)
 	(next k4 k5)
 	(next k5 k6)
-  (next k6 k7)
+  	(next k6 k7)
 	(next k7 k8)
 	(next k8 k9)
 	(next k9 k10)
@@ -148,30 +152,31 @@
 	(next k13 k14)
 	(next k14 k15)
 
-  (next c0 c1)
+  	(next c0 c1)
+	(next c1 c2)
+
+  	(next o0 o1)
+	(next o1 o2)
+
+	(ready-to-use machine0)
+	(has-flour kitchen0 f4)
+	(ready-mix kitchen0 m0)
+	(ready-dough kitchen0 d0)
+ 	(loaf-bread kitchen0 b0)
+	(breakfast-bun kitchen0 k0)
+	(cooked-bun kitchen0 c0)
+	(cooked-bread kitchen0 o0)
+
+	(= (energy) 0)
+	(= (pollution) 0)
+	(= (labour) 0)
+   )
+   (:goal (and (cooked-bun kitchen0 c2) ; >= cooked-bun are produced by 2 
+	       (cooked-bread kitchen0 o2) ; >= cooked-bread are produced by 2 
+	  ))
 	
-  (next o0 o1)
-	
-		(ready-to-use machine0)
-		(has-flour kitchen0 f4)
-		(ready-mix kitchen0 m0)
-		(ready-dough kitchen0 d0)
-		(loaf-bread kitchen0 b0)
-		(breakfast-bun kitchen0 k0)
-		(cooked-bun kitchen0 c0)
-		(cooked-bread kitchen0 o0)
-		(= (energy) 0)
-		(= (pollution) 0)
-		(= (labour) 0)
-	)
-	(:goal (and
-		 (cooked-bun kitchen0 c1) ; >=
-		 (cooked-bread kitchen0 o1) ; >=
-		)
-	)
-	
-(:metric minimize (energy))
-(:metric minimize (labour))
-(:metric minimize (pollution))
+   (:metric minimize (energy))
+   (:metric minimize (labour))
+   (:metric minimize (pollution))
 
 )

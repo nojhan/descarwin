@@ -56,6 +56,7 @@
 	o3 - olevel
 	o4 - olevel
 	o5 - olevel
+	o6 - olevel
     )
 
     (:init
@@ -105,6 +106,7 @@
 	(next o2 o3)
 	(next o3 o4)
 	(next o4 o5)
+	(next o5 o6)
 
 	(ready-to-use machine0)
 	(has-flour kitchen0 f10)
@@ -121,7 +123,7 @@
     (:goal (and
 	(cooked-bun kitchen0 c10) ; >=
         (breakfast-bun kitchen0 k5) ; >=
-	(cooked-bread kitchen0 o5) ; >=
+	(cooked-bread kitchen0 o6) ; >= >= cooked-bread are produced by 2 
 	(ready-mix kitchen0 m2) ; >=
 	(ready-dough kitchen0 d2) ; >=
 	   )
