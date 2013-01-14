@@ -1,0 +1,122 @@
+Script started on Mon 14 Jan 2013 01:40:52 PM CET
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/floortile]trtp0759>cpt_yahsp -C 100 -W -K0.01,0.01 -o domain/domain-sub.pddl -f problems/ pfile4.pddl[P[1@5
+number of last conflicts : 100
+enable wdeg
+temporal precision : 0.01,0.01
+domain file : domain/domain-sub.pddl
+problem file : problems/pfile5.pddl
+
+Parsing domain.................... done : 0.001          
+Parsing problem................... done : 0.001          
+domain : floor-tile
+problem : pfile5
+Instantiating operators........... done : 0.004          
+Creating initial structures....... done : 0.001          
+Computing bound................... done : 0.000          
+Computing e-deleters.............. done : 0.002          
+Finalizing e-deleters............. done : 0.001          
+Refreshing structures............. done : 0.003          
+Computing distances............... done : 0.009          
+Finalizing structures............. done : 0.001          
+Variables creation................ done : 0.009          
+Bad supporters.................... done : 0.010          
+Distance boosting................. done : 0.000          
+Initial propagations.............. done : 0.003          
+
+Problem : 186 actions, 80 fluents, 436 causals
+          22 init facts, 16 goals
+
+Bound : 10  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 11.74  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 13.48  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 15.22  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 16.96  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 18.7  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 20.44  ---  Nodes : 1  ---  Backtracks : 1  ---  Iteration time : 0.002
+Bound : 22.18  ---  Nodes : 2  ---  Backtracks : 2  ---  Iteration time : 0.003
+Bound : 23.92  ---  Nodes : 3  ---  Backtracks : 3  ---  Iteration time : 0.005
+Bound : 25.66  ---  Nodes : 8  ---  Backtracks : 8  ---  Iteration time : 0.007
+Bound : 27.4  ---  Nodes : 24  ---  Backtracks : 24  ---  Iteration time : 0.016
+Bound : 29.14  ---  Nodes : 50  ---  Backtracks : 50  ---  Iteration time : 0.033
+Bound : 30.88  ---  Nodes : 76  ---  Backtracks : 76  ---  Iteration time : 0.057
+Bound : 32.62  ---  Nodes : 166  ---  Backtracks : 166  ---  Iteration time : 0.146
+Bound : 34.36  ---  Nodes : 769  ---  Backtracks : 769  ---  Iteration time : 0.657
+Bound : 36.1  ---  Nodes : 245  ---  Backtracks : 231  ---  Iteration time : 0.244
+Bound : 35.18  ---  Nodes : 1273  ---  Backtracks : 1273  ---  Iteration time : 1.740
+Bound : 35.59  ---  Nodes : 1155  ---  Backtracks : 1155  ---  Iteration time : 1.217
+Bound : 35.8  ---  Nodes : 1304  ---  Backtracks : 1304  ---  Iteration time : 1.084
+Bound : 35.9  ---  Nodes : 1412  ---  Backtracks : 1412  ---  Iteration time : 1.208
+Bound : 35.95  ---  Nodes : 1291  ---  Backtracks : 1291  ---  Iteration time : 1.114
+Bound : 35.98  ---  Nodes : 1380  ---  Backtracks : 1380  ---  Iteration time : 1.141
+Bound : 35.99  ---  Nodes : 1253  ---  Backtracks : 1253  ---  Iteration time : 1.052
+
+0.00: (change-color robot1 white black) [5] [1]
+0.01: (change-color robot2 black white) [5] [1]
+0.02: (up robot1 tile_1-1 tile_2-1) [3] [3]
+0.03: (up robot2 tile_2-3 tile_3-3) [3] [3]
+3.04: (left robot2 tile_3-3 tile_3-2) [1] [6]
+3.05: (up robot1 tile_2-1 tile_3-1) [3] [3]
+5.06: (paint-up robot2 tile_4-2 tile_3-2 white) [2] [4]
+6.07: (paint-up robot1 tile_4-1 tile_3-1 black) [2] [4]
+7.08: (right robot2 tile_3-2 tile_3-3) [1] [6]
+8.09: (right robot1 tile_3-1 tile_3-2) [1] [6]
+8.10: (right robot2 tile_3-3 tile_3-4) [1] [6]
+9.11: (right robot1 tile_3-2 tile_3-3) [1] [6]
+9.12: (paint-up robot2 tile_4-4 tile_3-4 white) [2] [4]
+10.13: (paint-up robot1 tile_4-3 tile_3-3 black) [2] [4]
+11.14: (down robot2 tile_3-4 tile_2-4) [1] [6]
+12.15: (right robot1 tile_3-3 tile_3-4) [1] [6]
+12.16: (left robot2 tile_2-4 tile_2-3) [1] [6]
+13.17: (paint-up robot2 tile_3-3 tile_2-3 white) [2] [4]
+13.18: (down robot1 tile_3-4 tile_2-4) [1] [6]
+14.19: (paint-up robot1 tile_3-4 tile_2-4 black) [2] [4]
+15.20: (left robot2 tile_2-3 tile_2-2) [1] [6]
+16.21: (left robot1 tile_2-4 tile_2-3) [1] [6]
+16.22: (left robot2 tile_2-2 tile_2-1) [1] [6]
+17.23: (left robot1 tile_2-3 tile_2-2) [1] [6]
+17.24: (paint-up robot2 tile_3-1 tile_2-1 white) [2] [4]
+18.25: (paint-up robot1 tile_3-2 tile_2-2 black) [2] [4]
+19.26: (down robot2 tile_2-1 tile_1-1) [1] [6]
+20.27: (left robot1 tile_2-2 tile_2-1) [1] [6]
+20.28: (right robot2 tile_1-1 tile_1-2) [1] [6]
+21.29: (down robot1 tile_2-1 tile_1-1) [1] [6]
+21.30: (paint-up robot2 tile_2-2 tile_1-2 white) [2] [4]
+22.31: (paint-up robot1 tile_2-1 tile_1-1 black) [2] [4]
+23.32: (right robot2 tile_1-2 tile_1-3) [1] [6]
+24.33: (right robot2 tile_1-3 tile_1-4) [1] [6]
+24.34: (right robot1 tile_1-1 tile_1-2) [1] [6]
+25.35: (right robot1 tile_1-2 tile_1-3) [1] [6]
+25.36: (paint-up robot2 tile_2-4 tile_1-4 white) [2] [4]
+26.37: (paint-up robot1 tile_2-3 tile_1-3 black) [2] [4]
+27.38: (down robot2 tile_1-4 tile_0-4) [1] [6]
+28.39: (right robot1 tile_1-3 tile_1-4) [1] [6]
+28.40: (left robot2 tile_0-4 tile_0-3) [1] [6]
+29.41: (down robot1 tile_1-4 tile_0-4) [1] [6]
+29.42: (paint-up robot2 tile_1-3 tile_0-3 white) [2] [4]
+30.43: (paint-up robot1 tile_1-4 tile_0-4 black) [2] [4]
+31.44: (left robot2 tile_0-3 tile_0-2) [1] [6]
+32.45: (left robot2 tile_0-2 tile_0-1) [1] [6]
+32.46: (left robot1 tile_0-4 tile_0-3) [1] [6]
+33.47: (left robot1 tile_0-3 tile_0-2) [1] [6]
+33.48: (paint-up robot2 tile_1-1 tile_0-1 white) [2] [4]
+34.49: (paint-up robot1 tile_1-2 tile_0-2 black) [2] [4]
+
+Makespan : 36
+Total cost : 2.49
+Length : 50
+Nodes : 10412
+Backtracks : 10398
+Support choices : 3717
+Conflict choices : 6695
+Mutex choices : 0
+Start time choices : 0
+World size : 200K
+Nodes/sec : 1069.689
+Search us time : 9.734
+Search wc time : 9.736
+Total us time : 9.781
+Total wc time : 9.812
+
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/floortile]trtp0759>^Dexit
+
+Script done on Mon 14 Jan 2013 01:41:09 PM CET
