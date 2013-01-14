@@ -1,0 +1,58 @@
+Script started on Mon 14 Jan 2013 02:36:04 PM CET
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/ZenoTravel]louis16.fr.trt.thales>cpt_yahsp -o domain/zenoSimpleTime.pddl -f problems/pfil e2[K3
+domain file : domain/zenoSimpleTime.pddl
+problem file : problems/pfile3
+
+Parsing domain.................... done : 0.001          
+Parsing problem................... done : 0.000          
+domain : zeno-travel
+problem : ztravel-2-4
+Instantiating operators........... done : 0.002          
+Creating initial structures....... done : 0.001          
+Computing bound................... done : 0.000          
+Computing e-deleters.............. done : 0.001          
+Finalizing e-deleters............. done : 0.000          
+Refreshing structures............. done : 0.002          
+Computing distances............... done : 0.010          
+Finalizing structures............. done : 0.000          
+Variables creation................ done : 0.004          
+Bad supporters.................... done : 0.008          
+Distance boosting................. done : 0.001          
+Initial propagations.............. done : 0.005          
+
+Problem : 284 actions, 40 fluents, 569 causals
+          8 init facts, 5 goals
+
+Bound : 250  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 365  ---  Nodes : 4  ---  Backtracks : 1  ---  Iteration time : 0.001
+Bound : 265  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 273  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 277  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 279  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+
+0: (board person1 plane1 city0) [20] [0]
+20: (zoom plane1 city0 city1 fl4 fl3 fl2) [100] [2]
+120: (debark person1 plane1 city1) [30] [0]
+120: (board person3 plane1 city1) [20] [0]
+150: (zoom plane1 city1 city0 fl2 fl1 fl0) [100] [2]
+250: (debark person3 plane1 city0) [30] [0]
+
+Makespan : 280
+Total cost : 4
+Length : 6
+Nodes : 4
+Backtracks : 1
+Support choices : 4
+Conflict choices : 0
+Mutex choices : 0
+Start time choices : 0
+World size : 200K
+Nodes/sec : 879.257
+Search us time : 0.005
+Search wc time : 0.005
+Total us time : 0.040
+Total wc time : 0.070
+
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/ZenoTravel]louis16.fr.trt.thales>^Dexit
+
+Script done on Mon 14 Jan 2013 02:36:16 PM CET

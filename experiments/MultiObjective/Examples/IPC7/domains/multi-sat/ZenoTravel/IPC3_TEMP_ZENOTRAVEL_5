@@ -1,0 +1,64 @@
+Script started on Mon 14 Jan 2013 02:36:30 PM CET
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/ZenoTravel]louis16.fr.trt.thales>cpt_yahsp -o domain/zenoSimpleTime.pddl -f problems/pfil e4[K5
+domain file : domain/zenoSimpleTime.pddl
+problem file : problems/pfile5
+
+Parsing domain.................... done : 0.001          
+Parsing problem................... done : 0.000          
+domain : zeno-travel
+problem : ztravel-2-4
+Instantiating operators........... done : 0.004          
+Creating initial structures....... done : 0.001          
+Computing bound................... done : 0.000          
+Computing e-deleters.............. done : 0.002          
+Finalizing e-deleters............. done : 0.001          
+Refreshing structures............. done : 0.006          
+Computing distances............... done : 0.027          
+Finalizing structures............. done : 0.001          
+Variables creation................ done : 0.005          
+Bad supporters.................... done : 0.020          
+Distance boosting................. done : 0.002          
+Initial propagations.............. done : 0.013          
+
+Problem : 466 actions, 46 fluents, 932 causals
+          8 init facts, 4 goals
+
+Bound : 250  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.002
+Bound : 370  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.001
+Bound : 490  ---  Nodes : 6  ---  Backtracks : 0  ---  Iteration time : 0.004
+Bound : 385  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.002
+Bound : 393  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.002
+Bound : 397  ---  Nodes : 2  ---  Backtracks : 2  ---  Iteration time : 0.002
+Bound : 399  ---  Nodes : 2  ---  Backtracks : 2  ---  Iteration time : 0.002
+
+0: (board person4 plane1 city1) [20] [0]
+20: (zoom plane1 city1 city0 fl6 fl5 fl4) [100] [2]
+120: (board person3 plane1 city0) [20] [0]
+120: (board person2 plane1 city0) [20] [0]
+140: (zoom plane1 city0 city3 fl4 fl3 fl2) [100] [2]
+240: (debark person3 plane1 city3) [30] [0]
+240: (debark person2 plane1 city3) [30] [0]
+240: (debark person4 plane1 city3) [30] [0]
+240: (board person1 plane1 city3) [20] [0]
+270: (zoom plane1 city3 city2 fl2 fl1 fl0) [100] [2]
+370: (debark person1 plane1 city2) [30] [0]
+
+Makespan : 400
+Total cost : 6
+Length : 11
+Nodes : 10
+Backtracks : 4
+Support choices : 9
+Conflict choices : 1
+Mutex choices : 0
+Start time choices : 0
+World size : 500K
+Nodes/sec : 616.762
+Search us time : 0.016
+Search wc time : 0.016
+Total us time : 0.101
+Total wc time : 0.118
+
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/ZenoTravel]louis16.fr.trt.thales>^Dexit
+
+Script done on Mon 14 Jan 2013 02:36:36 PM CET

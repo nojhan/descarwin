@@ -1,0 +1,64 @@
+Script started on Mon 14 Jan 2013 02:35:49 PM CET
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/ZenoTravel]louis16.fr.trt.thales>cpt_yahsp -o domain/zenoSimpleTime.pddl -f problems/pfil e1[K2
+domain file : domain/zenoSimpleTime.pddl
+problem file : problems/pfile2
+
+Parsing domain.................... done : 0.001          
+Parsing problem................... done : 0.000          
+domain : zeno-travel
+problem : ztravel-1-3
+Instantiating operators........... done : 0.001          
+Creating initial structures....... done : 0.000          
+Computing bound................... done : 0.000          
+Computing e-deleters.............. done : 0.000          
+Finalizing e-deleters............. done : 0.000          
+Refreshing structures............. done : 0.001          
+Computing distances............... done : 0.003          
+Finalizing structures............. done : 0.000          
+Variables creation................ done : 0.003          
+Bad supporters.................... done : 0.001          
+Distance boosting................. done : 0.000          
+Initial propagations.............. done : 0.002          
+
+Problem : 131 actions, 18 fluents, 261 causals
+          4 init facts, 3 goals
+
+Bound : 350  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.000
+Bound : 472  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.000
+Bound : 594  ---  Nodes : 10  ---  Backtracks : 8  ---  Iteration time : 0.001
+Bound : 532  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.000
+Bound : 562  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.000
+Bound : 577  ---  Nodes : 2  ---  Backtracks : 2  ---  Iteration time : 0.001
+Bound : 585  ---  Nodes : 2  ---  Backtracks : 2  ---  Iteration time : 0.001
+Bound : 589  ---  Nodes : 2  ---  Backtracks : 2  ---  Iteration time : 0.001
+Bound : 591  ---  Nodes : 2  ---  Backtracks : 2  ---  Iteration time : 0.001
+
+0: (refuel plane1 city0 fl2 fl3) [73] [0]
+73: (zoom plane1 city0 city2 fl3 fl2 fl1) [100] [2]
+173: (board person1 plane1 city2) [20] [0]
+173: (refuel plane1 city2 fl1 fl2) [73] [0]
+246: (zoom plane1 city2 city1 fl2 fl1 fl0) [100] [2]
+346: (refuel plane1 city1 fl0 fl1) [73] [0]
+346: (debark person1 plane1 city1) [30] [0]
+419: (refuel plane1 city1 fl1 fl2) [73] [0]
+492: (zoom plane1 city1 city2 fl2 fl1 fl0) [100] [2]
+
+Makespan : 592
+Total cost : 6
+Length : 9
+Nodes : 18
+Backtracks : 16
+Support choices : 18
+Conflict choices : 0
+Mutex choices : 0
+Start time choices : 0
+World size : 100K
+Nodes/sec : 2847.235
+Search us time : 0.006
+Search wc time : 0.006
+Total us time : 0.019
+Total wc time : 0.035
+
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/ZenoTravel]louis16.fr.trt.thales>^Dexit
+
+Script done on Mon 14 Jan 2013 02:36:00 PM CET
