@@ -33,8 +33,9 @@
  :effect (and (at start (not (at ?a ?c1)))
               (at end (at ?a ?c2))
               (at end (not (fuel-level ?a ?l1)))
-              (at end (fuel-level ?a ?l2)))) 
-                                  
+              (at end (fuel-level ?a ?l2))
+              (increase (total-cost) 1)))
+
 (:durative-action zoom
  :parameters (?a - aircraft ?c1 ?c2 - city ?l1 ?l2 ?l3 - flevel)
  :duration (= ?duration 100)
@@ -47,8 +48,7 @@
               (at end (at ?a ?c2))
               (at end (not (fuel-level ?a ?l1)))
               (at end (fuel-level ?a ?l3))
-	)
-) 
+              (increase (total-cost) 2)))
 
 (:durative-action refuel
  :parameters (?a - aircraft ?c - city ?l - flevel ?l1 - flevel)
@@ -56,8 +56,6 @@
  :condition (and (at start (fuel-level ?a ?l))
                  (at start (next ?l ?l1))
                  (over all (at ?a ?c)))
- :effect (and (at end (fuel-level ?a ?l1)) (at end (not (fuel-level ?a ?l)))
-              (increase (total-cost) 13)))
-
+ :effect (and (at end (fuel-level ?a ?l1)) (at end (not (fuel-level ?a ?l)))))
 
 )
