@@ -24,7 +24,9 @@
   		  (over all (available-color ?c2)))
   :effect (and (at start (not (robot-has ?r ?c)))
   	       (at end (robot-has ?r ?c2))
-               (increase (total-cost) (- 6 5))))
+;               (increase (total-cost) (- 6 5))))
+               (at start (increase (total-cost) (- 6 5)))))
+
 
 (:durative-action paint-up
   :parameters (?r - robot ?y - tile ?x - tile ?c - color)
@@ -35,7 +37,8 @@
 		  (at start (clear ?y)))
   :effect (and (at start (not (clear ?y)))
   	       (at end (painted ?y ?c))
-               (increase (total-cost) (- 6 2))))
+;               (increase (total-cost) (- 6 2))))
+               (at start (increase (total-cost) (- 6 2)))))
 
 (:durative-action paint-down
   :parameters (?r - robot ?y - tile ?x - tile ?c - color)
@@ -46,7 +49,8 @@
 		  (at start (clear ?y)))
   :effect (and (at start (not (clear ?y)))
   	       (at end (painted ?y ?c))
-               (increase (total-cost) (- 6 2))))
+;               (increase (total-cost) (- 6 2))))
+               (at start (increase (total-cost) (- 6 2)))))
 
 
 (:durative-action up 
@@ -60,7 +64,8 @@
 	       (at end (robot-at ?r ?y))
 	       (at start (not (clear ?y)))
                (at end (clear ?x))
-               (increase (total-cost) (- 6 3))))
+;               (increase (total-cost) (- 6 3))))
+               (at start (increase (total-cost) (- 6 3)))))
 
 (:durative-action down 
   :parameters (?r - robot ?x - tile ?y - tile)
@@ -72,7 +77,8 @@
   	       (at end (robot-at ?r ?y))
 	       (at start (not (clear ?y)))
                (at end (clear ?x))
-               (increase (total-cost) 6)))
+;               (increase (total-cost) 6)))
+               (at start (increase (total-cost) 6))))
 
 (:durative-action right 
   :parameters (?r - robot ?x - tile ?y - tile)
@@ -84,7 +90,8 @@
   	       (at end (robot-at ?r ?y))
 	       (at start (not (clear ?y)))
                (at end (clear ?x))
-               (increase (total-cost) 6)))
+;               (increase (total-cost) 6)))
+               (at start (increase (total-cost) 6))))
 
 (:durative-action left 
   :parameters (?r - robot ?x - tile ?y - tile)
@@ -96,5 +103,7 @@
   	       (at end (robot-at ?r ?y))
 	       (at start (not (clear ?y)))
                (at end (clear ?x))
-               (increase (total-cost) 6)))
+;               (increase (total-cost) 6)))
+               (at start (increase (total-cost) 6))))
+
 )
