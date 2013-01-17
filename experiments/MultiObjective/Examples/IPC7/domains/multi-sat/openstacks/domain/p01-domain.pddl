@@ -20,10 +20,10 @@
 (:functions (total-cost))
 
 (:durative-action open-new-stack
- :duration (= ?duration 20)
- :parameters (?open ?new-open - count)
- :precondition (and (stacks-avail ?open)(next-count ?open ?new-open))
- :effect (and (not (stacks-avail ?open))(stacks-avail ?new-open) (increase (total-cost) 1)))
+:parameters (?open ?new-open - count)
+:duration (= ?duration 20)
+ :condition (and (at start (stacks-avail ?open)) (at start (next-count ?open ?new-open)))
+ :effect (and (at start (not (stacks-avail ?open))) (at end (stacks-avail ?new-open)) (at end (increase (total-cost) 1))))
 
 (:durative-action start-order
 :parameters (?o - order ?avail ?new-avail - count)
