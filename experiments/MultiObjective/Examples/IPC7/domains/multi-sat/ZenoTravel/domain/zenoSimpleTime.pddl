@@ -34,7 +34,7 @@
               (at end (at ?a ?c2))
               (at end (not (fuel-level ?a ?l1)))
               (at end (fuel-level ?a ?l2))
-              (increase (total-cost) 1)))
+              (at start (increase (total-cost) 1))))
 
 (:durative-action zoom
  :parameters (?a - aircraft ?c1 ?c2 - city ?l1 ?l2 ?l3 - flevel)
@@ -48,7 +48,7 @@
               (at end (at ?a ?c2))
               (at end (not (fuel-level ?a ?l1)))
               (at end (fuel-level ?a ?l3))
-              (increase (total-cost) 2)))
+              (at start (increase (total-cost) 2))))
 
 (:durative-action refuel
  :parameters (?a - aircraft ?c - city ?l - flevel ?l1 - flevel)

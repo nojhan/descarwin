@@ -17,11 +17,11 @@
 	(next ?n1 - count ?n2 - count)
 )
 
-(:functions (total-cost) 
-            (travel-slow-cost ?f1 - count ?f2 - count) 
-            (travel-fast-cost ?f1 - count ?f2 - count)  
-            (travel-slow-temp ?f1 - count ?f2 - count) 
-            (travel-fast-temp ?f1 - count ?f2 - count)  
+(:functions (total-cost)
+            (travel-slow-cost ?f1 - count ?f2 - count)
+            (travel-fast-cost ?f1 - count ?f2 - count)
+            (travel-slow-temp ?f1 - count ?f2 - count)
+            (travel-fast-temp ?f1 - count ?f2 - count)
 )
 
 (:durative-action move-up-slow

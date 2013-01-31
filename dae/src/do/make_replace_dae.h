@@ -54,7 +54,10 @@ eoReplacement<EOT> & do_make_replace_op( eoParser & parser, eoState & state )
     // // the full MergeReduce object
     // eoMergeReduce<EOT> mergeReduce (*pt_merge, *pt_reduce);
 
-    eoReplacement<EOT> * mergeReduce = new eoEPReplacement<EOT>(replaceTourSize);
+    eoReplacement<EOT> * mergeReduce = new eoCommaReplacement<EOT>(); // idem à comma et replaceTourSize == 1
+
+
+    //   eoReplacement<EOT> * mergeReduce = new eoEPReplacement<EOT>(replaceTourSize);
     state.storeFunctor( mergeReduce );
 
     // Now the weak elitism

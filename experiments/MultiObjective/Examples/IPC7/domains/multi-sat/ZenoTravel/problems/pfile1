@@ -34,5 +34,6 @@
 	))
 
 (:metric (and (minimize (total-time)) (minimize (total-cost))))
+;(:metric minimize (total-time))
 
 )

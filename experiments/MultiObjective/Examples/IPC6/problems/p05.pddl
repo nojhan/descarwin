@@ -49,18 +49,18 @@ slow0-0 slow1-0 - slow-elevator
 (passenger-at p6 n0)
 (passenger-at p7 n8)
 
-(= (travel-slow-time n0 n1) 12) (= (travel-slow-time n0 n2) 20) (= (travel-slow-time n0 n3) 28) (= (travel-slow-time n0 n4) 36) (= (travel-slow-time n1 n2) 12) (= (travel-slow-time n1 n3) 20) (= (travel-slow-time n1 n4) 28) (= (travel-slow-time n2 n3) 12) (= (travel-slow-time n2 n4) 20) (= (travel-slow-time n3 n4) 12) 
+(= (travel-slow-temp n0 n1) 12) (= (travel-slow-temp n0 n2) 20) (= (travel-slow-temp n0 n3) 28) (= (travel-slow-temp n0 n4) 36) (= (travel-slow-temp n1 n2) 12) (= (travel-slow-temp n1 n3) 20) (= (travel-slow-temp n1 n4) 28) (= (travel-slow-temp n2 n3) 12) (= (travel-slow-temp n2 n4) 20) (= (travel-slow-temp n3 n4) 12) 
 
-(= (travel-slow-time n4 n5) 12) (= (travel-slow-time n4 n6) 20) (= (travel-slow-time n4 n7) 28) (= (travel-slow-time n4 n8) 36) (= (travel-slow-time n5 n6) 12) (= (travel-slow-time n5 n7) 20) (= (travel-slow-time n5 n8) 28) (= (travel-slow-time n6 n7) 12) (= (travel-slow-time n6 n8) 20) (= (travel-slow-time n7 n8) 12) 
+(= (travel-slow-temp n4 n5) 12) (= (travel-slow-temp n4 n6) 20) (= (travel-slow-temp n4 n7) 28) (= (travel-slow-temp n4 n8) 36) (= (travel-slow-temp n5 n6) 12) (= (travel-slow-temp n5 n7) 20) (= (travel-slow-temp n5 n8) 28) (= (travel-slow-temp n6 n7) 12) (= (travel-slow-temp n6 n8) 20) (= (travel-slow-temp n7 n8) 12) 
 
 
-(= (travel-fast-time n0 n2) 11) (= (travel-fast-time n0 n4) 13) (= (travel-fast-time n0 n6) 15) (= (travel-fast-time n0 n8) 17) 
+(= (travel-fast-temp n0 n2) 11) (= (travel-fast-temp n0 n4) 13) (= (travel-fast-temp n0 n6) 15) (= (travel-fast-temp n0 n8) 17) 
 
-(= (travel-fast-time n2 n4) 11) (= (travel-fast-time n2 n6) 13) (= (travel-fast-time n2 n8) 15) 
+(= (travel-fast-temp n2 n4) 11) (= (travel-fast-temp n2 n6) 13) (= (travel-fast-temp n2 n8) 15) 
 
-(= (travel-fast-time n4 n6) 11) (= (travel-fast-time n4 n8) 13) 
+(= (travel-fast-temp n4 n6) 11) (= (travel-fast-temp n4 n8) 13) 
 
-(= (travel-fast-time n6 n8) 11) 
+(= (travel-fast-temp n6 n8) 11) 
 
 (= (travel-slow-cost n0 n1) 6) (= (travel-slow-cost n0 n2) 7) (= (travel-slow-cost n0 n3) 8) (= (travel-slow-cost n0 n4) 9) (= (travel-slow-cost n1 n2) 6) (= (travel-slow-cost n1 n3) 7) (= (travel-slow-cost n1 n4) 8) (= (travel-slow-cost n2 n3) 6) (= (travel-slow-cost n2 n4) 7) (= (travel-slow-cost n3 n4) 6) 
 

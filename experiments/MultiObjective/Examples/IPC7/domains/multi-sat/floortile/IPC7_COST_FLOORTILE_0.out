@@ -1,5 +1,5 @@
 Script started on Thu 17 Jan 2013 11:03:21 AM CET
-[/tools/fast-downward/src]louis15.fr.trt.thales>./plan-ipc seq-opt-fdss-1 floortile/domainCost/domain-sub.pddl floortile/problemsCost/pfile0.pddl floortile/IPC7_COST_FLOORTILE_0.sol
+[/tools/fast-downward/src]louis15.fr.trt.thales>./plan-ipc seq-opt-fdss-1 floortile/domainCost/domain-sub.pddl floortile/problemsCost/pfile0.pddl floortile/IPC7_COST_FLOORTILE_0.sol
 1. Running translator
 Second argument is a file name: use two translator arguments.
 Parsing... [0.000s CPU, 0.004s wall-clock]
