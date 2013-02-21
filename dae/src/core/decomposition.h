@@ -20,7 +20,8 @@ namespace daex
 {
 
 //! A decomposition is a list of Goal objects, and we are trying to minimize a scalar fitness (e.g. time or number of actions)
-class Decomposition : public std::list<Goal>,  public EO< eoMinimizingFitness >
+template<class G>
+class DecompositionBase : public std::list<G> //,  public EO< eoMinimizingFitness >
 {
 public:
 
@@ -30,10 +31,10 @@ public:
     /*!
      * Note: and is not feasible, @see eoDualFitness
      */
- Decomposition() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}  
+    DecompositionBase() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}  
 
-  virtual ~Decomposition(){}
-    
+    virtual ~DecompositionBase(){}
+
      /*
     Decomposition & operator=(const Decomposition & other){
        if (this != &other) {
@@ -48,11 +49,7 @@ public:
         return *this;
     }
      */
-    
-     //! After a modification of the decomposition, it needs to be re-evaluated
-    //! Variation operator should use this method to indicate it
-    virtual void invalidate();
-    
+
     daex::Plan plan_copy() const
     {
         return _plan_global;
@@ -62,7 +59,7 @@ public:
     {
         return _plan_global;
     }
-    
+
 
     daex::Plan & subplan(unsigned int i) 
     {
@@ -78,9 +75,6 @@ public:
     {
         return *(_plans_sub.end() - 1 );
     }
-    
-    
-    
 
     unsigned int subplans_size() const
     {
@@ -117,24 +111,50 @@ public:
     }
 
     /*
-    Decomposition::iterator iter_last_reached()
+    DecompositionBase::iterator iter_last_reached()
     {
         return iter_at( subplans_size() - 1 );
     }
     */
 
-    void plan_global( daex::Plan p );
+    void plan_global( daex::Plan p )
+    {
+        _plan_global = p;
+    }
 
-    void plans_sub_add( daex::Plan p );
+    void plans_sub_add( daex::Plan p )
+    {
+        _plans_sub.push_back( p );
+    }
 
-    void plans_sub_reset();
+    void plans_sub_reset()
+    {
+        _plans_sub.clear();
 
-    virtual void printOn( std::ostream & out ) const;
-    
-    virtual void readFrom(std::istream & _is) {/*FIXME : à implémenter*/};
+        // on prévoit un sous-plan de plus que le nombre de stations
+        // pour la dernière étape
+        _plans_sub.reserve( this->size() + 1 );
+    }
 
+    typename DecompositionBase<G>::iterator iter_at( unsigned int i )
+    {
+        if( i >= this->size() ) { // FIXME : remplacer par un assert
+            std::ostringstream msg;
+            msg << "asked for element " << i << " but size of the DecompositionBase is " << this->size();
+            throw( std::out_of_range( msg.str() ) );
+        }
 
-    Decomposition::iterator iter_at( unsigned int i );
+        typename DecompositionBase<G>::iterator it = this->begin();
+
+        std::advance( it, i );
+        /*
+           for( unsigned int j=0; j < i; ++i  ) {
+           ++it;
+           }
+           */
+
+        return it;
+    }
 
     // VV : getters/setters for 4 fields taken from daeCptYahspEval
     void b_max( unsigned int b ) { _b_max = b; }
@@ -153,6 +173,55 @@ public:
     void incr_number_evaluated_nodes(unsigned int B) { _B += B; }
     void setFeasible(bool  b){	_is_feasible = b; }
     bool is_feasible() const { return _is_feasible; }
+
+private:
+
+    bool _is_feasible;
+
+
+protected:
+
+    //! daex::Plan global compressé
+    daex::Plan _plan_global;
+
+    //! Vecteur des sous-plans
+    std::vector< daex::Plan > _plans_sub;
+
+    // VV : 4 fields made local to decomposition instead of daeCptYahspEval
+
+    //! Current number of backtracks/nodes allowed
+    unsigned int _b_max;
+
+    //! compteur de goals
+    unsigned int _k;
+
+    //! compteur de goals utiles
+    unsigned int _u;
+
+    //! compteur des tentatives de recherche
+    unsigned int _B;
+
+}; // class DecompositionBase
+
+
+class Decomposition : public DecompositionBase<Goal>, public EO< eoMinimizingFitness >
+{
+public:
+
+     //! After a modification of the decomposition, it needs to be re-evaluated
+    //! Variation operator should use this method to indicate it
+    virtual void invalidate()
+    {
+        this->EO<eoMinimizingFitness>::invalidate();
+
+        //clear the sub_plans vector
+        //because if the decomposition becomes invalid, so are its intermediate plans
+        this->plans_sub_reset();
+
+        //plan vide
+        this->_plan_global = daex::Plan();
+
+    }
 
     /** Reimplement comparisons, as feasibility changes the meaning of it.
      * In EO, "this < other" is read "other is better than this".
@@ -182,35 +251,25 @@ public:
         return !(this->fitness() <= other.fitness()); 
     }
 
+    virtual void printOn( std::ostream & out ) const
+    {
+        EO< eoMinimizingFitness >::printOn(out);
+        out << " ";
 
-private:
+        out << "(DecompositionBase[" <<  this->size() << "]: ";
 
-    bool _is_feasible;
+        std::copy( this->begin(), this->end(), std::ostream_iterator<Goal>(out, " ") );
+
+        out << ")";
+
+        //out << this->plan_copy();
+    }
+
+    virtual void readFrom(std::istream & _is) {/*FIXME : à implémenter*/};
+
+};
 
 
-protected:
-
-    //! daex::Plan global compressé
-    daex::Plan _plan_global;
-
-    //! Vecteur des sous-plans
-    std::vector< daex::Plan > _plans_sub;
-
-    // VV : 4 fields made local to decomposition instead of daeCptYahspEval
-
-    //! Current number of backtracks/nodes allowed
-    unsigned int _b_max;
-
-    //! compteur de goals
-    unsigned int _k;
-
-    //! compteur de goals utiles
-    unsigned int _u;
-
-    //! compteur des tentatives de recherche
-    unsigned int _B;
-
-}; // class Decomposition
 
 //! Print a decomposition in a simple format
 /** On a single line, print the date and the number of atoms of each goal, i.e.:
