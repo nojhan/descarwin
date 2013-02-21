@@ -61,6 +61,25 @@ protected:
     TimeVal _earliest_start_time;
 };
 
+
+//! A goal that embed a search strategy, to orient a multi-objective search toward makespan or cost.
+class GoalMO : public Goal
+{
+public:
+
+    GoalMO( TimeVal t, bool strategy_makespan ) : Goal(t), _strategy_makespan(strategy_makespan) {}
+    GoalMO() : Goal(), _strategy_makespan(true) {}
+
+    bool strategy_makespan() { return _strategy_makespan; }
+    void strategy_makespan( bool weight ) { _strategy_makespan = weight; }
+
+protected:
+    //! If true, use a search strategy that favors the makespan over the cost
+    bool _strategy_makespan;
+
+};
+
+
 } // namespace daex
 
 #endif // __GOAL_H__
