@@ -9,17 +9,6 @@
 namespace daex
 {
 
-
-void Decomposition::readFrom( std::istream & is )
-{
-    eoserial::readFrom( *this, is );
-}
-
-void Decomposition::printOn( std::ostream & out ) const
-{
-    eoserial::printOn( *this, out );
-}
-
 void simplePrint( std::ostream & out, Decomposition & decompo )
 {
     out << "Decomposition " 

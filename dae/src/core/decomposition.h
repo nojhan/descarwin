@@ -172,7 +172,20 @@ public:
     void setFeasible(bool  b){	_is_feasible = b; }
     bool is_feasible() const { return _is_feasible; }
 
+
 protected:
+     //! After a modification of the decomposition, it needs to be re-evaluated
+    //! Variation operator should use this method to indicate it
+    void invalidate_plan()
+    {
+        //clear the sub_plans vector
+        //because if the decomposition becomes invalid, so are its intermediate plans
+        this->plans_sub_reset();
+
+        //plan vide
+        this->_plan_global = daex::Plan();
+    }
+
     bool _is_feasible;
 
     //! daex::Plan global compressé
@@ -207,14 +220,7 @@ public:
     virtual void invalidate()
     {
         this->EO<eoMinimizingFitness>::invalidate();
-
-        //clear the sub_plans vector
-        //because if the decomposition becomes invalid, so are its intermediate plans
-        this->plans_sub_reset();
-
-        //plan vide
-        this->_plan_global = daex::Plan();
-
+        this->DecompositionBase<Goal>::invalidate_plan();
     }
 
     /** Reimplement comparisons, as feasibility changes the meaning of it.
@@ -270,7 +276,7 @@ public:
         json->add( "plan_global", &_plan_global );
         // subplans
         eoserial::Array* subplans = eoserial::makeArray
-            < std::vector< daex::Plan >, eoserial::SerializablePushAlgorithm >
+            < std::vector< Plan >, eoserial::SerializablePushAlgorithm >
             ( _plans_sub );
 
         json->add( "subplans", subplans );
@@ -321,11 +327,15 @@ public:
         eoserial::unpack( *json, "is_feasible", _is_feasible );
     }
 
-    virtual void readFrom(std::istream & is);
-    virtual void printOn(std::ostream & out) const;
+    virtual void readFrom(std::istream & is)
+    {
+        eoserial::readFrom( *this, is );
+    }
+    virtual void printOn(std::ostream & out) const
+    {
+        eoserial::printOn( *this, out );
+    }
 };
-
-
 
 //! Print a decomposition in a simple format
 /** On a single line, print the date and the number of atoms of each goal, i.e.:
