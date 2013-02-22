@@ -11,7 +11,6 @@
 #include <map>
 #include <sstream>
 #include <stdexcept>
-
 #include <gmpxx.h>
 //extern "C" {
 #include <src/cpt.h>
@@ -21,31 +20,72 @@
 //}
 
 #include "utils/pddl.h"
+#include "utils/eoJsonUtils.h"
+
+// Definitions used in cpt-yahsp can break STL.
+// FIXME These undef are inelegant, another solution should be used
+// (eg : rename all cpt-yahsp definitions, or not use STL, or...)
+#include "undef_yahsp.h"
+
+#include <eo>
+
+extern Fluent** fluents;
 
 namespace daex
 {
 
-class Atom
+class Atom : public eoPersistent, public eoserial::Persistent
 {
+
 public:
     //! Constructeur prédicats + objets + date au plus tot + pointeur vers structure interne YAHSP
-    Atom( TimeVal start_time, Fluent* fluent ) : _fluent(fluent), _earliest_start_time(start_time)
+    // Atom( TimeVal start_time, Fluent* fluent ) : _fluent(fluent), _earliest_start_time(start_time)
+    Atom( TimeVal start_time, unsigned int fluentIndex ) : _fluentIndex(fluentIndex), _earliest_start_time(start_time)
     {}
- 
+
+    // Empty ctor used for JSON serialization
+    Atom( ) {}
+
     //! Accesseurs
     TimeVal                     earliest_start_time() const { return _earliest_start_time; }
-    Fluent *                    fluent()              const { return _fluent; }
+    Fluent *                    fluent()              const { return fluents[ _fluentIndex ]; }
+    // Fluent* fluent() const { return _fluent; }
+    unsigned int                fluentIndex()         const { return _fluentIndex; }
 
 protected:
-    Fluent *                    _fluent;
+    unsigned int 				_fluentIndex;
+    // Fluent* _fluent;
     TimeVal                     _earliest_start_time;
 
 public:
     friend std::ostream& operator<<( std::ostream& out, const Atom & atom )
     {
-        out << "(Atom[" << atom.earliest_start_time() << "]: " << fluent_name(atom.fluent()) << ")";
-        out.flush();
+        atom.printOn( out );
         return out;
+    }
+
+    void printOn(std::ostream& out) const
+    {
+        eoserial::printOn( *this, out );
+    }
+
+    void readFrom(std::istream& _is)
+    {
+        eoserial::readFrom( *this, _is );
+    }
+
+    eoserial::Object* pack() const
+    {
+        eoserial::Object* obj = new eoserial::Object;
+        obj->add( "start_time", eoserial::make(_earliest_start_time) );
+        obj->add( "fluent_index", eoserial::make(_fluentIndex) );
+        return obj;
+    }
+
+    void unpack( const eoserial::Object* json )
+    {
+        eoserial::unpack( *json, "start_time", _earliest_start_time );
+        eoserial::unpack( *json, "fluent_index", _fluentIndex );
     }
 };
 

@@ -3,15 +3,15 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 # include the install configuration file where are defined the main variables
 INCLUDE(${CMAKE_SOURCE_DIR}/install.cmake OPTIONAL)
 
-IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	MESSAGE("-- Compilation in debug mode")
-	SET(EO_BUILD_DIR "debug")
-ELSE()
-	MESSAGE("-- Compilation in release mode")
-	SET(EO_BUILD_DIR "release")
-ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+SET(EO_SRC_DIR "${PARADISEO_DIR}/eo/src" CACHE PATH "EO source directory" FORCE)
 
-SET(EO_BIN_DIR "${EO_DIR}/${EO_BUILD_DIR}" CACHE PATH "EO binary directory" FORCE)
+#   IF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+#       MESSAGE("-- Compilation in debug mode")
+#   ELSE()
+#       MESSAGE("-- Compilation in release mode")
+#   ENDIF (CMAKE_BUILD_TYPE STREQUAL "Debug")
+
+SET(EO_BIN_DIR "${PARADISEO_BUILD_DIR}/eo" CACHE PATH "EO binary directory" FORCE)
 
 PROJECT(DESCARWIN)
 

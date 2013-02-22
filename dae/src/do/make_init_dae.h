@@ -2,6 +2,10 @@
 #ifndef _MAKE_INIT_DAE_H_
 #define _MAKE_INIT_DAE_H_
 
+/** FIXME essai d'évaluation du temps d'un individu pour limiter le temps total d'exécution du programme, dans la version parallèle (Pierre et Benjamin)
+# include <sys/resource.h> // rusage()
+*/
+
 namespace daex {
 
 void do_make_init_param( eoParser & parser )
@@ -30,7 +34,6 @@ daex::Init<EOT> & do_make_init_op( eoParser & parser, eoState & state, daex::pdd
 {
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
-    double b_max_increase_coef = parser.valueOf<double>("bmax-increase-coef");
 
     // l'initialisation se fait en fonction de la liste des dates au plus tot possibles (start time set)
     // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
@@ -184,8 +187,8 @@ template<class EOT>
 unsigned int estimate_bmax_incremental( 
             eoPop<EOT>& pop,
             eoParser & parser, unsigned int l_max, unsigned int eval_count,
-            std::string plan_file, TimeVal best_makespan, 
-            std::string dump_sep, unsigned int dump_file_count, std::string metadata
+            std::string plan_file, TimeVal & best_makespan, 
+            std::string dump_sep, unsigned int & dump_file_count, std::string metadata
         )
 {
     unsigned int popsize = parser.valueOf<unsigned int>("popSize");
@@ -199,15 +202,19 @@ unsigned int estimate_bmax_incremental(
 
     bool found = false;
     unsigned int goodguys = 0;
-    unsigned int b_max_in=1, b_max_last;
+    unsigned int b_max_in=1, b_max_last=0;
     EOT empty_decompo;
     unsigned int goodguys_min = b_max_ratio * popsize;
 
 #ifndef NDEBUG
     eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax with a minimum of " << goodguys_min << " good individuals" << std::endl;
 #endif
+    /* FIXME essai d'évaluation du temps d'un individu pour limiter le temps total d'exécution du programme, dans la version parallèle (Pierre et Benjamin)
+    bool hasTimedEval = false;
+    */
     //    while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
     while( (goodguys < goodguys_min) && (b_max_in < b_max_init) ) {
+
         goodguys=0;
         b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
 
@@ -246,7 +253,34 @@ unsigned int estimate_bmax_incremental(
         for (size_t i = 0; i < popsize; ++i) {
             // unfeasible individuals are invalidated in order to be re-evaluated 
             // with a larger bmax at the next iteration but we keep the good guys.
-            if (pop[i].is_feasible()) goodguys++;
+            if (pop[i].is_feasible()) 
+            {
+                goodguys++;
+                //FIXME essai d'évaluation du temps d'un individu pour limiter le temps total d'exécution du programme, dans la version parallèle (Pierre et Benjamin)
+                /*
+                if( ! hasTimedEval )
+                {
+                    hasTimedEval = true;
+                    pop[i].invalidate();
+                    struct rusage _start;
+                    struct rusage _stop;
+                    getrusage( RUSAGE_SELF, &_start );
+                    eval_bestfile( pop[i] );
+                    getrusage( RUSAGE_SELF, &_stop );
+                    std::cout << "[Estimating eval time] "
+                        << "User time (s / ms): "
+                            << _start.ru_utime.tv_sec - _stop.ru_utime.tv_sec
+                            << " / "
+                            << _start.ru_utime.tv_usec - _stop.ru_utime.tv_usec
+                        << "\n"
+                        << "System time (s / ms): "
+                        << _start.ru_stime.tv_sec - _stop.ru_stime.tv_sec
+                            << " / "
+                            << _start.ru_stime.tv_usec - _stop.ru_stime.tv_usec
+                        << std::endl;
+                }
+                */
+            }
             else pop[i].invalidate();
         }
         // If no individual haven't yet been found, then try a direct call to YAHSP (i.e. the empty decomposition evaluation)
@@ -305,6 +339,9 @@ unsigned int estimate_bmax_incremental(
     eoPopLoopEval<EOT> eval_pop( eval_bestfile );
 #endif
     eval_pop( pop, pop );
+
+    best_makespan = eval_bestfile.best();
+    dump_file_count = eval_bestfile.file_count();
 
     return b_max_fixed;
 }

@@ -13,7 +13,7 @@ bool testDirRes(std::string _dirName, bool _erase);
 namespace daex {
 
 void do_make_checkpoint_param( eoParser & parser ) 
-{  
+{
 #ifndef NDEBUG
     unsigned int out_save_freq = parser.createParam((unsigned int)0, "out-save-freq", "Save every F generation (0 = only final state, absent = never)", '\0', "Persistence" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "out-save-freq" << out_save_freq << std::endl;
@@ -25,7 +25,6 @@ void do_make_checkpoint_param( eoParser & parser )
     bool out_dir_erase = parser.createParam(true, "out-dir-erase", "erase files in out-dir, if any", '\0', "Output - Disk").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "out-dir-erase" << out_dir_erase << std::endl;
 #endif
-    
 }
 
 template <class EOT>

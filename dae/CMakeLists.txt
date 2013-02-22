@@ -19,6 +19,26 @@ IF( DAE_WITH_OMP )
       SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
       SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     ENDIF()
+
+    ADD_DEFINITIONS(-DWITH_OMP)
+ENDIF()
+
+# Mpi Addons
+IF(DAE_WITH_MPI)
+    MESSAGE("[DAE] Compilation with MPI.")
+
+    SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
+
+    # headers location
+    INCLUDE_DIRECTORIES(${MPI_DIR}/include)
+
+    # lib location
+    LINK_DIRECTORIES(${MPI_DIR}/lib)
+
+    # for conditional compilation in code
+    ADD_DEFINITIONS(-DWITH_MPI)
+
+    LINK_LIBRARIES(eompi)
 ENDIF()
 
 # include the sources
@@ -57,7 +77,7 @@ ADD_DEPENDENCIES(dae daex)
 IF( CPT_WITH_OMP )
     TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 ELSE()
-    TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
 ENDIF()
 
 # only if OpenMP on yahsp is activated
@@ -112,6 +132,13 @@ IF (CMAKE_BUILD_TYPE MATCHES Debug)
         ADD_DEPENDENCIES(featureselector daex)
         TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
     ENDIF()
+ENDIF()
+
+IF(DAE_WITH_MPI)
+    ADD_EXECUTABLE(test_serial tests/test_serialization.cpp)
+    ADD_DEPENDENCIES(test_serial daex)
+    TARGET_LINK_LIBRARIES(test_serial daex cpt_yahsp_library-common
+            cpt_yahsp_library-dae)
 ENDIF()
 
 # process to sources

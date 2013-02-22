@@ -13,11 +13,13 @@
 #include <src/yahsp.h>
 //}
 
+#include <eo>
+#include "utils/eoJsonUtils.h"
 
 namespace daex
 {
 
-class Plan
+class Plan : public eoserial::Persistent, public eoPersistent
 {
 protected:
 
@@ -39,7 +41,6 @@ protected:
     std::string _plan_rep;
 
 public:
-
     //! Construct a valid plan from a YAHSP's pointer: get the makespan and the string representation
     
      Plan() : _makespan( MAXTIME ),_cost_add(MAXTIME ), _cost_max(MAXTIME ), _search_steps(0), _is_valid(false), _plan_rep("No plan") {}
@@ -48,25 +49,11 @@ public:
      
      Plan( SolutionPlan * p_plan ) : _makespan(p_plan->makespan), _cost_add(p_plan ->cost_add), _cost_max(p_plan-> cost_max), _search_steps(0), _is_valid(true)
       {   // get the plan representation
-//FIXME OMP DIRTY
+# ifdef WITH_OMP
 #pragma omp critical
+# endif // WITH_OMP
         _plan_rep = plan_to_str( p_plan );
       }
-    
-    //! Construct a invalid plan from scratch
-      /*
-      Plan  & operator=(const daex::Plan  & other){
-       if (this != &other) {
-            _makespan = other._makespan;
-            _cost_add = other._cost_add; 
-            _cost_max = other._cost_max;
-             _search_steps = other._search_steps;
-             _is_valid = other._is_valid;
-	     _plan_rep  = other._plan_rep;
-        }
-        return *this;
-    }
-      */
 
     void search_steps( unsigned int steps ) { _search_steps = steps; }
     unsigned int search_steps() const { return _search_steps; }
@@ -121,14 +108,45 @@ public:
     friend std::ostream& operator<<( std::ostream& out, const daex::Plan & plan ) 
     {
         out << plan._plan_rep;
-	return out;
+        return out;
     }
 
-      std::string & plan_rep(){
+    std::string & plan_rep()
+    {
+        return _plan_rep ;
+    }
 
-		return _plan_rep ;
-	}
+    eoserial::Object* pack(void) const
+    {
+        eoserial::Object* json = new eoserial::Object;
+        json->add( "makespan", eoserial::make(_makespan) );
+        json->add( "cost_add", eoserial::make(_cost_add) );
+        json->add( "cost_max", eoserial::make(_cost_max) );
+        json->add( "search_steps", eoserial::make(_search_steps) );
+        json->add( "is_valid", eoserial::make(_is_valid) );
+        json->add( "plan_rep", eoserial::make(_plan_rep) );
+        return json;
+    }
 
+    void unpack( const eoserial::Object* json )
+    {
+        eoserial::unpack( *json, "makespan", _makespan );
+        eoserial::unpack( *json, "cost_add", _cost_add );
+        eoserial::unpack( *json, "cost_max", _cost_max );
+        eoserial::unpack( *json, "search_steps", _search_steps );
+        eoserial::unpack( *json, "is_valid", _is_valid );
+        eoserial::unpack( *json, "plan_rep", _plan_rep );
+    }
+
+    void printOn(std::ostream& out) const
+    {
+        eoserial::printOn( *this, out );
+    }
+
+    void readFrom(std::istream& _is)
+    {
+        eoserial::readFrom( *this, _is );
+    }
 };
 
 } // namespace daex

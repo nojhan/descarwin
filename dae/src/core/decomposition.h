@@ -1,4 +1,3 @@
-
 #ifndef __DECOMPOSITION_H__
 #define __DECOMPOSITION_H__
 
@@ -9,8 +8,8 @@
 #include <functional>
 
 #include <eo>
+#include <utils/eoTimer.h>
 
- 
 #include "goal.h"
 #include "plan.h"
 #include <src/globs.h>
@@ -21,11 +20,9 @@ namespace daex
 
 //! A decomposition is a list of Goal objects, and we are trying to minimize a scalar fitness (e.g. time or number of actions)
 template<class G>
-class DecompositionBase : public std::list<G> //,  public EO< eoMinimizingFitness >
+class DecompositionBase : public std::list<G>, public eoserial::Persistent
 {
 public:
-
-   
 
     //! At instanciation, a decomposition does not have any plan
     /*!
@@ -49,6 +46,7 @@ public:
         return *this;
     }
      */
+
 
     daex::Plan plan_copy() const
     {
@@ -174,12 +172,8 @@ public:
     void setFeasible(bool  b){	_is_feasible = b; }
     bool is_feasible() const { return _is_feasible; }
 
-private:
-
-    bool _is_feasible;
-
-
 protected:
+    bool _is_feasible;
 
     //! daex::Plan global compressé
     daex::Plan _plan_global;
@@ -247,26 +241,88 @@ public:
 
     //! Counterpart, <= and >= are derived from < and > and thus do not need to be modified
     bool operator>(const Decomposition& other) const 
-    { 
+    {
         return !(this->fitness() <= other.fitness()); 
     }
 
-    virtual void printOn( std::ostream & out ) const
+    eoserial::Object* pack(void) const
     {
-        EO< eoMinimizingFitness >::printOn(out);
-        out << " ";
+        eoserial::Object* json = new eoserial::Object;
 
-        out << "(DecompositionBase[" <<  this->size() << "]: ";
+        // list<Goal>
+        eoserial::Array* listGoal = eoserial::makeArray
+            < std::list<Goal>, eoserial::SerializablePushAlgorithm >
+            ( *this );
+        json->add( "goals", listGoal );
 
-        std::copy( this->begin(), this->end(), std::ostream_iterator<Goal>(out, " ") );
+        // eoFitness
+        bool invalidFitness = EO< eoMinimizingFitness >::invalid();
+        json->add( "invalidFitness", eoserial::make(invalidFitness) );
 
-        out << ")";
+        if ( !invalidFitness )
+        {
+            eoMinimizingFitness fitness = EO< eoMinimizingFitness >::fitness();
+            double fitnessValue = fitness; // implicit operator cast
+            json->add( "fitnessValue", eoserial::make(fitnessValue) );
+        }
 
-        //out << this->plan_copy();
+        // specific members
+        json->add( "plan_global", &_plan_global );
+        // subplans
+        eoserial::Array* subplans = eoserial::makeArray
+            < std::vector< daex::Plan >, eoserial::SerializablePushAlgorithm >
+            ( _plans_sub );
+
+        json->add( "subplans", subplans );
+        json->add( "b_max", eoserial::make(_b_max) );
+        json->add( "goal_count", eoserial::make(_k) );
+        json->add( "useful_goals", eoserial::make(_u) );
+        json->add( "attempts", eoserial::make(_B) );
+        json->add( "is_feasible", eoserial::make(_is_feasible) );
+
+        return json;
     }
 
-    virtual void readFrom(std::istream & _is) {/*FIXME : à implémenter*/};
+    void unpack( const eoserial::Object* json )
+    {
+        // list<Goal>
+        clear();
+        eoserial::unpackArray
+            < std::list< Goal >, eoserial::Array::UnpackObjectAlgorithm >
+            ( *json, "goals", *this );
 
+        // EO fitness
+        bool invalidFitness;
+        eoserial::unpack( *json, "invalidFitness", invalidFitness );
+        if (invalidFitness)
+        {
+            EO< eoMinimizingFitness >::invalidate();
+        } else
+        {
+            eoMinimizingFitness fitness;
+            double fitnessValue;
+            eoserial::unpack( *json, "fitnessValue", fitnessValue );
+            fitness = fitnessValue;
+            EO< eoMinimizingFitness >::fitness( fitness );
+        }
+
+        // specific members
+        eoserial::unpackObject( *json, "plan_global", _plan_global );
+        // _plans_sub
+        _plans_sub.clear();
+        eoserial::unpackArray
+            < std::vector< daex::Plan >, eoserial::Array::UnpackObjectAlgorithm >
+            ( *json, "subplans", _plans_sub );
+
+        eoserial::unpack( *json, "b_max", _b_max );
+        eoserial::unpack( *json, "goal_count", _k );
+        eoserial::unpack( *json, "useful_goals", _u );
+        eoserial::unpack( *json, "attempts", _B );
+        eoserial::unpack( *json, "is_feasible", _is_feasible );
+    }
+
+    virtual void readFrom(std::istream & is);
+    virtual void printOn(std::ostream & out) const;
 };
 
 

@@ -5,13 +5,13 @@ namespace daex {
 
 void evalBestMakespanPlanDump::call( Decomposition & eo )
 {
-    if( eo.plan().makespan() < _best ) {
+            if( eo.plan().makespan() < _best ) {
+# ifdef WITH_OMP
 #pragma omp critical
-        if( eo.plan().makespan() < _best ) {
+# endif // WITH_OMP
             _best = eo.plan().makespan();
             dump( eo );
-        }
-    } // if better
+        }// if better
 }
 
 void evalBestFitnessPlanDump::call( Decomposition & eo )
@@ -19,7 +19,9 @@ void evalBestFitnessPlanDump::call( Decomposition & eo )
     // Note: in EO, maximizing by default, later overloaded for minimizing
   // OMP DIRTY - first comparison is unprotected, in order to be non-blocking
     if( eo.fitness() > _best ) {
+# ifdef WITH_OMP
 #pragma omp critical
+# endif // WITH_OMP
         if( eo.fitness() > _best ) {
             _best = eo.fitness();
             dump( eo );
