@@ -1,16 +1,10 @@
 
-# Variables to set
-
 #  directory where EO has been installed
-SET(EO_DIR "<<PATH_TO_EO>>" CACHE PATH "EO directory" FORCE)
+SET(PARADISEO_DIR "<<PATH_TO_PARADISEO>>" CACHE PATH "ParadisEO directory" FORCE)
+
+set(PARADISEO_BUILD_DIR "${PARADISEO_DIR}/release" CACHE PATH "ParadisEO build dir" FORCE)
 
 # directory where CPT-YAHSP has been installed
 SET(CPT_YAHSP_DIR "<<PATH_TO_CPT_YAHSP>>" CACHE PATH "CPT-YAHSP directory" FORCE)
+SET(CPT_YAHSP_BUILD_DIR "${CPT_YAHSP_DIR}/release" CACHE PATH "CPT-YAHSP library directory" FORCE)
 
-# automagically set parameters, do not edit
-
-SET(EO_SRC_DIR "${EO_DIR}/src" CACHE PATH "EO source directory" FORCE)
-SET(EO_BIN_DIR "${EO_DIR}/release" CACHE PATH "EO binary directory" FORCE)
-
-SET(CPT_YAHSP_SRC_DIR "${CPT_YAHSP_DIR}" CACHE PATH "CPT-YAHSP source directory" FORCE)
-SET(CPT_YAHSP_BIN_DIR "${CPT_YAHSP_DIR}/release" CACHE PATH "CPT-YAHSP library directory" FORCE)

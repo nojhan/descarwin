@@ -7,6 +7,21 @@ ENDIF(COMMAND CMAKE_POLICY)
 # include the install configuration file where are defined the main variables
 INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake OPTIONAL)
 
+
+SET(EO_SRC_DIR "${PARADISEO_DIR}/eo/src" CACHE PATH "EO source directory" FORCE)
+SET(MOEO_SRC_DIR "${PARADISEO_DIR}/moeo/src" CACHE PATH "EO source directory" FORCE)
+SET(MO_SRC_DIR "${PARADISEO_DIR}/mo/src" CACHE PATH "EO source directory" FORCE)
+
+SET(EO_BIN_DIR "${PARADISEO_BUILD_DIR}/eo/lib" CACHE PATH "EO binary directory" FORCE)
+SET(MOEO_BIN_DIR "${PARADISEO_BUILD_DIR}/moeo/lib" CACHE PATH "EO binary directory" FORCE)
+SET(MO_BIN_DIR "${PARADISEO_BUILD_DIR}/mo/lib" CACHE PATH "EO binary directory" FORCE)
+
+# the source directory of yahsp is not /src/ because we include src/cpt.h instead of cpt.h
+# because of name collisions
+SET(CPT_YAHSP_SRC_DIR "${CPT_YAHSP_DIR}" CACHE PATH "CPT-YAHSP source directory" FORCE)
+SET(CPT_YAHSP_BIN_DIR "${CPT_YAHSP_BUILD_DIR}/lib" CACHE PATH "CPT-YAHSP source directory" FORCE)
+
+
 # define project name
 PROJECT(DAEX)
 
@@ -44,14 +59,18 @@ ENDIF()
 # include the sources
 INCLUDE_DIRECTORIES(
   ${EO_SRC_DIR}
+  ${MOEO_SRC_DIR}
+  ${MO_SRC_DIR}
   ${CPT_YAHSP_SRC_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   )
 
 # where CMake can find the libraries
 LINK_DIRECTORIES(
-  ${EO_BIN_DIR}/lib
-  ${CPT_YAHSP_BIN_DIR}/lib
+  ${EO_BIN_DIR}
+  ${MOEO_BIN_DIR}
+  ${MO_BIN_DIR}
+  ${CPT_YAHSP_BIN_DIR}
   )
 
 # flags to use with compiler
@@ -73,11 +92,15 @@ LINK_LIBRARIES(eoutils gmp eo rt gcov gdsl termcap)
 # global references that differ from the ones needed by dae-mt + yahsp.
 
 ADD_EXECUTABLE(dae dae.cpp)
+ADD_EXECUTABLE(daemo daemo.cpp)
 ADD_DEPENDENCIES(dae daex)
+ADD_DEPENDENCIES(daemo daex)
 IF( CPT_WITH_OMP )
-    TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(dae   daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(daemo daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 ELSE()
-    TARGET_LINK_LIBRARIES(dae daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(dae   daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(daemo daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
 ENDIF()
 
 # only if OpenMP on yahsp is activated
