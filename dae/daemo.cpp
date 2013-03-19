@@ -18,6 +18,7 @@
 #include "evaluation/cpt-yahsp.h"
 #include "evaluation/yahsp.h"
 #include "core/decomposition_mo.h"
+#include "variation/strategy_mo.h"
 
 #ifdef WITH_MPI
 #include <mpi/eoMpi.h>
