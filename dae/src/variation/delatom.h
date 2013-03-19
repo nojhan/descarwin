@@ -112,51 +112,51 @@ class MutationDelOneAtom: public eoMonOp<EOT>
 public:
     bool operator()( EOT & decompo ) 
     {
-    /*if( decompo.empty() ) {
-        return false;
-    }*/
+        /*if( decompo.empty() ) {
+          return false;
+          }*/
 
-#ifndef NDEBUG
-    eo::log << eo::debug << "d";
-    eo::log.flush();
-#endif
+                        #ifndef NDEBUG
+                        eo::log << eo::debug << "d";
+                        eo::log.flush();
+                        #endif
 
-    assert( !decompo.empty() );
+        assert( !decompo.empty() );
 
-    int range;
-    // if the decomposition has been modified since the last evaluation
-    // then do not take into account the last_reached station
-    if( decompo.invalid() ) {
-        range = decompo.size();
+        int range;
+        // if the decomposition has been modified since the last evaluation
+        // then do not take into account the last_reached station
+        if( decompo.invalid() ) {
+            range = decompo.size();
 
-    } else {
-        // the decomposition has not been modified, we can consider using the last_reached goal
-        // but we do not go over the size of the decomposition
-        range = std::min( 
-                static_cast<unsigned int>(decompo.size()), 
-                static_cast<unsigned int>( decompo.last_reached() ) + 1 
-                );
-    }
+        } else {
+            // the decomposition has not been modified, we can consider using the last_reached goal
+            // but we do not go over the size of the decomposition
+            range = std::min( 
+                    static_cast<unsigned int>(decompo.size()), 
+                    static_cast<unsigned int>( decompo.last_reached() ) + 1 
+                    );
+        }
 
-    // random goal in [0,last_reached[ or [0,nb_goals[
-    unsigned int i = rng.random( range );
-    Decomposition::iterator goal_i = decompo.iter_at(i);
+        // random goal in [0,last_reached[ or [0,nb_goals[
+        unsigned int i = rng.random( range );
+        Decomposition::iterator goal_i = decompo.iter_at(i);
 
-    // if the chosen goal has only one atom, skip the delete
-    if( goal_i->size() <= 1 ) {
-        return false;
+        // if the chosen goal has only one atom, skip the delete
+        if( goal_i->size() <= 1 ) {
+            return false;
 
-    } else {
-        // random atom in goal
-        unsigned int a = rng.random( goal_i->size() );
-    
-        goal_i->erase( goal_i->iter_at( a ) );
+        } else {
+            // random atom in goal
+            unsigned int a = rng.random( goal_i->size() );
 
-	decompo.invalidate();
+            goal_i->erase( goal_i->iter_at( a ) );
 
-        return true;
-    } // if decompo[i].size == 0
-};
+            decompo.invalidate();
+
+            return true;
+        } // if decompo[i].size == 0
+    };
 };
 
 

@@ -50,9 +50,9 @@ public:
 
 #endif
                 is_modified =  false;
-                //Goal goal=*decompo.iter_at(k);
+                //typename EOT::AtomType goal=*decompo.iter_at(k);
 
-                Goal::iterator candy = decompo.iter_at(k)->begin();
+                typename EOT::AtomType::iterator candy = decompo.iter_at(k)->begin();
                 //std::advance(candy, rng.random(goal.size()));
                 std::advance(candy, rng.random( decompo.iter_at(k)->size() ) );
 

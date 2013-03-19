@@ -57,7 +57,7 @@ public:
 
             // insertion d'un goal à une date au hasard 
             // entre 0 et la date au plus tot la plus tardive possible
-            Goal new_goal = random_goal(0, _times.rbegin()->first);
+            typename EOT::AtomType new_goal = random_goal(0, _times.rbegin()->first);
             decompo.insert( decompo.begin(), new_goal );
         */
 
@@ -89,7 +89,7 @@ public:
 #endif
 
 
-                Goal new_goal = random_goal(
+                typename EOT::AtomType new_goal = random_goal(
                             0, 
                             decompo.iter_at( 0 )->earliest_start_time()
                         );
@@ -137,7 +137,7 @@ public:
 #endif
 
                     // draw a random goal in ] t1, t2 ]
-                    Goal new_goal = random_goal( 0, t1 );
+                    typename EOT::AtomType new_goal = random_goal( 0, t1 );
 
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
@@ -156,7 +156,7 @@ public:
                     // JACK addgoal, the article does not specify what to do when t1 >= t2, the code version returns false and do nothing
                     
                     // proposed version for following the article' spirit: try to insert the goal between the two dates, whichever is the greater one
-                    //Goal new_goal = random_goal( std::min(t1,t2), std::max(t1,t2) );
+                    //typename EOT::AtomType new_goal = random_goal( std::min(t1,t2), std::max(t1,t2) );
 
                     // code version:
                     if( t1 >= t2 ) {
@@ -171,7 +171,7 @@ public:
 #endif
 
                     // draw a random goal in ] t1, t2 ]
-                    Goal new_goal = random_goal( t1, t2 );
+                    typename EOT::AtomType new_goal = random_goal( t1, t2 );
 
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
@@ -217,7 +217,7 @@ public:
                     // draw a random goal in [ t1, t2 ]
                     // that is in ] t0, t2 ]
                     //     not in ] t1, t2 ] !
-                    Goal new_goal = random_goal( t0, t2 );
+                    typename EOT::AtomType new_goal = random_goal( t0, t2 );
 
 #ifndef NDEBUG
                     eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
@@ -240,7 +240,7 @@ public:
                     // entre la date au plus tot du dernier goal et la date la plus tardive possible
                     t2 = _times.rbegin()->first;
 
-                    Goal new_goal = random_goal( t1, t2 );
+                    typename EOT::AtomType new_goal = random_goal( t1, t2 );
                     decompo.push_back( new_goal );
 
                 */
@@ -254,7 +254,7 @@ public:
                     // article version:
                     t2 = decompo.iter_at( j + 1 )->earliest_start_time(); 
 
-                    Goal new_goal = random_goal( std::min(t1,t2), std::max(t1,t2) );
+                    typename EOT::AtomType new_goal = random_goal( std::min(t1,t2), std::max(t1,t2) );
                     decompo.insert( decompo.iter_at( j+1 ), new_goal );
                 }
                 */
@@ -287,7 +287,7 @@ protected:
 
     //! Construct a random goal between the given dates
     // Atoms used are those with their earliest start time a the chosen date
-    Goal random_goal(  TimeVal t1, TimeVal t2 ){
+    typename EOT::AtomType random_goal(  TimeVal t1, TimeVal t2 ){
 #ifndef NDEBUG
     eo::log << eo::xdebug << "\t\trandom goal: in ]" << t1 << "," << t2 << "]";
 #endif
@@ -383,7 +383,7 @@ protected:
 
     eo::log << eo::xdebug << ", of which " << nomutex_atoms.size() << " are nomutex";
 
-    Goal result= random_subset( nomutex_atoms );
+    typename EOT::AtomType result= random_subset( nomutex_atoms );
 
     eo::log << eo::xdebug << ", final goal: " << result.earliest_start_time() << "(" << result.size() << ")" << std::endl;
 
