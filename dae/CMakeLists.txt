@@ -122,46 +122,17 @@ ENDIF()
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
     # Debug + OMP
     IF( CPT_WITH_OMP )
-        ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
-        ADD_DEPENDENCIES(test_chronopartition daex)
-        TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-
-        ADD_EXECUTABLE(test_b_max test_b_max.cpp)
-        ADD_DEPENDENCIES(test_b_max daex)
-        TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-
-        ADD_EXECUTABLE(test_stats test_stats.cpp)
-        ADD_DEPENDENCIES(test_stats daex)
-        TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-
         ADD_EXECUTABLE(featureselector featureselector.cpp)
         ADD_DEPENDENCIES(featureselector daex)
         TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
     ELSE()
     # Debug without OMP
-        ADD_EXECUTABLE(test_chronopartition test_chronopartition.cpp)
-        ADD_DEPENDENCIES(test_chronopartition daex)
-        TARGET_LINK_LIBRARIES(test_chronopartition daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
-
-        ADD_EXECUTABLE(test_b_max test_b_max.cpp)
-        ADD_DEPENDENCIES(test_b_max daex)
-        TARGET_LINK_LIBRARIES(test_b_max daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
-
-        ADD_EXECUTABLE(test_stats test_stats.cpp)
-        ADD_DEPENDENCIES(test_stats daex)
-        TARGET_LINK_LIBRARIES(test_stats daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
-
         ADD_EXECUTABLE(featureselector featureselector.cpp)
         ADD_DEPENDENCIES(featureselector daex)
         TARGET_LINK_LIBRARIES(featureselector daex cpt_yahsp_library-common-dae cpt_yahsp_library-dae)
     ENDIF()
-ENDIF()
 
-IF(DAE_WITH_MPI)
-    ADD_EXECUTABLE(test_serial tests/test_serialization.cpp)
-    ADD_DEPENDENCIES(test_serial daex)
-    TARGET_LINK_LIBRARIES(test_serial daex cpt_yahsp_library-common
-            cpt_yahsp_library-dae)
+    ADD_SUBDIRECTORY(tests)
 ENDIF()
 
 # process to sources
