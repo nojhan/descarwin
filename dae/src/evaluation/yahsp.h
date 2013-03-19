@@ -87,7 +87,10 @@ public:
     virtual void step_recorder_fail() {};
 
 public:
-   virtual void  call( EOT & decompo ){
+    virtual std::pair<double,bool> search( EOT & decompo )
+    {
+        double fitness = -1.0;
+        bool feasibility = false;
                                  #ifndef NDEBUG
                                      eo::log << eo::xdebug << "decompo.size=" << decompo.size() << std::endl;
                                  #endif
@@ -110,8 +113,10 @@ public:
             //   JACK the code does not even try to evaluate decompositions that are too long 
               // FIXME what is the effect on variation operators that relies on last_reached?
         if( decompo.size() >  daeCptYahspEval<EOT>::_l_max ) {
-           decompo.fitness(daeCptYahspEval<EOT>::fitness_unfeasible_too_long());
-           decompo.setFeasible(false);
+           // decompo.fitness(daeCptYahspEval<EOT>::fitness_unfeasible_too_long());
+           // decompo.setFeasible(false);
+           fitness = daeCptYahspEval<EOT>::fitness_unfeasible_too_long();
+           feasibility = false;
         } else 
                                  #endif
         {
@@ -172,12 +177,16 @@ public:
 
             if( code != PLAN_FOUND ) {
 #ifdef PAPERVERSION
-              decompo.fitness(fitness_unfeasible(decompo, previous_state), false);
-         decompo.setFeasible(false);
+              // decompo.fitness(fitness_unfeasible(decompo, previous_state), false);
+              // decompo.setFeasible(false);
+              fitness = this->fitness_unfeasible(decompo, previous_state);
+              feasibility = false;
 #else
-              decompo.fitness(this->fitness_unfeasible_intermediate(decompo));
-          decompo.setFeasible(false);
-#endif 
+              // decompo.fitness(this->fitness_unfeasible_intermediate(decompo));
+              // decompo.setFeasible(false);
+              fitness = this->fitness_unfeasible_intermediate(decompo);
+              feasibility = false;
+#endif
               break;
             }
         } // for igoal in decompo
@@ -197,8 +206,10 @@ public:
                     std::cout << decompo.size() << " " << plans_nb << std::endl;
                 */
 
-                decompo.fitness(this->fitness_feasible( decompo ));
-        decompo.setFeasible(true);
+                // decompo.fitness(this->fitness_feasible( decompo ));
+                // decompo.setFeasible(true);
+                fitness = this->fitness_feasible( decompo );
+                feasibility = false;
 
                                  #ifndef NDEBUG
                                                  eo::log << eo::debug << "*";
@@ -206,33 +217,47 @@ public:
                                  #endif
             } else {
 #ifdef PAPERVERSION
-                decompo.fitness(fitness_unfeasible(decompo, previous_state));
-        decompo.setFeasible(false);
+                // decompo.fitness(fitness_unfeasible(decompo, previous_state));
+                // decompo.setFeasible(false);
+                fitness = fitness_unfeasible(decompo, previous_state);
+                feasibility = false;
 #else
-                decompo.fitness(this->fitness_unfeasible_final(decompo) );
-        decompo.setFeasible(false);
-#endif 
+                // decompo.fitness(this->fitness_unfeasible_final(decompo) );
+                // decompo.setFeasible(false);
+                fitness = this->fitness_unfeasible_final(decompo);
+                feasibility = false;
+#endif
             } // if PLAN_FOUND for last goal
         } // if PLAN_FOUND
         cpt_free(previous_state);
       } // if size > _l_max
     } // if !decompo.invalid
-   free_yahsp_structures();
-}; 
-    
-    void post_call( EOT & decompo ) {
+    free_yahsp_structures();
+
+    return std::make_pair<double,bool>( fitness, feasibility );
+    };
+
+    void call( EOT& decompo )
+    {
+        std::pair<double,bool> result = search( decompo );
+        decompo.fitness( result.first );
+        decompo.setFeasible( result.second );
+    }
+
+    void post_call( EOT & decompo )
+    {
         decompo.plan().search_steps( decompo.get_number_evaluated_nodes() );
-        
-        } ;
-    
+    };
+
      void pre_call( EOT & decompo ) {/* FIXME unused variable */};   
-     
-     void operator()( EOT & decompo ) { 
+
+     void operator()( EOT & decompo )
+     {
         pre_call( decompo );
         call( decompo );
         post_call( decompo );
-     } ;
-     
+     };
+
 
 protected:
 
