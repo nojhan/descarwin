@@ -23,6 +23,7 @@ template<class G>
 class DecompositionBase : public std::list<G>, public eoserial::Persistent
 {
 public:
+    typedef G AtomType;
 
     //! At instanciation, a decomposition does not have any plan
     /*!
