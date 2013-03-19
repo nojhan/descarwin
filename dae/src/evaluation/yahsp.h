@@ -88,8 +88,9 @@ public:
     };
 
 public:
-    virtual void step_recorder() {};
-    virtual void step_recorder_fail() {};
+    virtual void pre_step( EOT & decompo ) {};
+    virtual void post_step_success() {};
+    virtual void post_step_fail() {};
 
 public:
     //! Solve the whole decomposition and returns a pair<fitness,feasibility>
@@ -248,6 +249,7 @@ protected:
     //! Call yahsp from a built fluent state to another and update decomposition's plans
     unsigned int solve_next( EOT & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes )
     {
+        pre_step(decompo);
                                  #ifndef NDEBUG
                                  eo::log << eo::xdebug << "ok" << std::endl;
                                  eo::log << eo::xdebug << "\t\tcall the solver...";
@@ -262,7 +264,7 @@ protected:
                                  eo::log.flush();
                                  #endif
         if( return_code == NO_PLAN || return_code == GOALS_MUTEX ) {
-            step_recorder_fail();
+            post_step_fail();
                                  #ifndef NDEBUG
                                  eo::log << eo::debug << "x";
                                  eo::log.flush();
@@ -291,7 +293,7 @@ protected:
                                  eo::log << eo::xdebug << "\t\trecord steps...";
                                  eo::log.flush();
                                  #endif
-            step_recorder();
+            post_step_success();
             solution_plan = NULL; // the corresponding pointer is stored in plans, thus we do not free it
                                  #ifndef NDEBUG
                                  eo::log << eo::xdebug << "ok" << std::endl;
@@ -403,7 +405,7 @@ public:
     /** Called if the yahsp search found a plan
      * Récupère le nombre de noeuds utilisés par une résolution avec yahsp
      */
-    void step_recorder()
+    void post_step_success()
     {
         node_numbers.push_back( static_cast<int>( solution_plan->backtracks ) ); // TODO SolutionPlan->backtracks est codé comme un double dans plan.h
                         #ifndef NDEBUG
@@ -414,7 +416,7 @@ public:
 
 
     //! Called if the yahsp search have failed to find a plan
-    void step_recorder_fail()
+    void post_step_fail()
     {
         node_numbers.push_back(stats.evaluated_nodes);
                         #ifndef NDEBUG
