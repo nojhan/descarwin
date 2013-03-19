@@ -2,13 +2,9 @@
 #define __GOAL_MO_H__
 
 #include "goal.h"
+#include "strategies.h"
 
 namespace daex {
-
-struct Strategies
-{
-    enum Type { length, cost, makespan_max, makespan_add };
-};
 
 //! A goal that embed a search strategy, to orient a multi-objective search toward makespan or cost.
 class GoalMO : public Goal
@@ -27,7 +23,6 @@ protected:
     Strategies::Type _strategy;
 
 };
-
 
 } // namespace daex
 

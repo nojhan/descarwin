@@ -6,6 +6,8 @@
 #include <eo>
 #include <moeo>
 
+#include "../core/strategies.h"
+
 namespace daex {
 
 /** Configure a random strategy for each goal.

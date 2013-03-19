@@ -3,6 +3,7 @@
 #define __DAEX_EVAL_YAHSP_MO_H__
 
 #include "../core/decomposition_mo.h"
+#include "../core/strategies.h"
 #include "../evaluation/yahsp.h"
 
 template<class EOT=daex::DecompositionMO>
