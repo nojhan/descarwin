@@ -158,8 +158,8 @@ void pddlLoad::load_pddl( std::string solver /*= SOLVER_YAHSP*/,
     for( unsigned int i=0; i < (unsigned int) fluents_nb; ++i) {
 
         // prédicat, objet, date au plus tot, pointeur vers le fluent CPT
-        // daex::Atom * atom = new daex::Atom( fluents[i]->init, fluents[i] );
-        daex::Atom * atom = new daex::Atom( fluents[i]->init, i );
+        // daex::Atom atom = new daex::Atom( fluents[i]->init, fluents[i] );
+        daex::Atom atom = daex::Atom( fluents[i]->init, i );
 
         //std::cout << *atom << std::endl;
 
@@ -173,16 +173,16 @@ void pddlLoad::compute_chrono_partition()
 {
     assert( _atoms.size() != 0 );
 
-    std::vector<daex::Atom*>::iterator it_atom = _atoms.begin();
+    std::vector<daex::Atom>::iterator it_atom = _atoms.begin();
 
     // pour tous les atomes existants
     while( it_atom != _atoms.end() ) {
 
-        TimeVal start_time = (*it_atom)->earliest_start_time();
+        TimeVal start_time = (*it_atom).earliest_start_time();
 
         // associer l'atome à sa date au plus tot
         _chrono_partition_atom[ start_time ].push_back( *it_atom );
-        
+
         it_atom++;
     }
 
@@ -211,9 +211,9 @@ pddlLoad::pddlLoad(
 
 pddlLoad::~pddlLoad()
 {
-    for( unsigned int i=0; i<_atoms.size(); ++i) {
-        delete _atoms[i];
-    }
+    // for( unsigned int i=0; i<_atoms.size(); ++i) {
+    //     delete _atoms[i];
+    // }
 }
 
 } // namespace daex

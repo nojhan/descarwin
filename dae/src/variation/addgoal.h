@@ -341,7 +341,7 @@ protected:
      * Récupérer les atomes correspondant au voisinage (dans la Chrono Partition) de la date *
      *****************************************************************************************/
 
-    std::list<Atom*> candidate_atoms;
+    std::list<Atom> candidate_atoms;
 
     ChronoPartition::const_iterator it = _times.find(date);
     it--;
@@ -363,7 +363,7 @@ protected:
 #endif
 
     /*    std::cout << "candidate atoms = {";
-    for(std::list<Atom*>::iterator ia=candidate_atoms.begin(), end=candidate_atoms.end(); ia != end; ++ia)
+    for(std::list<Atom>::iterator ia=candidate_atoms.begin(), end=candidate_atoms.end(); ia != end; ++ia)
       {std::cout << " " << **ia;}
       std::cout << std::endl;*/
 
@@ -378,7 +378,7 @@ protected:
 
 #ifndef NDEBUG
     // ici, nomutex_atoms contient un ensemble d'atomes non-mutex deux à deux
-    std::list<Atom*> nomutex_atoms = nomutex( candidate_atoms );
+    std::list<Atom> nomutex_atoms = nomutex( candidate_atoms );
     assert( nomutex_atoms.size() > 0 );
 
     eo::log << eo::xdebug << ", of which " << nomutex_atoms.size() << " are nomutex";

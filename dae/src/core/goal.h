@@ -11,7 +11,7 @@
 
 namespace daex {
 
-class Goal : public std::list<Atom*>, public eoserial::Persistent, public eoPersistent
+class Goal : public std::list<Atom>, public eoserial::Persistent, public eoPersistent
 {
 public:
 
@@ -32,27 +32,27 @@ public:
 
     friend std::ostream& operator<<( std::ostream & out, const Goal & goal )
     {
-    out << "(Goal[" << goal.size() << "]: ";
+        out << "(Goal[" << goal.size() << "]: ";
 
-    if( goal.size() != 0 ) {
+        if( goal.size() != 0 ) {
 
-        std::list<Atom*>::const_iterator it = goal.begin();
+            std::list<Atom>::const_iterator it = goal.begin();
 
-        out << *(*it);
-
-        it++;
-
-        while( it != goal.end() ) {
-            out << " " << *(*it);
+            out << *it;
 
             it++;
+
+            while( it != goal.end() ) {
+                out << " " << *it;
+
+                it++;
+            }
         }
-    }
 
-    out << ")";
+        out << ")";
 
-    return out;
-	};
+        return out;
+    };
 
     Goal::iterator iter_at( unsigned int i );
 
@@ -81,7 +81,7 @@ public:
     {
         void operator()( eoserial::Array & array, const T& obj )
         {
-            array.push_back( eoserial::make( obj->fluentIndex() ) );
+            array.push_back( eoserial::make( obj.fluentIndex() ) );
         }
     };
 
@@ -90,13 +90,13 @@ public:
         // begin with list members
         /*
         eoserial::Array* members = eoserial::makeArray
-            < std::list<Atom*>, PointerPushAlgorithm >
+            < std::list<Atom>, PointerPushAlgorithm >
             ( *this );
         */
 
         // FIXME enregistrer la liste des fluent index plutôt que les atom*
         eoserial::Array* members = eoserial::makeArray
-            < std::list<Atom*>, IndexPushAlgorithm >
+            < std::list<Atom>, IndexPushAlgorithm >
             ( *this );
 
         // continues with self
@@ -111,13 +111,13 @@ protected:
      * Static pointer to "global" vector of atoms (the ones contained in the object
      * pddl), used to retrieve atoms on deserialization.
      */
-    static const std::vector< daex::Atom* > * _atoms;
+    static const std::vector< daex::Atom > * _atoms;
 
 public:
     /**
      * Static setter to above described pointer.
      */
-    static void atoms( const std::vector<daex::Atom*> * a )
+    static void atoms( const std::vector<daex::Atom> * a )
     {
         _atoms = a;
     }
@@ -139,7 +139,7 @@ public:
     {
         // begin with list members
         clear();
-        eoserial::unpackArray< std::list<Atom*>, UnpackByIndex >
+        eoserial::unpackArray< std::list<Atom>, UnpackByIndex >
             ( *obj, "members", *this );
         
         // continues with self

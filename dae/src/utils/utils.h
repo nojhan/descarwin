@@ -13,19 +13,19 @@ namespace daex {
 
 //! Return true if candidate is mutex with at least one of the atom in goal(first,last)
 template<class T>
-  bool has_one_mutex_in( Atom* const& candidate, T const first, T const last)
+  bool has_one_mutex_in( Atom const& candidate, T const first, T const last)
 {
   for( T it=first; it!=last; ++it  ) {
         // il faut absolument passer par une variable intermédiaire, sans quoi le compilo
         // merde complètement
 
-        Atom* a = *it;
+        Atom a = *it;
 
         // Warning: fmutex does not test if an atom is mutex with itself, thus we have to do it manually
-        if( candidate == a 
-            || 
-            fmutex( candidate->fluent(),
-                            a->fluent() ) ) {
+        if( candidate == a
+            ||
+            fmutex( candidate.fluent(),
+                            a.fluent() ) ) {
 
             return true;
         }
@@ -47,7 +47,7 @@ template< class T1, class T2 >
 typename T1::iterator draw_until_mutex_if( T1 const& applicants, T2 const& goal, unsigned int maxtry, bool search_mutex )
 */
 //template< class T2 >
-//std::vector<Atom*>::const_iterator draw_until_mutex_if( std::vector<Atom*> const& applicants, T2 const& goal, unsigned int maxtry, bool search_mutex )
+//std::vector<Atom>::const_iterator draw_until_mutex_if( std::vector<Atom> const& applicants, T2 const& goal, unsigned int maxtry, bool search_mutex )
 /*
 template< class T1, class T2 >
 typename T1::const_iterator draw_until_mutex_if( T1 const& applicants, T2 const& goal, unsigned int maxtry, bool search_mutex )
@@ -55,11 +55,11 @@ typename T1::const_iterator draw_until_mutex_if( T1 const& applicants, T2 const&
     assert( maxtry <= applicants.size() );
 
     typedef std::list< typename T1::const_iterator > IterList;
-    //typedef std::list< std::vector<Atom*>::const_iterator > IterList;
+    //typedef std::list< std::vector<Atom>::const_iterator > IterList;
     IterList candidates;
     for( 
 //typename T1::iterator
-std::vector<Atom*>::const_iterator it = applicants.begin(), end = applicants.end(); it != end; ++it ) {
+std::vector<Atom>::const_iterator it = applicants.begin(), end = applicants.end(); it != end; ++it ) {
         candidates.push_back( it );
     }
 
@@ -99,9 +99,9 @@ typename T1::const_iterator draw_until_mutex_if( T1 const& applicants, T2 const 
     assert( maxtry <= applicants.size() );
 
     typedef std::list< typename T1::const_iterator > IterList;
-    //typedef std::list< std::vector<Atom*>::const_iterator > IterList;
+    //typedef std::list< std::vector<Atom>::const_iterator > IterList;
     IterList candidates;
-    for( /*typename T1::iterator*/std::vector<Atom*>::const_iterator it = applicants.begin(), end = applicants.end(); it != end; ++it ) {
+    for( /*typename T1::iterator*/std::vector<Atom>::const_iterator it = applicants.begin(), end = applicants.end(); it != end; ++it ) {
         candidates.push_back( it );
     }
 
@@ -156,26 +156,26 @@ typename T1::const_iterator draw_until_nomutex( T1 const& applicants, T2 const g
 /*! Among mutex, atoms are chosen randomly, in an iterative manner.
  * Thus, the subset is the larg we can get with a random walk in the candidate list.
  */
-//std::vector<Atom*> nomutex( std::vector<Atom*> candidate_atoms );
-//std::list<Atom*> nomutex( std::vector<Atom*> candidate_atoms );
-//std::list<Atom*> nomutex( std::list<Atom*> candidate_atoms );
+//std::vector<Atom> nomutex( std::vector<Atom> candidate_atoms );
+//std::list<Atom> nomutex( std::vector<Atom> candidate_atoms );
+//std::list<Atom> nomutex( std::list<Atom> candidate_atoms );
 template< class T >
 T nomutex( T const& candidates )
 {
     // copie dans une liste pour pouvoir faire des erases sans pb de segfault, par la suite
-    std::list<Atom*> candidate_atoms;
+    std::list<Atom> candidate_atoms;
     std::copy( candidates.begin(), candidates.end(), std::back_inserter( candidate_atoms ) );
 
     assert( candidate_atoms.size() > 0 );
 
-    //typedef std::vector<Atom*> T;
+    //typedef std::vector<Atom> T;
 
     T nomutex_atoms;
 
     while( candidate_atoms.size() > 0 ) {
 
         // le i-ème atome
-        std::list<Atom*>::iterator ca_it = candidate_atoms.begin();
+        std::list<Atom>::iterator ca_it = candidate_atoms.begin();
         // un atome au hasard
         std::advance(ca_it, rng.random( candidate_atoms.size() ) );
 
@@ -183,25 +183,25 @@ T nomutex( T const& candidates )
         if( candidate_atoms.size() > 1 ) {
 
             // vecteur contenant les itérateurs vers les atomes à supprimer après avoir tout parcouru
-            typedef std::vector< std::list<Atom*>::iterator > ItersVec;
+            typedef std::vector< std::list<Atom>::iterator > ItersVec;
             ItersVec iters_to_erase;
             iters_to_erase.reserve( candidate_atoms.size() );
 
             // parcours les atomes candidats
-            for( std::list<Atom*>::iterator it = candidate_atoms.begin(), end = candidate_atoms.end(); it != end; ++it ) {
-            
+            for( std::list<Atom>::iterator it = candidate_atoms.begin(), end = candidate_atoms.end(); it != end; ++it ) {
+
                 // ce ne sont pas les meme
                 if( ca_it != it ) {
-                    Atom* ca = *ca_it;
-                    Atom* a = *it;
+                    Atom ca = *ca_it;
+                    Atom a = *it;
 
                     assert( ca != a );
-                    assert( ca->fluent() != a->fluent() );
+                    assert( ca.fluent() != a.fluent() );
 
                     // si le candidat est mutex avec cet atome
                     if( fmutex(
-                                ca->fluent(), 
-                                a->fluent() 
+                                ca.fluent(), 
+                                a.fluent() 
                               )
                       ) {
 
@@ -211,7 +211,7 @@ T nomutex( T const& candidates )
                     } // if mutex
                 } // if ca_it != it
             } // for it in candidate_atoms
-            
+
             // supprime effectivement les atomes mutex et l'atome gardé de la liste des candidats
             for( typename ItersVec::iterator itte = iters_to_erase.begin(), iend = iters_to_erase.end(); itte != iend; ++itte ) {
                 candidate_atoms.erase( *itte );
@@ -232,8 +232,8 @@ T nomutex( T const& candidates )
     // Check that the resulting list effectively contains no atoms that are pairwise mutualy exlusives
     for(     typename T::iterator iatom  = nomutex_atoms.begin(), end  = nomutex_atoms.end(); iatom != end;  ++iatom  ) {
         for( typename T::iterator iatom2 = ++iatom,               end2 = nomutex_atoms.end(); iatom != end2; ++iatom2 ) {
-            //assert( ! fmutex( (*iatom )->fluent(), (*iatom2)->fluent() ) );
-            if( (*iatom )->fluent() == (*iatom2)->fluent() ) { exit(1); }
+            //assert( ! fmutex( (*iatom ).fluent(), (*iatom2).fluent() ) );
+            if( (*iatom ).fluent() == (*iatom2).fluent() ) { exit(1); }
         }
     }
 #endif
@@ -276,7 +276,7 @@ Goal random_subset( T candidate_atoms )
         goal.push_back(*it);
 
         // mise à jour incrémentale de la date du goal
-        goaldate = std::max( (*it)->earliest_start_time(), goaldate );
+        goaldate = std::max( it->earliest_start_time(), goaldate );
 
         assert(goaldate != 0);
 
@@ -311,9 +311,9 @@ void assert_nomutex( T begin, T end )
         begin2++;
         //if( begin2 == goal.end() ) { break; }
         for( T iatom2 = begin2; iatom2 != end; ++iatom2 ) {
-            Atom* a = *iatom;
-            Atom* b = *iatom2;
-            assert( ! fmutex( a->fluent(), b->fluent() ) );
+            Atom a = *iatom;
+            Atom b = *iatom2;
+            assert( ! fmutex( a.fluent(), b.fluent() ) );
         }
     }
 }

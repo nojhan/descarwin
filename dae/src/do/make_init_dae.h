@@ -93,9 +93,9 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
         TimeVal goal_time = 0;
         for( unsigned int j=0; j < yahsp_adam.states[i].fluents_nb; ++j ) {
             unsigned int common_id = yahsp_adam.states[i].fluents[j]->id;
-            daex::Atom* atom = pddl.atoms()[common_id];
+            daex::Atom atom = pddl.atoms()[common_id];
             goal.push_back( atom );
-            goal_time = std::max( goal_time, atom->earliest_start_time() );
+            goal_time = std::max( goal_time, atom.earliest_start_time() );
         }
         goal.earliest_start_time( goal_time );
 

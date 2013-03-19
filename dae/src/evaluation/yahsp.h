@@ -178,7 +178,7 @@ public:
                     for( daex::Goal::iterator iatom = igoal->begin(); iatom != igoal->end(); ++iatom ) {
                         //  le compilateur demande à expliciter le template pour fluents,
                         //car le C++ ne prend pas en compte les types de retour dans la signature (beurk).
-                        intermediate_goal_state[i] =  (*iatom)->fluent();
+                        intermediate_goal_state[i] =  iatom->fluent();
                         i++;
                     }
                     assert( i ==  igoal->size());

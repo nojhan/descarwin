@@ -24,6 +24,6 @@ Goal::iterator Goal::iter_at( unsigned int i )
     return it;
 }
 
-const std::vector< daex::Atom* > * Goal::_atoms;
+const std::vector< daex::Atom > * Goal::_atoms;
 
 } // namespace daex

@@ -47,7 +47,7 @@ namespace daex
 //! Dictionary associating existing earliest start dates with their corresponding atoms
 /** Note: std::map garanty that keys remains ordered according to their value (GNU implementation use a red-black tree).
  */
-class ChronoPartition : public std::map<TimeVal, std::vector< daex::Atom*> > 
+class ChronoPartition : public std::map<TimeVal, std::vector< daex::Atom> > 
 {
 public:
 
@@ -89,7 +89,7 @@ public:
     void compute_chrono_partition();
 
 
-    const std::vector< daex::Atom*> & atoms() const { return this->_atoms; }
+    const std::vector< daex::Atom> & atoms() const { return this->_atoms; }
     
     const ChronoPartition & chronoPartitionAtom() { return this->_chrono_partition_atom; }
 
@@ -98,7 +98,7 @@ public:
      *
      * Each atom contains pointers to the objects used by the CPT/YAHSP parser.
      */
-    std::vector< daex::Atom*> _atoms;
+    std::vector< daex::Atom> _atoms;
 
 
 protected:

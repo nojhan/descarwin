@@ -44,7 +44,7 @@ public:
     {}
 
     // Empty ctor used for JSON serialization
-    Atom( ) {}
+    Atom( ) : _fluentIndex(0), _earliest_start_time(0) {}
 
     //! Accesseurs
     TimeVal                     earliest_start_time() const { return _earliest_start_time; }
@@ -53,7 +53,7 @@ public:
     unsigned int                fluentIndex()         const { return _fluentIndex; }
 
 protected:
-    unsigned int 				_fluentIndex;
+    unsigned int                _fluentIndex;
     // Fluent* _fluent;
     TimeVal                     _earliest_start_time;
 
@@ -62,6 +62,25 @@ public:
     {
         atom.printOn( out );
         return out;
+    }
+
+    friend bool operator==( const Atom& a1, const Atom& a2 )
+    {
+#ifndef NDEBUG
+        if( a1.fluentIndex() == a2.fluentIndex() ) {
+            assert( a1.earliest_start_time() == a2.earliest_start_time() );
+            return true;
+        } else {
+            return false;
+        }
+#else
+        return ( a1.fluentIndex() == a2.fluentIndex() );
+#endif
+    }
+
+    friend bool operator!=( const Atom& a1, const Atom& a2 )
+    {
+        return !(a1==a2);
     }
 
     void printOn(std::ostream& out) const

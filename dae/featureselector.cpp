@@ -342,7 +342,7 @@ const ChronoPartition & chronopartition=pddload->chronoPartitionAtom();
 
 vector<unsigned int> chronopartitionhistogram(chronopartition.size(),0); 
 
-std::map<TimeVal, std::vector< daex::Atom*> >::const_iterator it=chronopartition.begin();
+std::map<TimeVal, std::vector< daex::Atom> >::const_iterator it=chronopartition.begin();
 
 
 for (unsigned int i=0;it!=chronopartition.end();++it,++i)

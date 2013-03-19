@@ -57,17 +57,17 @@ public:
                 std::advance(candy, rng.random( decompo.iter_at(k)->size() ) );
 
                 // création de la liste des atomes à la date du candidat privée du candidat lui-même
-                assert(_times.find((*candy)->earliest_start_time()) != _times.end()); // on vérifie que la map est bien constituée
-                std::vector<Atom*> at_date = _times.find((*candy)->earliest_start_time())->second;
+                assert(_times.find(candy->earliest_start_time()) != _times.end()); // on vérifie que la map est bien constituée
+                std::vector<Atom> at_date = _times.find(candy->earliest_start_time())->second;
                 at_date.erase(std::find(at_date.begin(), at_date.end(), *candy));
 
                 // tentative d'ajout d'un nouvel atome non mutex avec aucun des atomes du goal privé du candidat
-                //std::vector<Atom*>::const_iterator icandidate = draw_until_nomutex( at_date, goal, std::min( _maxtry_search_mutex, at_date.size() ) );
-                std::vector<Atom*>::const_iterator icandidate = draw_until_nomutex( at_date, decompo.iter_at(k)->begin(), decompo.iter_at(k)->end(), std::min( _maxtry_search_mutex, static_cast<unsigned int>(at_date.size()) ) );
+                //std::vector<Atom>::const_iterator icandidate = draw_until_nomutex( at_date, goal, std::min( _maxtry_search_mutex, at_date.size() ) );
+                std::vector<Atom>::const_iterator icandidate = draw_until_nomutex( at_date, decompo.iter_at(k)->begin(), decompo.iter_at(k)->end(), std::min( _maxtry_search_mutex, static_cast<unsigned int>(at_date.size()) ) );
                 if( icandidate != at_date.end() ) {
 #ifndef NDEBUG
                     eo::log << eo::xdebug << std::endl << "\tbefore:" << decompo << std::endl;
-                    eo::log << eo::xdebug << ", replaced: " << **candy << " by " << **icandidate;
+                    eo::log << eo::xdebug << ", replaced: " << *candy << " by " << *icandidate;
 #endif
                     *candy=*icandidate;
                     is_modified = true;
@@ -85,7 +85,7 @@ public:
                     if( icandidate != at_date.end() ) {
 #ifndef NDEBUG
                         eo::log << eo::xdebug << std::endl << "\tbefore:" << decompo << std::endl;
-                        eo::log << eo::xdebug << ", added: " <<  **icandidate;
+                        eo::log << eo::xdebug << ", added: " <<  *icandidate;
 #endif
                         decompo.iter_at(k)->push_back( *icandidate );
                         is_modified = true;
