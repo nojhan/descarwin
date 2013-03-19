@@ -15,8 +15,7 @@
 #include <utils/eoFeasibleRatioStat.h>
 
 #include "daex.h"
-#include "evaluation/cpt-yahsp.h"
-#include "evaluation/yahsp.h"
+#include "evaluation/yahsp_mo.h"
 #include "core/decomposition_mo.h"
 #include "variation/strategy_mo.h"
 
@@ -31,5 +30,17 @@
 
 int main ( int argc, char* argv[] )
 {
+    daex::DecompositionMO indiv;
+
+    // FIXME segfault on empty decomposition!!!
+    for( unsigned int i=0; i<50; ++i ) {
+        indiv.push_back( daex::DecompositionMO::AtomType() );
+    }
+
+    daemoYahspEvalAdd<daex::DecompositionMO> eval_add( 1 );
+    eval_add( indiv );
+
+    daemoYahspEvalMax<daex::DecompositionMO> eval_max( 1 );
+    eval_max( indiv );
 }
 

@@ -60,6 +60,8 @@ template<class EOT=daex::Decomposition >
 class daeYahspEval : public daeCptYahspEval<EOT>
 {
 public:
+    typedef std::pair<double,bool> FitT; // Fitness & Feasibility
+
     daeYahspEval(
             unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e6
     ) :
@@ -88,20 +90,30 @@ public:
     };
 
 public:
-    virtual void pre_step( EOT & decompo ) {};
+    /** hooks:
+     *  operator( decompo )
+     *      pre_call( decompo )
+     *      call( decompo )
+     *          solve( decompo )
+     *              pre_step( decompo[i] )
+     *              post_step()
+     *              post_step_fail()
+     *      post_call( decompo )
+     */
+    virtual void pre_step( typename EOT::AtomType& atom ) {};
     virtual void post_step_success() {};
     virtual void post_step_fail() {};
 
 public:
     //! Solve the whole decomposition and returns a pair<fitness,feasibility>
-    virtual std::pair<double,bool> search( EOT & decompo )
+    virtual FitT solve( EOT & decompo )
     {
         double fitness = -1.0;
         bool feasibility = false;
                                 #ifndef NDEBUG
                                 eo::log << eo::xdebug << "decompo.size=" << decompo.size() << std::endl;
                                 eo::log << eo::xdebug << "Check goal consistency" << std::endl;
-                                for( std::list<daex::Goal>::iterator igoal  = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
+                                for( typename EOT::iterator igoal  = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
                                     assert_noduplicate( igoal->begin(), igoal->end() );
                                     assert_nomutex(     igoal->begin(), igoal->end() );
                                 }
@@ -152,7 +164,7 @@ public:
                                 #ifndef NDEBUG
                                 unsigned int goalCounter = 0;
                                 #endif
-                for( daex::Decomposition::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
+                for( typename EOT::iterator igoal = decompo.begin(), iend = decompo.end(); igoal != iend; ++igoal ) {
                                 #ifndef NDEBUG
                                 eo::log << eo::xdebug << "\t goal #" << goalCounter++ << "/" << decompo.size() << std::endl;
                                 eo::log << eo::xdebug << "\t\tcopy of states and fluents...";
@@ -172,7 +184,7 @@ public:
                     assert( i ==  igoal->size());
                     //  search a plan towards the current goal
                     bitarray_copy( previous_state, *get_current_state(), fluents_nb );
-                    code = solve_next( decompo, intermediate_goal_state, igoal->size(), daeCptYahspEval<EOT>::_b_max_in );
+                    code = solve_next( decompo, *igoal, intermediate_goal_state, igoal->size(), daeCptYahspEval<EOT>::_b_max_in );
                     free(intermediate_goal_state);
 
                     if( code != PLAN_FOUND ) {
@@ -194,7 +206,7 @@ public:
                     decompo.b_max( daeCptYahspEval<EOT>::_b_max_last ); // VV : set b_max for the decomposition
 
                     bitarray_copy( previous_state, *get_current_state(), fluents_nb );
-                    unsigned int code = solve_next( decompo, goal_state, goal_state_nb, daeCptYahspEval<EOT>::_b_max_last );
+                    unsigned int code = solve_next( decompo, *(decompo.end()), goal_state, goal_state_nb, daeCptYahspEval<EOT>::_b_max_last );
 
                     if( code == PLAN_FOUND ) {
                         compress( decompo );
@@ -224,7 +236,7 @@ public:
 
     virtual void call( EOT& decompo )
     {
-        std::pair<double,bool> result = search( decompo );
+        FitT result = solve( decompo );
         decompo.fitness( result.first );
         decompo.setFeasible( result.second );
     }
@@ -247,9 +259,9 @@ public:
 protected:
 
     //! Call yahsp from a built fluent state to another and update decomposition's plans
-    unsigned int solve_next( EOT & decompo, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes )
+    unsigned int solve_next( EOT & decompo, typename EOT::AtomType& atom, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes )
     {
-        pre_step(decompo);
+        pre_step( atom );
                                  #ifndef NDEBUG
                                  eo::log << eo::xdebug << "ok" << std::endl;
                                  eo::log << eo::xdebug << "\t\tcall the solver...";
@@ -368,6 +380,10 @@ protected:
     /* unsigned int _intermediate_goal_state_nb; */
 };
 
+
+/***********************************************************************
+ * EVAL FOR INIT
+ **********************************************************************/
 
 //! Classe à utiliser lors de la première itération, pour estimer b_max
 template<class EOT=daex::Decomposition>
