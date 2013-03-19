@@ -4,7 +4,7 @@
 
 #include <moeo>
 
-#include "goal.h"
+#include "goal_mo.h"
 #include "decomposition.h"
 
 namespace daex {
