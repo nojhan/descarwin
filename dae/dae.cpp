@@ -137,7 +137,7 @@ int main ( int argc, char* argv[] )
 
     // check if we're in multistart mode
     bool with_multistart = parallel::check_roles_multistart( multistart_workers, eval_workers );
-    # endif // WITH_MPI
+# endif // WITH_MPI
 
     rng.reseed( seed );
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "seed" << seed << std::endl;
@@ -196,6 +196,13 @@ int main ( int argc, char* argv[] )
     std::string dump_sep = ".";
     unsigned int dump_file_count = 1;
     std::string metadata = "domain " + domain + "\n" + IPC_PLAN_COMMENT + "instance " + instance;
+#endif
+
+#ifndef NDEBUG
+    eo::log << eo::progress << "OK" << std::endl;
+    //eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
+    eo::log.flush();
+    eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
 #endif
 
     unsigned int b_max_fixed = parser.valueOf<unsigned int>("bmax-fixed");
@@ -342,13 +349,6 @@ int main ( int argc, char* argv[] )
 
     // ALGORITHM
     eoEasyEA<daex::Decomposition> dae( checkpoint, eval, pop_eval, breed, replacor, offsprings );
-
-#ifndef NDEBUG
-    eo::log << eo::progress << "OK" << std::endl;
-    //eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
-    eo::log.flush();
-    eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
-#endif
 
     /********************
      * MULTI-START RUNS *
