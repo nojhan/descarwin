@@ -91,8 +91,10 @@ eoGeneralBreeder<EOT> & do_make_variation_op( eoParser & parser, eoState & state
     double proba_cross = parser.valueOf<double>("proba-cross");
     double proba_mut = parser.valueOf<double>("proba-mut");
 
+#ifdef DAE_MO
     std::string strategy = parser.valueOf<std::string>("strategy");
     double proba_strategy = parser.valueOf<double>("proba-strategy");
+#endif
 
 
     unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
