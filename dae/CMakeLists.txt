@@ -21,6 +21,13 @@ SET(MO_BIN_DIR "${PARADISEO_BUILD_DIR}/mo/lib" CACHE PATH "EO binary directory" 
 SET(CPT_YAHSP_SRC_DIR "${CPT_YAHSP_DIR}" CACHE PATH "CPT-YAHSP source directory" FORCE)
 SET(CPT_YAHSP_BIN_DIR "${CPT_YAHSP_BUILD_DIR}/lib" CACHE PATH "CPT-YAHSP source directory" FORCE)
 
+SET(DAE_MO "false" CACHE BOOL "Build the Multi-Objective version of DaE")
+IF( DAE_MO )
+    SET( BINARY_NAME "daemo" CACHE STRING "Name of the built binary")
+    ADD_DEFINITIONS(-DDAE_MO)
+ELSE()
+    SET( BINARY_NAME "dae" CACHE STRING "Name of the built binary")
+ENDIF()
 
 # define project name
 PROJECT(DAEX)
@@ -92,15 +99,11 @@ LINK_LIBRARIES(eoutils gmp eo rt gcov gdsl termcap)
 # global references that differ from the ones needed by dae-mt + yahsp.
 
 ADD_EXECUTABLE(dae dae.cpp)
-ADD_EXECUTABLE(daemo daemo.cpp)
 ADD_DEPENDENCIES(dae daex)
-ADD_DEPENDENCIES(daemo daex)
 IF( CPT_WITH_OMP )
     TARGET_LINK_LIBRARIES(dae   daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
-    TARGET_LINK_LIBRARIES(daemo daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 ELSE()
     TARGET_LINK_LIBRARIES(dae   daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
-    TARGET_LINK_LIBRARIES(daemo daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
 ENDIF()
 
 # only if OpenMP on yahsp is activated
