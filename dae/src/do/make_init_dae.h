@@ -70,7 +70,11 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     eo::log << eo::logging << "Evaluate a first empty plan" << std::endl; 
 
     //Let's find a feasible plan with default yashp parameter settings
-    unsigned int return_code = cpt_basic_search();
+
+#ifndef NDEBUG // avoid warning about unused variable
+    unsigned int return_code =
+#endif
+    cpt_basic_search();
     //std::cout << "return_code : " << return_code << std::endl;
     assert( return_code == PLAN_FOUND );
     eo::log << eo::debug << "Found a plan" << std::endl;
@@ -186,7 +190,12 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 template<class EOT>
 unsigned int estimate_bmax_incremental(
         eoPop<EOT>& pop,
-        eoParser & parser, unsigned int l_max, unsigned int eval_count,
+        eoParser & parser, unsigned int l_max,
+        unsigned int
+#ifndef NDEBUG // avoid warning about unused variable
+        eval_count
+#endif
+        ,
         std::string plan_file, TimeVal & best_makespan, 
         std::string dump_sep, unsigned int & dump_file_count, std::string metadata
         )

@@ -12,7 +12,11 @@ bool testDirRes(std::string _dirName, bool _erase);
 
 namespace daex {
 
-void do_make_checkpoint_param( eoParser & parser ) 
+void do_make_checkpoint_param( eoParser &
+#ifndef NDEBUG // avoid warning about unused variable
+        parser
+#endif
+)
 {
 #ifndef NDEBUG
     unsigned int out_save_freq = parser.createParam((unsigned int)0, "out-save-freq", "Save every F generation (0 = only final state, absent = never)", '\0', "Persistence" ).value();
@@ -28,8 +32,15 @@ void do_make_checkpoint_param( eoParser & parser )
 }
 
 template <class EOT>
-eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator, eoParser & parser, eoState & state, eoPop<EOT> & pop
+eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
+        eoParser &
+#ifndef NDEBUG // avoid warning about unused variable
+        parser
+#endif
+        ,
+        eoState & state, eoPop<EOT> &
 #ifndef NDEBUG
+        pop
         , eoEvalFuncCounter<EOT> & eval_counter
 #endif
 )
