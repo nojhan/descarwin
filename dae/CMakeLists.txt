@@ -92,7 +92,7 @@ ENDIF()
 #ELSE()
  
 # target + link libraries
-LINK_LIBRARIES(eoutils gmp eo rt gcov gdsl termcap)
+LINK_LIBRARIES(eoutils gmp eo eoserial rt gcov gdsl termcap)
 
 # VV  : cpt_yahsp_library-common-dae-omp and  cpt_yahsp_library-dae are  no more
 # factorized because dae + yahsp-mt need  to be completely recompiled due to TLS
