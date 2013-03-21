@@ -231,7 +231,7 @@ unsigned int estimate_bmax_incremental(
 
         // in non multi-threaded version, use the plan dumper
         //#ifndef SINGLE_EVAL_ITER_DUMP
-        daex::evalBestMakespanPlanDump eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
+        daex::evalBestMakespanPlanDump<EOT> eval_bestfile( eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 
         // if we do not want MT, but we want debug, add more eval wrappers
 #ifndef NDEBUG
@@ -338,7 +338,7 @@ unsigned int estimate_bmax_incremental(
     // evaluate pop before leaving
     daeYahspEval<EOT> eval_yahsp( 
             l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
-    daex::evalBestMakespanPlanDump eval_bestfile( 
+    daex::evalBestMakespanPlanDump<EOT> eval_bestfile( 
             eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
 #ifndef NDEBUG
     eoEvalFuncCounter<EOT> eval_counter( eval_bestfile, "Eval.\t" );

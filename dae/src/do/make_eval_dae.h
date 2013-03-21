@@ -74,7 +74,7 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
 
     //#ifndef SINGLE_EVAL_ITER_DUMP
     // dump the best solution found so far in a file
-    daex::evalBestMakespanPlanDump* eval_bestfile = new daex::evalBestMakespanPlanDump( *eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
+    daex::evalBestMakespanPlanDump<EOT>* eval_bestfile = new daex::evalBestMakespanPlanDump<EOT>( *eval_yahsp, plan_file, best_makespan, false, dump_sep, dump_file_count, metadata );
     state.storeFunctor( eval_bestfile );
 
 #ifndef NDEBUG

@@ -11,7 +11,6 @@ SET(LIBRARY_OUTPUT_PATH ${DAEX_LIB_OUTPUT_PATH})
 SET (DAEX_SOURCES
   utils/posix_timer.cpp
   utils/pddl_load.cpp
-  utils/evalBestPlanDump.cpp
   utils/cli.cpp
   core/goal.cpp
   utils/eoJsonUtils.cpp

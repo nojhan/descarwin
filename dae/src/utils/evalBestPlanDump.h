@@ -17,7 +17,7 @@
 
 namespace daex {
 
-template< class T >
+template< class T, class EOT >
 class BestPlanDumpper
 {
     public:
@@ -45,7 +45,7 @@ class BestPlanDumpper
         std::ofstream _of;
 
     public:
-        void dump( Decomposition & eo )
+        void dump( EOT & eo )
         {
             if( _single_file ) {
                 // explicitely erase the file before writing in it
@@ -84,18 +84,18 @@ class BestPlanDumpper
         T best() { return _best; }
 };
 
-/** 
+/**
 Dump an evaluated plan to a given file if it has the best "value" found so far, use derived class to use either makespan or fitness as "value".
 
 Note: test if the file could be open only in debug mode
 If the file cannot be open during the calls, everything will fail in an standard exception.
 */
-template<class T>
-class evalBestPlanDump : public eoEvalFunc<Decomposition>, public BestPlanDumpper<T>
+template<class T, class EOT>
+class evalBestPlanDump : public eoEvalFunc<EOT>, public BestPlanDumpper<T,EOT>
 {
 public:
     evalBestPlanDump(
-            eoEvalFunc<Decomposition>& func, 
+            eoEvalFunc<EOT>& func, 
             std::string afilename, 
             T worst,
             bool single_file = false,
@@ -103,10 +103,10 @@ public:
             unsigned int file_count = 0,
             std::string metadata = ""
     )
-        : BestPlanDumpper<T>( afilename, worst, single_file, file_count, sep, metadata ), _func(func)
+        : BestPlanDumpper<T,EOT>( afilename, worst, single_file, file_count, sep, metadata ), _func(func)
     {}
 
-        void operator()( Decomposition & eo )
+        void operator()( EOT & eo )
     {
         if( eo.invalid() ) {
             // don't forget to call the embedded evaluator
@@ -123,7 +123,7 @@ public:
     }
 
 protected:
-    virtual void call( Decomposition & eo ) = 0;
+    virtual void call( EOT & eo ) = 0;
 
     /* TODO on x86-64, when called inside a ofstream::open, this functional call returns a corrupted string
     const char * filename()
@@ -139,7 +139,7 @@ protected:
     }
     */
 
-    eoEvalFunc<Decomposition>& _func;
+    eoEvalFunc<EOT>& _func;
 }; // class evalBestPlanDump
 
 
@@ -149,11 +149,12 @@ Dump an evaluated plan to a given file if it has the best makespan found so far
 Note: test if the file could be open only in debug mode
 If the file cannot be open during the calls, everything will fail in an standard exception.
 */
-class evalBestMakespanPlanDump : public evalBestPlanDump<TimeVal>
+template<class EOT>
+class evalBestMakespanPlanDump : public evalBestPlanDump<TimeVal,EOT>
 {
 public:
     evalBestMakespanPlanDump(
-            eoEvalFunc<Decomposition>& func, 
+            eoEvalFunc<EOT>& func, 
             std::string afilename, 
             TimeVal worst,
             bool single_file = false,
@@ -161,12 +162,21 @@ public:
             unsigned int file_count = 0,
             std::string metadata = ""
     )
-        : evalBestPlanDump<TimeVal>( func, afilename, worst, single_file, sep, file_count, metadata )
+        : evalBestPlanDump<TimeVal,EOT>( func, afilename, worst, single_file, sep, file_count, metadata )
     {
     }
 
 protected:
-    virtual void call( Decomposition & eo );
+    virtual void call( EOT & eo )
+    {
+        if( eo.plan().makespan() < this->_best ) {
+# ifdef WITH_OMP
+#pragma omp critical
+# endif // WITH_OMP
+            this->_best = eo.plan().makespan();
+            this->dump( eo );
+        }// if better
+    }
 };
 
 
@@ -176,24 +186,38 @@ Dump an evaluated plan to a given file if it has the best fitness found so far
 Note: test if the file could be open only in debug mode
 If the file cannot be open during the calls, everything will fail in an standard exception.
 */
-class evalBestFitnessPlanDump  : public evalBestPlanDump<Decomposition::Fitness>
+template<class EOT>
+class evalBestFitnessPlanDump  : public evalBestPlanDump<typename EOT::Fitness, EOT>
 {
 public:
     evalBestFitnessPlanDump(
-            eoEvalFunc<Decomposition>& func,
+            eoEvalFunc<EOT>& func,
             std::string afilename,
-            Decomposition::Fitness worst,
+            typename EOT::Fitness worst,
             bool single_file = false,
             std::string sep = ".",
             unsigned int file_count = 0,
             std::string metadata = ""
     )
-        : evalBestPlanDump<Decomposition::Fitness>( func, afilename, worst, single_file, sep, file_count, metadata )
+        : evalBestPlanDump<typename EOT::Fitness,EOT>( func, afilename, worst, single_file, sep, file_count, metadata )
     {
     }
 
 protected:
-    virtual void call( Decomposition & eo );
+    virtual void call( EOT & eo )
+    {
+        // Note: in EO, maximizing by default, later overloaded for minimizing
+        // OMP DIRTY - first comparison is unprotected, in order to be non-blocking
+        if( eo.fitness() > this->_best ) {
+# ifdef WITH_OMP
+#pragma omp critical
+# endif // WITH_OMP
+            if( eo.fitness() > this->_best ) {
+                this->_best = eo.fitness();
+                this->dump( eo );
+            }
+        } // if better
+    }
 };
 
 } // namespace daex
