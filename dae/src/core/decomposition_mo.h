@@ -19,18 +19,18 @@ public:
      * Returns true if the _ith objective have to be minimzed
      * @param _i index of the objective
      */
-    static bool minimizing (int _i) { return true; }
+    static bool minimizing( int ) { return true; }
 
     /**
      * Returns true if the _ith objective have to be maximzed
      * @param _i index of the objective
      */
-    static bool maximizing (int _i) { return false; }
+    static bool maximizing( int ) { return false; }
 
     /**
      * Returns the number of objectives
      */
-    static unsigned int nObjectives () { return 2; }
+    static unsigned int nObjectives() { return 2; }
 };
 
 

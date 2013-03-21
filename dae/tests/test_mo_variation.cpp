@@ -37,7 +37,7 @@ void print_strategies( daex::DecompositionMO decompo )
     std::clog << std::endl;
 }
 
-int main ( int argc, char* argv[] )
+int main ( int , char** )
 {
     daex::DecompositionMO indiv;
     indiv.invalidate();

@@ -7,8 +7,8 @@ namespace daex {
 void do_make_replace_param( eoParser & parser )
 {
     // MODIFS MS START
-    unsigned replaceTourSize = parser.createParam(unsigned(1), "replaceTourSize", "Size of Replacement Tournament (1->deterministic (hum, pas logique ;-(", '\0', "Evolution Engine" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "replaceTourSize" << replaceTourSize << std::endl;
+    // unsigned replaceTourSize = parser.createParam(unsigned(1), "replaceTourSize", "Size of Replacement Tournament (1->deterministic (hum, pas logique ;-(", '\0', "Evolution Engine" ).value();
+    // eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "replaceTourSize" << replaceTourSize << std::endl;
 
     bool weakElitism = parser.createParam(true, "weakElitism", "Weak Elitism in replacement", '\0', "Evolution Engine").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "weakElitism" << weakElitism << std::endl;
@@ -23,7 +23,7 @@ void do_make_replace_param( eoParser & parser )
 template<class EOT>
 eoReplacement<EOT> & do_make_replace_op( eoParser & parser, eoState & state )
 {
-    unsigned int replaceTourSize = parser.valueOf<unsigned int>("replaceTourSize");
+    // unsigned int replaceTourSize = parser.valueOf<unsigned int>("replaceTourSize");
     bool weakElitism = parser.valueOf<bool>("weakElitism");
 
     // JACK : L'article indique qu'on fait un remplacement en tournoi déterministe et qu'il n'y a pas d'élistisme, on aurait alors ça :

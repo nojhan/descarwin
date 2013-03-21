@@ -100,7 +100,7 @@ public:
      *              post_step_fail()
      *      post_call( decompo )
      */
-    virtual void pre_step( typename EOT::AtomType& atom ) {};
+    virtual void pre_step( typename EOT::AtomType& ) {};
     virtual void post_step_success() {};
     virtual void post_step_fail() {};
 
@@ -246,7 +246,7 @@ public:
         decompo.plan().search_steps( decompo.get_number_evaluated_nodes() );
     };
 
-    virtual void pre_call( EOT & decompo ) { decompo; };
+    virtual void pre_call( EOT & ) { };
 
     void operator()( EOT & decompo )
     {
