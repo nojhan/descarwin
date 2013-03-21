@@ -22,10 +22,19 @@ items=$( for i in $(seq 0 $((nb-1)) ); do printf "${#bs[i]}_$i\n"; done | sort |
 for i in $items; do
     printf "%${max}s ... " "${bs[$i]}"
     ./${bs[$i]} 1>/dev/null 2>/dev/null
-    if [[ $? == 0 ]]; then
-        printf "${OK} OK${RAZ}\n"
+    err=$?
+    if [[ $err == 0 ]]; then
+        build_dir=$(basename $(echo $bs | sed "s,_,/,g"))
+        printf "${OK} OK${RAZ} -- run_test.sh $build_dir ... "
+        ./run_test.sh $build_dir 1>/dev/null 2>/dev/null
+        err=$?
+        if [[ $err == 0 ]]; then
+            printf "${OK} OK${RAZ}\n"
+        else
+            printf "${NOK}NOK${RAZ} ($err)\n"
+        fi
     else
-        printf "${NOK}NOK${RAZ}\n"
+        printf "${NOK}NOK${RAZ} ($err)\n"
     fi
 done
 
