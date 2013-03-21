@@ -52,7 +52,17 @@ void do_make_variation_param( eoParser & parser, unsigned int pop_size )
     double proba_mut = parser.createParam( (double)0.8, "proba-mut", 
             "Probability to apply one of the mutation", 'm', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_mut" << proba_mut << std::endl;
-    
+
+#ifdef DAE_MO
+    std::string strategy = parser.createParam( (std::string)"random", "strategy",
+            "How to change the search strategy for DAEMO_YAHSP. Either a fixed one among: length, cost, makespan-max or makespan-add; either: random, flip-goal (random makespan-add or cost at each goal) or flip-decomposition (random makespan-add or cost for the whole individual)",
+            'y', "Multi-objective").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strategy" << strategy << std::endl;
+
+    double proba_strategy = parser.createParam( (double)0.5, "proba-strategy",
+            "Probability to choose makespan-add metric when using the flip-goal or flip-decomposition strategies", 'p', "Multi-Objective" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_strategy" << proba_strategy << std::endl;
+#endif
     /*
     unsigned int maxtry_candidate = parser.createParam( (unsigned int)11, "maxtry-candidate", 
             "Maximum number of atoms to try when searching for a candidate in the changeAtom mutation", 'y', "Misc" ).value();
@@ -80,6 +90,10 @@ eoGeneralBreeder<EOT> & do_make_variation_op( eoParser & parser, eoState & state
     double w_addatom = parser.valueOf<double>("w-addatom");
     double proba_cross = parser.valueOf<double>("proba-cross");
     double proba_mut = parser.valueOf<double>("proba-mut");
+
+    std::string strategy = parser.valueOf<std::string>("strategy");
+    double proba_strategy = parser.valueOf<double>("proba-strategy");
+
 
     unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
     unsigned int maxtry_mutex = 0;     // deactivated by default: should try every candidates
@@ -144,10 +158,39 @@ eoGeneralBreeder<EOT> & do_make_variation_op( eoParser & parser, eoState & state
     eoSGAGenOp<EOT> * variator = new eoSGAGenOp<EOT>( *crossover, proba_cross, *mutator, proba_mut);
     state.storeFunctor( variator );
 
+#ifdef DAE_MO
+    // FIXME permits to choose a different MO search strategies subset from the parser? And rates ?
+    eoMonOp<EOT> * set_strat;
+    if( strategy == "random" ) {
+        set_strat = new daex::StrategyRandom<EOT>(/*default strategies and rates*/);
+    } else if( strategy == "flip-goal" ) {
+        set_strat = new daex::StrategyFlipGoal<EOT>( proba_strategy );
+    } else if( strategy == "flip-decomposition" ) {
+        set_strat = new daex::StrategyFlipDecomposition<EOT>( proba_strategy );
+    } else if( strategy == "length" ) {
+        set_strat = new daex::StrategyFixed<EOT>( Strategies::length );
+    } else if( strategy == "cost" ) {
+        set_strat = new daex::StrategyFixed<EOT>( Strategies::cost );
+    } else if( strategy == "makespan-max" ) {
+        set_strat = new daex::StrategyFixed<EOT>( Strategies::makespan_max );
+    } else if( strategy == "makespan-add" ) {
+        set_strat = new daex::StrategyFixed<EOT>( Strategies::makespan_add );
+    } else {
+        throw std::runtime_error("Unknown MO search strategy");
+    }
+    state.storeFunctor( set_strat );
+    eoSequentialOp<EOT> * movariat = new eoSequentialOp<EOT>();
+    state.storeFunctor( movariat );
+    movariat->add(  *variator, 1.0 ); // always call
+    movariat->add( *set_strat, 1.0 ); // always call
+
+    // selector, variator, rate (for selection), interpret_as_rate
+    eoGeneralBreeder<EOT> * breed = new eoGeneralBreeder<EOT>( *p_selectone, *movariat, (double)offsprings, false );
+#else
     // selector, variator, rate (for selection), interpret_as_rate
     eoGeneralBreeder<EOT> * breed = new eoGeneralBreeder<EOT>( *p_selectone, *variator, (double)offsprings, false );
+#endif
     state.storeFunctor( breed );
-    // FIXME tester si on veut 700% ou 700
 
     return *breed;
 }
