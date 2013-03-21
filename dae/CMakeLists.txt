@@ -98,25 +98,25 @@ LINK_LIBRARIES(eoutils gmp eo eoserial rt gcov gdsl termcap)
 # factorized because dae + yahsp-mt need  to be completely recompiled due to TLS
 # global references that differ from the ones needed by dae-mt + yahsp.
 
-ADD_EXECUTABLE(dae dae.cpp)
-ADD_DEPENDENCIES(dae daex)
+ADD_EXECUTABLE(${BINARY_NAME} dae.cpp)
+ADD_DEPENDENCIES(${BINARY_NAME} daex)
 IF( CPT_WITH_OMP )
-    TARGET_LINK_LIBRARIES(dae   daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(${BINARY_NAME}   daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 ELSE()
-    TARGET_LINK_LIBRARIES(dae   daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(${BINARY_NAME}   daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
 ENDIF()
 
 # only if OpenMP on yahsp is activated
 IF (CPT_WITH_OMP AND DAE_WITH_OMP )
-    ADD_EXECUTABLE(dae-sm dae.cpp)
-    ADD_DEPENDENCIES(dae-sm daex)
+    ADD_EXECUTABLE(${BINARY_NAME}-sm dae.cpp)
+    ADD_DEPENDENCIES(${BINARY_NAME}-sm daex)
     TARGET_LINK_LIBRARIES(dae-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae-sm)
 
-    ADD_EXECUTABLE(dae-mt dae.cpp)
-    ADD_DEPENDENCIES(dae-mt daex-yahsp-mt)
-    TARGET_LINK_LIBRARIES(dae-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
+    ADD_EXECUTABLE(${BINARY_NAME}-mt dae.cpp)
+    ADD_DEPENDENCIES(${BINARY_NAME}-mt daex-yahsp-mt)
+    TARGET_LINK_LIBRARIES(${BINARY_NAME}-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
     SET_TARGET_PROPERTIES(
-    dae-mt
+    ${BINARY_NAME}-mt
     PROPERTIES 
     COMPILE_FLAGS "-DYAHSP_MT"
     )
