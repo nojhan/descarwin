@@ -41,10 +41,15 @@ public:
 
     bool operator()( EOT & decompo )
     {
+        bool modified = false;
         for( typename EOT::iterator igoal=decompo.begin(), end=decompo.end(); igoal!=end; ++igoal) {
             unsigned int which = rng.roulette_wheel( _rates );
-            igoal->strategy( _strategies[which] );
+            if( igoal->strategy() != _strategies[which] ) {
+                igoal->strategy( _strategies[which] );
+                modified = true;
+            }
         } // for igoal in decompo
+        return modified;
     }
 
 protected:
@@ -82,13 +87,21 @@ public:
 
     bool operator()( EOT & decompo )
     {
+        bool modified=false;
         for( typename EOT::iterator igoal=decompo.begin(), end=decompo.end(); igoal!=end; ++igoal) {
             if( rng.flip(_proba_strategy_makespan) ) {
-                igoal->strategy( Strategies::makespan_add );
+                if( igoal->strategy() != Strategies::makespan_add ) {
+                    igoal->strategy( Strategies::makespan_add );
+                    modified=true;
+                }
             } else {
-                igoal->strategy( Strategies::cost );
+                if( igoal->strategy() != Strategies::cost ) {
+                    igoal->strategy( Strategies::cost );
+                    modified=true;
+                }
             }
         } // for igoal in decompo
+        return modified;
     }
 
 protected:
@@ -112,9 +125,14 @@ public:
             strategy = Strategies::makespan_add;
         }
 
+        bool modified=false;
         for( typename EOT::iterator igoal=decompo.begin(), end=decompo.end(); igoal!=end; ++igoal) {
-            igoal->strategy( strategy );
+            if( igoal->strategy() != strategy ) {
+                igoal->strategy( strategy );
+                modified=true;
+            }
         } // for igoal in decompo
+        return modified;
     }
 
 protected:
@@ -133,9 +151,14 @@ public:
 
     bool operator()( EOT & decompo )
     {
+        bool modified=false;
         for( typename EOT::iterator igoal=decompo.begin(), end=decompo.end(); igoal!=end; ++igoal) {
-            igoal->strategy( _strategy );
+            if( igoal->strategy() != _strategy ) {
+                igoal->strategy( _strategy );
+                modified=true;
+            }
         } // for igoal in decompo
+        return modified;
     }
 
 protected:
