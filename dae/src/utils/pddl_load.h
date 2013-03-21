@@ -45,9 +45,9 @@ namespace daex
 
 
 //! Dictionary associating existing earliest start dates with their corresponding atoms
-/** Note: std::map garanty that keys remains ordered according to their value (GNU implementation use a red-black tree).
+/** Note: std::map garanty that keys remains ordered according to their value (GNU implementation use a red-black tree)
  */
-class ChronoPartition : public std::map<TimeVal, std::vector< daex::Atom> > 
+class ChronoPartition : public std::map<TimeVal, std::vector< daex::Atom> >
 {
 public:
 

@@ -54,7 +54,7 @@ int main ( int argc, char* argv[] )
     //std::clog << "# Sequential: " << is_sequential << std::endl;
     
     eoState state;
-    daex::Init<> init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
+    daex::Init<daex::Decomposition> init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
     eoPop<daex::Decomposition> pop = do_make_pop( parser, state, init );
     make_help( parser );
 

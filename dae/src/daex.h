@@ -9,8 +9,11 @@
 #include "utils/pddl.h"
 
 #include "core/goal.h"
+#include "core/goal_mo.h"
 #include "core/plan.h"
 #include "core/decomposition.h"
+#include "core/decomposition_mo.h"
+#include "core/strategies.h"
 
 #include "initialization/init.h"
 
@@ -19,6 +22,7 @@
 #include "variation/delgoal.h"
 #include "variation/delatom.h"
 #include "variation/crossover.h"
+#include "variation/strategy_mo.h"
 
 #include "utils/utils.h"
 #include "utils/posix_timer.h"

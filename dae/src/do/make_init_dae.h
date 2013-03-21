@@ -39,7 +39,7 @@ daex::Init<EOT> & do_make_init_op( eoParser & parser, eoState & state, daex::pdd
     // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
     daex::Init<EOT>* init = new daex::Init<EOT>( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
     state.storeFunctor( init );
-    
+
 #ifndef NDEBUG
     eo::log << eo::logging << std::endl;
     eo::log << eo::logging << "\tChrono partition size: " << pddl.chronoPartitionAtom().size() << std::endl;
@@ -47,7 +47,7 @@ daex::Init<EOT> & do_make_init_op( eoParser & parser, eoState & state, daex::pdd
 
     eo::log << eo::debug << "\tChrono partition dates(#atoms): ";
     for( daex::ChronoPartition::const_iterator it = pddl.chronoPartitionAtom().begin(), end = pddl.chronoPartitionAtom().end(); it != end; ++it ) {
-         eo::log << eo::debug << it->first << "(" << it->second.size() << ") ";
+        eo::log << eo::debug << it->first << "(" << it->second.size() << ") ";
     }
     eo::log << eo::debug << std::endl;
 #endif
@@ -86,10 +86,10 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     yahsp_print_adam( yahsp_adam );
 #endif
     //Data processing: from Yahsp to dae
-    daex::Decomposition adam;
+    EOT adam;
     for( unsigned int i=0; i < yahsp_adam.states_nb; ++i) {
 
-        daex::Goal goal;
+        typename EOT::AtomType goal;
         TimeVal goal_time = 0;
         for( unsigned int j=0; j < yahsp_adam.states[i].fluents_nb; ++j ) {
             unsigned int common_id = yahsp_adam.states[i].fluents[j]->id;
@@ -104,11 +104,11 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
     yahsp_free_adam(yahsp_adam);
     eo::log << eo::debug << "Adam:" << std::endl << adam << std::endl;
 
-	//daeYahspEval<daex::Decomposition> eval_yahsp(l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
-    daeYahspEval<daex::Decomposition> eval_yahsp(yahsp_adam.states_nb, solution_plan->backtracks, solution_plan->backtracks, fitness_weight, fitness_penalty );
+    //daeYahspEval<EOT> eval_yahsp(l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    daeYahspEval<EOT> eval_yahsp(yahsp_adam.states_nb, solution_plan->backtracks, solution_plan->backtracks, fitness_weight, fitness_penalty );
     eval_yahsp(adam);
     //std::cout << "EVAL ADAM : " << adam.is_feasible() << std::endl;
-	assert(adam.is_feasible());
+    assert(adam.is_feasible());
 
     eo::log << eo::logging << "Create a population of Adam" << std::endl; 
     // Remember the pop size before clearing it
@@ -132,50 +132,50 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
     unsigned int goodguys_feasible = pop_size;
     unsigned int goodguys_min = b_max_ratio * pop_size;
-	daex::MutationDelGoal<EOT> delgoal;
-	//While too many feasible individuals:
-	//	Two steps :
-	//		1) perturbation with goal suppression
-	//  	2) fixing by increasing bmax
-	//std::cout << "BEFOORE : goodguys_feasible : " << goodguys_feasible << std::endl;
-	for (unsigned int i = 0; i < pop_size; ++i) {
-			eval_yahsp(pop[i]);
-			std::cout << pop[i].is_feasible() << pop[i].fitness();
-		}
-	while (goodguys_feasible > goodguys_min) {
+    daex::MutationDelGoal<EOT> delgoal;
+    //While too many feasible individuals:
+    //	Two steps :
+    //		1) perturbation with goal suppression
+    //  	2) fixing by increasing bmax
+    //std::cout << "BEFOORE : goodguys_feasible : " << goodguys_feasible << std::endl;
+    for (unsigned int i = 0; i < pop_size; ++i) {
+        eval_yahsp(pop[i]);
+        std::cout << pop[i].is_feasible() << pop[i].fitness();
+    }
+    while (goodguys_feasible > goodguys_min) {
 
-		//Step 1
-		unsigned int feasibles = 0;
-		for (unsigned int i = 0; i < pop_size; ++i) {
-			delgoal(pop[i]);
-			eval_yahsp(pop[i]);
-			if (pop[i].is_feasible()) {
-				feasibles++;
-			}
-		}
-		goodguys_feasible = feasibles;
-		//std::cout << "STEP 1 : goodguys_feasible : " << goodguys_feasible << std::endl;
+        //Step 1
+        unsigned int feasibles = 0;
+        for (unsigned int i = 0; i < pop_size; ++i) {
+            delgoal(pop[i]);
+            eval_yahsp(pop[i]);
+            if (pop[i].is_feasible()) {
+                feasibles++;
+            }
+        }
+        goodguys_feasible = feasibles;
+        //std::cout << "STEP 1 : goodguys_feasible : " << goodguys_feasible << std::endl;
 
-		//Step 2
-		unsigned int iters = 0;
-		while (goodguys_feasible < goodguys_min && iters <= bmax_iters
-				&& b_max_in <= b_max_init) {
-			unsigned int feasibles = 0;
+        //Step 2
+        unsigned int iters = 0;
+        while (goodguys_feasible < goodguys_min && iters <= bmax_iters
+                && b_max_in <= b_max_init) {
+            unsigned int feasibles = 0;
 
-			for (unsigned int i = 0; i < pop_size; ++i) {
-				eval_yahsp(pop[i]);
-				if (pop[i].is_feasible()) {
-					feasibles++;
-				}
-			}
+            for (unsigned int i = 0; i < pop_size; ++i) {
+                eval_yahsp(pop[i]);
+                if (pop[i].is_feasible()) {
+                    feasibles++;
+                }
+            }
 
-			b_max_in = b_max_in * b_max_increase_coef;
-			iters++;
-			goodguys_feasible = feasibles;
-		}// while feasible & iter & bmax
-		//std::cout << "STEP 2 : goodguys_feasible : " << goodguys_feasible << std::flush;
-		daeYahspEval<daex::Decomposition> eval_yahsp(l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
-	} // while goodguys_feasible > goodguys_min
+            b_max_in = b_max_in * b_max_increase_coef;
+            iters++;
+            goodguys_feasible = feasibles;
+        }// while feasible & iter & bmax
+        //std::cout << "STEP 2 : goodguys_feasible : " << goodguys_feasible << std::flush;
+        daeYahspEval<EOT> eval_yahsp(l_max, b_max_in, b_max_last, fitness_weight, fitness_penalty );
+    } // while goodguys_feasible > goodguys_min
 
     eo::log << eo::logging << "After insemination, b_max=" << b_max_in << std::endl;
 
@@ -184,11 +184,11 @@ unsigned int estimate_bmax_insemination( eoParser & parser, daex::pddlLoad & pdd
 
 
 template<class EOT>
-unsigned int estimate_bmax_incremental( 
-            eoPop<EOT>& pop,
-            eoParser & parser, unsigned int l_max, unsigned int eval_count,
-            std::string plan_file, TimeVal & best_makespan, 
-            std::string dump_sep, unsigned int & dump_file_count, std::string metadata
+unsigned int estimate_bmax_incremental(
+        eoPop<EOT>& pop,
+        eoParser & parser, unsigned int l_max, unsigned int eval_count,
+        std::string plan_file, TimeVal & best_makespan, 
+        std::string dump_sep, unsigned int & dump_file_count, std::string metadata
         )
 {
     unsigned int popsize = parser.valueOf<unsigned int>("popSize");
@@ -210,8 +210,8 @@ unsigned int estimate_bmax_incremental(
     eo::log << eo::progress << "Apply an incremental computation strategy to fix bmax with a minimum of " << goodguys_min << " good individuals" << std::endl;
 #endif
     /* FIXME essai d'évaluation du temps d'un individu pour limiter le temps total d'exécution du programme, dans la version parallèle (Pierre et Benjamin)
-    bool hasTimedEval = false;
-    */
+       bool hasTimedEval = false;
+       */
     //    while( (((double)goodguys/(double)popsize) < b_max_ratio) && (b_max_in < b_max_init) ) {
     while( (goodguys < goodguys_min) && (b_max_in < b_max_init) ) {
 
@@ -258,28 +258,28 @@ unsigned int estimate_bmax_incremental(
                 goodguys++;
                 //FIXME essai d'évaluation du temps d'un individu pour limiter le temps total d'exécution du programme, dans la version parallèle (Pierre et Benjamin)
                 /*
-                if( ! hasTimedEval )
-                {
-                    hasTimedEval = true;
-                    pop[i].invalidate();
-                    struct rusage _start;
-                    struct rusage _stop;
-                    getrusage( RUSAGE_SELF, &_start );
-                    eval_bestfile( pop[i] );
-                    getrusage( RUSAGE_SELF, &_stop );
-                    std::cout << "[Estimating eval time] "
-                        << "User time (s / ms): "
-                            << _start.ru_utime.tv_sec - _stop.ru_utime.tv_sec
-                            << " / "
-                            << _start.ru_utime.tv_usec - _stop.ru_utime.tv_usec
-                        << "\n"
-                        << "System time (s / ms): "
-                        << _start.ru_stime.tv_sec - _stop.ru_stime.tv_sec
-                            << " / "
-                            << _start.ru_stime.tv_usec - _stop.ru_stime.tv_usec
-                        << std::endl;
-                }
-                */
+                   if( ! hasTimedEval )
+                   {
+                   hasTimedEval = true;
+                   pop[i].invalidate();
+                   struct rusage _start;
+                   struct rusage _stop;
+                   getrusage( RUSAGE_SELF, &_start );
+                   eval_bestfile( pop[i] );
+                   getrusage( RUSAGE_SELF, &_stop );
+                   std::cout << "[Estimating eval time] "
+                   << "User time (s / ms): "
+                   << _start.ru_utime.tv_sec - _stop.ru_utime.tv_sec
+                   << " / "
+                   << _start.ru_utime.tv_usec - _stop.ru_utime.tv_usec
+                   << "\n"
+                   << "System time (s / ms): "
+                   << _start.ru_stime.tv_sec - _stop.ru_stime.tv_sec
+                   << " / "
+                   << _start.ru_stime.tv_usec - _stop.ru_stime.tv_usec
+                   << std::endl;
+                   }
+                   */
             }
             else pop[i].invalidate();
         }

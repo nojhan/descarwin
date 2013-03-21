@@ -110,7 +110,7 @@ public:
         /* Already checked at the beginning of an eval
         eo::log << eo::xdebug << "Check goal consistency in addatom...";
         eo::log.flush();
-        for( daex::Decomposition::iterator igoal = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
+        for( typename EOT::iterator igoal = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
             assert_noduplicate( igoal->begin(), igoal->end() );
             assert_nomutex(     igoal->begin(), igoal->end() );
         }

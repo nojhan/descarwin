@@ -43,7 +43,7 @@ public:
 
     bool is_modified;
 
-    Decomposition::iterator igoal = decompo.begin();
+    typename EOT::iterator igoal = decompo.begin();
 
     // return 0 if no goal reached
     int unreach_goal = std::min( 
@@ -140,7 +140,7 @@ public:
 
         // random goal in [0,last_reached[ or [0,nb_goals[
         unsigned int i = rng.random( range );
-        Decomposition::iterator goal_i = decompo.iter_at(i);
+        typename EOT::iterator goal_i = decompo.iter_at(i);
 
         // if the chosen goal has only one atom, skip the delete
         if( goal_i->size() <= 1 ) {

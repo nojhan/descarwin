@@ -271,7 +271,7 @@ public:
     /* Already checked at the beginning of an eval
     eo::log << eo::xdebug << "Check goal consistency in addgoal...";
     eo::log.flush();
-    for( daex::Decomposition::iterator igoal = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
+    for( typename EOT::iterator igoal = decompo.begin(), goal_end = decompo.end(); igoal != goal_end; ++igoal ) {
         assert_noduplicate( igoal->begin(), igoal->end() );
         assert_nomutex(     igoal->begin(), igoal->end() );
     }
@@ -383,7 +383,7 @@ protected:
 
     eo::log << eo::xdebug << ", of which " << nomutex_atoms.size() << " are nomutex";
 
-    typename EOT::AtomType result= random_subset( nomutex_atoms );
+    typename EOT::AtomType result= random_subset<typename EOT::AtomType,std::list<Atom> >( nomutex_atoms );
 
     eo::log << eo::xdebug << ", final goal: " << result.earliest_start_time() << "(" << result.size() << ")" << std::endl;
 
@@ -392,7 +392,7 @@ protected:
     // note that nomutex returns the largest random subset of nomutex atom it can found
     // thus, the call to random_subset guaranty that we get one of the several random subset 
     // of atoms that are nomutex (even a set of 1 atom)
-    return random_subset( nomutex( candidate_atoms ) );
+    return random_subset<typename EOT::AtomType,std::list<Atom> >( nomutex( candidate_atoms ) );
 #endif
 
     };

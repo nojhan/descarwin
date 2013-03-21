@@ -12,10 +12,12 @@
   #include <algorithm>
 namespace daex {
 
- template< class EOT = daex::Decomposition>
+template<class EOT>
 class Init : public eoInit<EOT>//Decomposition>
 {
 public:
+    typedef typename EOT::AtomType G;
+
     // TODO autoriser les décomposition vides ? (_min_nb = 0 )
     Init( const ChronoPartition & times, unsigned int l_max_init_coef = 2, unsigned int min_nb = 1 ):_times(times), _min_nb(min_nb), _l_max_init_coef(l_max_init_coef), _l_max( 20 ) {
         assert( ! _times.empty() );
@@ -91,7 +93,7 @@ public:
             assert( _times.at( *idate ).size() > 0 );
 
             // FIXME random_subset semble retourner tous les atomes existants, et pas un sous-ensemble
-            Goal goal = random_subset( nomutex( _times.at( *idate ) ) );
+            G goal = random_subset<G,std::vector<Atom> >( nomutex( _times.at( *idate ) ) );
 
             /* Already checked at the beginning of an eval
 #ifndef NDEBUG
@@ -116,7 +118,7 @@ eo::log.flush();
             eo::log << eo::xdebug << std::endl << "Check atom's earliest start times consistency...";
             eo::log.flush();
             // assert that any atom in the goal have the same earliest start date (Fluent:init, in CPT)
-            for( Goal::iterator iatom = goal.begin(), end = goal.end(); iatom != end; ++iatom ) {
+            for( typename G::iterator iatom = goal.begin(), end = goal.end(); iatom != end; ++iatom ) {
                 assert( iatom->fluent()->init == goal.earliest_start_time() );
             }
             eo::log << eo::xdebug << "OK" << std::endl;

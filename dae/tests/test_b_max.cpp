@@ -40,9 +40,9 @@ int main ( int argc, char* argv[] )
     std::clog << "# Heuristic: " << HEURISTIC_H1 << std::endl;
     //std::clog << "# Sequential: " << is_sequential << std::endl;
     std::clog << "# Nodes number distribution during evaluations at init: " << std::endl;
-    
+
     eoState state;
-    daex::Init<> init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
+    daex::Init<daex::Decomposition> init( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
     eoPop<daex::Decomposition> pop = do_make_pop( parser, state, init );
     make_help( parser );
 

@@ -12,6 +12,7 @@ class GoalMO : public Goal
 public:
 
     GoalMO( TimeVal t, Strategies::Type strategy ) : Goal(t), _strategy(strategy) {}
+    GoalMO( TimeVal t ) : Goal( t ), _strategy( Strategies::makespan_add ) {}
     GoalMO() : Goal(), _strategy( Strategies::makespan_add ) {}
 
     Strategies::Type strategy() { return _strategy; }

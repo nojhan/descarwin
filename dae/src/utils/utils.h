@@ -247,8 +247,8 @@ T nomutex( T const& candidates )
  * First a random number of atoms in drawn, then atoms are randomly chosen among candidates.
  * The earliest start time of the goal is updated.
  */
-template< class T>
-Goal random_subset( T candidate_atoms )
+template<class U, class T>
+U random_subset( T candidate_atoms )
 {
 #ifndef NDEBUG
     eo::log << eo::xdebug << "\t\trandom_subset of " << candidate_atoms.size() << " candidates:";
@@ -256,9 +256,9 @@ Goal random_subset( T candidate_atoms )
 
     // extraire un sous-ensemble aléatoire de candidate_atoms, ce qui formera le goal à insérer
     // la date au plus tot est forcément celle utilisée pour le choix des atomes
-    Goal goal(0);
+    U goal(0);
     TimeVal goaldate = 0;
-    
+
     // d'abord un _nombre_ aléatoire d'atomes à choisir dans [1, candidate_atoms.size]
     unsigned int N = 1 + rng.random( candidate_atoms.size() );
 
@@ -291,7 +291,7 @@ Goal random_subset( T candidate_atoms )
     goal.earliest_start_time(goaldate);
 
 #ifndef NDEBUG
-	eo::log << eo::xdebug << "goal final date: " << goal.earliest_start_time();
+    eo::log << eo::xdebug << "goal final date: " << goal.earliest_start_time();
     eo::log << eo::xdebug << std::endl;
 #endif
     return goal;
@@ -300,8 +300,6 @@ Goal random_subset( T candidate_atoms )
 
 template<class T>
 void assert_nomutex( T begin, T end ) 
-//void assert_nomutex( Goal::iterator begin, Goal::iterator end ) ;
-
 {
     // check if there is no atom that has mutex in the same goal or a duplicate
     T iend = end;

@@ -13,7 +13,6 @@ SET (DAEX_SOURCES
   utils/pddl_load.cpp
   utils/evalBestPlanDump.cpp
   utils/cli.cpp
-  core/decomposition.cpp
   core/goal.cpp
   utils/eoJsonUtils.cpp
   )

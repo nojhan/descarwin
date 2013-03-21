@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <functional>
+#include <iomanip>
 
 #include <eo>
 #include <utils/eoTimer.h>
@@ -344,7 +345,20 @@ public:
  *  e.g.:
  *    Decompositon (3): 2(5) 12(45) 123(4)
  */
-void simplePrint( std::ostream & out, Decomposition & decompo );
+template<class EOT>
+void simplePrint( std::ostream & out, EOT & decompo )
+{
+    out << "Decomposition "
+        << std::right << std::setfill(' ') << std::setw(3)
+        << "[" << decompo.size() << "]: ";
+
+    for( typename EOT::iterator igoal = decompo.begin(), end = decompo.end(); igoal != end; ++igoal ) {
+        out << "\t" << std::right << std::setfill(' ') << std::setw(3)
+            << igoal->earliest_start_time() << "(" << igoal->size() << ")";
+    }
+
+    out << std::endl;
+}
 
 
 } // namespace daex

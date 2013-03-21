@@ -59,6 +59,14 @@ int main ( int argc, char* argv[] )
     */
 #endif
 
+
+#ifdef DAE_MO // if multi-objective DAE
+    typedef daex::DecompositionMO T;
+#else
+    typedef daex::Decomposition T;
+#endif
+
+
     /**************
      * PARAMETERS *
      **************/
@@ -182,10 +190,10 @@ int main ( int argc, char* argv[] )
      * INITIALIZATION *
      ******************/
 
-    daex::Init<daex::Decomposition>& init = daex::do_make_init_op<daex::Decomposition>( parser, state, pddl );
+    daex::Init<T>& init = daex::do_make_init_op<T>( parser, state, pddl );
 
     // randomly generate the population with the init operator
-    eoPop<daex::Decomposition> pop = eoPop<daex::Decomposition>( pop_size, init ) ;
+    eoPop<T> pop = eoPop<T>( pop_size, init ) ;
 
     // used to pass the eval count through the several eoEvalFuncCounter evaluators
     unsigned int eval_count = 0;
@@ -212,7 +220,7 @@ int main ( int argc, char* argv[] )
             b_max_fixed = daex::estimate_bmax_insemination( parser, pddl, pop, init.l_max() );
         } else {
             // if not insemination, incremental search strategy
-            b_max_fixed  = daex::estimate_bmax_incremental<daex::Decomposition>( 
+            b_max_fixed  = daex::estimate_bmax_incremental<T>( 
                     pop, parser, init.l_max(), eval_count, plan_file, best_makespan, dump_sep, dump_file_count, metadata 
                     );
         }
@@ -252,16 +260,16 @@ int main ( int argc, char* argv[] )
 
     // do_make_eval returns a pair: the evaluator instance
     // and a pointer on a func counter that may be null of we are in release mode
-    std::pair< eoEvalFunc<daex::Decomposition>&, eoEvalFuncCounter<daex::Decomposition>* > eval_pair
-        = daex::do_make_eval_op<daex::Decomposition>(
+    std::pair< eoEvalFunc<T>&, eoEvalFuncCounter<T>* > eval_pair
+        = daex::do_make_eval_op<T>(
                 parser, state, init.l_max(), eval_count, b_max_in, b_max_last, plan_file, best_makespan, dump_sep, dump_file_count, metadata
                 );
-    eoEvalFunc<daex::Decomposition>& eval = eval_pair.first;
+    eoEvalFunc<T>& eval = eval_pair.first;
 
 #ifndef NDEBUG
     // in debug mode, we should have a func counter
     assert( eval_pair.second != NULL );
-    eoEvalFuncCounter<daex::Decomposition>& eval_counter = * eval_pair.second;
+    eoEvalFuncCounter<T>& eval_counter = * eval_pair.second;
 
     eo::log << eo::progress << "OK" << std::endl;
 
@@ -273,7 +281,7 @@ int main ( int argc, char* argv[] )
     // parallelize-loop is not set, and a MPI based parallelized version, otherwise.
 #ifdef WITH_MPI
     unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
-    eoPopEvalFunc<daex::Decomposition>* p_pop_eval = parallel::do_make_parallel_eval(
+    eoPopEvalFunc<T>* p_pop_eval = parallel::do_make_parallel_eval(
             eval, plan_file, best_makespan, dump_file_count, dump_sep, metadata, max_seconds,
             /* multistart parameters */
             with_multistart,
@@ -282,9 +290,9 @@ int main ( int argc, char* argv[] )
                 evaluatorsAffectations[ eval_master-1 ]
                 : evaluatorsAffectations[ 0 ]
     );
-    eoPopEvalFunc<daex::Decomposition>& pop_eval = *p_pop_eval;
+    eoPopEvalFunc<T>& pop_eval = *p_pop_eval;
 # else
-    eoPopLoopEval<daex::Decomposition> pop_eval( eval );
+    eoPopLoopEval<T> pop_eval( eval );
 # endif // WITH_MPI
 
 # ifdef WITH_MPI
@@ -297,7 +305,7 @@ int main ( int argc, char* argv[] )
         || ( with_multistart && rank >= (int)multistart_workers + 1) )
     {
         // eval workers just perform evaluation
-        eoPop<daex::Decomposition> pop;
+        eoPop<T> pop;
         pop_eval( pop, pop ); // Just one call is necessary, as ParallelApply is a MultiJob (see eo doc).
 
         timerStat.stop("dae_main");
@@ -323,32 +331,32 @@ int main ( int argc, char* argv[] )
 #endif
 
     // STOPPING CRITERIA
-    eoCombinedContinue<daex::Decomposition> continuator = daex::do_make_continue_op<daex::Decomposition>( parser, state );
+    eoCombinedContinue<T> continuator = daex::do_make_continue_op<T>( parser, state );
 
     // Direct access to continuators are needed during restarts (see below)
-    eoSteadyFitContinue<daex::Decomposition> & steadyfit
-        = *( dynamic_cast<eoSteadyFitContinue<daex::Decomposition>* >( continuator[0] ) );
-    eoGenContinue<daex::Decomposition> & maxgen
-        = *( dynamic_cast< eoGenContinue<daex::Decomposition>* >( continuator[1] ) );
+    eoSteadyFitContinue<T> & steadyfit
+        = *( dynamic_cast<eoSteadyFitContinue<T>* >( continuator[0] ) );
+    eoGenContinue<T> & maxgen
+        = *( dynamic_cast< eoGenContinue<T>* >( continuator[1] ) );
 
 
     // CHECKPOINTING
-    eoCheckPoint<daex::Decomposition> & checkpoint = daex::do_make_checkpoint_op( continuator, parser, state, pop
+    eoCheckPoint<T> & checkpoint = daex::do_make_checkpoint_op( continuator, parser, state, pop
 #ifndef NDEBUG
             , eval_counter
 #endif
             );
 
     // SELECTION AND VARIATION
-    daex::MutationDelGoal<daex::Decomposition>* delgoal = new daex::MutationDelGoal<daex::Decomposition>;
-    eoGeneralBreeder<daex::Decomposition> & breed = daex::do_make_variation_op<daex::Decomposition>( parser, state, pddl, delgoal );
+    daex::MutationDelGoal<T>* delgoal = new daex::MutationDelGoal<T>;
+    eoGeneralBreeder<T> & breed = daex::do_make_variation_op<T>( parser, state, pddl, delgoal );
 
     // REPLACEMENT
-    eoReplacement<daex::Decomposition> & replacor = daex::do_make_replace_op<daex::Decomposition>( parser, state );
+    eoReplacement<T> & replacor = daex::do_make_replace_op<T>( parser, state );
     unsigned int offsprings = parser.valueOf<unsigned int>("offsprings");
 
     // ALGORITHM
-    eoEasyEA<daex::Decomposition> dae( checkpoint, eval, pop_eval, breed, replacor, offsprings );
+    eoEasyEA<T> dae( checkpoint, eval, pop_eval, breed, replacor, offsprings );
 
     /********************
      * MULTI-START RUNS *
@@ -356,14 +364,14 @@ int main ( int argc, char* argv[] )
 
     // best decomposition of all the runs, in case of multi-start
     // start at the best element of the init
-    daex::Decomposition best = pop.best_element();
+    T best = pop.best_element();
     unsigned int run = 0;
 
     // evaluate an empty decomposition, for comparison with decomposed solutions
-    daex::Decomposition empty_decompo;
+    T empty_decompo;
 # ifdef WITH_MPI
     {
-        eoPop<daex::Decomposition> tempPop;
+        eoPop<T> tempPop;
         tempPop.push_back( empty_decompo );
         pop_eval( tempPop, tempPop );
     }
@@ -383,11 +391,11 @@ int main ( int argc, char* argv[] )
 
         FinallyBlock(
 # ifdef WITH_MPI
-                eoPopEvalFunc<daex::Decomposition> * _p_pop_eval,
+                eoPopEvalFunc<T> * _p_pop_eval,
 # endif // WITH_MPI
-                eoPop<daex::Decomposition> & _pop,
-                daex::Decomposition & _best,
-                daex::Decomposition & _empty_decompo
+                eoPop<T> & _pop,
+                T & _best,
+                T & _empty_decompo
                 ) :
 # ifdef WITH_MPI
             p_pop_eval( _p_pop_eval ),
@@ -496,11 +504,11 @@ int main ( int argc, char* argv[] )
         private:
 
 # ifdef WITH_MPI
-        eoPopEvalFunc<daex::Decomposition> * p_pop_eval;
+        eoPopEvalFunc<T> * p_pop_eval;
 # endif // WITH_MPI
-        eoPop<daex::Decomposition>& pop;
-        daex::Decomposition & best;
-        daex::Decomposition & empty_decompo;
+        eoPop<T>& pop;
+        T & best;
+        T & empty_decompo;
     };
 
     try
@@ -550,7 +558,7 @@ int main ( int argc, char* argv[] )
                 eo::log << "After dae search..." << std::endl;
 
                 // remember the best of all runs
-                daex::Decomposition best_of_run = pop.best_element();
+                T best_of_run = pop.best_element();
 
                 // note: operator> is overloaded in EO, don't be afraid: we are minimizing
                 if( best_of_run.fitness() > best.fitness() ) {
@@ -572,12 +580,12 @@ int main ( int argc, char* argv[] )
                 // Once the bmax is known, there is no need to re-estimate it,
                 // thus we re-init ater the first search, because the pop has already been created before,
                 // when we were trying to estimate the b_max.
-                pop = eoPop<daex::Decomposition>( pop_size, init );
+                pop = eoPop<T>( pop_size, init );
 
                 eo::log << "[Master] After re init of population, evaluating population." << std::endl;
 
                 // evaluate
-                // eoPopLoopEval<daex::Decomposition> pop_eval( eval ); // FIXME useful ??
+                // eoPopLoopEval<T> pop_eval( eval ); // FIXME useful ??
                 pop_eval( pop, pop );
 
                 // reset run's continuator counters
