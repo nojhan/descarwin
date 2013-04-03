@@ -18,7 +18,7 @@ void do_make_init_param( eoParser & parser )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "l_max_init_coef" << l_max_init_coef << std::endl;
 
     unsigned int l_min = parser.createParam( (unsigned int)1, "lmin", 
-            "Minimum number of goals in a decomposition", 'l', "Initialization" ).value();
+            "Minimum number of goals in a decomposition", 'L', "Initialization" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "l_min" << l_min << std::endl;
 
     // Evaluation

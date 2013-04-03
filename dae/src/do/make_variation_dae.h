@@ -22,7 +22,7 @@ void do_make_variation_param( eoParser & parser, unsigned int pop_size )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "radius" << radius << std::endl;
 
     double proba_change = parser.createParam( (double)0.8, "proba-change", 
-            "Probability to change an atom for the changeAtom mutation", 'c', "Variation" ).value();
+            "Probability to change an atom for the changeAtom mutation", 'O', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_change" << proba_change << std::endl;
 
     double proba_del_atom = parser.createParam( (double)0.8, "proba-del-atom", 
