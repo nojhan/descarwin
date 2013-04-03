@@ -41,7 +41,7 @@ void do_make_checkpoint_param( eoParser &
 template<class EOT>
 void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state, eoPop<EOT>& pop, moeoArchive<EOT>& archive )
 {
-    typedef typename EOT::MOEOObjectiveVector OVT;
+    typedef typename EOT::ObjectiveVector OVT;
 
     moeoArchiveUpdater<EOT> * arch_updater = new moeoArchiveUpdater<EOT>( archive, pop);
     state.storeFunctor( arch_updater );

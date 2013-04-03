@@ -4,7 +4,7 @@
 
 namespace daex {
 
-void do_make_variation_param( eoParser & parser, unsigned int pop_size )
+void do_make_breed_param( eoParser & parser, unsigned int pop_size )
 {
     // Selection
     unsigned int toursize = parser.createParam( (unsigned int)5, "tournament", 
@@ -15,7 +15,10 @@ void do_make_variation_param( eoParser & parser, unsigned int pop_size )
             "Number of offsprings to produces", 'f', "Selection" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "offsprings" << offsprings << std::endl;
 
+}
 
+void do_make_variation_param( eoParser & parser )
+{
     // Variation
     unsigned int radius = parser.createParam( (unsigned int)2, "radius", 
             "Number of neighbour goals to consider for the addGoal mutation", 'R', "Variation" ).value();
@@ -76,11 +79,38 @@ void do_make_variation_param( eoParser & parser, unsigned int pop_size )
 }
 
 template<class EOT>
-eoGeneralBreeder<EOT> & do_make_variation_op( eoParser & parser, eoState & state, pddlLoad & pddl, MutationDelGoal<EOT> * ext_delgoal = NULL )
+eoGeneralBreeder<EOT> & do_make_breed_op( eoParser & parser, eoState & state, eoGenOp<EOT> & variator )
 {
     unsigned int toursize = parser.valueOf<unsigned int>("tournament");
     unsigned int offsprings = parser.valueOf<unsigned int>("offsprings");
 
+
+    // SELECTION
+    // TODO cet opérateur, fait soit un tri de la pop (true), soit un shuffle (false), idéalement, on ne voudrait ni l'un ni l'autre, car on parcours tout, peu importe l'ordre
+
+    // JACK the article indicate that there is no selection, but the article use a deterministic tournament
+
+    eoSelectOne<EOT> * p_selectone;
+    if ( toursize == 1 ) {
+    // L'article indique qu'il n'y a pas de sélection, on aurait alors ça :
+      p_selectone = (eoSelectOne<EOT> *) ( new eoSequentialSelect<EOT> ( true ) );
+    }
+    else {
+    // MAIS le code utilise un tournoi déterministe, on a donc ça :
+      p_selectone = (eoSelectOne<EOT> *) ( new eoDetTournamentSelect<EOT> ( toursize ) );
+    }
+    state.storeFunctor( p_selectone );
+
+    // selector, variator, rate (for selection), interpret_as_rate
+    eoGeneralBreeder<EOT> * breed = new eoGeneralBreeder<EOT>( *p_selectone, variator, (double)offsprings, false );
+    state.storeFunctor( breed );
+
+    return *breed;
+}
+
+template<class EOT>
+eoGenOp<EOT> & do_make_variation_op( eoParser & parser, eoState & state, pddlLoad & pddl, MutationDelGoal<EOT> * ext_delgoal = NULL )
+{
     unsigned int radius = parser.valueOf<unsigned int>("radius");
     double proba_change = parser.valueOf<double>("proba-change");
     double proba_del_atom = parser.valueOf<double>("proba-del-atom");
@@ -100,22 +130,6 @@ eoGeneralBreeder<EOT> & do_make_variation_op( eoParser & parser, eoState & state
     unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
     unsigned int maxtry_mutex = 0;     // deactivated by default: should try every candidates
 
-    // SELECTION
-    // TODO cet opérateur, fait soit un tri de la pop (true), soit un shuffle (false), idéalement, on ne voudrait ni l'un ni l'autre, car on parcours tout, peu importe l'ordre
-    
-    // JACK the article indicate that tere is no selection, but the article use a deterministic tournament
-
-    eoSelectOne<EOT> * p_selectone;
-    if ( toursize == 1 ) {
-    // L'article indique qu'il n'y a pas de sélection, on aurait alors ça :
-      p_selectone = (eoSelectOne<EOT> *) ( new eoSequentialSelect<EOT> ( true ) );
-    }
-    else {
-    /// MAIS le code utilise un tournoi déterministe, on a donc ça :
-      p_selectone = (eoSelectOne<EOT> *) ( new eoDetTournamentSelect<EOT> ( toursize ) );
-    }
-    state.storeFunctor( p_selectone );
-    
     // VARIATION
 
     // mutations
@@ -186,15 +200,10 @@ eoGeneralBreeder<EOT> & do_make_variation_op( eoParser & parser, eoState & state
     movariat->add(  *variator, 1.0 ); // always call
     movariat->add( *set_strat, 1.0 ); // always call
 
-    // selector, variator, rate (for selection), interpret_as_rate
-    eoGeneralBreeder<EOT> * breed = new eoGeneralBreeder<EOT>( *p_selectone, *movariat, (double)offsprings, false );
+    return *movariat; // variation + set strategy
 #else
-    // selector, variator, rate (for selection), interpret_as_rate
-    eoGeneralBreeder<EOT> * breed = new eoGeneralBreeder<EOT>( *p_selectone, *variator, (double)offsprings, false );
+    return *variator; // variation only
 #endif
-    state.storeFunctor( breed );
-
-    return *breed;
 }
 
 } // namespace daex

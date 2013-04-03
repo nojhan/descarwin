@@ -43,10 +43,10 @@ typedef moeoRealObjectiveVector<DecompoMOTraits> DecompoMOObjectives;
 class DecompositionMO : public DecompositionBase<GoalMO>, public MOEO< DecompoMOObjectives, /*MOEOFitness*/double, /*MOEODiversity*/double >
 {
 public:
-    typedef DecompoMOObjectives MOEOObjectiveVector ;
-    typedef double MOEOFitness;
-    typedef double MOEODiversity;
-    typedef MOEO<MOEOObjectiveVector,MOEOFitness,MOEODiversity> MOEOType;
+    typedef DecompoMOObjectives ObjectiveVector ;
+    typedef double Fitness;
+    typedef double Diversity;
+    typedef MOEO<ObjectiveVector,Fitness,Diversity> MOEOType;
 public:
 
     virtual void invalidate()

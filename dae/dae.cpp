@@ -122,6 +122,15 @@ int main ( int argc, char* argv[] )
     bool insemination = parser.createParam(false, "insemination", "Use the insemination heuristic to estimate b_max at init", '\0', "Initialization").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "insemination" << insemination << std::endl;
 
+#ifdef DAE_MO
+    // multi-objective algorithm
+    double kappa = parser.createParam(0.05, "kappa", "Scaling factor kappa for indicator based search", 'k', "Evolution Engine").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "kappa" << kappa << std::endl;
+
+    double rho = parser.createParam(1.1, "rho", "reference point for the hypervolume indicator", 'R', "Evolution Engine").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "rho" << rho << std::endl;
+#endif
+
     // seed
     eoValueParam<unsigned int> & param_seed = parser.createParam( (unsigned int)0, "seed", "Random number seed", 'S' );
     // if one want to initialize on current time
@@ -156,9 +165,13 @@ int main ( int argc, char* argv[] )
     // Parameters makers
     daex::do_make_eval_param( parser );
     daex::do_make_init_param( parser );
-    daex::do_make_variation_param( parser, pop_size);
+    daex::do_make_variation_param( parser );
+    daex::do_make_breed_param( parser, pop_size);
     daex::do_make_checkpoint_param( parser );
+
+#ifndef DAE_MO // only in mono-objective
     daex::do_make_replace_param( parser );
+#endif
 
     // special case of stopping criteria parameters
     daex::do_make_continue_param( parser )    ;
@@ -360,16 +373,26 @@ int main ( int argc, char* argv[] )
 #endif
             );
 
-    // SELECTION AND VARIATION
+    // VARIATION
     daex::MutationDelGoal<T>* delgoal = new daex::MutationDelGoal<T>;
-    eoGeneralBreeder<T> & breed = daex::do_make_variation_op<T>( parser, state, pddl, delgoal );
+    eoGenOp<T> & variator = daex::do_make_variation_op<T>( parser, state, pddl, delgoal );
 
-    // REPLACEMENT
+    // ALGORITHM
+#ifdef DAE_MO // MULTI-OBJECTIVE
+    moeoHypervolumeBinaryMetric<typename T::ObjectiveVector> metric(rho);
+
+    moeoIBEA<T> dae( checkpoint, eval, variator, metric, kappa );
+
+#else // MONO-OBJECTIVE
+    // Selection
+    eoGeneralBreeder<T> & breeder = daex::do_make_breed_op<T>( parser, state, variator );
+
+    // Replacement
     eoReplacement<T> & replacor = daex::do_make_replace_op<T>( parser, state );
     unsigned int offsprings = parser.valueOf<unsigned int>("offsprings");
 
-    // ALGORITHM
-    eoEasyEA<T> dae( checkpoint, eval, pop_eval, breed, replacor, offsprings );
+    eoEasyEA<T> dae( checkpoint, eval, pop_eval, breeder, replacor, offsprings );
+#endif
 
     /********************
      * MULTI-START RUNS *
