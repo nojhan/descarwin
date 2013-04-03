@@ -56,7 +56,7 @@ void do_make_variation_param( eoParser & parser, unsigned int pop_size )
 #ifdef DAE_MO
     std::string strategy = parser.createParam( (std::string)"random", "strategy",
             "How to change the search strategy for DAEMO_YAHSP. Either a fixed one among: length, cost, makespan-max or makespan-add; either: random, flip-goal (random makespan-add or cost at each goal) or flip-decomposition (random makespan-add or cost for the whole individual)",
-            'y', "Multi-objective").value();
+            'y', "Multi-Objective").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strategy" << strategy << std::endl;
 
     double proba_strategy = parser.createParam( (double)0.5, "proba-strategy",
