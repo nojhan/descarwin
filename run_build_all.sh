@@ -24,7 +24,7 @@ for i in $items; do
     ./${bs[$i]} 1>/dev/null 2>/dev/null
     err=$?
     if [[ $err == 0 ]]; then
-        build_dir=$(basename $(echo $bs | sed "s,_,/,g"))
+        build_dir=$(basename $(echo ${bs[i]} | sed "s,_,/,g"))
         printf "${OK} OK${RAZ} -- run_test.sh $build_dir ... "
         ./run_test.sh $build_dir 1>/dev/null 2>/dev/null
         err=$?
