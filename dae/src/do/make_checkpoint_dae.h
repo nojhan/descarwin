@@ -31,6 +31,69 @@ void do_make_checkpoint_param( eoParser &
 #endif
 }
 
+#ifdef DAE_MO
+//! Add multi-objective (fitness-dependent) checkpoints to the checkpoint
+template<class EOT>
+void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state )
+{
+
+}
+
+
+#else // DAE_MO
+
+
+//! Add mono-objective (fitness-dependent) checkpoints to the checkpoint
+template<class EOT>
+void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoPop<EOT>& pop, eoState & state )
+{
+#ifdef SINGLE_EVAL_ITER_DUMP
+    BestMakespanStat* stat_makespan = new BestMakespanStat("BestMakespan");
+    state.storeFunctor( stat_makespan );
+    BestPlanStat* stat_plan = new BestPlan("BestPlan");
+    state.storeFunctor( stat_plan );
+#endif
+
+#ifndef NDEBUG
+    // get best fitness
+    // for us, has the form "fitness feasibility" (e.g. "722367 1")
+    eoBestFitnessStat<EOT>* best_stat = new eoBestFitnessStat<EOT>("Best");
+    state.storeFunctor( best_stat );
+
+    // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
+    eoNthElementFitnessStat<EOT>* median_stat = new eoNthElementFitnessStat<EOT>( pop.size() / 2, "Median" );
+    state.storeFunctor( median_stat );
+
+    if( eo::log.getLevelSelected() >= eo::progress ) {
+        checkpoint.add( *best_stat );
+        checkpoint.add( *median_stat );
+        clog_monitor.add( *best_stat );
+        clog_monitor.add( *median_stat );
+#ifdef SINGLE_EVAL_ITER_DUMP
+        checkpoint.add( *stat_makespan );
+        clog_monitor.add( *stat_makespan );
+        checkpoint.add( *stat_plan );
+        clog_monitor.add( *stat_plan );
+#endif
+    }
+
+#ifdef SINGLE_EVAL_ITER_DUMP
+    // Note: commented here because superseeded by the eoEvalBestPlanFileDump
+    // append the plans in a file
+    // std::string _filename, std::string _delim = " ", bool _keep = false, bool _header=false, bool _overwrite = false
+    eoFileMonitor* file_monitor = new eoFileMonitor( plan_file, "\n", false, false, true);
+    state.storeFunctor(file_monitor );
+    file_monitor.add( *stat_plan );
+    checkpoint.add( *file_monitor );
+#endif
+
+#endif // NDEBUG
+}
+
+#endif // DAE_MO
+
+
+
 template <class EOT>
 eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
         eoParser &
@@ -50,45 +113,9 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     eoCheckPoint<EOT> * checkpoint = new eoCheckPoint<EOT>( continuator );
     state.storeFunctor( checkpoint );
 
-#ifdef SINGLE_EVAL_ITER_DUMP
-    BestMakespanStat* stat_makespan = new BestMakespanStat("BestMakespan");
-    state.storeFunctor( stat_makespan );
-    BestPlanStat* stat_plan = new BestPlan("BestPlan");
-    state.storeFunctor( stat_plan );
-#endif
-
 #ifndef NDEBUG
-    // get the best plan only if it improve the fitness
-    // note: fitness is different from the makespan!
-    //eoBestPlanImprovedStat<EOT> best_plan( worst_fitness, "Best improved plan");
-    // at each generation
-    //checkpoint->add( *best_plan );
-    
-    // display the stats on std::cout
-    // ostream & out, bool _verbose=true, std::string _delim = "\t", unsigned int _width=20, char _fill=' ' 
     eoOStreamMonitor* clog_monitor = new eoOStreamMonitor( std::clog, "\t", 10, ' '); 
     state.storeFunctor( clog_monitor );
-
-
-    // get best fitness
-    // for us, has the form "fitness feasibility" (e.g. "722367 1")
-    eoBestFitnessStat<EOT>* best_stat = new eoBestFitnessStat<EOT>("Best");
-    state.storeFunctor( best_stat );
-
-    // FIXME désactiver la séparation faisable/non-faisable ou la faire différement
-    //eoInterquartileRangeStat<EOT> iqr_stat( std::make_pair(0.0,false), "IQR" );
-//    eoInterquartileRangeStat<EOT> iqr_f( std::make_pair(0.0,false), "IQR_f" );
-//    eoInterquartileRangeStat<EOT> iqr_uf( std::make_pair(0.0,false), "IQR_uf" );
-//    eoDualStatSwitch<EOT,eoInterquartileRangeStat<EOT> > dual_iqr( iqr_f, iqr_uf, "\t" );
-// 
-    // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
-    eoNthElementFitnessStat<EOT>* median_stat = new eoNthElementFitnessStat<EOT>( pop.size() / 2, "Median" ); 
-    state.storeFunctor( median_stat );
-    /*
-    eoNthElementFitnessStat<EOT> median_f( pop.size() / 2, "Median_f" ); 
-    eoNthElementFitnessStat<EOT> median_uf( pop.size() / 2, "Median_uf" ); 
-    eoDualStatSwitch<EOT,eoNthElementFitnessStat<EOT> > dual_median( median_f, median_uf, "\t/\t" );
-    */
 
     FeasibleRatioStat<EOT>* feasible_stat = new FeasibleRatioStat<EOT>( "F.Ratio" );
     state.storeFunctor( feasible_stat );
@@ -99,44 +126,24 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     if( eo::log.getLevelSelected() >= eo::progress ) {
 
         // compute stas at each generation
-        checkpoint->add( *best_stat );
         checkpoint->add( *feasible_stat );
         checkpoint->add( *asize_stat );
-        checkpoint->add( *median_stat );
-        //checkpoint->add( *dual_median );
-        //checkpoint->add( *iqr_stat );
-//        checkpoint->add( *dual_iqr );
-#ifdef SINGLE_EVAL_ITER_DUMP
-        checkpoint->add( *stat_makespan );
-        checkpoint->add( *stat_plan );
-        clog_monitor->add( *stat_makespan );
-        clog_monitor->add( *stat_plan );
-#else
+#ifndef SINGLE_EVAL_ITER_DUMP
         clog_monitor->add( eval_counter );
 #endif
-        clog_monitor->add( *best_stat );
         clog_monitor->add( *asize_stat );
         clog_monitor->add( *feasible_stat );
-        clog_monitor->add( *median_stat );
-        //clog_monitor->add( *dual_median );
-        //clog_monitor->add( *iqr_stat );
-//        clog_monitor->add( *dual_iqr );
-        
+
         // the checkpoint should call the monitor at every generation
         checkpoint->add( *clog_monitor );
     }
-
-#ifdef SINGLE_EVAL_ITER_DUMP
-    // Note: commented here because superseeded by the eoEvalBestPlanFileDump
-    // append the plans in a file
-    // std::string _filename, std::string _delim = " ", bool _keep = false, bool _header=false, bool _overwrite = false
-    eoFileMonitor* file_monitor = new eoFileMonitor( plan_file, "\n", false, false, true);
-    state.storeFunctor(file_monitor );
-    file_monitor->add( *stat_plan );
-    checkpoint->add( *file_monitor );
-#endif
-    
     //state.formatJSON("dae_state");
+
+#ifdef DAE_MO
+    add_stats_multi( *checkpoint, *clog_monitor, state );
+#else
+    add_stats_mono( *checkpoint, *clog_monitor, pop, state );
+#endif
 
     // pour plus d'output (recopiés de do/make_checkpoint)
     // un state, pour sauver l'état courant
@@ -167,7 +174,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
 
     checkpoint->add( *state_saver );
 #endif // NDEBUG
-    
+
     return *checkpoint;
 }
 
