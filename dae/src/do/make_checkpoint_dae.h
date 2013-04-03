@@ -3,6 +3,11 @@
 #define _MAKE_CHECKPOINT_DAE_H_
 
 #include <eo>
+
+#ifdef DAE_MO
+#include <moeo>
+#endif
+
 #include <utils/checkpointing>
 
 // at the moment, in utils/make_help.cpp
@@ -34,9 +39,41 @@ void do_make_checkpoint_param( eoParser &
 #ifdef DAE_MO
 //! Add multi-objective (fitness-dependent) checkpoints to the checkpoint
 template<class EOT>
-void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state )
+void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state, eoPop<EOT>& pop, moeoArchive<EOT>& archive )
 {
+    typedef typename EOT::MOEOObjectiveVector OVT;
 
+    moeoArchiveUpdater<EOT> * arch_updater = new moeoArchiveUpdater<EOT>( archive, pop);
+    state.storeFunctor( arch_updater );
+    checkpoint.add( *arch_updater );
+
+    // instanciate a metric comparing two Pareto front (hence a "binary" one)
+    // use OVT, the type of the objective vectors
+    moeoContributionMetric<OVT> * m_contribution = new moeoContributionMetric<OVT>;
+    // state.storeFunctor( m_contribution ); // can't store this due to ambiguous base with a different template type // FIXME use smart pointers
+    // wrap it in an eoStat
+    eoStat<EOT,double>* contribution = new moeoBinaryMetricStat<EOT>( *m_contribution, "contrib" );
+    state.storeFunctor( contribution );
+    // add it to the checkpoint
+    checkpoint.add( *contribution );
+
+    moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
+    // state.storeFunctor( m_entropy );
+    moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "entropy" );
+    state.storeFunctor( entropy );
+    checkpoint.add( *entropy );
+
+    moeoHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoHyperVolumeDifferenceMetric<OVT>(true,1.1);
+    // state.storeFunctor( m_hypervolume );
+    moeoBinaryMetricStat<EOT>* hypervolume = new moeoBinaryMetricStat<EOT>( *m_hypervolume, "hyp-vol" );
+    state.storeFunctor( hypervolume );
+    checkpoint.add( *hypervolume );
+
+    moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT> * m_epsilon = new moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT>;
+    // state.storeFunctor( m_epsilon );
+    moeoBinaryMetricStat<EOT>* epsilon = new moeoBinaryMetricStat<EOT>( *m_epsilon, "epsilon" );
+    state.storeFunctor( epsilon );
+    checkpoint.add( *epsilon );
 }
 
 
@@ -45,7 +82,7 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
 
 //! Add mono-objective (fitness-dependent) checkpoints to the checkpoint
 template<class EOT>
-void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoPop<EOT>& pop, eoState & state )
+void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state, eoPop<EOT>& pop )
 {
 #ifdef SINGLE_EVAL_ITER_DUMP
     BestMakespanStat* stat_makespan = new BestMakespanStat("BestMakespan");
@@ -106,6 +143,9 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
         pop
         , eoEvalFuncCounter<EOT> & eval_counter
 #endif
+#ifdef DAE_MO
+        , moeoArchive<EOT>& archive
+#endif
 )
 {
     // attach a continuator to the checkpoint
@@ -140,9 +180,9 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     //state.formatJSON("dae_state");
 
 #ifdef DAE_MO
-    add_stats_multi( *checkpoint, *clog_monitor, state );
+    add_stats_multi( *checkpoint, *clog_monitor, state, pop, archive );
 #else
-    add_stats_mono( *checkpoint, *clog_monitor, pop, state );
+    add_stats_mono( *checkpoint, *clog_monitor, state, pop );
 #endif
 
     // pour plus d'output (recopiés de do/make_checkpoint)

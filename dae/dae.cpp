@@ -332,6 +332,9 @@ int main ( int argc, char* argv[] )
     eo::log << eo::progress << "Algorithm instanciation...";
     eo::log.flush();
 #endif
+#ifdef DAE_MO
+    moeoUnboundedArchive<T> archive;
+#endif
 
     // STOPPING CRITERIA
     eoCombinedContinue<T> continuator = daex::do_make_continue_op<T>( parser, state );
@@ -347,6 +350,9 @@ int main ( int argc, char* argv[] )
     eoCheckPoint<T> & checkpoint = daex::do_make_checkpoint_op( continuator, parser, state, pop
 #ifndef NDEBUG
             , eval_counter
+#endif
+#ifdef DAE_MO
+            , archive
 #endif
             );
 
