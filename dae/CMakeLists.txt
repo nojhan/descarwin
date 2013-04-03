@@ -21,13 +21,7 @@ SET(MO_BIN_DIR "${PARADISEO_BUILD_DIR}/mo/lib" CACHE PATH "EO binary directory" 
 SET(CPT_YAHSP_SRC_DIR "${CPT_YAHSP_DIR}" CACHE PATH "CPT-YAHSP source directory" FORCE)
 SET(CPT_YAHSP_BIN_DIR "${CPT_YAHSP_BUILD_DIR}/lib" CACHE PATH "CPT-YAHSP source directory" FORCE)
 
-SET(DAE_MO "false" CACHE BOOL "Build the Multi-Objective version of DaE")
-IF( DAE_MO )
-    SET( BINARY_NAME "daemo" CACHE STRING "Name of the built binary")
-    ADD_DEFINITIONS(-DDAE_MO)
-ELSE()
-    SET( BINARY_NAME "dae" CACHE STRING "Name of the built binary")
-ENDIF()
+SET( BUILD_DAE_MO "false" CACHE BOOL "Build the Multi-Objective version of DaE")
 
 # define project name
 PROJECT(DAEX)
@@ -98,28 +92,63 @@ LINK_LIBRARIES(eoutils gmp eo eoserial rt gcov gdsl termcap)
 # factorized because dae + yahsp-mt need  to be completely recompiled due to TLS
 # global references that differ from the ones needed by dae-mt + yahsp.
 
-ADD_EXECUTABLE(${BINARY_NAME} dae.cpp)
-ADD_DEPENDENCIES(${BINARY_NAME} daex)
+ADD_EXECUTABLE(dae dae.cpp)
+ADD_DEPENDENCIES(dae daex)
 IF( CPT_WITH_OMP )
-    TARGET_LINK_LIBRARIES(${BINARY_NAME}   daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(dae   daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
 ELSE()
-    TARGET_LINK_LIBRARIES(${BINARY_NAME}   daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
+    TARGET_LINK_LIBRARIES(dae   daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
+ENDIF()
+
+IF( BUILD_DAE_MO )
+    ADD_EXECUTABLE(daemo dae.cpp)
+    SET_TARGET_PROPERTIES(
+        daemo
+        PROPERTIES
+        COMPILE_DEFINITIONS "DAE_MO"
+    )
+    IF( CPT_WITH_OMP )
+        TARGET_LINK_LIBRARIES(daemo   daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae)
+    ELSE()
+        TARGET_LINK_LIBRARIES(daemo   daex cpt_yahsp_library-common-dae     cpt_yahsp_library-dae)
+    ENDIF()
 ENDIF()
 
 # only if OpenMP on yahsp is activated
 IF (CPT_WITH_OMP AND DAE_WITH_OMP )
-    ADD_EXECUTABLE(${BINARY_NAME}-sm dae.cpp)
-    ADD_DEPENDENCIES(${BINARY_NAME}-sm daex)
+    ADD_EXECUTABLE(dae-sm dae.cpp)
+    ADD_DEPENDENCIES(dae-sm daex)
     TARGET_LINK_LIBRARIES(dae-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae-sm)
 
-    ADD_EXECUTABLE(${BINARY_NAME}-mt dae.cpp)
-    ADD_DEPENDENCIES(${BINARY_NAME}-mt daex-yahsp-mt)
-    TARGET_LINK_LIBRARIES(${BINARY_NAME}-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
+    ADD_EXECUTABLE(dae-mt dae.cpp)
+    ADD_DEPENDENCIES(dae-mt daex-yahsp-mt)
+    TARGET_LINK_LIBRARIES(dae-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
     SET_TARGET_PROPERTIES(
-    ${BINARY_NAME}-mt
-    PROPERTIES 
-    COMPILE_FLAGS "-DYAHSP_MT"
+        dae-mt
+        PROPERTIES
+        COMPILE_DEFINITIONS "YAHSP_MT"
     )
+
+    IF( BUILD_DAE_MO )
+        ADD_EXECUTABLE(daemo-sm dae.cpp)
+        ADD_DEPENDENCIES(daemo-sm daex)
+        TARGET_LINK_LIBRARIES(daemo-sm daex cpt_yahsp_library-common-dae-omp cpt_yahsp_library-dae-sm)
+        SET_TARGET_PROPERTIES(
+            daemo-sm
+            PROPERTIES
+            COMPILE_DEFINITIONS "DAE_MO"
+        )
+
+        ADD_EXECUTABLE(daemo-mt dae.cpp)
+        ADD_DEPENDENCIES(daemo-mt daex-yahsp-mt)
+        TARGET_LINK_LIBRARIES(daemo-mt daex-yahsp-mt cpt_yahsp_library-dae-mt)
+        SET_TARGET_PROPERTIES(
+            daemo-mt
+            PROPERTIES
+            COMPILE_DEFINITIONS "YAHSP_MT;DAE_MO"
+        )
+    ENDIF()
+
 ENDIF()
 
 IF (CMAKE_BUILD_TYPE MATCHES Debug)
