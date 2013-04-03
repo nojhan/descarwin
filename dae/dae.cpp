@@ -337,7 +337,11 @@ int main ( int argc, char* argv[] )
 #endif
 
     // STOPPING CRITERIA
+#ifdef DAE_MO
+    eoCombinedContinue<T> continuator = daex::do_make_continue_op<T>( parser, state, archive );
+#else
     eoCombinedContinue<T> continuator = daex::do_make_continue_op<T>( parser, state );
+#endif
 
     // Direct access to continuators are needed during restarts (see below)
     eoSteadyFitContinue<T> & steadyfit
