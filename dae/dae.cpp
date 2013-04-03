@@ -14,8 +14,6 @@
 #include <utils/eoFeasibleRatioStat.h>
 
 #include "daex.h"
-#include "evaluation/cpt-yahsp.h"
-#include "evaluation/yahsp.h"
 
 #ifdef WITH_MPI
 #include <mpi/eoMpi.h>
@@ -74,7 +72,10 @@ int main ( int argc, char* argv[] )
     // EO
     eoParser parser(argc, argv);
     make_verbose(parser);
+
+#ifdef WITH_OMP
     make_parallel(parser);
+#endif
 
 #ifdef WITH_MPI
     using eo::mpi::timerStat;
@@ -89,10 +90,12 @@ int main ( int argc, char* argv[] )
     // log some EO parameters
     eo::log << eo::logging << "Parameters:" << std::endl;
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "verbose" << eo::log.getLevelSelected() << std::endl;
+#ifdef WITH_OMP
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-loop" << eo::parallel.isEnabled() << std::endl;
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-dynamic" << eo::parallel.isDynamic() << std::endl;
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-prefix" << eo::parallel.prefix() << std::endl;
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "parallelize-nthreads" << eo::parallel.nthreads() << std::endl;
+#endif
 
 
     // GENERAL PARAMETERS
