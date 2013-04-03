@@ -3,7 +3,12 @@
 #define _MAKE_EVAL_DAE_H_
 
 #include "evaluation/cpt-yahsp.h"
+
+#ifdef DAE_MO
+#include "evaluation/yahsp_mo.h"
+#else
 #include "evaluation/yahsp.h"
+#endif
 
 namespace daex {
 
@@ -49,16 +54,25 @@ void do_make_eval_param( eoParser & parser )
         exit(1);
     }
 
+#ifdef DAE_MO
+    double astar_weight = parser.createParam( (double)1, "astar-weight", // FIXME default value??
+            "A* weight within YAHSP", 'H', "Evaluation" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "astar-weight" << astar_weight << std::endl;
+
+    bool cost_max = parser.createParam( (bool)false, "cost-max",
+            "Use max cost instead of additive costs as the second objective", 'M', "Multi-Objective" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "cost-max" << cost_max << std::endl;
+#endif
 }
 
 
 template<class EOT>
 std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
-    do_make_eval_op( 
+    do_make_eval_op(
             eoParser & parser, eoState & state,
             unsigned int l_max,
             unsigned int eval_count, unsigned int estimated_b_max, unsigned int b_max_last,
-            std::string plan_file, TimeVal best_makespan, 
+            std::string plan_file, TimeVal best_makespan,
             std::string dump_sep, unsigned int dump_file_count, std::string metadata
     )
 {
@@ -66,7 +80,19 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
     unsigned int fitness_penalty = parser.valueOf<unsigned int>("fitness-penalty");
     unsigned int max_seconds = parser.valueOf<unsigned int>("max-seconds");
 
-    daeYahspEval<EOT>* eval_yahsp = new daeYahspEval<EOT>( l_max, estimated_b_max, b_max_last, fitness_weight, fitness_penalty );
+    eoEvalFunc<EOT>* eval_yahsp;
+#ifdef DAE_MO
+    double astar_weight = parser.valueOf<double>("astar-weight");
+    bool cost_max = parser.valueOf<bool>("cost-max");
+    if( cost_max ) {
+        eval_yahsp = new daemoYahspEvalMax<EOT>( astar_weight, l_max, estimated_b_max, b_max_last, fitness_weight, fitness_penalty );
+    } else {
+        eval_yahsp = new daemoYahspEvalAdd<EOT>( astar_weight, l_max, estimated_b_max, b_max_last, fitness_weight, fitness_penalty );
+    }
+#else
+    eval_yahsp = new daeYahspEval<EOT>( l_max, estimated_b_max, b_max_last, fitness_weight, fitness_penalty );
+#endif
+
     state.storeFunctor( eval_yahsp );
 
     // nested evals:

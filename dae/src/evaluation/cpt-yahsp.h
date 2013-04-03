@@ -44,7 +44,7 @@ std::string timeValToString( TimeVal x ){
 };
 
 //! Convertit un plan CPT/YAHSP en plan DAEx
- daex::Plan convertPlanCptToDae( SolutionPlan plan );
+daex::Plan convertPlanCptToDae( SolutionPlan plan );
 
 //! Affectation de pointeurs depuis les atomes DAEx vers leur équivalent CPT/YAHSP
 void bindDaeYahspCpt( daex::pddlLoad & pddl, std::string solver = SOLVER_YAHSP );

@@ -56,7 +56,6 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray ){
 
 //! Évaluateur principal, à utiliser pour les itérations normales
 template<class EOT=daex::Decomposition >
-
 class daeYahspEval : public daeCptYahspEval<EOT>
 {
 public:
