@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-mkdir -p mpi_debug
-cd mpi_debug
-cmake -DCPT_WITH_OMP=1 -DDAE_WITH_MPI=1 -DCMAKE_BUILD_TYPE=Debug ..
-make
-err=$?
-cd ..
-exit $err

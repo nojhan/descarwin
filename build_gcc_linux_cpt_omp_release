@@ -1,9 +1,0 @@
-#!/usr/bin/env sh
-
-mkdir -p cpt-omp_release
-cd cpt-omp_release
-cmake -DCPT_WITH_OMP=1 -DDAE_WITH_MPI=0 -DCMAKE_BUILD_TYPE=Release ..
-make
-err=$?
-cd ..
-exit $err

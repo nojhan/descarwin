@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-mkdir -p mpi_release
-cd mpi_release
-cmake -DCPT_WITH_OMP=1 -DDAE_WITH_MPI=1  ..
-make
-err=$?
-cd ..
-exit $err

@@ -1,8 +1,10 @@
 
+cd builds/
+
 build_dir=$1 # directory where DAE has been built (debug, release or whatever)
 
-  domain="./scripts/runs/ipc6_tempo-sat_elevators-strips_p01-domain.pddl"
-instance="./scripts/runs/ipc6_tempo-sat_elevators-strips_p01.pddl"
+  domain="../scripts/runs/ipc6_tempo-sat_elevators-strips_p01-domain.pddl"
+instance="../scripts/runs/ipc6_tempo-sat_elevators-strips_p01.pddl"
 
 d=$(basename $domain .pddl)
 i=$(basename $instance .pddl)
