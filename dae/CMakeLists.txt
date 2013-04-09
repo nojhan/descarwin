@@ -8,20 +8,18 @@ ENDIF(COMMAND CMAKE_POLICY)
 INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/install.cmake OPTIONAL)
 
 
-SET(EO_SRC_DIR "${PARADISEO_DIR}/eo/src" CACHE PATH "EO source directory" FORCE)
-SET(MOEO_SRC_DIR "${PARADISEO_DIR}/moeo/src" CACHE PATH "EO source directory" FORCE)
-SET(MO_SRC_DIR "${PARADISEO_DIR}/mo/src" CACHE PATH "EO source directory" FORCE)
+SET(EO_SRC_DIR "${PARADISEO_DIR}/eo/src")
+SET(MOEO_SRC_DIR "${PARADISEO_DIR}/moeo/src")
+SET(MO_SRC_DIR "${PARADISEO_DIR}/mo/src")
 
-SET(EO_BIN_DIR "${PARADISEO_BUILD_DIR}/eo/lib" CACHE PATH "EO binary directory" FORCE)
-SET(MOEO_BIN_DIR "${PARADISEO_BUILD_DIR}/moeo/lib" CACHE PATH "EO binary directory" FORCE)
-SET(MO_BIN_DIR "${PARADISEO_BUILD_DIR}/mo/lib" CACHE PATH "EO binary directory" FORCE)
+SET(EO_BIN_DIR "${PARADISEO_BUILD_DIR}/eo/lib")
+SET(MOEO_BIN_DIR "${PARADISEO_BUILD_DIR}/moeo/lib")
+SET(MO_BIN_DIR "${PARADISEO_BUILD_DIR}/mo/lib")
 
-# the source directory of yahsp is not /src/ because we include src/cpt.h instead of cpt.h
-# because of name collisions
-SET(CPT_YAHSP_SRC_DIR "${CPT_YAHSP_DIR}" CACHE PATH "CPT-YAHSP source directory" FORCE)
-SET(CPT_YAHSP_BIN_DIR "${CPT_YAHSP_BUILD_DIR}/lib" CACHE PATH "CPT-YAHSP source directory" FORCE)
 
 SET( BUILD_DAE_MO "false" CACHE BOOL "Build the Multi-Objective version of DaE")
+SET( DAE_WITH_OMP "false" CACHE BOOL "Build a parallel DAE with OpenMP (shared memory)")
+SET( DAE_WITH_MPI "false" CACHE BOOL "Build a parallel DAE with MPI (message passing)")
 
 # define project name
 PROJECT(DAEX)
@@ -43,7 +41,8 @@ ENDIF()
 IF(DAE_WITH_MPI)
     MESSAGE("[DAE] Compilation with MPI.")
 
-    SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
+    #SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
+    SET(CMAKE_CXX_COMPILER "/usr/bin/mpicxx")
 
     # headers location
     INCLUDE_DIRECTORIES(${MPI_DIR}/include)
