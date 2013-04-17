@@ -3,16 +3,28 @@ cd builds/
 
 build_dir=$1 # directory where DAE has been built (debug, release or whatever)
 
-  domain="../scripts/runs/ipc6_tempo-sat_elevators-strips_p01-domain.pddl"
-instance="../scripts/runs/ipc6_tempo-sat_elevators-strips_p01.pddl"
+
+if [[ "$build_dir" = "daemo"* ]]; then
+    bin="./${build_dir}/dae/daemo"
+      domain="../instances//multi-objectives/Bread/domain.pddl"
+    instance="../instances/multi-objectives/Bread/pfile01.pddl"
+    specific=""
+else
+    bin="./${build_dir}/dae/dae"
+      domain="../scripts/runs/ipc6_tempo-sat_elevators-strips_p01-domain.pddl"
+    instance="../scripts/runs/ipc6_tempo-sat_elevators-strips_p01.pddl"
+    specific=""
+fi
 
 d=$(basename $domain .pddl)
 i=$(basename $instance .pddl)
-plan="./dae_test_${d}_${i}_s0.plan"
+plan="./${bin}_test_${d}_${i}_s0.plan"
 
-cmd="./${build_dir}/dae/dae --domain=${domain} --instance=${instance} --seed=0 --verbose=debug
---status=./dae_test_${d}_${i}_s0.status --plan-file=${plan}
+common="--domain=${domain} --instance=${instance} --seed=0 --verbose=debug
+--status=./${bin}_test_${d}_${i}_s0.status --plan-file=${plan}
 --max-seconds=1799 --runs-max=1 --gen-max=3 --bmax-fixed=100"
+
+cmd="${bin} ${common} ${specific}"
 
 echo $cmd
 $cmd

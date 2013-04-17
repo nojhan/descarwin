@@ -1,0 +1,90 @@
+Script started on Mon 14 Jan 2013 01:32:54 PM CET
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/floortile]louis07.fr.trt.thales>ln -s /home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/rel ease/cpt_yahsp
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/floortile]louis07.fr.trt.thales>cpt_yahsp -C 100 -W -K0.01,0.01 -o domain/domain-sub.pddl -f problems/pfile0.pddl
+number of last conflicts : 100
+enable wdeg
+temporal precision : 0.01,0.01
+domain file : domain/domain-sub.pddl
+problem file : problems/pfile0.pddl
+
+Parsing domain.................... done : 0.001          
+Parsing problem................... done : 0.001          
+domain : floor-tile
+problem : pfile0
+Instantiating operators........... done : 0.001          
+Creating initial structures....... done : 0.000          
+Computing bound................... done : 0.000          
+Computing e-deleters.............. done : 0.000          
+Finalizing e-deleters............. done : 0.000          
+Refreshing structures............. done : 0.001          
+Computing distances............... done : 0.001          
+Finalizing structures............. done : 0.000          
+Variables creation................ done : 0.004          
+Bad supporters.................... done : 0.002          
+Distance boosting................. done : 0.000          
+Initial propagations.............. done : 0.001          
+
+Problem : 104 actions, 49 fluents, 239 causals
+          14 init facts, 9 goals
+
+Bound : 8  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.000
+Bound : 9.81  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.000
+Bound : 11.62  ---  Nodes : 0  ---  Backtracks : 0  ---  Iteration time : 0.000
+Bound : 13.43  ---  Nodes : 1  ---  Backtracks : 1  ---  Iteration time : 0.000
+Bound : 15.24  ---  Nodes : 2  ---  Backtracks : 2  ---  Iteration time : 0.001
+Bound : 17.05  ---  Nodes : 6  ---  Backtracks : 6  ---  Iteration time : 0.001
+Bound : 18.86  ---  Nodes : 12  ---  Backtracks : 12  ---  Iteration time : 0.003
+Bound : 20.67  ---  Nodes : 26  ---  Backtracks : 21  ---  Iteration time : 0.008
+Bound : 19.43  ---  Nodes : 24  ---  Backtracks : 24  ---  Iteration time : 0.006
+Bound : 19.72  ---  Nodes : 24  ---  Backtracks : 24  ---  Iteration time : 0.006
+Bound : 19.86  ---  Nodes : 20  ---  Backtracks : 20  ---  Iteration time : 0.006
+Bound : 19.93  ---  Nodes : 20  ---  Backtracks : 20  ---  Iteration time : 0.006
+Bound : 19.97  ---  Nodes : 20  ---  Backtracks : 20  ---  Iteration time : 0.006
+Bound : 19.99  ---  Nodes : 20  ---  Backtracks : 20  ---  Iteration time : 0.006
+
+0.00: (paint-up robot2 tile_3-2 tile_2-2 black) [2] [4]
+0.01: (down robot1 tile_3-1 tile_2-1) [1] [6]
+1.02: (paint-up robot1 tile_3-1 tile_2-1 white) [2] [4]
+2.03: (down robot2 tile_2-2 tile_1-2) [1] [6]
+3.04: (left robot2 tile_1-2 tile_1-1) [1] [6]
+3.05: (right robot1 tile_2-1 tile_2-2) [1] [6]
+4.06: (right robot1 tile_2-2 tile_2-3) [1] [6]
+4.07: (paint-up robot2 tile_2-1 tile_1-1 black) [2] [4]
+5.08: (paint-up robot1 tile_3-3 tile_2-3 white) [2] [4]
+6.09: (right robot2 tile_1-1 tile_1-2) [1] [6]
+7.10: (right robot2 tile_1-2 tile_1-3) [1] [6]
+7.11: (left robot1 tile_2-3 tile_2-2) [1] [6]
+8.12: (down robot1 tile_2-2 tile_1-2) [1] [6]
+8.13: (paint-up robot2 tile_2-3 tile_1-3 black) [2] [4]
+9.14: (paint-up robot1 tile_2-2 tile_1-2 white) [2] [4]
+10.15: (down robot2 tile_1-3 tile_0-3) [1] [6]
+11.16: (left robot2 tile_0-3 tile_0-2) [1] [6]
+11.17: (left robot1 tile_1-2 tile_1-1) [1] [6]
+12.18: (down robot1 tile_1-1 tile_0-1) [1] [6]
+12.19: (up robot2 tile_0-2 tile_1-2) [3] [3]
+13.20: (paint-up robot1 tile_1-1 tile_0-1 white) [2] [4]
+15.21: (right robot1 tile_0-1 tile_0-2) [1] [6]
+16.22: (right robot1 tile_0-2 tile_0-3) [1] [6]
+17.23: (down robot2 tile_1-2 tile_0-2) [1] [6]
+17.24: (paint-up robot1 tile_1-3 tile_0-3 white) [2] [4]
+18.25: (paint-up robot2 tile_1-2 tile_0-2 black) [2] [4]
+
+Makespan : 20
+Total cost : 1.35
+Length : 26
+Nodes : 175
+Backtracks : 170
+Support choices : 99
+Conflict choices : 76
+Mutex choices : 0
+Start time choices : 0
+World size : 100K
+Nodes/sec : 3536.429
+Search us time : 0.049
+Search wc time : 0.050
+Total us time : 0.062
+Total wc time : 0.110
+
+[/home/saveant/TGV/DESCARWIN/dae/descarwin/trunk/experiments/MultiObjective/Examples/IPC7/domains/multi-sat/floortile]louis07.fr.trt.thales>^Dexit
+
+Script done on Mon 14 Jan 2013 01:34:02 PM CET
