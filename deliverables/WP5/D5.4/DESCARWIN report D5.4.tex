@@ -1,0 +1,312 @@
+\documentclass[english]{DESCARWINreport}
+
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage{graphicx}
+\usepackage{multirow}
+%\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{subfigure}
+\usepackage{lscape}
+%\usepackage{aaai}
+
+\algsetup{indent=1.8em}
+\renewcommand{\algorithmiccomment}[1]{// #1}
+\newcommand{\pp}{planning tasks}
+\newcommand{\PP}{planning task}
+\newcommand{\dae}{{\em Divide-and-Evolve}}
+\newcommand{\DAEI}{{\sc D\&E}}
+\newcommand{\DAEII}{{\sc DaE2}}
+\newcommand{\DAE}{{\sc DaE}}
+\newcommand{\DAEX}{{\sc DaE$_{\text{X}}$}}
+\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
+\newcommand{\CPT}{{\sc CPT}}
+\newcommand{\LPG}{{\sc LPG}}
+\newcommand{\LAMA}{{\sc LAMA}}
+\newcommand{\TFD}{{\sc TFD}}
+\newcommand{\YAHSP}{{\sc YAHSP}}
+\newcommand{\OPENSTACKS}{{\sc Openstacks}}
+\newcommand{\ELEVATORS}{{\sc Elevators}}
+\newcommand{\CREWPLANNING}{{\sc CrewPlanning}}
+\newcommand{\FLOORTILE}{{\sc Floortile}}
+\newcommand{\PARCPRINTER}{{\sc ParcPrinter}}
+
+
+\def\UU{{\mathbb{U}}}
+
+%\title{DESCARWIN\\\bigskip {\em \LARGE The Marriage of Descartes and Darwin}\\\bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip {\LARGE WP1: the \DAEX\ Planning System}}
+\title{DESCARWIN\\\bigskip {\em \LARGE The Marriage of Descartes and Darwin}\\\vspace{8cm} {\LARGE D5.4: Artificial Insemination}}
+%ANR-09-COSI-002
+%\author{Yann Semet}
+\date{\today}
+\laboratory{TRT - INRIA - ONERA}
+\docref{62 441 217-179-6}
+
+\revision{-}
+
+\setlength{\parindent}{0cm}
+\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+
+
+% Pour réduire globalement l'espace entre les items d'une liste
+% on peut également utiliser le bout de code suivant de M. Wooding
+% Les paramètres utilisés pour définir cette mise en page
+% sont les suivants :
+% \topsep espace vertical supplémentaire (ajoute à \parskip)
+% 	inséré entre le texte précédant la liste et le 1er objet
+% 	de la liste
+% \partosep espace vertical supplémentaire inséré devant la liste
+% 	si celle-ci est précédée d'une ligne blanche
+% \itemsep espace vertical supplémentaire (ajouté à \parsep)
+% 	inséré entre les éléments d'une liste.
+
+%%%% debut macro %%%%
+\makeatletter
+\toks@\expandafter{\@listI}
+\edef\@listI{\the\toks@\setlength{\parsep}{0pt}}
+\edef\@listI{\the\toks@\setlength{\topsep}{0pt}}
+\makeatother
+%%%% fin macro %%%%
+
+
+\begin{document}
+
+\maketitle
+
+%\cleardoublepage
+
+\begin{revisions}
+\begin{revtable}
+\dates{May 31, 2013}{}{}{}
+\writers{Yann Semet\\Pierre Sav\'eant}{}{}{}
+\approvers{P. Sav\'eant}{}{}{}
+\end{revtable}
+\begin{revisionlabels}
+\revlabel{initial version}
+\revlabel{}
+\end{revisionlabels}
+\end{revisions}
+
+\begin{abstract}
+This document provides the description and experimentation of the population initialization algorithm by invoking external planners and called thereafter artificial insemination or inoculation.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\chapter{Introduction}
+
+%\vspace{-0.2cm}
+\begin{algorithm}[h!]
+\caption{evaluate(Ind, planner)}
+\label{algoFitness}
+{\small
+\begin{algorithmic}[1]
+\REQUIRE{$I$, $G$, $b_\text{max}$, $l_\text{max}$}
+\STATE{$k \leftarrow 0 \; ; \; u \leftarrow 0 \; ; \; B \leftarrow 0$}
+\STATE{$i \leftarrow$ I$ \; ; \; g \leftarrow \{\}$}
+\WHILE{$g \neq G$} \label{begin.loop}
+\STATE{$g\leftarrow $ nextGoal(Ind)}
+\STATE{$(sol_k, b_{\text{done}}) \leftarrow \mbox{planner.Solve}(i,g,b_{\text{max}})$} \label{CPT.solve}
+\IF{$sol_k = \bot$} \label{CPT.fail}
+\RETURN {($\bot$, $10\cdot k \cdot \text{\it dist}(i,G) + \text{length(Ind)} - u)$} \label{return.infeasible}
+\ELSIF[\hfill avoid empty plan]{$\text{length}(sol_k) > 0$} \label{useful.states}
+\STATE{$u \leftarrow u+1$} \hfill \COMMENT{useful states counter}
+\STATE{$B \leftarrow B + b_{\text{done}}$} \hfill \COMMENT{total search steps} \label{algo-backtracks}
+\ENDIF
+\STATE{$i \leftarrow$ ExecPlan$(i,sol_k)$}  \hfill \COMMENT{next initial state}\label{global.state}
+\STATE{$k\leftarrow k+1$} \hfill \COMMENT{intermediate goal counter}
+\ENDWHILE \label{end.loop}
+\STATE{$(Sol, Q)\leftarrow \mbox{Compress}((sol_j)_{0 \leq j \leq k})$} \label{CPT.compress}
+\RETURN{$(Sol, Q+\frac{length(Ind)-u+1}{Q} + \frac{B}{l_\text{max} \cdot\, b_\text{max}})$} \label{return.feasible}
+\end{algorithmic}
+}
+\end{algorithm}
+%\vspace{-0.2cm}
+
+%\vspace{-0.2cm}
+\begin{algorithm}[h!]
+\caption{crossover(Ind$_1$,Ind$_2$)}
+{\small
+\label{algo-crossover}
+\begin{tabbing}
+1: $s_a$ \= $\leftarrow$ \= $\UU($Ind$_1)$ \` // Ind$_1 =(s_i)_{1 \leq i \leq n}$\\
+2: $t_b$ \> $\leftarrow$ \> $\UU($Ind$_2)$ \` // Ind$_2 =(t_i)_{1 \leq i \leq m}$\\
+3: {\bf if} $\Delta(t_b) > \Delta(s_a)$ \= {\bf then} \= {\bf return} \= $(s_1,\ldots,s_a,t_b,\ldots,t_m)$\\
+4: \> {\bf else} \> {\bf return} \> $(t_1,\ldots,t_b,s_a,\ldots,s_n)$
+\end{tabbing}
+}
+\vspace{-0.2cm}
+\end{algorithm}
+%\vspace{-0.3cm}
+
+%\vspace{-0.2cm}
+\begin{algorithm}[h!]
+\caption{addGoal(Ind)}
+\label{algo-addGoal}
+{\small
+\begin{algorithmic}[1]
+\REQUIRE{$r$} \hfill \COMMENT{neighborhood radius}
+\STATE{$j \leftarrow \UU$([1, min(length(Ind),lastReached(Ind))])}
+\STATE{$s\leftarrow \{\}$} \hfill \COMMENT{insert $s$ between $s_j$ and $s_{j+1}$}
+\STATE{$t \leftarrow \UU(\{t \in T\;|\; \Delta(s_j) < t \leq \Delta(s_{j+1}) \})$} %\hfill \COMMENT{$\Delta(s_j) < t \leq \Delta(s_{j+1})$}
+\STATE{$A_t \leftarrow \{a \in A \;|\; T(a)\in \text{neighbourhood}(t,r) \} $} 
+\STATE{$A_m\leftarrow \{\}$ } \hfill \COMMENT{set of non pairwise mutex atoms}
+\WHILE{$A_t\neq \{\}$}
+\STATE{$a \leftarrow \UU(A_t)$}
+\STATE{$A_m\leftarrow A_m\cup \{a\}$ }
+\STATE{$A_t \leftarrow A_t \setminus (\{a\}\cup M(a))$}
+\ENDWHILE
+\STATE{$N \leftarrow \UU([1,\#A_m])$} \hfill \COMMENT{goal length}
+\REPEAT 
+\STATE{$a \leftarrow \UU(A_m)$} \hfill \COMMENT{choose uniformly an atom in $A_m$}
+\STATE{$s \leftarrow s \cup \{a\}$} \hfill \COMMENT{add to $s$}
+\STATE{$A_m\leftarrow A_m \setminus \{a\}$}\hfill \COMMENT{remove from $A_m$ }
+\UNTIL{$\#s = N$}
+\STATE{insert(Ind, $s$, $j$)} \hfill \COMMENT{insert $s$ after goal j}
+\RETURN{Ind}
+\end{algorithmic}
+}
+\end{algorithm}
+%\vspace{-0.3cm}
+
+%\vspace{-0.2cm}
+\begin{algorithm}[h!]
+\caption{addAtom(Ind)}
+\label{algo-modifstateadd}
+{\small
+\begin{algorithmic}[1]
+\REQUIRE {$p_c, p_a$} \hfill \COMMENT{relative probabilities to change or add an atom}
+\FORALL{$k \in$ [1,min(length(\text{Ind}),lastReached(\text{Ind})+1)]}
+\IF[\hfill atom change]{$\UU([0,1]) < \frac{p_c}{\text{length(Ind)}}$}
+\STATE{$a \leftarrow \UU(\text{Ind}[k])$}
+\STATE{$b \leftarrow \UU(\{b \in M(a)\;|\;T(b)=\Delta(\text{Ind}[k]) \land \nexists c  \in \quad~\hskip 0.8cm (\text{Ind}[k] \setminus \{a\}), b \in M(c)\})$}
+\STATE{$\text{Ind}[k] \leftarrow (\text{Ind}[k] \setminus \{a\}) \cup \{b\}$}
+\ENDIF
+\IF[\hfill atom addition]{$\UU([0,1]) < p_a$}
+\STATE{$a \leftarrow \UU(\{b \in A\;|\; T(b) = \Delta(\text{Ind}[k]) \land \nexists c \in \quad~\hskip 1cm \text{Ind}[k], b \in M(c)\})$}
+\STATE{$\text{Ind}[k] \leftarrow \text{Ind}[k] \cup \{a\}$}
+\ENDIF
+\ENDFOR
+\RETURN{Ind}
+\end{algorithmic}
+}
+\end{algorithm}
+%\vspace{-0.4cm}
+
+
+%\vspace{-0.2cm}
+\begin{algorithm}[h!]
+\caption{generateIndividual(N)}
+\label{algoInit}
+{\small
+\begin{algorithmic}[1]
+\REQUIRE{$T$} \hfill \COMMENT{candidate start times}
+\STATE{$D \leftarrow \{\}$}\hfill \COMMENT{ordered list of timestamps}
+\REPEAT
+\STATE{$t \leftarrow \UU(T)$} 
+\STATE{$T \leftarrow T \setminus \{t\}$} 
+\STATE{Insert($t,D)$} \hfill  \COMMENT{maintain $D$ ordered}
+\UNTIL{$\#D = N$}
+\STATE{$\text{Ind} \leftarrow \{\}$}  \hfill \COMMENT{start building the individual}
+\FOR{$t \in \ D $}
+\STATE{$s \leftarrow \{\}$} \hfill \COMMENT{start building the intermediate goal}
+\STATE{$A_t \leftarrow \{a \in A\;|\;T(a) = t\}$}    \hfill \COMMENT{atoms that can appear at $t$}
+\STATE{$n \leftarrow \UU([1,\#A_t])$} \hfill \COMMENT{number of atoms} \label{init.state}
+\WHILE{$n \neq 0 \wedge A_t \neq \{\}$} \label{begin.loopInit}
+\STATE{$a \leftarrow \UU(A_t)$}    \hfill \COMMENT{choose uniformly an atom in $A_t$}
+\STATE{$s \leftarrow s \cup \{a\}$}   \hfill \COMMENT{add to $s$}
+\STATE{$A_t \leftarrow A_t\setminus \left(\{a\} \cup M(a)\right)$ }  \hfill \COMMENT{remove all mutex}
+\STATE{$n \leftarrow n-1$}
+\ENDWHILE \label{end.loopInit}
+\STATE{$\text{Ind} \leftarrow \text{Ind} + \{s\}$}  \hfill \COMMENT{add the new intermediate goal}
+\ENDFOR
+\RETURN{Ind}
+\end{algorithmic}
+}
+\end{algorithm}
+%\vspace{-0.2cm}
+
+\begin{algorithm}[tb!]
+\caption{DAEX({\scriptsize popSize, OffSpringSize, MaxGen, MaxChgt,} {\small p$_\text{cross}$, p$_\text{mut}$, w$_\text{addGoal}$, w$_\text{delGoal}$, w$_\text{addAtom}$, w$_\text{delAtom}$, b$_\text{max}$, l$_\text{max}$, $r, p_c, p_a$})}
+% {\scriptsize // Main loop: $h=h^1$ popSize=100, OffSpringSize = 700}}
+\label{algoMain}
+{\small
+\begin{algorithmic}[1]
+\REQUIRE{planner, $h$}\hfill \COMMENT{embedded planner and heuristic function}
+\FORALL{$a \in A$}
+\STATE{$T(a) \leftarrow h(a)$} \hfill \COMMENT{compute earliest start time}
+\ENDFOR
+\STATE{$T \leftarrow \{T(a) \neq 0\;|\;a \in A\}$} \hfill \COMMENT{candidate start times set}
+\STATE{pop $\leftarrow$ \{\}} \hfill \COMMENT{start building the population}
+\REPEAT
+\STATE{pop $\leftarrow$ pop $\cup$ \{GenerateIndividual($\UU([1,\#T])\}$)} \label{init.sequence}
+\UNTIL{$\#$pop = popSize}
+\REPEAT \label{main.loop}
+\STATE{offspring $\leftarrow$ \{\}}
+\REPEAT
+\STATE{Ind$_1$ $\leftarrow$ $\UU$(pop)}
+\IF{$\UU([0,1])$ $<$ p$_\text{cross}$}
+\STATE{Ind$_2$ $\leftarrow$ $\UU$(pop)}
+\STATE{Newind $\leftarrow$ crossover(Ind$_1$,Ind$_2$)}
+\ELSE
+\STATE{Newind $\leftarrow$ Ind$_1$}
+\ENDIF
+\IF{$\UU([0,1])$ $<$ p$_\text{mut}$}
+\STATE{$f \leftarrow$ $\UU_\text{weighted}$({\scriptsize addGoal, addAtom, delGoal, delAtom, w$_\text{addGoal}$, w$_\text{delGoal}$, w$_\text{addAtom}$, w$_\text{delAtom}$})}
+\STATE{Newind $\leftarrow$ APPLY($f$, Newind)}
+\ENDIF
+\STATE{offspring $\leftarrow$ offspring $\cup$ \{Newind\}}
+\UNTIL{$\#$offspring = OffSpringSize}
+\FORALL{Ind $\in$ pop $\cup$ offspring}
+\STATE{Evaluate(Ind, planner)}
+\ENDFOR
+\STATE{pop $\leftarrow$ SurvivalSelection(pop $\cup$ offspring)}\label{main.survival}
+\UNTIL{$\#$gen $>$ MaxGen OR noImprovementSince(MaxChgt)}
+\RETURN{Evaluate(pop.BestIndividual, planner).Sol}
+\end{algorithmic}
+}
+\end{algorithm}
+
+
+
+
+
+
+
+\chapter{Artificial Insemination}
+
+\chapter{Experimentation}
+
+\chapter{Conclusion}
+
+
+
+\chapter{References}
+
+
+%\bibliographystyle{plain}
+%\bibliography{icaps10}
+
+\begin{thebibliography}{}
+%\bibliographystyle{aaai}
+\bibliographystyle{plain}
+
+
+\bibitem{AligneSaveant2010}
+Aligne, F.; and Sav\'eant, P.
+\newblock Gestion de crise : optimisation de la mise en {\oe}uvre des plans de secours.
+\newblock In Workshop Interdisciplinaire sur la S{\'e}curit{\'e} Globale ({\em WISG 2010}).
+
+
+\end{thebibliography}
+
+
+\end{document}
