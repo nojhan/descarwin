@@ -22,10 +22,13 @@
 \RequirePackage{babel}
 \RequirePackage{ifthen}
 \RequirePackage{multibib}
+\RequirePackage{xcolor}
 \newcites{mandatory}{Doc Mandatory}
 
 \renewcommand\sfdefault{phv}
 \renewcommand\familydefault{\sfdefault}
+
+\definecolor{turquoise}{RGB}{93,191,212}
 
 \RequirePackage{vmargin} 
 \setpapersize{A4}
@@ -109,9 +112,11 @@
 	\vspace*{-2cm} 
 	\hspace*{-1,3cm} 
 	\setlength{\unitlength}{1pt}
+		\color{turquoise}
 	  \begin{picture}(0,0)(10,38)
 	  	\multiput(0,10)(0.1,0){75}{\line(0,0){61}}
 	  \end{picture}
+		\color{black}
 	  \vspace*{-1cm} 
 		\begin{tabular}{cp{16cm}}
 			\multicolumn{2}{l}{\ \textbf{\large TRT - INRIA - ONERA}}\\
@@ -125,8 +130,14 @@
 
 %	\vfill
 	\vspace{5cm} 
-	\begin{center}\Huge \bfseries \@title \end{center}
-	\vfill
+	\begin{center}\Huge \bfseries \@title \\
+\vfill
+\includegraphics[width=.3\textwidth]{hd_logo_thales}
+\hfill
+\includegraphics[width=.25\textwidth]{INRIA_logo}
+\hfill
+\includegraphics[width=.3\textwidth]{ONERA_logo}\end{center}
+	%\vfill
 	
 	\hspace{-2cm}\vspace*{-2,5cm}
 	\begin{tabular}{|p{7.6cm}|p{8.1cm}|c|}
