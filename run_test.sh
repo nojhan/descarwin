@@ -6,8 +6,8 @@ build_dir=$1 # directory where DAE has been built (debug, release or whatever)
 
 if [[ "$build_dir" = "daemo"* ]]; then
     bin="./${build_dir}/dae/daemo"
-      domain="../instances//multi-objectives/Bread/domain.pddl"
-    instance="../instances/multi-objectives/Bread/pfile01.pddl"
+      domain="../instances/multi-objectives/zenoMiniMulti/domain-zeno-time-miniRisk.pddl"
+    instance="../instances/multi-objectives/zenoMiniMulti/zeno3eMiniMulti.pddl"
     specific=""
 else
     bin="./${build_dir}/dae/dae"
