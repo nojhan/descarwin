@@ -399,9 +399,14 @@ int main ( int argc, char* argv[] )
      * MULTI-START RUNS *
      ********************/
 
+#ifdef DAE_MO
+    // the best solution to a multi-objective problem is a Pareto front (an archive)
+    moeoUnboundedArchive<T> best = archive;
+#else
     // best decomposition of all the runs, in case of multi-start
     // start at the best element of the init
     T best = pop.best_element();
+#endif
     unsigned int run = 0;
 
     // evaluate an empty decomposition, for comparison with decomposed solutions
@@ -431,7 +436,11 @@ int main ( int argc, char* argv[] )
                 eoPopEvalFunc<T> * _p_pop_eval,
 # endif // WITH_MPI
                 eoPop<T> & _pop,
+#ifdef DAE_MO
+                moeoUnboundedArchive<T> & _best,
+#else
                 T & _best,
+#endif
                 T & _empty_decompo
                 ) :
 # ifdef WITH_MPI
@@ -446,8 +455,13 @@ int main ( int argc, char* argv[] )
 
         ~FinallyBlock()
         {
+#ifdef DAE_MO
+            best( pop ); // update the best archive
+#else
             // push the best result, in case it was not in the last run
+            // but produced by the init after the last search
             pop.push_back( best );
+#endif
 
 #ifndef NDEBUG
             // call the checkpoint, as if it was ending a generation
@@ -527,15 +541,20 @@ int main ( int argc, char* argv[] )
             }
 #endif
 
-            /*
-               pop.push_back( empty_decompo );
+#ifndef NDEBUG
+
+#ifdef DAE_MO
+            std::cout << best << std::endl;
+#else
+            pop.push_back( empty_decompo );
             // push the best result, in case it was not in the last run
             pop.push_back( best );
             pop_eval( pop, pop ); // FIXME normalement inutile
             // print_results( pop, time_start, run );
-            //
-            */
-            std::cout << "End of main!" << std::endl;
+            std::cout << pop.best_element() << std::endl;
+#endif
+            eo::log << eo::progress << "The end" << std::endl;
+#endif
         }
 
         private:
@@ -544,7 +563,11 @@ int main ( int argc, char* argv[] )
         eoPopEvalFunc<T> * p_pop_eval;
 # endif // WITH_MPI
         eoPop<T>& pop;
+#ifdef DAE_MO
+        moeoUnboundedArchive<T> & best;
+#else
         T & best;
+#endif
         T & empty_decompo;
     };
 
@@ -594,7 +617,7 @@ int main ( int argc, char* argv[] )
                 eo::log << "After dae search..." << std::endl;
 
 #ifdef DAE_MO
-                // FIXME manage the archive
+                archive( pop );
 #else
                 // remember the best of all runs
                 T best_of_run = pop.best_element();
