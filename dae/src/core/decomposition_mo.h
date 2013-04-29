@@ -72,20 +72,28 @@ public:
             ( *this );
         json->add( "goals", listGoal );
 
-        // eoFitness
-        bool invalidFitness = MOEOType::invalid();
-        json->add( "invalidFitness", eoserial::make(invalidFitness) );
-
-        if ( !invalidFitness )
-        {
+        bool invalidObjVec = MOEOType::invalidObjectiveVector();
+        json->add( "invalidObjVec", eoserial::make(invalidObjVec) );
+        if( !invalidObjVec ) {
             // must be double, or else the direct serialization would not work
             double objective_makespan = this->objectiveVector(0);
             json->add( "objective_makespan", eoserial::make(objective_makespan) );
 
             double objective_cost = this->objectiveVector(1);
             json->add( "objective_cost", eoserial::make(objective_cost) );
+        }
 
-            double diversity = this->diversity();
+        bool invalidFitness = MOEOType::invalidFitness();
+        json->add( "invalidFitness", eoserial::make(invalidFitness) );
+        if( !invalidFitness ) {
+            Fitness fitness = this->fitness();
+            json->add( "fitness", eoserial::make(fitness) );
+        }
+
+        bool invalidDiversity = MOEOType::invalidDiversity();
+        json->add( "invalidDiversity", eoserial::make(invalidDiversity) );
+        if( !invalidDiversity ) {
+            Diversity diversity = this->diversity();
             json->add( "diversity", eoserial::make(diversity) );
         }
 
@@ -114,14 +122,11 @@ public:
             < std::list< GoalMO >, eoserial::Array::UnpackObjectAlgorithm >
             ( *json, "goals", *this );
 
-        // EO fitness
-        bool invalidFitness;
-        eoserial::unpack( *json, "invalidFitness", invalidFitness );
-        if (invalidFitness)
-        {
-            MOEOType::invalidate();
-        } else
-        {
+        bool invalidObjVec;
+        eoserial::unpack( *json, "invalidObjVec", invalidObjVec );
+        if (invalidObjVec) {
+            MOEOType::invalidateObjectiveVector();
+        } else {
             // in MOEO, the fitness is computed only by the Pareto archive
             // here, we only need the objectives and the diversity
             double objective_makespan;
@@ -130,11 +135,27 @@ public:
             double objective_cost;
             eoserial::unpack( *json, "objective_cost", objective_cost);
 
-            double diversity;
-            eoserial::unpack( *json, "diversity", diversity);
-
             this->objectiveVector(0, objective_makespan);
             this->objectiveVector(1, objective_cost);
+        }
+
+        bool invalidFitness;
+        eoserial::unpack( *json, "invalidFitness", invalidFitness );
+        if( invalidFitness ) {
+            MOEOType::invalidateFitness();
+        } else {
+            Fitness fitness;
+            eoserial::unpack( *json, "fitness", fitness );
+            this->fitness( fitness );
+        }
+
+        bool invalidDiversity;
+        eoserial::unpack( *json, "invalidDiversity", invalidDiversity );
+        if( invalidDiversity ) {
+            MOEOType::invalidateDiversity();
+        } else {
+            Diversity diversity;
+            eoserial::unpack( *json, "diversity", diversity );
             this->diversity( diversity );
         }
 
