@@ -592,6 +592,9 @@ int main ( int argc, char* argv[] )
                 dae( pop );
                 eo::log << "After dae search..." << std::endl;
 
+#ifdef DAE_MO
+                // FIXME manage the archive
+#else
                 // remember the best of all runs
                 T best_of_run = pop.best_element();
 
@@ -599,6 +602,7 @@ int main ( int argc, char* argv[] )
                 if( best_of_run.fitness() > best.fitness() ) {
                     best = best_of_run;
                 }
+#endif
 
                 // TODO handle the case when we have several best decomposition with the same fitness but different plans?
                 // TODO use previous searches to re-estimate a better b_max?
