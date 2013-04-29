@@ -48,17 +48,13 @@ eoCombinedContinue<EOT> & do_make_continue_op( eoParser & parser, eoState & stat
     unsigned int steadygen = parser.valueOf<unsigned int>("gen-steady");
     unsigned int maxgens = parser.valueOf<unsigned int>("gen-max");
 
-    eoSteadyFitContinue<EOT>* steadyfit = new eoSteadyFitContinue<EOT>( mingen, steadygen );
-    state.storeFunctor( steadyfit );
-
     eoGenContinue<EOT>* maxgen = new eoGenContinue<EOT>( maxgens );
     state.storeFunctor( maxgen );
 
     // combine the continuators
-    eoCombinedContinue<EOT>* continuator = new eoCombinedContinue<EOT>( *steadyfit );
+    eoCombinedContinue<EOT>* continuator = new eoCombinedContinue<EOT>( *maxgen );
     state.storeFunctor( continuator );
 
-    continuator->add(*maxgen);
 
 #ifdef DAE_MO
     // if the user asked for a pareto-target continuator
@@ -68,6 +64,10 @@ eoCombinedContinue<EOT> & do_make_continue_op( eoParser & parser, eoState & stat
         state.storeFunctor(hypcont);
         continuator->add(*hypcont);
     }
+#else
+    eoSteadyFitContinue<EOT>* steadyfit = new eoSteadyFitContinue<EOT>( mingen, steadygen );
+    state.storeFunctor(steadyfit);
+    continuator->add(*steadyfit);
 #endif
     return *continuator;
 }
