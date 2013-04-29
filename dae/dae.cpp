@@ -357,11 +357,12 @@ int main ( int argc, char* argv[] )
 #endif
 
     // Direct access to continuators are needed during restarts (see below)
-    eoSteadyFitContinue<T> & steadyfit
-        = *( dynamic_cast<eoSteadyFitContinue<T>* >( continuator[0] ) );
     eoGenContinue<T> & maxgen
-        = *( dynamic_cast< eoGenContinue<T>* >( continuator[1] ) );
-
+        = *( dynamic_cast< eoGenContinue<T>* >( continuator.at(0) ) );
+#ifndef DAE_MO
+    eoSteadyFitContinue<T> & steadyfit
+        = *( dynamic_cast<eoSteadyFitContinue<T>* >( continuator.at(1) ) ) );
+#endif
 
     // CHECKPOINTING
     eoCheckPoint<T> & checkpoint = daex::do_make_checkpoint_op( continuator, parser, state, pop
@@ -628,8 +629,10 @@ int main ( int argc, char* argv[] )
                 pop_eval( pop, pop );
 
                 // reset run's continuator counters
-                steadyfit.totalGenerations( mingen, steadygen );
                 maxgen.totalGenerations( maxgens );
+#ifndef DAE_MO
+                steadyfit.totalGenerations( mingen, steadygen );
+#endif
 # ifdef WITH_MPI
                 timerStat.stop("main_run");
 # endif
