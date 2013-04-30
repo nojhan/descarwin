@@ -1,37 +1,23 @@
-(define (domain zeno-travel)
-(:requirements :strips :durative-actions :action-costs)
-(:predicates
-	 (at ?x ?c) (aircraft ?p) (person ?x) (city ?x) (libre ?x)
-)
-(:functions (citythreat ?x) (timeTerre ?x ?y) (total-cost)
-)
+; MULTIZENO (IJCAI 2013)
 
-(:action fly
- :parameters (?a ?c1 ?c2 ?x)
- :duration (= ?duration (timeTerre ?c1 ?c2))
- :precondition
-	(and (aircraft ?a) (city ?c1) (city ?c2)    
-             (at ?a ?c1) 
-             (person ?x) (at ?x ?c1) (libre ?a)
-        )
- :effect
-	(and (at ?a ?c2) (not (at ?a ?c1)) 
-             (not (libre ?a)) (libre ?a) (not (at ?x ?c1)) (at ?x ?c2)
-	     (increase (total-cost) (citythreat ?c2))
-        )
-)
+(define (domain multi-zeno-travel)
+ (:requirements :durative-actions :action-costs)
+ (:types aircraft person city - object)
+ (:predicates (at ?x - object ?c - city) (libre ?x - aircraft)
 
-(:action flyVide
- :parameters (?a ?c1 ?c2)
- :duration (= ?duration (timeTerre ?c1 ?c2))
- :precondition
-	(and (aircraft ?a) (city ?c1) (city ?c2) (at ?a ?c1) 
-        (libre ?a)
-        )
- :effect
-	(and (at ?a ?c2) (not (at ?a ?c1))
-             (not (libre ?a)) (libre ?a)
-	     (increase (total-cost) (citythreat ?c2))
-        )
-)
-)
+ (:functions (citythreat ?x) (timeTerre ?x ?y) (total-cost))
+
+ (:action fly :parameters (?a - aircraft ?c1 ?c2 - city ?x - person)
+  :duration (= ?duration (timeTerre ?c1 ?c2))
+  :condition (and (at ?a ?c1) (libre ?a) (at ?x ?c1))
+  :effect (and (not (at ?a ?c1)) (at ?a ?c2) 
+               (not (libre ?a)) (libre ?a) 
+               (not (at ?x ?c1)) (at ?x ?c2)
+               (increase (total-cost) (citythreat ?c2))))
+
+ (:action flyVide :parameters (?a - aircraft ?c1 ?c2 - city)
+  :duration (= ?duration (timeTerre ?c1 ?c2))
+  :condition (and (at ?a ?c1) (libre ?a))
+  :effect (and (not (at ?a ?c1)) (at ?a ?c2) 
+               (not (libre ?a)) (libre ?a)
+	       (increase (total-cost) (citythreat ?c2)))))
