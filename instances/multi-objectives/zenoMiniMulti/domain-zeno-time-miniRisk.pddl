@@ -1,7 +1,7 @@
 ; MULTIZENO (IJCAI 2013)
 
 (define (domain multi-zeno-travel)
- (:requirements :durative-actions :action-costs)
+ (:requirements :typing :durative-actions :action-costs)
  (:types aircraft person city - object)
  (:predicates (at ?x - object ?c - city) (libre ?x - aircraft)
 

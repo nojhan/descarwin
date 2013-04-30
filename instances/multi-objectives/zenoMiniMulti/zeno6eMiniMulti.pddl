@@ -2,19 +2,10 @@
 
 (define (problem MULTIZENO-B)
  (:domain multi-zeno-travel)
- (:objects plane1 - aircraft
-           plane2 - aircraft
-	   person1 - person
-	   person2 - person
-	   person3 - person
-	   person4 - person
- 	   person5 - person
-	   person6 - person
-	   city0 - city
-	   city1 - city
-	   city2 - city
-	   city3 - city
-	   city4 - city)
+
+ (:objects plane1 - plane2 - aircraft
+	   person1 person2 person3 person4 person5 person6 - person
+           city0 city1 city2 city3 city4 - city)
 
  (:init	(= (total-cost) 0)
 	(= (citythreat city0) 0)
