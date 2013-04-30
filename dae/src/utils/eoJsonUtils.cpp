@@ -1,6 +1,6 @@
 # include "eoJsonUtils.h"
 
-# include <serial/Object.h>
+# include <serial/SerialObject.h>
 # include <serial/Parser.h>
 
 # include <string>
