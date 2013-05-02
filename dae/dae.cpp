@@ -571,7 +571,7 @@ int main ( int argc, char* argv[] )
         T & empty_decompo;
     };
 
-    // try {
+    try {
         FinallyBlock finallyBlock(
 # ifdef WITH_MPI
             p_pop_eval,
@@ -661,13 +661,14 @@ int main ( int argc, char* argv[] )
 # endif
             } // while
         } // if with multistart
-//     } catch( std::exception const& e ) {
-// #ifndef NDEBUG
-//             eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
-// #endif
-//             eo::log << eo::progress << "Leaving (living?) after an exception : " << e.what() << std::endl;
-//         return 0;
-//     }
+    // } catch( std::exception const& e ) {
+    } catch( eoMaxTimeException const& e ) {
+#ifndef NDEBUG
+            eo::log << eo::progress << "... premature end of search, current result:" << std::endl;
+#endif
+            eo::log << eo::progress << "Stop after exception : " << e.what() << std::endl;
+        return 0;
+    }
 
 
     return 0;
