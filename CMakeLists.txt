@@ -2,8 +2,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(DESCARWIN)
 
 # Note: toplevel definition, because it is used also for dae
-set(CPT_WITH_OMP "on" CACHE BOOL "Build a parallel YAHSP with OpenMP (shared memory)")
-set(CPT_WITH_MPI "on" CACHE BOOL "Build a parallel YAHSP with MPI (message passing)")
+set(CPT_WITH_OMP "off" CACHE BOOL "Build a parallel YAHSP with OpenMP (shared memory)")
+set(CPT_WITH_MPI "off" CACHE BOOL "Build a parallel YAHSP with MPI (message passing)")
 
 IF(NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE Release CACHE STRING
