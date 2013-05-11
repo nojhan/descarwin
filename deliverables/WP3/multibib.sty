@@ -1,0 +1,32 @@
+%  multibib.sty
+%  Zaehlt Eintraege ueber mehrere Bib-Umg. hinweg
+
+\newcounter{bibcntr}
+\setcounter{bibcntr}{0}
+
+\newcommand{\myusecounter}[1]
+ {\@nmbrlisttrue\def\@listctr{#1}}%
+
+\renewenvironment{thebibliography}[2]             %<
+                                 [\value{bibcntr}]%<
+ {\chapter*{\bibname
+    \@mkboth{\MakeUppercase\bibname}%
+            {\MakeUppercase\bibname}}%
+  \list{\@biblabel{\arabic{bibcntr}}}%            %<
+    {\settowidth\labelwidth{\@biblabel{#2}}%      %<
+     \leftmargin\labelwidth
+     \advance\leftmargin\labelsep
+     \@openbib@code
+     \myusecounter{bibcntr}%                      %<
+     \setcounter{bibcntr}{#1}%                    %<
+     \renewcommand\thebibcntr{\arabic{bibcntr}}}% %<
+  \sloppy
+  \clubpenalty4000
+  \@clubpenalty \clubpenalty
+  \widowpenalty4000%
+  \sfcode`\.\@m}
+ {\def\@noitemerr
+  {\@latex@warning{%
+    Empty `thebibliography' environment}}%
+  \endlist
+ }
