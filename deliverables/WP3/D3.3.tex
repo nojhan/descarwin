@@ -56,6 +56,10 @@ Multi-objective Experimentations}}
 \usepackage[final]{pdfpages}
 
 \hoffset -2cm
+\textwidth 15cm
+
+\newcommand{\DAE}{{\sc DaE}}
+\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
 
 \begin{document}
 
@@ -82,7 +86,24 @@ Multi-objective Experimentations}}
 %\end{figure}
 
 \begin{abstract}
-The object of this document is to provide results of the experimentation campaign regarding the original multi-objective approach to AI planning developed in the Descarwin project.
+The object of this document is to provide results of the experimentation campaign regarding the original multi-objective approach to AI planning developed in the Descarwin project. It is made of 3 chapters, corresponding to 3 publications describing the different steps of our experimental campaign that validate our approach to Pareto-based multi-objective AI planning. Each chapter starts with an extended abstract that introduces the context of the work, followed by a copy of the published paper.
+
+\begin{itemize}
+ \item This first validation was performed on the original {\tt Zeno} benchmark suite, as described in Deliverable 3.1. The benchmark is first described in detail, and the experimental parts compare several multi-objective evolutionary engines in several instances of this benchmark.
+
+This work has been published as: ``Mostepha Redouane Khouadjia, Marc Schoenauer, Vincent Vidal, Johann Dréo and Pierre Savéant, {\em Multi-Objective AI Planning: Evaluating DaEYAHSP on a Tunable Benchmark}. In Robin C. Purshouse, Peter J. Fleming, and Carlos M. Fonseca, Eds, Proc. 7th International Conference on Evolutionary Multi-Criterion Optimization (EMO2013), pp 36-50, LNCS 7811, Springer Verlag, 2013.'' 
+
+\item This second validation compares the Pareto-based approach that was found the best-performing in the previous chapter, i.e. the one that uses IBEA (the indicator-based evolutionary multi-objective algorithm) with hypervolume indicator, with the more traditional aggregation-based approach using the single objective version of \DAE. The 
+
+This work has been published as: ``Mostepha Redouane Khouadjia, Marc Schoenauer, Vincent Vidal, Johann Dréo and Pierre Savéant, {\em Multi-Objective AI Planning: Comparing Aggregation and Pareto Approaches}. In Martin Middendorf and Christian Blum, Eds, Proc. 13th European Conference on Evolutionary Computation in Combinatorial Optimisation (EvoCOP2013), pp 202-213, LNCS 7832, Springer Verlag, 2013.''
+
+\item This last series of experiments validates the multi-objective \DAEYAHSP\ approach against the only competitor from the AI Planning community, i.e. the approach using the metric-sensitive planner LPG, one of the state-of-the-art planner in single-objective setting, that can however directly handle aggregated objectives. The comparative experiments here involve not only the {\tt Zeno} test-bench, but also the other domains and instances proposed in Deliverable 3.1 based on the multi-objectivizations of some IPC7 (single-objective) domains. In most cases, \DAEYAHSP\ is found to outperform the LPG-based approach.
+
+This work has been accepted at IJCAI 2013 conference, August 2013, as ``Mostepha Redouane Khouadjia, Marc Schoenauer, Vincent Vidal, Johann Dréo and Pierre Savéant, {\em Pareto-Based Multiobjective AI Planning}. In Proc. 23rd International Joint Conference on Artificial Intelligence (IJCAI 2013), 2013.''
+\end{itemize}
+
+
+
 \end{abstract}
 
 %\begin{figure}[htbp]
@@ -94,8 +115,9 @@ The object of this document is to provide results of the experimentation campaig
 
 \newpage
 
-\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
 \chapter{Evaluating \DAEYAHSP\ on a Tunable Benchmark}
+
+
 
 \newpage
 \hoffset 0cm
