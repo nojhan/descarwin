@@ -252,11 +252,13 @@ unsigned int estimate_bmax_incremental(
         //#endif
         eval_pop( pop, pop );
 
+#ifndef DAE_MO
 #ifndef NDEBUG
         eoBestFitnessStat<EOT> best_statTEST("Best");
         best_statTEST(pop);
         //        eo::log << eo::logging << "\tbest_fitness " << timeValToString(best_statTEST.value());
         eo::log << eo::logging << "\tbest_fitness " << best_statTEST.value();
+#endif
 #endif
 
         for (size_t i = 0; i < popsize; ++i) {
