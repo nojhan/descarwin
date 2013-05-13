@@ -3,7 +3,7 @@
 (define (problem MULTIZENO-E)
  (:domain multi-zeno-travel)
 
- (:objects plane1 - plane2 - aircraft
+ (:objects plane1 plane2 - aircraft
 	   person1 person2 person3 person4 person5 - person
            city0 city1 city2 city3 city4 - city)
 

@@ -3,7 +3,7 @@
 (define (domain multi-zeno-travel)
  (:requirements :typing :durative-actions :action-costs)
  (:types aircraft person city - object)
- (:predicates (at ?x - object ?c - city) (libre ?x - aircraft)
+ (:predicates (at ?x - object ?c - city) (libre ?x - aircraft))
 
  (:functions (citythreat ?x) (timeTerre ?x ?y) (total-cost))
 
