@@ -14,7 +14,7 @@ public:
 
     virtual FitT objective_makespan( EOT& decompo )
     {
-        return solve( decompo );
+        return this->solve( decompo );
     }
 
 
