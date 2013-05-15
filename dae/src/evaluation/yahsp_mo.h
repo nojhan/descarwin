@@ -23,7 +23,7 @@ public:
 
 
     daemoYahspEval(
-        unsigned int astar_weigth, // FIXME default value?
+        unsigned int astar_weight, // FIXME default value?
         unsigned int l_max_ = 20,
         unsigned int b_max_in = 10,
         unsigned int b_max_last = 30,
@@ -32,18 +32,23 @@ public:
     ) :
         daeYahspEval<EOT>( l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
     {
-        yahsp_set_weight( astar_weigth );
+        yahsp_set_weight( astar_weight );
     }
 
 
     void call( EOT& decompo )
     {
-        daex::DecompoMOObjectives objVector;
+        typename EOT::ObjectiveVector objVector;
+
+        // get the fitness that correspond to the "makespan" objective
+        // for unfeasible decomposition, that may be a penalized fitness
+        // FIXME how to be sure that the hypervolume compted on unfeasible decomposition is always smaller than the feasible one? We must check that the scale are not the same OR bring back the feasibility flag in the fitness!
         FitT makespan = objective_makespan( decompo );
         objVector[0] = makespan.first;
 
         if( makespan.second ) {
             // if the decomposition is feasible, we have a max/add cost
+            // (depending on what the user asked)
             FitT cost = objective_cost( decompo );
             assert( makespan.second == cost.second ); // equal feasibilities
             objVector[1] = cost.first;
@@ -52,7 +57,7 @@ public:
             // thus we use the same value as for the 1st objective
             objVector[1] = makespan.first;
         }
-        // change the MO fitness
+        // change the MO "fitness"
         decompo.objectiveVector(objVector);
     }
 
@@ -66,8 +71,10 @@ public:
                 yahsp_set_optimize_length(); break; }
 
             case daex::Strategies::cost: {
-                // search for plans with lower costs
-                yahsp_set_optimize_cost(); break; } // FIXME what about two strategies: cost-add and cost-max?
+                // search for plans with lower (additive) costs
+                // NOTE: YAHSP does only optimize additive cost,
+                // but may compute max cost after compression
+                yahsp_set_optimize_cost(); break; }
 
             case daex::Strategies::makespan_add: {
                 yahsp_set_optimize_makespan_add(); break; }
@@ -91,14 +98,14 @@ public:
     typedef typename daemoYahspEval<EOT>::FitT FitT;
 
     daemoYahspEvalAdd(
-        unsigned int astar_weigth, // FIXME default value?
+        unsigned int astar_weight, // FIXME default value?
         unsigned int l_max_ = 20,
         unsigned int b_max_in = 10,
         unsigned int b_max_last = 30,
         double fitness_weight = 10,
         double fitness_penalty = 1e6
     ) :
-        daemoYahspEval<EOT>( astar_weigth, l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
+        daemoYahspEval<EOT>( astar_weight, l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
     {}
 
     virtual FitT objective_cost( EOT& decompo )
@@ -116,14 +123,14 @@ public:
     typedef typename daemoYahspEval<EOT>::FitT FitT;
 
     daemoYahspEvalMax(
-        unsigned int astar_weigth, // FIXME default value?
+        unsigned int astar_weight, // FIXME default value?
         unsigned int l_max_ = 20,
         unsigned int b_max_in = 10,
         unsigned int b_max_last = 30,
         double fitness_weight = 10,
         double fitness_penalty = 1e6
     ) :
-        daemoYahspEval<EOT>( astar_weigth, l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
+        daemoYahspEval<EOT>( astar_weight, l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
     {}
 
     virtual FitT objective_cost( EOT& decompo )
