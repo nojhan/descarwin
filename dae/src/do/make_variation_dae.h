@@ -57,8 +57,10 @@ void do_make_variation_param( eoParser & parser )
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_mut" << proba_mut << std::endl;
 
 #ifdef DAE_MO
-    std::string strategy = parser.createParam( (std::string)"random", "strategy",
-            "How to change the search strategy for DAEMO_YAHSP. Either a fixed one among: length, cost, makespan-max or makespan-add; either: random, flip-goal (random makespan-add or cost at each goal) or flip-decomposition (random makespan-add or cost for the whole individual)",
+    // the flip-decomposition seems to be the best option, as stated in the article:
+    // "Pareto-based Multiobjective AI Planning", IJCAI 2013
+    std::string strategy = parser.createParam( (std::string)"flip-decomposition", "strategy",
+            "How to change the search strategy for DAEMO_YAHSP. Either a fixed one, for all goals, among: length, cost, makespan-max or makespan-add; Either a different one for each goal: random, flip-goal (random makespan-add or cost at each goal) or flip-decomposition (random makespan-add or cost for the whole individual)",
             'y', "Multi-Objective").value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strategy" << strategy << std::endl;
 

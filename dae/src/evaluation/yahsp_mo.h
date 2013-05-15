@@ -62,10 +62,12 @@ public:
     {
         switch( goal.strategy() ) {
             case daex::Strategies::length: {
+                // search for short plans
                 yahsp_set_optimize_length(); break; }
 
             case daex::Strategies::cost: {
-                yahsp_set_optimize_cost(); break; }
+                // search for plans with lower costs
+                yahsp_set_optimize_cost(); break; } // FIXME what about two strategies: cost-add and cost-max?
 
             case daex::Strategies::makespan_add: {
                 yahsp_set_optimize_makespan_add(); break; }
