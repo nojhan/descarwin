@@ -380,7 +380,7 @@ int main ( int argc, char* argv[] )
 
     // ALGORITHM
 #ifdef DAE_MO // MULTI-OBJECTIVE
-    moeoHypervolumeBinaryMetric<typename T::ObjectiveVector> metric(rho);
+    moeoHypervolumeBinaryMetric<T::ObjectiveVector> metric(rho);
 
     moeoIBEA<T> dae( checkpoint, eval, variator, metric, kappa );
 
