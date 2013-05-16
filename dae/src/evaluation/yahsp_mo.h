@@ -44,6 +44,8 @@ public:
         // for unfeasible decomposition, that may be a penalized fitness
         // FIXME how to be sure that the hypervolume compted on unfeasible decomposition is always smaller than the feasible one? We must check that the scale are not the same OR bring back the feasibility flag in the fitness!
         FitT result = objective_makespan( decompo );
+        decompo.setFeasible( result.second );
+
         objVector[0] = result.first;
 
         if( result.second ) {
@@ -59,7 +61,6 @@ public:
         }
         // change the MO "fitness"
         decompo.objectiveVector(objVector);
-        decompo.setFeasible( result.second );
     }
 
 
