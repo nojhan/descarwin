@@ -210,7 +210,7 @@ public:
                     if( code == PLAN_FOUND ) {
                         compress( decompo );
                         fitness = this->fitness_feasible( decompo );
-                        feasibility = false;
+                        feasibility = true;
                                     #ifndef NDEBUG
                                     eo::log << eo::debug << "*";
                                     eo::log.flush();
