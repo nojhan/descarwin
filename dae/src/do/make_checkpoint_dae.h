@@ -53,7 +53,7 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         moeoContributionMetric<OVT> * m_contribution = new moeoContributionMetric<OVT>;
         // state.storeFunctor( m_contribution ); // can't store this due to ambiguous base with a different template type // FIXME use smart pointers
         // wrap it in an eoStat
-        eoStat<EOT,double>* contribution = new moeoBinaryMetricStat<EOT>( *m_contribution, "contrib" );
+        eoStat<EOT,double>* contribution = new moeoBinaryMetricStat<EOT>( *m_contribution, "Contrib" );
         state.storeFunctor( contribution );
         // add it to the checkpoint
         checkpoint.add( *contribution );
@@ -61,30 +61,31 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
 
         moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
         // state.storeFunctor( m_entropy );
-        moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "entropy" );
+        moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "Entropy" );
         state.storeFunctor( entropy );
         checkpoint.add( *entropy );
         clog_monitor.add( *entropy );
 
         moeoHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoHyperVolumeDifferenceMetric<OVT>(true,1.1);
         // state.storeFunctor( m_hypervolume );
-        moeoBinaryMetricStat<EOT>* hypervolume = new moeoBinaryMetricStat<EOT>( *m_hypervolume, "hyp-vol" );
+        moeoBinaryMetricStat<EOT>* hypervolume = new moeoBinaryMetricStat<EOT>( *m_hypervolume, "Hyp-Vol" );
         state.storeFunctor( hypervolume );
         checkpoint.add( *hypervolume );
+        clog_monitor.add( *hypervolume );
 
         moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT> * m_epsilon = new moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT>;
         // state.storeFunctor( m_epsilon );
-        moeoBinaryMetricStat<EOT>* epsilon = new moeoBinaryMetricStat<EOT>( *m_epsilon, "epsilon" );
+        moeoBinaryMetricStat<EOT>* epsilon = new moeoBinaryMetricStat<EOT>( *m_epsilon, "Epsilon" );
         state.storeFunctor( epsilon );
         checkpoint.add( *epsilon );
         clog_monitor.add( *epsilon );
 
-        moeoBestObjVecStat<EOT> * best_stat = new moeoBestObjVecStat<EOT>;
+        moeoBestObjVecStat<EOT> * best_stat = new moeoBestObjVecStat<EOT>("Best");
         state.storeFunctor(best_stat);
         checkpoint.add( *best_stat );
         clog_monitor.add( *best_stat );
 
-        moeoAverageObjVecStat<EOT> * average_stat = new moeoAverageObjVecStat<EOT>;
+        moeoAverageObjVecStat<EOT> * average_stat = new moeoAverageObjVecStat<EOT>("Average");
         state.storeFunctor(average_stat);
         checkpoint.add( *average_stat );
         clog_monitor.add( *average_stat );
