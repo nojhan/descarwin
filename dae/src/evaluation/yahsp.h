@@ -296,7 +296,8 @@ protected:
             // if k != plans_nb => the same decomposition is evaluated simultaneously by several threads !!!
             assert( decompo.get_number_evaluated_goals() == (unsigned int) plans_nb );
 
-            decompo.plans_sub_add( daex::Plan() ); // On ne stocke plus les sous-plans mais on garde la structure notamment pour last_reached.
+            // just store the plan _representation_ (and not the real YAHSP's solution_plan structure)
+            decompo.plans_sub_add( daex::Plan( solution_plan ) );
             decompo.last_subplan().search_steps( decompo.get_number_evaluated_nodes() );
                                  #ifndef NDEBUG
                                  eo::log << eo::xdebug << "ok" << std::endl;
