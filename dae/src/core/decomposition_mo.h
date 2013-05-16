@@ -72,8 +72,9 @@ public:
             json->add( "plan_global", &_plan_global );
         }
 
-        json->add( "goal_count", eoserial::make(_k) );
-        json->add( "useful_goals", eoserial::make(_u) );
+        json->add( "goals_number", eoserial::make( this->size() ) );
+        json->add( "goals_evaluated", eoserial::make(_k) );
+        json->add( "goals_useful", eoserial::make(_u) );
 
         // list<GoalMO>
         eoserial::Array* listGoal = eoserial::makeArray
@@ -127,8 +128,8 @@ public:
         eoserial::unpackObject( *json, "plan_global", _plan_global );
         }
 
-        eoserial::unpack( *json, "goal_count", _k );
-        eoserial::unpack( *json, "useful_goals", _u );
+        eoserial::unpack( *json, "goals_evaluated", _k );
+        eoserial::unpack( *json, "goals_useful", _u );
 
         // list<Goal>
         clear();
