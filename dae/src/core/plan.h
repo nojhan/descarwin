@@ -76,7 +76,7 @@ public:
 
     //! Print a SolutionPlan in a string using YAHSP's print_plan_ipc function
     std::string plan_to_str( SolutionPlan * p_plan )
-    {        
+    {
         std::ostringstream out;
 
         char* buffer;
@@ -103,6 +103,25 @@ public:
         return out.str();
     }
 
+    std::string escape_newlines( const std::string &in, const std::string &search="\n", const std::string &replace="\\n" ) const
+    {
+        std::string s = in;
+        for( size_t pos = 0; ; pos += replace.length() ) {
+            // find the substring
+            pos = s.find( search, pos );
+            if( pos == std::string::npos ) break;
+            // erase and insert == replace
+            s.erase( pos, search.length() );
+            s.insert( pos, replace );
+        }
+        return s;
+    }
+
+    std::string plan_to_str_escaped( SolutionPlan * p_plan )
+    {
+        return escape_newlines( plan_to_str( p_plan ) );
+    }
+
 
     //! Print the string rep on a ostream
     friend std::ostream& operator<<( std::ostream& out, const daex::Plan & plan ) 
@@ -124,7 +143,10 @@ public:
         json->add( "cost_max", eoserial::make(_cost_max) );
         json->add( "search_steps", eoserial::make(_search_steps) );
         json->add( "is_valid", eoserial::make(_is_valid) );
-        json->add( "plan_rep", eoserial::make(_plan_rep) );
+
+        const std::string rep = escape_newlines(_plan_rep);
+        json->add( "plan_rep", eoserial::make( rep ) );
+
         return json;
     }
 
