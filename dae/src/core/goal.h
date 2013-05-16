@@ -87,22 +87,22 @@ public:
 
     eoserial::Object* pack() const
     {
-        // begin with list members
+        // begin with list atoms
         /*
-        eoserial::Array* members = eoserial::makeArray
+        eoserial::Array* atoms = eoserial::makeArray
             < std::list<Atom>, PointerPushAlgorithm >
             ( *this );
         */
 
         // FIXME enregistrer la liste des fluent index plutôt que les atom*
-        eoserial::Array* members = eoserial::makeArray
+        eoserial::Array* atoms = eoserial::makeArray
             < std::list<Atom>, IndexPushAlgorithm >
             ( *this );
 
         // continues with self
         eoserial::Object* obj = new eoserial::Object;
         obj->add( "start_time", eoserial::make(_earliest_start_time) );
-        obj->add( "members", members );
+        obj->add( "atoms", atoms );
         return obj;
     }
 
