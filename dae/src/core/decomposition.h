@@ -171,12 +171,30 @@ public:
     unsigned int get_number_evaluated_nodes() const { return _B; }
     void reset_number_evaluated_nodes() { _B = 0; }
     void incr_number_evaluated_nodes(unsigned int B) { _B += B; }
-    void setFeasible(bool  b){	_is_feasible = b; }
+
+    void setFeasible(bool  b)
+    {
+        _is_feasible = b;
+
+        // if the decomposition is unfeasible
+        if( !_is_feasible ) {
+            // a global plan does not exists
+            this->invalidate_plan_global();
+        }
+    }
+
     bool is_feasible() const { return _is_feasible; }
 
 
 protected:
-     //! After a modification of the decomposition, it needs to be re-evaluated
+
+    //! If the decomposition is valid but not feasible, there is no global plan
+    void invalidate_plan_global()
+    {
+        this->_plan_global = daex::Plan();
+    }
+
+    //! After a modification of the decomposition, it needs to be re-evaluated
     //! Variation operator should use this method to indicate it
     void invalidate_plan()
     {
@@ -184,8 +202,8 @@ protected:
         //because if the decomposition becomes invalid, so are its intermediate plans
         this->plans_sub_reset();
 
-        //plan vide
-        this->_plan_global = daex::Plan();
+        // and the global plan too
+        this->invalidate_plan_global();
     }
 
     bool _is_feasible;

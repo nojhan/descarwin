@@ -66,11 +66,29 @@ public:
     {
         eoserial::Object* json = new eoserial::Object;
 
+        json->add( "is_feasible", eoserial::make(_is_feasible) );
+        if( _is_feasible ) {
+            // specific members
+            json->add( "plan_global", &_plan_global );
+        }
+
+        json->add( "goal_count", eoserial::make(_k) );
+        json->add( "useful_goals", eoserial::make(_u) );
+
         // list<GoalMO>
         eoserial::Array* listGoal = eoserial::makeArray
             < std::list<GoalMO>, eoserial::SerializablePushAlgorithm >
             ( *this );
         json->add( "goals", listGoal );
+
+        // subplans
+        eoserial::Array* subplans = eoserial::makeArray
+            < std::vector< Plan >, eoserial::SerializablePushAlgorithm >
+            ( _plans_sub );
+        json->add( "subplans", subplans );
+
+        json->add( "b_max", eoserial::make(_b_max) );
+        json->add( "attempts", eoserial::make(_B) );
 
         bool invalid_objective_vector = MOEOType::invalidObjectiveVector();
         json->add( "invalid_objective_vector", eoserial::make(invalid_objective_vector) );
@@ -97,30 +115,35 @@ public:
             json->add( "diversity", eoserial::make(diversity) );
         }
 
-        // specific members
-        json->add( "plan_global", &_plan_global );
-        // subplans
-        eoserial::Array* subplans = eoserial::makeArray
-            < std::vector< Plan >, eoserial::SerializablePushAlgorithm >
-            ( _plans_sub );
-
-        json->add( "subplans", subplans );
-        json->add( "b_max", eoserial::make(_b_max) );
-        json->add( "goal_count", eoserial::make(_k) );
-        json->add( "useful_goals", eoserial::make(_u) );
-        json->add( "attempts", eoserial::make(_B) );
-        json->add( "is_feasible", eoserial::make(_is_feasible) );
-
         return json;
     }
 
     void unpack( const eoserial::Object* json )
     {
+
+        eoserial::unpack( *json, "is_feasible", _is_feasible );
+        if( _is_feasible ) {
+        // specific members
+        eoserial::unpackObject( *json, "plan_global", _plan_global );
+        }
+
+        eoserial::unpack( *json, "goal_count", _k );
+        eoserial::unpack( *json, "useful_goals", _u );
+
         // list<Goal>
         clear();
         eoserial::unpackArray
             < std::list< GoalMO >, eoserial::Array::UnpackObjectAlgorithm >
             ( *json, "goals", *this );
+
+        // _plans_sub
+        _plans_sub.clear();
+        eoserial::unpackArray
+            < std::vector< daex::Plan >, eoserial::Array::UnpackObjectAlgorithm >
+            ( *json, "subplans", _plans_sub );
+
+        eoserial::unpack( *json, "b_max", _b_max );
+        eoserial::unpack( *json, "attempts", _B );
 
         bool invalid_objective_vector;
         eoserial::unpack( *json, "invalid_objective_vector", invalid_objective_vector );
@@ -158,20 +181,6 @@ public:
             eoserial::unpack( *json, "diversity", diversity );
             this->diversity( diversity );
         }
-
-        // specific members
-        eoserial::unpackObject( *json, "plan_global", _plan_global );
-        // _plans_sub
-        _plans_sub.clear();
-        eoserial::unpackArray
-            < std::vector< daex::Plan >, eoserial::Array::UnpackObjectAlgorithm >
-            ( *json, "subplans", _plans_sub );
-
-        eoserial::unpack( *json, "b_max", _b_max );
-        eoserial::unpack( *json, "goal_count", _k );
-        eoserial::unpack( *json, "useful_goals", _u );
-        eoserial::unpack( *json, "attempts", _B );
-        eoserial::unpack( *json, "is_feasible", _is_feasible );
     }
 
     virtual void readFrom(std::istream & is)

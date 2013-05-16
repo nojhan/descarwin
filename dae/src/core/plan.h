@@ -138,26 +138,30 @@ public:
     eoserial::Object* pack(void) const
     {
         eoserial::Object* json = new eoserial::Object;
-        json->add( "makespan", eoserial::make(_makespan) );
-        json->add( "cost_add", eoserial::make(_cost_add) );
-        json->add( "cost_max", eoserial::make(_cost_max) );
         json->add( "search_steps", eoserial::make(_search_steps) );
         json->add( "is_valid", eoserial::make(_is_valid) );
+        if( _is_valid ) {
+            json->add( "makespan", eoserial::make(_makespan) );
+            json->add( "cost_add", eoserial::make(_cost_add) );
+            json->add( "cost_max", eoserial::make(_cost_max) );
 
-        const std::string rep = escape_newlines(_plan_rep);
-        json->add( "plan_rep", eoserial::make( rep ) );
+            const std::string rep = escape_newlines(_plan_rep);
+            json->add( "plan_rep", eoserial::make( rep ) );
+        }
 
         return json;
     }
 
     void unpack( const eoserial::Object* json )
     {
-        eoserial::unpack( *json, "makespan", _makespan );
-        eoserial::unpack( *json, "cost_add", _cost_add );
-        eoserial::unpack( *json, "cost_max", _cost_max );
         eoserial::unpack( *json, "search_steps", _search_steps );
         eoserial::unpack( *json, "is_valid", _is_valid );
-        eoserial::unpack( *json, "plan_rep", _plan_rep );
+        if( _is_valid ) {
+            eoserial::unpack( *json, "makespan", _makespan );
+            eoserial::unpack( *json, "cost_add", _cost_add );
+            eoserial::unpack( *json, "cost_max", _cost_max );
+            eoserial::unpack( *json, "plan_rep", _plan_rep );
+        }
     }
 
     void printOn(std::ostream& out) const

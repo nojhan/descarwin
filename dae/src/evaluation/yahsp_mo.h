@@ -43,22 +43,23 @@ public:
         // get the fitness that correspond to the "makespan" objective
         // for unfeasible decomposition, that may be a penalized fitness
         // FIXME how to be sure that the hypervolume compted on unfeasible decomposition is always smaller than the feasible one? We must check that the scale are not the same OR bring back the feasibility flag in the fitness!
-        FitT makespan = objective_makespan( decompo );
-        objVector[0] = makespan.first;
+        FitT result = objective_makespan( decompo );
+        objVector[0] = result.first;
 
-        if( makespan.second ) {
+        if( result.second ) {
             // if the decomposition is feasible, we have a max/add cost
             // (depending on what the user asked)
             FitT cost = objective_cost( decompo );
-            assert( makespan.second == cost.second ); // equal feasibilities
+            assert( result.second == cost.second ); // equal feasibilities
             objVector[1] = cost.first;
         } else {
             // else, we have no cost, thus we cannot discriminate,
             // thus we use the same value as for the 1st objective
-            objVector[1] = makespan.first;
+            objVector[1] = result.first;
         }
         // change the MO "fitness"
         decompo.objectiveVector(objVector);
+        decompo.setFeasible( result.second );
     }
 
 
