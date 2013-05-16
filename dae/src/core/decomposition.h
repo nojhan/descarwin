@@ -30,7 +30,7 @@ public:
     /*!
      * Note: and is not feasible, @see eoDualFitness
      */
-    DecompositionBase() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}  
+    DecompositionBase() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}
 
     virtual ~DecompositionBase(){}
 
@@ -39,11 +39,11 @@ public:
        if (this != &other) {
              std::list<Goal>::operator=(other);
              _plan_global = other.plan_copy();
-             _plans_sub = other.subplans(); 
+             _plans_sub = other.subplans();
              _b_max = other.b_max();
              _k = other.get_number_evaluated_goals();
              _u = other.get_number_useful_goals();
-             _B = other.get_number_evaluated_nodes();            
+             _B = other.get_number_evaluated_nodes();
         }
         return *this;
     }
