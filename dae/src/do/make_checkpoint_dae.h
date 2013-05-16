@@ -47,33 +47,49 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
     state.storeFunctor( arch_updater );
     checkpoint.add( *arch_updater );
 
-    // instanciate a metric comparing two Pareto front (hence a "binary" one)
-    // use OVT, the type of the objective vectors
-    moeoContributionMetric<OVT> * m_contribution = new moeoContributionMetric<OVT>;
-    // state.storeFunctor( m_contribution ); // can't store this due to ambiguous base with a different template type // FIXME use smart pointers
-    // wrap it in an eoStat
-    eoStat<EOT,double>* contribution = new moeoBinaryMetricStat<EOT>( *m_contribution, "contrib" );
-    state.storeFunctor( contribution );
-    // add it to the checkpoint
-    checkpoint.add( *contribution );
+    if( eo::log.getLevelSelected() >= eo::progress ) {
+        // instanciate a metric comparing two Pareto front (hence a "binary" one)
+        // use OVT, the type of the objective vectors
+        moeoContributionMetric<OVT> * m_contribution = new moeoContributionMetric<OVT>;
+        // state.storeFunctor( m_contribution ); // can't store this due to ambiguous base with a different template type // FIXME use smart pointers
+        // wrap it in an eoStat
+        eoStat<EOT,double>* contribution = new moeoBinaryMetricStat<EOT>( *m_contribution, "contrib" );
+        state.storeFunctor( contribution );
+        // add it to the checkpoint
+        checkpoint.add( *contribution );
+        clog_monitor.add( *contribution );
 
-    moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
-    // state.storeFunctor( m_entropy );
-    moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "entropy" );
-    state.storeFunctor( entropy );
-    checkpoint.add( *entropy );
+        moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
+        // state.storeFunctor( m_entropy );
+        moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "entropy" );
+        state.storeFunctor( entropy );
+        checkpoint.add( *entropy );
+        clog_monitor.add( *entropy );
 
-    moeoHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoHyperVolumeDifferenceMetric<OVT>(true,1.1);
-    // state.storeFunctor( m_hypervolume );
-    moeoBinaryMetricStat<EOT>* hypervolume = new moeoBinaryMetricStat<EOT>( *m_hypervolume, "hyp-vol" );
-    state.storeFunctor( hypervolume );
-    checkpoint.add( *hypervolume );
+        moeoHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoHyperVolumeDifferenceMetric<OVT>(true,1.1);
+        // state.storeFunctor( m_hypervolume );
+        moeoBinaryMetricStat<EOT>* hypervolume = new moeoBinaryMetricStat<EOT>( *m_hypervolume, "hyp-vol" );
+        state.storeFunctor( hypervolume );
+        checkpoint.add( *hypervolume );
 
-    moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT> * m_epsilon = new moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT>;
-    // state.storeFunctor( m_epsilon );
-    moeoBinaryMetricStat<EOT>* epsilon = new moeoBinaryMetricStat<EOT>( *m_epsilon, "epsilon" );
-    state.storeFunctor( epsilon );
-    checkpoint.add( *epsilon );
+        moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT> * m_epsilon = new moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT>;
+        // state.storeFunctor( m_epsilon );
+        moeoBinaryMetricStat<EOT>* epsilon = new moeoBinaryMetricStat<EOT>( *m_epsilon, "epsilon" );
+        state.storeFunctor( epsilon );
+        checkpoint.add( *epsilon );
+        clog_monitor.add( *epsilon );
+
+        moeoBestObjVecStat<EOT> * best_stat = new moeoBestObjVecStat<EOT>;
+        state.storeFunctor(best_stat);
+        checkpoint.add( *best_stat );
+        clog_monitor.add( *best_stat );
+
+        moeoAverageObjVecStat<EOT> * average_stat = new moeoAverageObjVecStat<EOT>;
+        state.storeFunctor(average_stat);
+        checkpoint.add( *average_stat );
+        clog_monitor.add( *average_stat );
+    }
+
 }
 
 
@@ -92,16 +108,16 @@ void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monit
 #endif
 
 #ifndef NDEBUG
-    // get best fitness
-    // for us, has the form "fitness feasibility" (e.g. "722367 1")
-    eoBestFitnessStat<EOT>* best_stat = new eoBestFitnessStat<EOT>("Best");
-    state.storeFunctor( best_stat );
-
-    // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
-    eoNthElementFitnessStat<EOT>* median_stat = new eoNthElementFitnessStat<EOT>( pop.size() / 2, "Median" );
-    state.storeFunctor( median_stat );
-
     if( eo::log.getLevelSelected() >= eo::progress ) {
+        // get best fitness
+        // for us, has the form "fitness feasibility" (e.g. "722367 1")
+        eoBestFitnessStat<EOT>* best_stat = new eoBestFitnessStat<EOT>("Best");
+        state.storeFunctor( best_stat );
+
+        // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
+        eoNthElementFitnessStat<EOT>* median_stat = new eoNthElementFitnessStat<EOT>( pop.size() / 2, "Median" );
+        state.storeFunctor( median_stat );
+
         checkpoint.add( *best_stat );
         checkpoint.add( *median_stat );
         clog_monitor.add( *best_stat );
