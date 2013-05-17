@@ -544,7 +544,18 @@ int main ( int argc, char* argv[] )
 #ifndef NDEBUG
 
 #ifdef DAE_MO
-            std::cout << best << std::endl;
+            // ugly fix to output correctly formatted json
+            // FIXME backport json serialization everywhere in paradisEO
+            // std::cout << best << std::endl;
+            std::cout << "[" << std::endl;
+            // best is a kind of eoPop containing non-dominated solutions
+            moeoArchive<T>::iterator idecompo=best.begin(), end=best.end();
+            std::cout << *idecompo;// << std::endl;
+            idecompo++;
+            for( ; idecompo != end; ++idecompo ) {
+                std::cout << "," << *idecompo;// << std::endl;
+            }
+            std::cout << "]" << std::endl;
 #else
             pop.push_back( empty_decompo );
             // push the best result, in case it was not in the last run
