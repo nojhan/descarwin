@@ -174,6 +174,12 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     eoOStreamMonitor* clog_monitor = new eoOStreamMonitor( std::clog, "\t", 10, ' '); 
     state.storeFunctor( clog_monitor );
 
+    eoGenCounter* gen_count = new eoGenCounter( 0, "Gen" );
+    state.storeFunctor( gen_count );
+
+    eoTimeCounter* time_count = new eoTimeCounter();
+    state.storeFunctor( time_count );
+
     FeasibleRatioStat<EOT>* feasible_stat = new FeasibleRatioStat<EOT>( "F.Ratio" );
     state.storeFunctor( feasible_stat );
 
@@ -183,11 +189,15 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     if( eo::log.getLevelSelected() >= eo::progress ) {
 
         // compute stas at each generation
+        checkpoint->add( *time_count );
+        checkpoint->add( *gen_count );
         checkpoint->add( *feasible_stat );
         checkpoint->add( *asize_stat );
 #ifndef SINGLE_EVAL_ITER_DUMP
         clog_monitor->add( eval_counter );
 #endif
+        clog_monitor->add( *time_count );
+        clog_monitor->add( *gen_count );
         clog_monitor->add( *asize_stat );
         clog_monitor->add( *feasible_stat );
 
