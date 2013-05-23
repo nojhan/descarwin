@@ -110,7 +110,7 @@ The third and final set of experiments reported here looks at how using external
 \chapter{Introduction}
 
 \begin{quotation}
-\emph{"`It is difficult to catch a black cat in dark room, especially when it is not there."'}
+\emph{"`It is difficult to catch a black cat in a dark room, especially when it is not there."'}
 \begin{flushright}
 Chinese Proverb
 
@@ -129,26 +129,24 @@ In that perspective, the traditional evolutionary building block the present rep
 
 To sum up, and come back to our metaphoric epigraph, we will henceforth try to catch the cat faster by starting at least from the right room.
 
-\section{Rationale}
+\section{The Seven Motivations of Highly Effective Inoculations}
 
 
-As mentionned earlier
+As mentioned earlier, the main rationale behind inoculation is to steer randomness in the right direction by injecting external knowledge into your population. There are several such forms of knowledge and just as many potential benefits to movitate you to try to improve your algorithm with an inoculation procedure:
 
-Expert vs. black box
-
-
-Dangers and tricks of the trade
-
-
-
-Rationale (P1, P2, etc.)
 \begin{description}
 
-\item[Motivation 1 : bypassing "`crazy randomness"'] Moving from chaos to early order, especially around representation...
+\item[Motivation 1 : Bypassing "`Senseless Randomness"'] 
 
-\item[Motivation 2 : precomputation, landmarks, initial quirks]
+Optimization fitness plots are usually very steep over early iterations or generations. It usually means that vast portions of the search space can be quickly discarded as being senseless for the problem at hand where interesting things only happen within the bounds of a restricted set of parameter intervals. A reasonable approximation of these intervals can usually be obtained quickly, either by design, heuristics or sampling, and inoculation, based on that estimate can serve the purpose of "`starting directly from the bottom of the curve"' which can represent a usually small but sometimes substantial fraction of the total run time. Another example where large savings can be obtained by cutting through trivial search has to do with order based approaches, such as permutation based algorithms typical of combinatorial optimization, where early generations are usually spent running for a first reasonable permutation which makes sense with respect to problem data. The \emph{h1} heuristic used by \DAE is an example of substantial improvement obtained in this manner: it prevents the consideration of decompositions which do not make sense in terms of earliest possible start dates for atoms.
 
-\item[Motivation 3 : solving a relaxed version of the problem]
+\item[Motivation 2 : Precomputation]
+
+An optimization problem is usually made of both generic domain information and specific settings for the problem at hand. Both contain many items that can be useful when solving the actual problem, i.e. when the search has started. These items can be secured through precomputations and later fed to the search algorithm, for instance by inoculation in the initial population. These precomputations can indeed often be modeled as partial solutions and be used to construct individuals. An example in AI planning is \emph{landmarks}, which are facts that "`must be true at some point on any solution path to the given planning task."' \cite{DBLP:journals/corr/abs-1107-0052}. Knowing such facts before starting the search can help restrict it to a smaller number of reasonable paths.
+
+\item[Motivation 3 : Solving a Relaxed Version of the Problem]
+
+
 
 \item[Motivation 4 : having a first shot at the actual problem]
 
@@ -159,6 +157,11 @@ Rationale (P1, P2, etc.)
 \item[Motivation 7 : statistics and sampling]
 
 \end{description}
+
+In spite of these numerous possible motivations, there are at least two potential drawbacks to inoculation that the designer will want to keep in mind. The first one takes place within the traditional quest evolutionary computation practitionners are all familiar with: the infamous exploration/exploitation tradeoff. If helping the search by having it start from an interesting zone can obviously speed things up, it can also turn out be an insidious bias leading to a local optimum and therefore be a source of premature convergence. Several countermeasures can be imagined: use several inoculants coming from different external sources, build an initial population filling routine with a carefully crafted use of variations to ensure sufficient variety, having a mixed scheme with both inoculants and purely random individuals and so on. The second drawback is that inoculation procedures are, most of the time, highly problem specific and therefore force you to make a step away from the admitedly utopic dream of a generic solver.
+
+
+
 
 \section{State of the Art}
 
