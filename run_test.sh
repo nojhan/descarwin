@@ -26,7 +26,7 @@ common="--domain=${domain} --instance=${instance} --seed=0 --verbose=debug
 
 cmd="${bin} ${common} ${specific}"
 
-echo $cmd
+echo $cmd 1>&2
 $cmd
 
 # echo "PLAN:"
