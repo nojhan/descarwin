@@ -240,12 +240,13 @@ public:
 
     /* IBEA (the algo of DAEMO) needs to update the fitness from a double
      * (@see moeoExpBinaryIndicatorBasedFitnessAssignment).
-     * We thus provide an accessor that produce UNFEASIBLE fitness by default.
-     * Fitness will be made feasible or unfeasible at evaluation.
+     * We thus provide an accessor that DO NOT alter feasibility.
+     * Fitness will be made feasible or unfeasible at evaluation
+     * (@see daemoYahspEval::call).
      */
     void fitness( double value )
     {
-        this->fitness( value, false ); // unfeasible by default (until eval)
+        this->fitness( value, this->is_feasible() );
     }
 
     // To avoid an (annoying) name hiding (a feature of C++),

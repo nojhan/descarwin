@@ -19,7 +19,7 @@ public:
 
 
     //! Handler to be implemented, with either additive or max costs
-    virtual Fitness objective_cost( EOT& decompo ) = 0;
+    virtual double objective_cost( EOT& decompo ) = 0;
 
 
     daemoYahspEval(
@@ -42,7 +42,6 @@ public:
 
         // get the fitness that correspond to the "makespan" objective
         // for unfeasible decomposition, that may be a penalized fitness
-        // FIXME how to be sure that the hypervolume compted on unfeasible decomposition is always smaller than the feasible one? We must check that the scale are not the same OR bring back the feasibility flag in the fitness!
         Fitness result = objective_makespan( decompo );
 
         objVector[0] = result.value();
@@ -50,16 +49,25 @@ public:
         if( result.is_feasible() ) {
             // if the decomposition is feasible, we have a max/add cost
             // (depending on what the user asked)
-            Fitness cost = objective_cost( decompo );
-            assert( result.is_feasible() == cost.is_feasible() ); // equal feasibilities
-            objVector[1] = cost.value();
+            // NOTE: should be called before objective_makespan, because it just get the costs computed by the
+            // evaluation (@see solve)
+            double cost = objective_cost( decompo );
+            objVector[1] = cost;
         } else {
             // else, we have no cost, thus we cannot discriminate,
             // thus we use the same value as for the 1st objective
             objVector[1] = result.value();
         }
-        // change the MO "fitness"
+        // change the MO objectives
         decompo.objectiveVector(objVector);
+
+        // Update the feasibility but not the fitness.
+        // We use a dummy fitness (which is a diferent concept that the objectives, in MOEO)
+        // because the feasibility is stored in the fitness, but the fitness is computed in IBEA
+        // by the fitness assignement operator (@see moeoExpBinaryIndicatorBasedFitnessAssignment).
+        // Here, we update the feasability, which will not change when the fitness will be updated
+        // (@see Decomposition::fitness(double) ).
+        decompo.fitness( -1.0, result.is_feasible() );
     }
 
 
@@ -109,9 +117,9 @@ public:
         daemoYahspEval<EOT>( astar_weight, l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
     {}
 
-    virtual Fitness objective_cost( EOT& decompo )
+    virtual double objective_cost( EOT& decompo )
     {
-        return std::make_pair<double,bool>( decompo.plan().cost_add(), decompo.is_feasible() );
+        return decompo.plan().cost_add();
     }
 };
 
@@ -134,9 +142,9 @@ public:
         daemoYahspEval<EOT>( astar_weight, l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
     {}
 
-    virtual Fitness objective_cost( EOT& decompo )
+    virtual double objective_cost( EOT& decompo )
     {
-        return std::make_pair<double,bool>( decompo.plan().cost_max(), decompo.is_feasible() );
+        return decompo.plan().cost_max();
     }
 };
 
