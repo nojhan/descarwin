@@ -20,16 +20,15 @@ namespace daex
 {
 
 //! A decomposition is a list of Goal objects, and we are trying to minimize a scalar fitness (e.g. time or number of actions)
-template<class G>
-class DecompositionBase : public std::list<G>, public eoserial::Persistent
+template<class G, class BaseT>
+class DecompositionBase : public std::list<G>, public eoserial::Persistent, public BaseT
 {
 public:
     typedef G AtomType;
+    typedef BaseT BaseType;
+    typedef typename BaseT::Fitness Fitness;
 
     //! At instanciation, a decomposition does not have any plan
-    /*!
-     * Note: and is not feasible, @see eoDualFitness
-     */
     DecompositionBase() :_plan_global(), _plans_sub(), _b_max(0), _k(0), _u(0), _B(0){}
 
     virtual ~DecompositionBase(){}
@@ -136,7 +135,7 @@ public:
         _plans_sub.reserve( this->size() + 1 );
     }
 
-    typename DecompositionBase<G>::iterator iter_at( unsigned int i )
+    typename DecompositionBase<G,BaseT>::iterator iter_at( unsigned int i )
     {
         if( i >= this->size() ) { // FIXME : remplacer par un assert
             std::ostringstream msg;
@@ -144,7 +143,7 @@ public:
             throw( std::out_of_range( msg.str() ) );
         }
 
-        typename DecompositionBase<G>::iterator it = this->begin();
+        typename DecompositionBase<G,BaseT>::iterator it = this->begin();
 
         std::advance( it, i );
         /*
@@ -172,23 +171,11 @@ public:
     void reset_number_evaluated_nodes() { _B = 0; }
     void incr_number_evaluated_nodes(unsigned int B) { _B += B; }
 
-    void setFeasible(bool  b)
-    {
-        _is_feasible = b;
-
-        // if the decomposition is unfeasible
-        if( !_is_feasible ) {
-            // a global plan does not exists
-            this->invalidate_plan_global();
-        }
-    }
-
-    bool is_feasible() const { return _is_feasible; }
-
-
 protected:
 
-    //! If the decomposition is valid but not feasible, there is no global plan
+    /*! If the decomposition is valid but not feasible,
+     * we should be able to remove the global plan only
+     */
     void invalidate_plan_global()
     {
         this->_plan_global = daex::Plan();
@@ -205,8 +192,6 @@ protected:
         // and the global plan too
         this->invalidate_plan_global();
     }
-
-    bool _is_feasible;
 
     //! daex::Plan global compressé
     daex::Plan _plan_global;
@@ -228,48 +213,75 @@ protected:
     //! compteur des tentatives de recherche
     unsigned int _B;
 
-}; // class DecompositionBase
-
-
-class Decomposition : public DecompositionBase<Goal>, public EO< eoMinimizingFitness >
-{
 public:
-
-     //! After a modification of the decomposition, it needs to be re-evaluated
-    //! Variation operator should use this method to indicate it
-    virtual void invalidate()
-    {
-        this->EO<eoMinimizingFitness>::invalidate();
-        this->DecompositionBase<Goal>::invalidate_plan();
-    }
-
-    /** Reimplement comparisons, as feasibility changes the meaning of it.
-     * In EO, "this < other" is read "other is better than this".
+    /* This overload the fitness method from EO,
+     * because we need to invalidate the global plan in some cases
+     * NOTE: this is used when asking for fitness(double),
+     *        because EO fitnesses have implicit cast to double
      */
-    bool operator<(const Decomposition& other) const 
+    void fitness( Fitness f )
     {
-        if( this->is_feasible() && !other.is_feasible() ) { // only this is feasible
-            return false;
+        this->BaseType::fitness( f );
 
-        } else if( !this->is_feasible() && other.is_feasible() ) { // only other is feasible
-            return true;
-
-        } else {
-        /* Similar to:
-        if( ( this->is_feasible() && other.is_feasible() ) // both feasible
-            ||
-            ( !this->is_feasible() && !other.is_feasible() ) // both unfeasible
-          ) {
-        */
-            return this->fitness() < other.fitness(); // fallback to fitness
+        // if the decomposition is unfeasible
+        if( !f.is_feasible() ) {
+            // a global plan does not exists
+            this->invalidate_plan_global();
         }
     }
 
-    //! Counterpart, <= and >= are derived from < and > and thus do not need to be modified
-    bool operator>(const Decomposition& other) const 
+    void fitness( double value, bool feasible )
     {
-        return !(this->fitness() <= other.fitness()); 
+        Fitness fit( value, feasible );
+        // call the local proxy, to invalidate global plan if necessary
+        // (this is why name hiding is useful).
+        this->fitness( fit );
     }
+
+    /* IBEA (the algo of DAEMO) needs to update the fitness from a double
+     * (@see moeoExpBinaryIndicatorBasedFitnessAssignment).
+     * We thus provide an accessor that produce UNFEASIBLE fitness by default.
+     * Fitness will be made feasible or unfeasible at evaluation.
+     */
+    void fitness( double value )
+    {
+        this->fitness( value, false ); // unfeasible by default (until eval)
+    }
+
+    // To avoid an (annoying) name hiding (a feature of C++),
+    // which is due to the previous fitness method overloading,
+    // we must overload fitness as a proxy to the base class' implementation.
+    Fitness fitness() const
+    {
+        return this->BaseType::fitness();
+    }
+
+    //! Just a shortcut to fitness.is_feasible()
+    bool is_feasible() const
+    {
+        return this->BaseType::fitness().is_feasible();
+    }
+
+    bool invalid() const
+    {
+        return this->BaseType::invalid();
+    }
+
+    //! After a modification of the decomposition, it needs to be re-evaluated
+    //! Variation operator should use this method to indicate it
+    virtual void invalidate()
+    {
+        this->BaseType::invalidate();
+        this->invalidate_plan();
+    }
+}; // class DecompositionBase
+
+
+class Decomposition : public DecompositionBase<Goal, EO<eoMinimizingDualFitness> >
+{
+public:
+    typedef DecompositionBase<Goal,EO<eoMinimizingDualFitness> > BaseType;
+    // typedef eoMinimizingDualFitness Fitness;
 
     eoserial::Object* pack(void) const
     {
@@ -282,13 +294,14 @@ public:
         json->add( "goals", listGoal );
 
         // eoFitness
-        bool invalidFitness = EO< eoMinimizingFitness >::invalid();
+        bool invalidFitness = this->invalid();
         json->add( "invalidFitness", eoserial::make(invalidFitness) );
 
         if ( !invalidFitness )
         {
-            eoMinimizingFitness fitness = EO< eoMinimizingFitness >::fitness();
-            double fitnessValue = fitness; // implicit operator cast
+            Fitness fit = this->fitness();
+            json->add( "is_feasible", eoserial::make( fit.is_feasible() ) );
+            double fitnessValue = fit; // implicit operator cast
             json->add( "fitnessValue", eoserial::make(fitnessValue) );
         }
 
@@ -304,7 +317,6 @@ public:
         json->add( "goal_count", eoserial::make(_k) );
         json->add( "useful_goals", eoserial::make(_u) );
         json->add( "attempts", eoserial::make(_B) );
-        json->add( "is_feasible", eoserial::make(_is_feasible) );
 
         return json;
     }
@@ -317,19 +329,18 @@ public:
             < std::list< Goal >, eoserial::Array::UnpackObjectAlgorithm >
             ( *json, "goals", *this );
 
-        // EO fitness
         bool invalidFitness;
         eoserial::unpack( *json, "invalidFitness", invalidFitness );
         if (invalidFitness)
         {
-            EO< eoMinimizingFitness >::invalidate();
+            this->invalidate();
         } else
         {
-            eoMinimizingFitness fitness;
             double fitnessValue;
+            bool feasible;
             eoserial::unpack( *json, "fitnessValue", fitnessValue );
-            fitness = fitnessValue;
-            EO< eoMinimizingFitness >::fitness( fitness );
+            eoserial::unpack( *json, "is_feasible", feasible );
+            this->fitness( std::make_pair<double,bool>(fitnessValue,feasible) );
         }
 
         // specific members
@@ -344,13 +355,13 @@ public:
         eoserial::unpack( *json, "goal_count", _k );
         eoserial::unpack( *json, "useful_goals", _u );
         eoserial::unpack( *json, "attempts", _B );
-        eoserial::unpack( *json, "is_feasible", _is_feasible );
     }
 
     virtual void readFrom(std::istream & is)
     {
         eoserial::readFrom( *this, is );
     }
+
     virtual void printOn(std::ostream & out) const
     {
         eoserial::printOn( *this, out );

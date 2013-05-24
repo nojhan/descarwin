@@ -230,7 +230,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
 
     bool dirOK = testDirRes( out_dir, out_dir_erase ) ;
     if( ! dirOK ) {
-        eo::log << eo::warnings << "WARNNG: Cannot write to " << out_dir  << std::endl;
+        eo::log << eo::warnings << "WARNING: Cannot write to " << out_dir  << std::endl;
     }
 
     unsigned freq = out_save_freq>0 ? out_save_freq : std::numeric_limits<unsigned int>::max();

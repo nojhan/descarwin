@@ -40,20 +40,15 @@ public:
 typedef moeoRealObjectiveVector<DecompoMOTraits> DecompoMOObjectives;
 
 
-class DecompositionMO : public DecompositionBase<GoalMO>, public MOEO< DecompoMOObjectives, /*MOEOFitness*/double, /*MOEODiversity*/double >
+class DecompositionMO : public DecompositionBase<GoalMO,
+        MOEO< DecompoMOObjectives, /*MOEOFitness*/eoMinimizingDualFitness, /*MOEODiversity*/double >
+    >
 {
 public:
     typedef DecompoMOObjectives ObjectiveVector ;
-    typedef double Fitness;
+    typedef eoMinimizingDualFitness Fitness;
     typedef double Diversity;
     typedef MOEO<ObjectiveVector,Fitness,Diversity> MOEOType;
-public:
-
-    virtual void invalidate()
-    {
-        this->MOEOType::invalidate();
-        this->DecompositionBase<GoalMO>::invalidate_plan();
-    }
 
     /* FIXME tester s'il vaut mieux une comparaison lexicographique ou pas pour le multi-objectif
      * dans l'algo MO de Mostepha, il n'y a pas de comparaison lexicographique sur la faisabilité,
@@ -62,15 +57,10 @@ public:
      * Pour ce faire, déplacer les operator> depuis Decomposition vers DecompositionBase.
      */
 
+
     eoserial::Object* pack(void) const
     {
         eoserial::Object* json = new eoserial::Object;
-
-        json->add( "is_feasible", eoserial::make(_is_feasible) );
-        if( _is_feasible ) {
-            // specific members
-            json->add( "plan_global", &_plan_global );
-        }
 
         json->add( "goals_number", eoserial::make( this->size() ) );
         json->add( "goals_evaluated", eoserial::make(_k) );
@@ -105,8 +95,12 @@ public:
         bool invalid_fitness = MOEOType::invalidFitness();
         json->add( "invalid_fitness", eoserial::make(invalid_fitness) );
         if( !invalid_fitness ) {
-            Fitness fitness = this->fitness();
-            json->add( "fitness", eoserial::make(fitness) );
+            json->add( "is_feasible", eoserial::make( this->MOEOType::fitness().is_feasible() ) );
+            json->add( "fitness", eoserial::make(this->MOEOType::fitness() ) );
+            if( this->MOEOType::fitness().is_feasible() ) {
+                // specific members
+                json->add( "plan_global", &_plan_global );
+            }
         }
 
         bool invalid_diversity = MOEOType::invalidDiversity();
@@ -121,12 +115,6 @@ public:
 
     void unpack( const eoserial::Object* json )
     {
-
-        eoserial::unpack( *json, "is_feasible", _is_feasible );
-        if( _is_feasible ) {
-        // specific members
-        eoserial::unpackObject( *json, "plan_global", _plan_global );
-        }
 
         eoserial::unpack( *json, "goals_evaluated", _k );
         eoserial::unpack( *json, "goals_useful", _u );
@@ -167,10 +155,17 @@ public:
         eoserial::unpack( *json, "invalid_fitness", invalid_fitness );
         if( invalid_fitness ) {
             MOEOType::invalidateFitness();
+
         } else {
-            Fitness fitness;
-            eoserial::unpack( *json, "fitness", fitness );
-            this->fitness( fitness );
+            double fit;
+            bool feasible;
+            eoserial::unpack( *json, "is_feasible", feasible );
+            eoserial::unpack( *json, "fitness", fit );
+            this->fitness( std::make_pair<double,bool>(fit,feasible) );
+            if( feasible ) {
+                // specific members
+                eoserial::unpackObject( *json, "plan_global", _plan_global );
+            }
         }
 
         bool invalid_diversity;
@@ -192,6 +187,7 @@ public:
     {
         eoserial::printOn( *this, out );
     }
+
 };
 
 } // namespace daex

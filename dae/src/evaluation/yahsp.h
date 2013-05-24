@@ -59,7 +59,7 @@ template<class EOT=daex::Decomposition >
 class daeYahspEval : public daeCptYahspEval<EOT>
 {
 public:
-    typedef std::pair<double,bool> FitT; // Fitness & Feasibility
+    typedef typename EOT::Fitness Fitness;
 
     daeYahspEval(
             unsigned int l_max_ = 20, unsigned int b_max_in = 10, unsigned int b_max_last = 30, double fitness_weight = 10, double fitness_penalty = 1e6
@@ -105,7 +105,7 @@ public:
 
 public:
     //! Solve the whole decomposition and returns a pair<fitness,feasibility>
-    virtual FitT solve( EOT & decompo )
+    virtual Fitness solve( EOT & decompo )
     {
         double fitness = -1.0;
         bool feasibility = false;
@@ -235,9 +235,8 @@ public:
 
     virtual void call( EOT& decompo )
     {
-        FitT result = solve( decompo );
-        decompo.fitness( result.first );
-        decompo.setFeasible( result.second );
+        Fitness result = solve( decompo );
+        decompo.fitness( result.value(), result.is_feasible() );
     }
 
     virtual void post_call( EOT & decompo )
