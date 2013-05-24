@@ -59,12 +59,13 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         checkpoint.add( *contribution );
         clog_monitor.add( *contribution );
 
-        moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
-        // state.storeFunctor( m_entropy );
-        moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "Entropy" );
-        state.storeFunctor( entropy );
-        checkpoint.add( *entropy );
-        clog_monitor.add( *entropy );
+        // <JD> the moeo entropy metric segfaults for small distances, don't know why
+        // moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
+        // // state.storeFunctor( m_entropy );
+        // moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "Entropy" );
+        // state.storeFunctor( entropy );
+        // checkpoint.add( *entropy );
+        // clog_monitor.add( *entropy );
 
         moeoHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoHyperVolumeDifferenceMetric<OVT>(true,1.1);
         // state.storeFunctor( m_hypervolume );
