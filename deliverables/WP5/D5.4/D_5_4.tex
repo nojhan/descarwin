@@ -129,7 +129,7 @@ In that perspective, the traditional evolutionary building block the present rep
 
 To sum up, and come back to our metaphoric epigraph, we will henceforth try to catch the cat faster by starting at least from the right room.
 
-\section{The Seven Motivations of Highly Effective Inoculations}
+\section{State of the Art: The Seven Motivations of Highly Effective Inoculations}
 
 
 As mentioned earlier, the main rationale behind inoculation is to steer randomness in the right direction by injecting external knowledge into your population. There are several such forms of knowledge and just as many potential benefits to movitate you to try to improve your algorithm with an inoculation procedure:
@@ -140,36 +140,47 @@ As mentioned earlier, the main rationale behind inoculation is to steer randomne
 
 Optimization fitness plots are usually very steep over early iterations or generations. It usually means that vast portions of the search space can be quickly discarded as being senseless for the problem at hand where interesting things only happen within the bounds of a restricted set of parameter intervals. A reasonable approximation of these intervals can usually be obtained quickly, either by design, heuristics or sampling, and inoculation, based on that estimate can serve the purpose of "`starting directly from the bottom of the curve"' which can represent a usually small but sometimes substantial fraction of the total run time. Another example where large savings can be obtained by cutting through trivial search has to do with order based approaches, such as permutation based algorithms typical of combinatorial optimization, where early generations are usually spent running for a first reasonable permutation which makes sense with respect to problem data. The \emph{h1} heuristic used by \DAE is an example of substantial improvement obtained in this manner: it prevents the consideration of decompositions which do not make sense in terms of earliest possible start dates for atoms.
 
-\item[Motivation 2 : Precomputation]
+\item[Motivation 2 : Taking Time to Precompute]
 
 An optimization problem is usually made of both generic domain information and specific settings for the problem at hand. Both contain many items that can be useful when solving the actual problem, i.e. when the search has started. These items can be secured through precomputations and later fed to the search algorithm, for instance by inoculation in the initial population. These precomputations can indeed often be modeled as partial solutions and be used to construct individuals. An example in AI planning is \emph{landmarks}, which are facts that "`must be true at some point on any solution path to the given planning task."' \cite{DBLP:journals/corr/abs-1107-0052}. Knowing such facts before starting the search can help restrict it to a smaller number of reasonable paths.
 
 \item[Motivation 3 : Solving a Relaxed Version of the Problem]
 
+One fundamental technique in Operations Research and Mathematical Programming is to consider a relaxed version of the problem one is about to solve. Relaxed means without taking some or all constraints into account. Solutions to the relaxed problem and solutions to the actual problem often share many characteristics and the relaxed version, which can usually be obtained way more easily and quickly can be an excellent informant. It can, for instance, serve as the basis for an admissible heuristic providing a lower bound on the best possible solution in terms of the objective function, which can be used to guide the \emph{A*} algorithm in its search of a solution path. An inoculant based on a relaxed solution could be an excellent way to quickly identify elementary characteristics common to all good solutions. 
 
 
-\item[Motivation 4 : having a first shot at the actual problem]
+\item[Motivation 4 : Having a First Shot at the Actual Problem]
 
-\item[Motivation 5 : using algorithm portfolios]
+In a spirit similar to the previous motivation concerning relaxed solutions, if you have access to an external solver that is able to very quickly find a viable solution to your full problem, albeit with poor fitness performance, or if you can tune your solver to do that, you may have an excellent way to jumpstart your search! The creation of the inoculant in this case is moreover straightforward because what you obtain is already a complete, viable solution or individual.
 
-\item[Motivation 6 : experts talking]
+\item[Motivation 5 : Algorithm portfolios]
 
-\item[Motivation 7 : statistics and sampling]
+Extending over motivation 4, if you have several solvers with varying performance characteristics, the best possible strategy might be to combine their respective strengths with a hybrid scheme, possibly based on conditions identifying the best one use in a given context. Inoculation can act as one such strategy in several ways, as it can: 1) hybridize a fast but suboptimal solver with a deep solving one by giving a small initial time slot to the former and leaving the rest to the latter 2) hybridize metric sensitive solvers or solvers with abilities pertaining to different aspects of the solutions with similar time allowances in a relay race inspired fashion 3) allow many different solvers to offer a variety of inoculated starting points to be genetically mixed.
+
+\item[Motivation 6 : Solution Portfolios and Domain Experts]
+
+Real-World optimization efforts could not be successful without domain experts. Algorithms, sophisticated as they might be, can only be efficient if they manipulate the right data in the right way and applying out-of-the-box algorithms on raw field data is bound to lead nowhere in the vast majority of cases. Any optimization campaign should be based on a dialogue between the computer scientist and the domain expert, the former incorporating information provided by the latter into the various parts of her algorithms and data structures. One thing experts often provide is solution patterns or portfolios: "`in context XYZ, ABC is a good plan"'. These patterns often can be seen as partial solutions and can be inoculated if one can come up with a way of constructing full individuals with these building blocks. An example of "`primordial soup"' of good building blocks serving as the basis for the initial population can be seen in Messy Genetic Algorithms \cite{Kargupta95search}.
+
+\item[Motivation 7 : Statistics and Sampling]
+
+One thing one might want to attempt before launching the actual search is to use purely random sampling to get a quick idea of the shape of the search space with respect to the degrees of freedom at hand, an idea generalized by Estimation of Distribution Algorithms \cite{Baluja95removingthe, Larranaga:2002b}
+. There is always a compromise to be found in stochastic search between keeping on sampling and moving on to other parts of the search space and this compromise is usually particularly sensitive at the beginning of the search, especially with fast or prematurely converging algorithms. You may therefore want, in fear of local optima, to inoculate your initial population with strong individuals identified through fast but extensive preliminary surveys.
+
 
 \end{description}
 
-In spite of these numerous possible motivations, there are at least two potential drawbacks to inoculation that the designer will want to keep in mind. The first one takes place within the traditional quest evolutionary computation practitionners are all familiar with: the infamous exploration/exploitation tradeoff. If helping the search by having it start from an interesting zone can obviously speed things up, it can also turn out be an insidious bias leading to a local optimum and therefore be a source of premature convergence. Several countermeasures can be imagined: use several inoculants coming from different external sources, build an initial population filling routine with a carefully crafted use of variations to ensure sufficient variety, having a mixed scheme with both inoculants and purely random individuals and so on. The second drawback is that inoculation procedures are, most of the time, highly problem specific and therefore force you to make a step away from the admitedly utopic dream of a generic solver.
+%\newline
+%\newline
+
+In spite of these numerous possible motivations, there are at least two potential drawbacks to inoculation that the designer will want to keep in mind. The first one takes place within the traditional quest evolutionary computation practitioners are all familiar with: the infamous exploration/exploitation tradeoff. If helping the search by having it start from an interesting zone can obviously speed things up, it can also turn out be an insidious bias leading to a local optimum and therefore be a source of premature convergence. Several countermeasures can be imagined: use several inoculants coming from different external sources, build an initial population filling routine with a carefully crafted use of variations to ensure sufficient variety, having a mixed scheme with both inoculants and purely random individuals and so on. The second drawback is that inoculation procedures are, most of the time, highly problem specific and therefore force you to make a step away from the admittedly utopic dream of a generic solver.
+
+Extensive discussion of inoculation to boost evolutionary search can be found in \cite{Surry96, SurryPhD}. An example of inoculation in a real-world context with substantial benefits can be found in \cite{semetGECCO06} where the technique is used to solve a railroad based combinatorial problem faster by using aforementioned motivations 1, 2 and 3.
 
 
-
-
-\section{State of the Art}
-
-Messy GAs \cite{Kargupta95search}, PBIL \cite{Baluja95removingthe}, EDAs \cite{Larranaga:2002b}
-
-Surry \cite{Surry96, SurryPhD}
-
-Semet \cite{semetGECCO06}
+%\section{State of the Art}
+%Messy GAs \cite{Kargupta95search}, PBIL \cite{Baluja95removingthe}, EDAs \cite{Larranaga:2002b}
+%Surry \cite{Surry96, SurryPhD}
+%Semet \cite{semetGECCO06}
 
 \newpage
 \chapter{Inoculation with Yahsp}
