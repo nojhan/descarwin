@@ -57,9 +57,10 @@ eoCombinedContinue<EOT> & do_make_continue_op( eoParser & parser, eoState & stat
 
 
 #ifdef DAE_MO
+    typedef typename EOT::ObjectiveVector::Type OVT;
     // if the user asked for a pareto-target continuator
     if ( parser.isItThere("pareto-target") ) {
-        std::vector<double> pareto_target = parser.valueOf< std::vector<double> >("pareto-target");
+        std::vector<OVT> pareto_target = parser.valueOf< std::vector<OVT> >("pareto-target");
         moeoHypContinue<EOT>* hypcont = new moeoHypContinue<EOT>( pareto_target, archive, true, 1.1 );
         state.storeFunctor(hypcont);
         continuator->add(*hypcont);

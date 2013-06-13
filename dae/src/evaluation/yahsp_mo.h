@@ -44,20 +44,31 @@ public:
         // for unfeasible decomposition, that may be a penalized fitness
         Fitness result = objective_makespan( decompo );
 
-        objVector[0] = result.value();
+        // assign value + feasibility to the first objective (makespan)
+        // result contains a pair<value,feasibility>
+        objVector[0] = result;
 
+        double cost;
+        // the feasability is computed only by objective_makespan (where the plan is computed)
+        // costs are gathered after this computation
         if( result.is_feasible() ) {
             // if the decomposition is feasible, we have a max/add cost
             // (depending on what the user asked)
             // NOTE: should be called before objective_makespan, because it just get the costs computed by the
             // evaluation (@see solve)
-            double cost = objective_cost( decompo );
-            objVector[1] = cost;
+            cost = objective_cost( decompo );
         } else {
             // else, we have no cost, thus we cannot discriminate,
             // thus we use the same value as for the 1st objective
-            objVector[1] = result.value();
+            cost = result.value();
         }
+        // assign value + feasibility to the second objective (cost)
+        objVector[1] = Fitness( cost, result.is_feasible() );
+
+        // assign value + feasibility to the whole objective vector
+        // necessary because objective vectors implement Pareto domination (@see DualRealObjectiveVector::dominates)
+        objVector.is_feasible( result.is_feasible() );
+
         // change the MO objectives
         decompo.objectiveVector(objVector);
 

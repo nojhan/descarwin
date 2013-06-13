@@ -2,6 +2,7 @@
 #ifndef __DECOMPOSITION_MO_H__
 #define __DECOMPOSITION_MO_H__
 
+#include <eo>
 #include <moeo>
 
 #include "goal_mo.h"
@@ -37,7 +38,7 @@ public:
 /**
  * Definition of the objective vector for multi-objective planning problems: a vector of doubles
  */
-typedef moeoRealObjectiveVector<DecompoMOTraits> DecompoMOObjectives;
+typedef moeoDualRealObjectiveVector<DecompoMOTraits> DecompoMOObjectives;
 
 
 class DecompositionMO : public DecompositionBase<GoalMO,
@@ -84,7 +85,10 @@ public:
         bool invalid_objective_vector = MOEOType::invalidObjectiveVector();
         json->add( "invalid_objective_vector", eoserial::make(invalid_objective_vector) );
         if( !invalid_objective_vector ) {
+            json->add( "feasible_objectives", eoserial::make( this->objectiveVector().is_feasible() ) );
+
             // must be double, or else the direct serialization would not work
+            // thus we use the implicit casting of eoDualFitness
             double objective_makespan = this->objectiveVector(0);
             json->add( "objective_makespan", eoserial::make(objective_makespan) );
 
@@ -95,7 +99,7 @@ public:
         bool invalid_fitness = MOEOType::invalidFitness();
         json->add( "invalid_fitness", eoserial::make(invalid_fitness) );
         if( !invalid_fitness ) {
-            json->add( "is_feasible", eoserial::make( this->MOEOType::fitness().is_feasible() ) );
+            json->add( "feasible_fitness", eoserial::make( this->MOEOType::fitness().is_feasible() ) );
             json->add( "fitness", eoserial::make(this->MOEOType::fitness() ) );
             if( this->MOEOType::fitness().is_feasible() ) {
                 // specific members
@@ -147,8 +151,12 @@ public:
             double objective_cost;
             eoserial::unpack( *json, "objective_cost", objective_cost);
 
-            this->objectiveVector(0, objective_makespan);
-            this->objectiveVector(1, objective_cost);
+            bool feasible_objectives;
+            eoserial::unpack( *json, "feasible_objectives", feasible_objectives );
+
+            this->objectiveVector(0, std::pair<double,bool>(objective_makespan,feasible_objectives));
+            this->objectiveVector(1, std::pair<double,bool>(objective_cost,    feasible_objectives));
+            this->objectiveVector().is_feasible( feasible_objectives );
         }
 
         bool invalid_fitness;
@@ -158,11 +166,11 @@ public:
 
         } else {
             double fit;
-            bool feasible;
-            eoserial::unpack( *json, "is_feasible", feasible );
+            bool feasible_fitness;
+            eoserial::unpack( *json, "feasible_fitness", feasible_fitness );
             eoserial::unpack( *json, "fitness", fit );
-            this->fitness( std::make_pair<double,bool>(fit,feasible) );
-            if( feasible ) {
+            this->fitness( std::make_pair<double,bool>(fit,feasible_fitness) );
+            if( feasible_fitness ) {
                 // specific members
                 eoserial::unpackObject( *json, "plan_global", _plan_global );
             }
