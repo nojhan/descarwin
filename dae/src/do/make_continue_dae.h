@@ -28,7 +28,7 @@ void do_make_continue_param( eoParser & parser )
 
 #ifdef DAE_MO
     eoValueParam< std::vector<double> > & pareto_target = parser.createParam((std::vector<double> )(4,1,2,3,4), "pareto-target", // FIXME better unreachable default value?
-            "Stop when Pareto set reaches",'p', "Stopping criterion");
+            "Stop when this feasible Pareto set is reached",'p', "Stopping criterion");
         eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "pareto-target";
             for( unsigned int i=0; i<pareto_target.value().size(); ++i){ eo::log << pareto_target.value().at(i) << ", "; }
             eo::log << std::endl;
@@ -61,7 +61,8 @@ eoCombinedContinue<EOT> & do_make_continue_op( eoParser & parser, eoState & stat
     // if the user asked for a pareto-target continuator
     if ( parser.isItThere("pareto-target") ) {
         std::vector<OVT> pareto_target = parser.valueOf< std::vector<OVT> >("pareto-target");
-        moeoHypContinue<EOT>* hypcont = new moeoHypContinue<EOT>( pareto_target, archive, true, 1.1 );
+        // NOTE: we assume that we always want to reach a feasible targeted front
+        moeoDualHypContinue<EOT>* hypcont = new moeoDualHypContinue<EOT>( pareto_target, /*feasible*/true, archive, /*normalize*/true, /*rho*/1.1 ); // FIXME: do we want to normalize?
         state.storeFunctor(hypcont);
         continuator->add(*hypcont);
     }
