@@ -148,10 +148,10 @@ void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monit
         eoStat<EOT,std::string>& best_stat = make_dual_stat< eoBestFitnessStat<EOT> >( "Best", state );
 
         // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
-        // eoNthElementFitnessStat<EOT>* median_stat = new eoNthElementFitnessStat<EOT>( pop.size() / 2, "Median" );
-        // state.storeFunctor( median_stat );
-        int nth = static_cast<int>(pop.size()/2);
-        eoStat<EOT,std::string>& median_stat = make_dual_stat_param< eoNthElementStat<EOT> >( nth, "Median", state );
+        // we should use a ratio here, and not a position,
+        // because the size of a [un]feasible pop is unknown at runtime
+        double median_ratio = 0.5;
+        eoStat<EOT,std::string>& median_stat = make_dual_stat_param< eoNthElementStat<EOT> >( median_ratio, "Median", state );
 
         checkpoint.add( best_stat );
         checkpoint.add( median_stat );
