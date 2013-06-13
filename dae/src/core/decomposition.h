@@ -244,10 +244,12 @@ public:
      * Fitness will be made feasible or unfeasible at evaluation
      * (@see daemoYahspEval::call).
      */
+    /*
     void fitness( double value )
     {
         this->fitness( value, this->is_feasible() );
     }
+    */
 
     // To avoid an (annoying) name hiding (a feature of C++),
     // which is due to the previous fitness method overloading,

@@ -381,8 +381,9 @@ int main ( int argc, char* argv[] )
     // ALGORITHM
 #ifdef DAE_MO // MULTI-OBJECTIVE
     moeoHypervolumeBinaryMetric<T::ObjectiveVector> metric(rho);
+    moeoExpBinaryIndicatorBasedDualFitnessAssignment<T> assignment( metric, kappa );
 
-    moeoIBEA<T> dae( checkpoint, eval, variator, metric, kappa );
+    moeoIBEA<T> dae( checkpoint, pop_eval, variator, assignment );
 
 #else // MONO-OBJECTIVE
     // Selection
