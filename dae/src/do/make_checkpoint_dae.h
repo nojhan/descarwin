@@ -59,7 +59,7 @@ eoDualStatSwitch<EOSTAT>& make_dual_stat( std::string name, eoState& state )
 }
 
 template<class EOSTAT, class T>
-eoDualStatSwitch<EOSTAT>& make_dual_stat_param( T param, std::string name, eoState& state )
+eoDualStatSwitch<EOSTAT>& make_dual_stat_param( T& param, std::string name, eoState& state )
 {
     EOSTAT* stat_feasible = new EOSTAT( param, name+DAEX_FEASIBILITY_SUFFIX);
     state.storeFunctor( stat_feasible );
