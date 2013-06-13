@@ -176,8 +176,10 @@ int main ( int argc, char* argv[] )
     // special case of stopping criteria parameters
     daex::do_make_continue_param( parser )    ;
     // Those parameters are needed during restarts (see below)
+#ifndef DAE_MO
     unsigned int mingen = parser.valueOf<unsigned int>("gen-min");
     unsigned int steadygen = parser.valueOf<unsigned int>("gen-steady");
+#endif
     unsigned int maxgens = parser.valueOf<unsigned int>("gen-max");
 
     make_help( parser );
