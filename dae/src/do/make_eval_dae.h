@@ -105,7 +105,7 @@ std::pair<  eoEvalFunc<EOT>&, eoEvalFuncCounter<EOT>*  >
 
 #ifndef NDEBUG
     // counter, for checkpointing
-    eoEvalFuncCounter<EOT>* eval_counter = new eoEvalFuncCounter<EOT>( *eval_bestfile, "Eval.\t" );
+    eoEvalFuncCounter<EOT>* eval_counter = new eoEvalFuncCounter<EOT>( *eval_bestfile, "Eval." );
     eval_counter->value( eval_count );
     state.storeFunctor( eval_counter );
 # else // NDEBUG

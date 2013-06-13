@@ -17,6 +17,11 @@ bool testDirRes(std::string _dirName, bool _erase);
 
 namespace daex {
 
+#define DAEX_FEASIBILITY_SUFFIX "_f"
+#define DAEX_UNFEASIBILITY_SUFFIX "_u"
+#define DAEX_FEASIBILITY_SEP " / "
+#define DAEX_LOG_SEP ", "
+
 void do_make_checkpoint_param( eoParser &
 #ifndef NDEBUG // avoid warning about unused variable
         parser
@@ -35,10 +40,6 @@ void do_make_checkpoint_param( eoParser &
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "out-dir-erase" << out_dir_erase << std::endl;
 #endif
 }
-
-#define DAEX_FEASIBILITY_SUFFIX "_f"
-#define DAEX_UNFEASIBILITY_SUFFIX "_u"
-#define DAEX_FEASIBILITY_SEP "\t"
 
 //! Wrap given statistic computation operators into a dual switch
 template<class EOSTAT>
@@ -203,7 +204,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     state.storeFunctor( checkpoint );
 
 #ifndef NDEBUG
-    eoOStreamMonitor* clog_monitor = new eoOStreamMonitor( std::clog, "\t", 10, ' '); 
+    eoOStreamMonitor* clog_monitor = new eoOStreamMonitor( std::clog, DAEX_LOG_SEP, 1, ' ');
     state.storeFunctor( clog_monitor );
 
     eoGenCounter* gen_count = new eoGenCounter( 0, "Gen" );
