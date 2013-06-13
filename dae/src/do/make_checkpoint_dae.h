@@ -204,7 +204,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     state.storeFunctor( checkpoint );
 
 #ifndef NDEBUG
-    eoOStreamMonitor* clog_monitor = new eoOStreamMonitor( std::clog, DAEX_LOG_SEP, 1, ' ');
+    eoOStreamMonitor* clog_monitor = new eoOStreamMonitor( std::clog, DAEX_LOG_SEP, 1, ' ', true, " = ");
     state.storeFunctor( clog_monitor );
 
     eoGenCounter* gen_count = new eoGenCounter( 0, "Gen" );
