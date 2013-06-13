@@ -36,6 +36,44 @@ void do_make_checkpoint_param( eoParser &
 #endif
 }
 
+#define DAEX_FEASIBILITY_SUFFIX "_f"
+#define DAEX_UNFEASIBILITY_SUFFIX "_u"
+#define DAEX_FEASIBILITY_SEP "\t"
+
+//! Wrap given statistic computation operators into a dual switch
+template<class EOSTAT>
+eoDualStatSwitch<EOSTAT>& make_dual_stat( std::string name, eoState& state )
+{
+    EOSTAT* stat_feasible = new EOSTAT(name+DAEX_FEASIBILITY_SUFFIX);
+    state.storeFunctor( stat_feasible );
+
+    EOSTAT* stat_unfeasible = new EOSTAT(name+DAEX_UNFEASIBILITY_SUFFIX);
+    state.storeFunctor( stat_unfeasible );
+
+    eoDualStatSwitch<EOSTAT>* dual_stat
+        = new eoDualStatSwitch<EOSTAT>( *stat_feasible, *stat_unfeasible, DAEX_FEASIBILITY_SEP);
+    state.storeFunctor( dual_stat );
+
+    return *dual_stat;
+}
+
+template<class EOSTAT, class T>
+eoDualStatSwitch<EOSTAT>& make_dual_stat_param( T param, std::string name, eoState& state )
+{
+    EOSTAT* stat_feasible = new EOSTAT( param, name+DAEX_FEASIBILITY_SUFFIX);
+    state.storeFunctor( stat_feasible );
+
+    EOSTAT* stat_unfeasible = new EOSTAT( param, name+DAEX_UNFEASIBILITY_SUFFIX);
+    state.storeFunctor( stat_unfeasible );
+
+    eoDualStatSwitch<EOSTAT>* dual_stat
+        = new eoDualStatSwitch<EOSTAT>( *stat_feasible, *stat_unfeasible, DAEX_FEASIBILITY_SEP);
+    state.storeFunctor( dual_stat );
+
+    return *dual_stat;
+}
+
+
 #ifdef DAE_MO
 //! Add multi-objective (fitness-dependent) checkpoints to the checkpoint
 template<class EOT>
@@ -53,11 +91,10 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         moeoContributionMetric<OVT> * m_contribution = new moeoContributionMetric<OVT>;
         // state.storeFunctor( m_contribution ); // can't store this due to ambiguous base with a different template type // FIXME use smart pointers
         // wrap it in an eoStat
-        eoStat<EOT,double>* contribution = new moeoBinaryMetricStat<EOT>( *m_contribution, "Contrib" );
-        state.storeFunctor( contribution );
+        eoStat<EOT,std::string>& contribution = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_contribution, "Cntrb", state );
         // add it to the checkpoint
-        checkpoint.add( *contribution );
-        clog_monitor.add( *contribution );
+        checkpoint.add( contribution );
+        clog_monitor.add( contribution );
 
         // <JD> the moeo entropy metric segfaults for small distances, don't know why
         // moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
@@ -68,28 +105,22 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         // clog_monitor.add( *entropy );
 
         moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,1.1);
-        // state.storeFunctor( m_hypervolume );
-        moeoBinaryMetricStat<EOT>* hypervolume = new moeoBinaryMetricStat<EOT>( *m_hypervolume, "Hyp-Vol" );
-        state.storeFunctor( hypervolume );
-        checkpoint.add( *hypervolume );
-        clog_monitor.add( *hypervolume );
+        eoStat<EOT,std::string>& hypervolume = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_hypervolume, "HypVol", state );
+        checkpoint.add( hypervolume );
+        clog_monitor.add( hypervolume );
 
         moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT> * m_epsilon = new moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT>;
-        // state.storeFunctor( m_epsilon );
-        moeoBinaryMetricStat<EOT>* epsilon = new moeoBinaryMetricStat<EOT>( *m_epsilon, "Epsilon" );
-        state.storeFunctor( epsilon );
-        checkpoint.add( *epsilon );
-        clog_monitor.add( *epsilon );
+        eoStat<EOT,std::string>& epsilon = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_epsilon, "Epsi", state );
+        checkpoint.add( epsilon );
+        clog_monitor.add( epsilon );
 
-        moeoBestObjVecStat<EOT> * best_stat = new moeoBestObjVecStat<EOT>("Best");
-        state.storeFunctor(best_stat);
-        checkpoint.add( *best_stat );
-        clog_monitor.add( *best_stat );
+        eoStat<EOT,std::string>& best_stat = make_dual_stat< moeoBestObjVecStat<EOT> >("Best", state );
+        checkpoint.add( best_stat );
+        clog_monitor.add( best_stat );
 
-        moeoAverageObjVecStat<EOT> * average_stat = new moeoAverageObjVecStat<EOT>("Average");
-        state.storeFunctor(average_stat);
-        checkpoint.add( *average_stat );
-        clog_monitor.add( *average_stat );
+        eoStat<EOT,std::string>& average_stat = make_dual_stat< moeoAverageObjVecStat<EOT> >("Avrg", state );
+        checkpoint.add( average_stat );
+        clog_monitor.add( average_stat );
     }
 
 }
@@ -105,7 +136,7 @@ void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monit
 #ifdef SINGLE_EVAL_ITER_DUMP
     BestMakespanStat* stat_makespan = new BestMakespanStat("BestMakespan");
     state.storeFunctor( stat_makespan );
-    BestPlanStat* stat_plan = new BestPlan("BestPlan");
+    BestPlanStat* stat_plan = new BestPlanStat("BestPlan");
     state.storeFunctor( stat_plan );
 #endif
 
@@ -113,17 +144,17 @@ void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monit
     if( eo::log.getLevelSelected() >= eo::progress ) {
         // get best fitness
         // for us, has the form "fitness feasibility" (e.g. "722367 1")
-        eoBestFitnessStat<EOT>* best_stat = new eoBestFitnessStat<EOT>("Best");
-        state.storeFunctor( best_stat );
+        eoStat<EOT,std::string>& best_stat = make_dual_stat< eoBestFitnessStat<EOT> >( "Best", state );
 
         // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
-        eoNthElementFitnessStat<EOT>* median_stat = new eoNthElementFitnessStat<EOT>( pop.size() / 2, "Median" );
-        state.storeFunctor( median_stat );
+        // eoNthElementFitnessStat<EOT>* median_stat = new eoNthElementFitnessStat<EOT>( pop.size() / 2, "Median" );
+        // state.storeFunctor( median_stat );
+        eoStat<EOT,std::string>& median_stat = make_dual_stat_param< eoNthElementStat<EOT> >( static_cast<int>(pop.size()/2), "Median", state );
 
-        checkpoint.add( *best_stat );
-        checkpoint.add( *median_stat );
-        clog_monitor.add( *best_stat );
-        clog_monitor.add( *median_stat );
+        checkpoint.add( best_stat );
+        checkpoint.add( median_stat );
+        clog_monitor.add( best_stat );
+        clog_monitor.add( median_stat );
 #ifdef SINGLE_EVAL_ITER_DUMP
         checkpoint.add( *stat_makespan );
         clog_monitor.add( *stat_makespan );
@@ -181,11 +212,10 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     eoTimeCounter* time_count = new eoTimeCounter();
     state.storeFunctor( time_count );
 
-    FeasibleRatioStat<EOT>* feasible_stat = new FeasibleRatioStat<EOT>( "F.Ratio" );
+    FeasibleRatioStat<EOT>* feasible_stat = new FeasibleRatioStat<EOT>( "Fsbl%" );
     state.storeFunctor( feasible_stat );
 
-    eoAverageSizeStat<EOT>* asize_stat = new eoAverageSizeStat<EOT>( "Av.Size" );
-    state.storeFunctor( asize_stat );
+    eoStat<EOT,std::string>& asize_stat = make_dual_stat< eoAverageSizeStat<EOT> >( "AvSz", state );
 
     if( eo::log.getLevelSelected() >= eo::progress ) {
 
@@ -193,13 +223,13 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
         checkpoint->add( *time_count );
         checkpoint->add( *gen_count );
         checkpoint->add( *feasible_stat );
-        checkpoint->add( *asize_stat );
+        checkpoint->add( asize_stat );
 #ifndef SINGLE_EVAL_ITER_DUMP
         clog_monitor->add( eval_counter );
 #endif
         clog_monitor->add( *time_count );
         clog_monitor->add( *gen_count );
-        clog_monitor->add( *asize_stat );
+        clog_monitor->add( asize_stat );
         clog_monitor->add( *feasible_stat );
 
         // the checkpoint should call the monitor at every generation
