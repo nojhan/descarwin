@@ -132,7 +132,7 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
 
 //! Add mono-objective (fitness-dependent) checkpoints to the checkpoint
 template<class EOT>
-void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state, eoPop<EOT>& pop )
+void add_stats_mono( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state )
 {
 #ifdef SINGLE_EVAL_ITER_DUMP
     BestMakespanStat* stat_makespan = new BestMakespanStat("BestMakespan");
@@ -242,7 +242,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
 #ifdef DAE_MO
     add_stats_multi( *checkpoint, *clog_monitor, state, pop, archive );
 #else
-    add_stats_mono( *checkpoint, *clog_monitor, state, pop );
+    add_stats_mono( *checkpoint, *clog_monitor, state );
 #endif
 
     // pour plus d'output (recopiés de do/make_checkpoint)
