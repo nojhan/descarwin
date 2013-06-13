@@ -27,7 +27,9 @@ void do_make_continue_param( eoParser & parser )
         eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "maxgens" << maxgens << std::endl;
 
 #ifdef DAE_MO
-    eoValueParam< std::vector<double> > & pareto_target = parser.createParam((std::vector<double> )(4,1,2,3,4), "pareto-target", // FIXME better unreachable default value?
+    int t[5] = {4,1,2,3,4};
+    std::vector<double> target( &t[0], &t[0]+5 );
+    eoValueParam< std::vector<double> > & pareto_target = parser.createParam( target, "pareto-target", // FIXME better unreachable default value?
             "Stop when this feasible Pareto set is reached",'p', "Stopping criterion");
         eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "pareto-target";
             for( unsigned int i=0; i<pareto_target.value().size(); ++i){ eo::log << pareto_target.value().at(i) << ", "; }
@@ -44,8 +46,10 @@ eoCombinedContinue<EOT> & do_make_continue_op( eoParser & parser, eoState & stat
 #endif
     )
 {
+#ifndef DAE_MO
     unsigned int mingen = parser.valueOf<unsigned int>("gen-min");
     unsigned int steadygen = parser.valueOf<unsigned int>("gen-steady");
+#endif
     unsigned int maxgens = parser.valueOf<unsigned int>("gen-max");
 
     eoGenContinue<EOT>* maxgen = new eoGenContinue<EOT>( maxgens );
@@ -62,12 +66,12 @@ eoCombinedContinue<EOT> & do_make_continue_op( eoParser & parser, eoState & stat
     if ( parser.isItThere("pareto-target") ) {
         std::vector<OVT> pareto_target = parser.valueOf< std::vector<OVT> >("pareto-target");
         // NOTE: we assume that we always want to reach a feasible targeted front
-        moeoDualHypContinue<EOT>* hypcont = new moeoDualHypContinue<EOT>( pareto_target, /*feasible*/true, archive, /*normalize*/true, /*rho*/1.1 ); // FIXME: do we want to normalize?
+        eoContinue<EOT>* hypcont = new moeoDualHypContinue<EOT>( pareto_target, /*feasible*/true, archive, /*normalize*/true, /*rho*/1.1 ); // FIXME: do we want to normalize?
         state.storeFunctor(hypcont);
         continuator->add(*hypcont);
     }
 #else
-    eoSteadyFitContinue<EOT>* steadyfit = new eoSteadyFitContinue<EOT>( mingen, steadygen );
+    eoContinue<EOT>* steadyfit = new eoSteadyFitContinue<EOT>( mingen, steadygen );
     state.storeFunctor(steadyfit);
     continuator->add(*steadyfit);
 #endif
