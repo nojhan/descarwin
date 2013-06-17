@@ -41,13 +41,18 @@ public:
 typedef moeoDualRealObjectiveVector<DecompoMOTraits> DecompoMOObjectives;
 
 
-class DecompositionMO : public DecompositionBase<GoalMO,
-        MOEO< DecompoMOObjectives, /*MOEOFitness*/eoMaximizingDualFitness, /*MOEODiversity*/double >
+class DecompositionMO : public DecompositionBase<
+        GoalMO,
+        MOEO<
+            DecompoMOObjectives, /* ObjectiveVector */
+            eoMinimizingDualFitness, /*MOEOFitness*/
+            double /*MOEODiversity*/
+        >
     >
 {
 public:
     typedef DecompoMOObjectives ObjectiveVector ;
-    typedef eoMaximizingDualFitness Fitness;
+    typedef eoMinimizingDualFitness Fitness;
     typedef double Diversity;
     typedef MOEO<ObjectiveVector,Fitness,Diversity> MOEOType;
 
