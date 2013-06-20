@@ -1,0 +1,370 @@
+\documentclass[english]{DESCARWINreport}
+%pm[ForwardSearch("%bm.pdf","%Wc",%l,0,0,1)]
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\usepackage{graphicx}
+\usepackage{multirow}
+%\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{subfigure}
+\usepackage{lscape}
+%\usepackage{aaai}
+
+\algsetup{indent=1.8em}
+\renewcommand{\algorithmiccomment}[1]{// #1}
+\newcommand{\pp}{planning tasks}
+\newcommand{\PP}{planning task}
+\newcommand{\dae}{{\em Divide-and-Evolve}}
+\newcommand{\DAEI}{{\sc D\&E}}
+\newcommand{\DAEII}{{\sc DaE2}}
+\newcommand{\DAE}{{\sc DaE}}
+\newcommand{\DAEX}{{\sc DaE$_{\text{X}}$}}
+\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
+\newcommand{\CPT}{{\sc CPT}}
+\newcommand{\LPG}{{\sc LPG}}
+\newcommand{\LAMA}{{\sc LAMA}}
+\newcommand{\TFD}{{\sc TFD}}
+\newcommand{\YAHSP}{{\sc YAHSP}}
+\newcommand{\OPENSTACKS}{{\sc Openstacks}}
+\newcommand{\ELEVATORS}{{\sc Elevators}}
+\newcommand{\CREWPLANNING}{{\sc CrewPlanning}}
+\newcommand{\FLOORTILE}{{\sc Floortile}}
+\newcommand{\PARCPRINTER}{{\sc ParcPrinter}}
+
+\def\modae{{\em Multiobjective Divide-and-Evolve}}
+\def\MODAE{{\sc MO-DaE}}
+\newcommand{\MODAEYAHSP}{{\sc MO-DaE$_{\text{YAHSP}}$}}
+\newcommand{\MODAEX}{{\sc MO-DaE$_{\text{X}}$}}
+
+\def\UU{{\mathbb{U}}}
+
+%\title{DESCARWIN\\\bigskip {\em \LARGE The Marriage of Descartes and Darwin}\\\bigskip \bigskip \bigskip \bigskip \bigskip \bigskip \bigskip {\LARGE WP1: the \DAEX\ Planning System}}
+%\title{DESCARWIN\\\bigskip {\em \LARGE The Marriage of Descartes and Darwin}\\\vspace{8cm} {\LARGE D6.2: Crisis Management Planning Benchmark}}
+\title{DESCARWIN\\\bigskip {\em \LARGE The Marriage of Descartes and Darwin}\\
+\vspace{8cm}
+{\LARGE Rapport final}}
+%\vfill
+%\includegraphics[width=.33\textwidth]{hd_logo_thales.jpg}
+%\includegraphics[width=.33\textwidth]{INRIA_logo.jpg}
+%\includegraphics[width=.33\textwidth]{ONERA_logo.jpg}}
+%ANR-09-COSI-002
+%\author{Pierre Savéant}
+\date{\today}
+\laboratory{TRT - INRIA - ONERA}
+\docref{62 441 217-179-6}
+
+\revision{-}
+
+
+%\setlength{\parindent}{0cm}
+%\setlength{\parskip}{2ex plus 0.5ex minus 0.2ex}
+
+
+% Pour réduire globalement l'espace entre les items d'une liste
+% on peut également utiliser le bout de code suivant de M. Wooding
+% Les paramètres utilisés pour définir cette mise en page
+% sont les suivants :
+% \topsep espace vertical supplémentaire (ajoute à \parskip)
+% 	inséré entre le texte précédant la liste et le 1er objet
+% 	de la liste
+% \partosep espace vertical supplémentaire inséré devant la liste
+% 	si celle-ci est précédée d'une ligne blanche
+% \itemsep espace vertical supplémentaire (ajouté à \parsep)
+% 	inséré entre les éléments d'une liste.
+
+%%%% debut macro %%%%
+\makeatletter
+\toks@\expandafter{\@listI}
+\edef\@listI{\the\toks@\setlength{\parsep}{0pt}}
+\edef\@listI{\the\toks@\setlength{\topsep}{0pt}}
+\makeatother
+%%%% fin macro %%%%
+
+\definecolor{wavecrest}{cmyk}{0.83,0.0,0.79,0.20}
+
+\begin{document}
+
+\maketitle
+
+%\cleardoublepage
+
+\begin{revisions}
+\begin{revtable}
+\dates{April 30, 2013}{}{}{}
+\writers{}{}{}{}
+\approvers{}{}{}{}
+\end{revtable}
+\begin{revisionlabels}
+\revlabel{initial version}
+\revlabel{}
+\end{revisionlabels}
+\end{revisions}
+
+\begin{abstract}
+This document provides the main sections of the final report to be copied in the official Word version of the document.
+\end{abstract}
+
+\tableofcontents
+
+\newpage
+
+\chapter{B	RESUME CONSOLIDE PUBLIC}
+\color{wavecrest} 
+
+Ce résumé est destiné à être diffusé auprès d'un large public pour promouvoir les résultats du projet, il ne fera donc pas mention de résultats confidentiels et utilisera un vocabulaire adapté mais n'excluant pas les termes techniques. Il en sera fourni une version française et une version en anglais. Il est nécessaire de respecter les instructions ci-dessous.
+\color{black}
+
+\section{B.1	INSTRUCTIONS POUR LES RESUMES CONSOLIDES PUBLICS}
+\color{wavecrest} 
+Les résumés publics en français et en anglais doivent être structurés de la façon suivante. 
+
+Titre d'accroche du projet (environ 80 caractères espaces compris)
+Titre d'accroche, si possible percutant et concis, qui  résume et explicite votre projet selon une logique grand public : il n'est pas nécessaire de présenter exhaustivement le projet mais il faut plutôt s'appuyer sur son aspect le plus marquant. 
+
+Les deux premiers paragraphes sont précédés d'un titre spécifique au projet rédigé par vos soins.
+
+Titre 1 : situe l'objectif  général du projet et sa problématique (150 caractères max espaces compris)
+Paragraphe 1 : (environ 1200 caractères espaces compris)
+Le paragraphe 1 précise les enjeux et objectifs du projet : indiquez le contexte, l'objectif général, les problèmes traités, les solutions recherchées, les perspectives et les retombées au niveau technique ou/et sociétal
+
+
+Titre 2 : précise les méthodes ou technologies utilisées (150 caractères max espaces compris)
+Paragraphe 2 : (environ 1200 caractères espaces compris)
+Le paragraphe 2 indique comment les résultats attendus sont obtenus grâce à certaines méthodes ou/et technologies. Les technologies utilisées ou/et les méthodes permettant de surmonter les verrous sont explicitées (il faut éviter le jargon scientifique, les acronymes ou les abréviations).
+
+ Résultats majeurs du projet (environ 600 caractères espaces compris)
+Faits marquants diffusables en direction du grand public, expliciter les applications ou/et les usages rendus possibles, quelles sont les pistes de recherche ou/et de développement originales, éventuellement non prévues au départ.
+Préciser aussi toute autre retombée= partenariats internationaux, nouveaux débouchés, nouveaux contrats, start-up, synergies de recherche, pôles de compétitivités, etc.
+
+Production scientifique et brevets depuis le début du projet (environ 500 caractères espaces compris) 
+Ne pas mettre une simple liste mais faire quelques commentaires. Vous pouvez aussi indiquer les actions de normalisation
+
+Illustration
+Une illustration avec un schéma, graphique ou photo et une brève légende. L'illustration doit être clairement lisible à une taille d'environ 6cm de large et 5cm de hauteur. Prévoir une résolution suffisante pour l'impression. Envoyer seulement des illustrations dont vous détenez les droits.
+
+Informations factuelles
+Rédiger une phrase précisant le type de projet (recherche industrielle, recherche fondamentale, développement expérimental, exploratoire, innovation, etc.), le coordonnateur, les partenaires, la date de démarrage effectif, la durée du projet, l'aide ANR et le coût global du projet, par exemple "` Le projet XXX est un projet de recherche fondamentale coordonné par xxx. Il associe aussi xxx, ainsi que des laboratoires xxx et xxx). Le projet a commencé en juin 2006 et a duré 36 mois. Il a bénéficié d'une aide ANR de xxx euros pour un coût global de l'ordre de xxx  euros"
+
+\color{black}
+\chapter{B.2	RESUME CONSOLIDE PUBLIC EN FRANÇAIS}
+\color{wavecrest} 
+Titre d'accroche du projet (environ 80 caractères espaces compris)
+\color{black}
+
+Planificateur automatique multi-objectif basé sur un algorithme évolutionnaire
+\color{wavecrest}
+
+Titre 1 : situe l'objectif  général du projet et sa problématique (150 caractères max espaces compris)
+\color{black}
+
+Résoudre divers problèmes de planification séquentiels, temporels ou multi-objectifs avec le même algorithme évolutionnaire à partir d'une description axiomatique du domaine d'application.
+\color{wavecrest} 
+
+Paragraphe 1 : (environ 1200 caractères espaces compris)
+\color{black}
+
+Le problème de planification se pose pour de nombreux systèmes critiques : sécurité, gestion du trafic aérien, missions spatiales, production industrielle, transport. Cette classe de problèmes est en général difficile à modéliser et à résoudre non seulement du fait de l'enchevêtrement des contraintes mais aussi à cause du problème de la qualification des solutions lorsque celle-ci s'appuie sur plusieurs critères antagonistes. Nous avons développé le planificateur DAEYAHSP basé sur un algorithme évolutionnaire qui cherche à décomposer le problème initial en sous-problèmes qui soient solubles par le planificateur embarqué YAHSP.
+Nous y avons ajouté la possibilité d'exprimer des prévisions temporelles ainsi que l'optimisation multi-objective. Lorsque la qualité de la solution s'exprime selon plusieurs critères antagonistes pour lesquels il n'existe pas de fonction d'agrégation explicite, il ne nous reste plus qu'à construire l'ensemble des solutions non-dominées : le fameux front de Pareto.
+Afin d'évaluer le planificateur résultant, MO-DAE, nous avons construit un ensemble de benchmarks multi-objectifs à partir de domaines existants ainsi qu'un tout nouveau dans le contexte de la gestion de crise.
+
+\color{wavecrest} 
+
+Titre 2 : précise les méthodes ou technologies utilisées (150 caractères max espaces compris)
+\color{black}
+
+Le processus stochastique évolutionnaire guidant la recherche d'un plan est généralisé en un algorithme d'optimisation multi-objectif basé sur l'indicateur d'hypervolume.
+
+\color{wavecrest} 
+
+Paragraphe 2 : (environ 1200 caractères espaces compris)
+\color{black}
+
+La qualification d'une solution aux problèmes posés dans les applications pratiques fait souvent intervenir des critères antagonistes tels que le temps de réalisation et le coût. Lorsqu'il n'existe pas de fonction d'agrégation pour obtenir un ordre total, telle que la moyenne pondérée par exemple, on peut toutefois construire l'ensemble des solutions non-dominées (ou Pareto-optimales) --- charge à l'utilisateur d'y choisir selon le contexte sa solution préférée. 
+Les algorithmes évolutionnaires étant naturellement extensibles au cas multi-objectif, di-verses approches ont été proposées dont l'approche basée sur l'indicateur d'hypervolume (IBEAH) que nous avons retenue. Nous l'avons donc adaptée à notre algorithme DAE pour donner naissance à MO-DAE. Notre planificateur embarqué, YAHSP, étant mono-objectif, plusieurs stratégies sont possibles pour diversifier la population. On optimisera par exemple le coût et l'on calculera le temps total associé (ou l'inverse).
+Notre campagne d'expérimentations a montré l'efficacité de notre algorithme pour cons-truire une approximation du front de Pareto sur l'ensemble des benchmarks multi-objectifs que nous avons conçus. 
+
+\color{wavecrest}
+ 
+Résultats majeurs du projet (environ 600 caractères espaces compris)
+\color{black}
+
+Le premier résultat majeur a été de remporter le premier prix de la compétition internatio-nale de planification (IPC-2011) dans la session dédiée à la planification temporelle avec DAEYAHSP ainsi que le second prix avec YAHSP.
+La seconde contribution a été de proposer le premier planificateur multi-objectif au sens Pareto (calcul des meilleurs compromis) avec également la création d'un jeu de benchmarks afin de pouvoir l'évaluer. Ces travaux nous ont permis d'obtenir une publication dans le congrès international le plus réputé en Intelligence Artificielle (IJCAI-2013) ainsi que dans trois autres congrès internationaux (LION-7, EMO-2013, EvoCOP-2013).
+
+\chapter{B.3	RESUME CONSOLIDE PUBLIC EN ANGLAIS}
+
+\color{wavecrest} 
+Titre d'accroche du projet (environ 80 caractères espaces compris)
+\color{black}
+Multiobjective domain-independent planner based on Evolutionary Computation
+
+\color{wavecrest} 
+
+Titre 1 : situe l'objectif  général du projet et sa problématique (150 caractères max espaces compris)
+\color{black}
+
+Solve any kind of sequential, temporal or multiobjective planning tasks with a unique evolutionary algorithm from an axiomatic description of the application domain.
+
+\color{wavecrest}
+ 
+Paragraphe 1 : (environ 1200 caractères espaces compris)
+\color{black}
+
+Planning, as the search for the optimal sequence of actions to reach a set of goals, is ubiqui-tous in critical systems: security (crisis management, surveillance), air traffic management, space missions, industry (supply chain management, logistics and planning), transportation (traffic optimization). This class of problems is usually hard to model and to solve due to the intricacy of constraints and the difficulty of finding the best solutions when multiple objectives are conflicting. 
+We have developed the domain-independent planner DAEYAHSP based on an evolutionary algorithm which divide the problem into subproblems which are in turn submitted to the embedded solver YAHSP.
+Two new features were added: temporal prediction and multiobjective optimization. When solution quality is assessed with multiple criteria which are antagonistic and when in addition the context is such that no aggregation function can be conceived, then we can only build the set of non-dominated solutions: the so-called Pareto front. 
+In order to evaluate the resulting planner, MO-DAE, we designed original multiobjective benchmarks built upon existing domains and a brand new one derived from a crisis emer-gency use case.
+
+\color{wavecrest}
+ 
+Titre 2 : précise les méthodes ou technologies utilisées (150 caractères max espaces compris)
+\color{black}
+
+The stochastic search procedure is upgraded to a multiobjective optimization algorithm based on the hypervolume indicator.
+
+\color{wavecrest} 
+
+Paragraphe 2 : (environ 1200 caractères espaces compris)
+\color{black}
+
+Real-world problems usually involve several antagonistic objectives such as the total dura-tion and the cost. When no aggregator such as the weighted mean is available to build a total order than at least we can compute the set of optimal trade-offs between the antagonistic objectives --- the so-called Pareto front.
+Any evolutionary algorithm can be turned naturally into a multiobjective algorithm by encapsulating its fitness function. The state-of-the-art are the indicator-based multiobjective evolutionary algorithms (IBEA) and especially the one using the hypervolume indicator (IBEAH) that we have retained. Adapted to DAE, it gave rise to MO-DAE. Since our embedded planner, YAHSP, is monoobjective, several strategies are possible to get different individuals. For instance we can optimize the cost and compute the total time (or the reverse).
+The experimentation campaign showed the performance of the algorithm to build approxi-mation of Pareto fronts on all multiobjective benchmarks that we have designed.
+
+Major Results
+
+Our first success has been to win the 7th International Planning Competition (IPC-2011) in the deterministic temporal satisficing track with DAEYAHSP as well as the second position with YAHSP.
+The second contribution has been to bring the planning community with the first true Pareto-based (set of better trade-offs) multiobjective planner together with a set of brand new benchmarks to evaluate it. This work will appear in the proceedings of the International Joint Conference on Artificial Intelligence (IJCAI-2013), the most famous AI conference, as well as three other papers (LION-7, EMO-2013, EvoCOP-2013).
+
+\chapter{C	MEMOIRE SCIENTIFIQUE}
+
+\color{wavecrest} 
+
+Maximum 5 pages. On donne ci-dessous des indications sur le contenu possible du mémoire. Ce mémoire peut être accompagné de rapports annexes plus détaillés.
+
+Le mémoire scientifique couvre la totalité de la durée du projet. Il doit présenter une synthèse auto-suffisante rappelant les objectifs, le travail réalisé et les résultats obtenus mis en perspective avec les attentes initiales et l'état de l'art. C'est un document d'un format semblable à celui des articles scientifiques ou des monographies. Il doit refléter le caractère collectif de l'effort fait par les partenaires au cours du projet. Le coordinateur prépare ce rapport sur la base des contributions de tous les partenaires. Une version préliminaire en est soumise à l'ANR pour la revue de fin de projet. 
+
+Un mémoire scientifique signalé comme confidentiel ne sera pas diffusé. Justifier brièvement la raison de la confidentialité demandée. Les mémoires non confidentiels seront susceptibles d'être diffusés par l'ANR, notamment via les {/bf archives ouvertes http://hal.archives-ouvertes.fr.}
+
+\color{black}
+
+\section{C.1	RESUME DU MEMOIRE}
+
+\color{wavecrest} 
+Ce résumé peut être repris du résumé consolidé public.
+
+\color{black}
+Planning, as the search for the optimal sequence of actions to reach a set of goals, is ubiqui-tous in critical systems: security (crisis management, surveillance), air traffic management, space missions, industry (supply chain management, logistics and planning), transportation (traffic optimization). This class of problems is usually hard to model and to solve due to the intricacy of constraints and the difficulty of finding the best solutions when multiple objectives are conflicting. 
+We have developed the domain-independent planner DAEYAHSP based on an evolutionary algorithm which divide the problem into subproblems which are in turn submitted to the embedded solver YAHSP.
+Two new features were added: temporal prediction and multiobjective optimization. When solution quality is assessed with multiple criteria which are antagonistic and when in addition the context is such that no aggregation function can be conceived, then we can only build the set of non-dominated solutions: the so-called Pareto front. 
+In order to evaluate the resulting planner, MO-DAE, we designed original multiobjective benchmarks built upon existing domains and a brand new one derived from a crisis emer-gency use case.
+
+\section{C.2	ENJEUX ET PROBLEMATIQUE, ETAT DE L'ART}
+
+\color{wavecrest} 
+
+Présenter les enjeux initiaux du projet, la problématique formulée par le projet, et l'état de l'art sur lequel il s'appuie. Présenter leurs éventuelles évolutions pendant la durée du projet (les apports propres au projet sont présentés en ?C.4).
+
+\color{black}
+The initial objectives of DESCARWIN were twofold:
+1.	To refine and validate the Divide-and-Evolve method w.r.t. state-of-the art planners,
+2.	To extend the scope with features required by real-world planning problems.
+DAEX, the concrete implementation of the Divide-and-Evolve paradigm, is a domain-independent satisficing planning system based on Evolutionary Computation. The basic principle is to carry out a Divide-and-Conquer strategy driven by an evolutionary algorithm. The key components of DAEX are a state-based decomposition principle, an evolutionary algorithm to drive the optimization process, and an embedded planner X to solve the sub-problems. The instantiation of DAEX with the heuristic forward search YAHSP planner has given rise to DAEYAHSP. The marriage of DAE and YAHSP matches a clean role separation: YAHSP gets a few tries to find a solution quickly whereas DAE controls the optimization process. The two programs were rewritten and tested before being sent to the International Planning Competition (IPC-2011).
+Two new features were added: temporal prediction and multiobjective optimization. The first one is not new but the second one is totally new for the planning community. When solution quality is assessed with multiple criteria which are antagonistic and when in addi-tion the context is such that no aggregation function can be conceived, then we can only build the set of non-dominated solutions: the so-called Pareto front. In order to evaluate the resulting planner, MO-DAE, we designed original multiobjective benchmarks built upon existing domains and a brand new one derived from a crisis emergency use case. The last bench includes also temporal prediction as mentioned earlier.
+Although we wanted initially to extend the scope to preferences (PDDL3.1) it has been proved in the meantime that this semantics can be captured by an automated rewriting process down to classical planning. Instead we worked on another idea called artificial insemination or sometimes inoculation. The principle is to populate the initial generation with good individuals provided by some external planner.
+
+
+\section{C.3	APPROCHE SCIENTIFIQUE ET TECHNIQUE}
+
+DAEYAHSP
+
+This section introduces the main principles of the satisficing planner DAE, referring to ?[1] for a comprehensive presentation.
+Given a planning problem P=?A, O, I, G?, where A denotes the set of atoms, O the set of actions, I the initial state, and G the goal state, DAEX searches the space of sequences of partial states (si)i?[0,n+1], with s0=I and sn+1=G: DAEX looks for the sequence such that the plan ? obtained by compressing subplans ?i found by some embedded planner X as solutions of Pi =?A, O, ?i, si+1?i?[0,n], has the best possible quality (with ?i denoting the final state reached by applying ?i-1 from ?i-1.
+Each intermediate state (si)i?[1,n] is first seen as a set of goals and then completed as a new initial state for the next step by simply applying the plan found to reach it.
+In order to reduce the number of atoms used to describe these states, DAE relies on the ad-missible heuristic function h1 [2]: only the ones that are possibly true according to h1 are considered.
+Furthermore, mutually exclusive atoms, which can be computed at low cost, are also forbidden in intermediate states si. These two rules are strictly imposed during the random initialization phase, and progressively relaxed during the search phase.
+The compression of subplans is required by temporal planning where actions can run con-currently: a simple concatenation would obviously not produce the minimal makespan.
+Due to the weak structure of the search space (variable-length sequences of variable-length lists of atoms), Evolutionary Algorithms (EAs) have been chosen as the method of choice: EAs are metaheuristics that are flexible enough to explore such spaces, as long as they are provided with some stochastic variation operators (aka move operators in the heuristic search community) -- and of course some objective function to optimize. Variation operators in DAE are (i) a crossover operator, a straightforward adaptation of the standard one-point crossover to variable-length sequences; and (ii) different mutation operators, that modify the sequence at hand either at the sequence level, or at the state level, randomly adding or removing one item (state or atom). 
+The objective value is obtained by running the embedded planner on the successive subproblems. When the goal state is reached, a feasibility fitness is computed based on the compression of solution subplans, favoring quality; otherwise, an unfeasibility fitness is computed, implementing a gradient towards satisfiability (see ?[1] for details).
+DAE can embed any existing planner, but the marriage of DAE and YAHSP matches a clean role separation: YAHSP gets a few tries to find a solution quickly whereas DAE controls the optimization process.
+We added two novelties to the version described in ?[1]. One important parameter is the maximum number of expanded nodes allowed to the YAHSP subsolver which defines empirically what is considered as an easy problem for YAHSP. As a matter of fact, the minimum number of required nodes varies from few nodes to thousands depending of the planning task. In the current release this number is estimated during the population initialization stage. An incremental loop is performed until the ratio of feasible individuals is over a given threshold or a maximum boundary has been reached. By default this number is doubled at each iteration until at least one feasible individual is produced or 100000 has been reached. Furthermore we add the capability to perform restarts within a time contract in order to increase solution quality. The fitness used for the competition differs from the one described in ?[1]. The fitness for bad individuals has been simplified by withdrawing the Hamming distance to the goal. The new fitness depends only on the   "decomposition distance": the number of intermediate goals reached and more specifically the one that are "useful". A useful intermediate goal is a goal that requires a non-empty plan to be reached.
+
+INOCULATION
+
+We have also experimented another method of initializing the first population by injecting external knowledge called inoculation or artificial insemination.
+Two experimental campaigns were conducted. The first one is our early attempt at designing an inoculation procedure that builds the initial population around an individual constructed by our embedded planner, YAHSP, with an additional routine designed to produce a consequently refined estimate of the critical parameter defining YAHSP's exploratory allowance, bmax, once the search has started. Experimental results show very poor performance and high risk of runs, with "unlucky" random seeds, getting stuck in fruitless sampling of the search space.
+The second set of experiments follows a different strategy, getting rid of YAHSP as the inoculant provider on one hand and being far more parsimonious with bmax on the other hand. We use additional sampling both to compensate for bmax's restricted increase and to produce the inoculant. We call this procedure "Inoculation through mass selection". Experimental results exhibit both substantial improvements in speed and risk reduction for our algorithm, albeit on a limited subset of the entire IPC benchmark.
+
+MO-DAE (Multiobjective planning)
+
+Two modifications of DAEYAHSP were needed to turn it into a Multi-Objective Evolutionary Algorithm (MOEA): (i) use some multiobjective selection in lieu of the single-objective tour-nament selection that is used in the single-objective context; (ii) use the embedded planner to compute the values of both objectives (e.g., makespan and cost). The former modification is straightforward, and several alternatives have been experimented within ?[3]. The conclusion is that IBEAH ?[5] performs best on many problems and has be retained for the final release. However, because YAHSP is both a temporal planner and a cost planner, two strategies are possible for YAHSP within MO-DAE: it can be asked to optimize only the makespan (resp. the cost), and to simply compute the cost (resp. the makespan) when executing the solution plan. After several campaigns, it turned out that the optimal values for DAEYAHSP have always been equal weights: something that was to be expected, as no objective should be preferred to the other.
+
+DAEYAHSP, and even more so, MO-DAEYAHSP, have a number of free parameters that need to be tuned in order to obtain the best possible results. It is well-known that parameter tuning can make a complete difference between failure and success for the same algorithm on the same problem. In this work, all user-defined parameters have been tuned using the frame-work PARAMILS ?[3], that handles any parameterized algorithm whose parameters can be discretized, and uses some Iterated Local Search (ILS) to explore the space of parameter configurations.
+Furthermore, because the goal of this work is to demonstrate the efficiency of MO-DAE to robustly find a good approximation of the Pareto front of multiobjective AI Planning prob-lems, those parameters were tuned anew for one instance of moderate complexity in each domain, and the resulting parameter set was used for all instances of the same domain. This represents a trade-off between CPU cost and performance: there is little hope to ever find some universal parameters for DAE, that would allow DAE to obtain its best quality performance on all possible instances; on the other hand, such best quality can obviously be obtained by optimizing the parameters anew for each new instance, but at the price of a huge CPU cost.
+
+MO-Benchs
+
+Two approaches were used to design multiobjective benchmark problems: first, using a highly simplified version of the well-known IPC domain ZENOTRAVEL, a simple and easy to tune domain was built, and the exact Pareto front can be easily identified for all its instances. The other approach is based on modifying IPC-2011 problems.
+Two satisficing tracks were open at IPC-2011: sequential satisficing, i.e., sequential STRIPS planning in which actions have a cost and where the total cost is to be minimized, and temporal satisficing, where actions have a duration and can be run in parallel and where the total makespan is to be minimized. Three possible ways of generating multiobjective instances have been considered. When the domains appeared in both tracks, with the same instances, and when the cost increases as the makespan decreases, a simple merge of both instances is enough. This was the case for domain ELEVATORS. For some domains, the cost values of the cost instance did not ensure that both objectives would be antagonistic. This is the case for CREWPLANNING, FLOORTILE, and PARCPRINTER. For these instances we arbitrarily set the cost values to a maximum cost minus the value of the duration. 
+Finally, for the OPENSTACKS domain, the cost version has a single costly action, that penalizes the use of a new stack: such scheme is very general in scheduling applications with resources (with more resources, things get done faster, but cost more). For this domain, this cost action was simply added to the temporal domain.
+
+Crisis Management USE-CASE
+
+The crisis management benchmark that was developed includes a generic set of actions (the domain) and a suite of grounded scenarios (or problems). We then designed a second domain in which a cost criterion is added, in order to provide a new benchmark to the multiobjective planner MO-DAE.
+
+The crisis is related to a terrorist attack in an underground station. The objective is to im-prove the coordination of all the actors to get back to a normal situation as soon as possi-ble. Rescue operations imply many actors such as the police, and the medical services. The originality of the model is to take into account the impact of an urban traffic prediction on transit times thanks to timed-initial literals. The model is then refined with the task of routing casualties to the nearest hospitals, matching the type of casualties with hospitals having the required competencies. This adds a capacity constraint to the model since hospitals have a bounded number of available beds for each type of injuries.
+
+\section{C.4	RESULTATS OBTENUS}
+
+\color{wavecrest} 
+Positionner les résultats par rapports aux livrables du projet et aux publications, brevets etc. Revisiter l'état de l'art et les enjeux à la fin du projet.
+
+\color{black}
+The most remarkable results are our first position at IPC-2011 in the temporal satisficing session  and also our paper on MO-DAE accepted at IJCJAI 2013 ?[5], the most famous international conference on Artificial Intelligence. Altogether 14 papers or posters were accepted during the project life (see section E2 for a comprehensive list).
+We have developed the first truly multiobjective planner and a whole set of new multiobjective problems. On the application side, the use-case on crisis emergency is totally original.
+
+\section{C.5	EXPLOITATION DES RESULTATS}
+The multiobjective planner MO-DAE will be made available to the open-source community as well as the set of multiobjective benchmarks.
+The crisis management domain is currently under consideration for a Thales application.
+And of course we will participate to the next International Planning Competition to be held in 2014 with our current release.
+
+\section{C.6	DISCUSSION}
+
+\color{wavecrest} 
+Discussion sur le degré de réalisation des objectifs initiaux, les verrous restant à franchir, les ruptures, les élargissements possibles, les perspectives ouvertes par le projet, l'impact scientifique, industriel ou sociétal des résultats. 
+
+\color{black}
+Almost all declared initial objectives have been reached. The embedded planner still needs to be extended to numerical fluents and to required concurrency. The crisis management use-case is a first step towards a real-life application and we hope to apply our solver on more industrial use-cases.
+As far as software engineering is concerned, a big work is undergoing on rewriting the research code into a modular and reusable code, as well as a test suite. This step is mandatory before giving the code to the open source community.
+On the publication side, one of our objectives is to submit an extended paper to a journal such as Artificial Intelligence.
+
+\section{C.7	CONCLUSIONS}
+The DESCARWIN project has been very fruitful and has produced scientific advances both in terms of publications and software. MO-DAE, the first multiobjective planner, is made available to the open source community.
+
+
+\section{C.8	RÉFÉRENCES}
+[1]	J. Bibaï, P. Savéant, M. Schoenauer, and V. Vidal. An Evolutionary Metaheuristic Based on State Decomposition for Domain-Independent Satisficing Planning. In 20th International Conference on Automated Planning and Scheduling (ICAPS-2010), AAAI Press, pp. 18-25, 2010.
+
+[2]	P. Haslum and H. Geffner. Admissible Heuristics for Optimal Planning. In 5th Int. Conf. on AI Planning and Scheduling (AIPS 2000), pp. 140-149, 2000.
+
+[3]	F. Hutter, H. H. Hoos, K. Leyton-Brown, and Thomas Stützle. ParamILS: An Automatic Algorithm Configuration Framework. Journal of Artificial Intelligence Research (JAIR), Vol. 36, pp.267-306, 2009.
+
+[4]	M.-R. Khouadjia, M. Schoenauer, V. Vidal, J. Dréo, and P. Savéant. Multi-Objective AI Planning: Evaluating DAE-YAHSP on a Tunable Benchmark. In 7th International Conference on Evolutionary Multi-Criterion Optimization (EMO 2013), pp. 36-50, 2013.
+
+[5]	M.-R. Khouadjia, M. Schoenauer, V. Vidal, J. Dréo, and P. Savéant. Pareto-Based Multiobjective AI Planning. In 23rd International Joint Conference on Artificial Intelligence (IJCAI 2013), 2013.
+
+[6]	V. Vidal and H. Geffner. Branching and Pruning: An Optimal Temporal POCL Planner Based on Constraint Programming. In Nineteenth National Conference on Artificial Intelligence (AAAI-04), AAAI Press, pp. 570-577, 2004.
+
+[7]	V. Vidal. A Lookahead Strategy for Heuristic Search Planning. In 14th International Conference on Planning and Scheduling (ICAPS-04), AAAI Press, pp. 150-159, 2004.
+
+[8]	E. Zitzler and S. Künzli. Indicator-Based Selection in Multiobjective Search. In 8th International Conference on Parallel Problem Solving from Nature (PPSN VIII), pp. 832-842, 2004.
+
+
+
+\end{document}
