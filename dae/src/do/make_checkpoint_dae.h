@@ -110,10 +110,11 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         checkpoint.add( hypervolume );
         clog_monitor.add( hypervolume );
 
-        moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT> * m_epsilon = new moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT>;
-        eoStat<EOT,std::string>& epsilon = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_epsilon, "Epsi", state );
-        checkpoint.add( epsilon );
-        clog_monitor.add( epsilon );
+        // FIXME the epsilon stat cannot handle dual fitness, it must be overloaded
+        // moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT> * m_epsilon = new moeoVecVsVecAdditiveEpsilonBinaryMetric<OVT>;
+        // eoStat<EOT,std::string>& epsilon = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_epsilon, "Epsi", state );
+        // checkpoint.add( epsilon );
+        // clog_monitor.add( epsilon );
 
         eoStat<EOT,std::string>& best_stat = make_dual_stat< moeoBestObjVecStat<EOT> >("Best", state );
         checkpoint.add( best_stat );
