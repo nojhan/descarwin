@@ -84,7 +84,7 @@ int main ( int argc, char* argv[] )
     eoBestFitnessStat<daex::Decomposition> best_stat;
     eoNthElementFitnessStat<daex::Decomposition> median_stat( pop.size() / 2, "Median" ); 
     //eoInterquartileRangeStat<daex::Decomposition> iqr_stat( std::make_pair(0.0,false) );
-    eoInterquartileRangeStat<daex::Decomposition> iqr_stat( 0.0 );
+    eoInterquartileRangeStat<daex::Decomposition> iqr_stat;
     daex::FeasibleRatioStat<daex::Decomposition> feasible_stat( "F.Ratio" );
 
 
