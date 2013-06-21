@@ -65,7 +65,7 @@ bool operator!=( const PDDLTerm & term, const daex::pddlObject & object );
  * Note : L'operator() et le calcul de distance sont virtuels purs, 
  * il doivent etre implémentés.
  */
-template<class EOT = daex::Decomposition>
+template<class EOT>
 class daeCptYahspEval : public eoEvalFunc< EOT>
 {
 public:

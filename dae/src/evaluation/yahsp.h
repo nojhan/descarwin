@@ -55,7 +55,7 @@ std::ostream & operator<<( std::ostream & out, BitArray bitarray ){
 
 
 //! Évaluateur principal, à utiliser pour les itérations normales
-template<class EOT=daex::Decomposition >
+template<class EOT>
 class daeYahspEval : public daeCptYahspEval<EOT>
 {
 public:
@@ -385,7 +385,7 @@ protected:
  **********************************************************************/
 
 //! Classe à utiliser lors de la première itération, pour estimer b_max
-template<class EOT=daex::Decomposition>
+template<class EOT>
 class daeYahspEvalInit : public daeYahspEval<EOT>
 {
 public:

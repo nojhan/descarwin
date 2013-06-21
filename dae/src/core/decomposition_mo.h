@@ -38,12 +38,12 @@ public:
 /**
  * Definition of the objective vector for multi-objective planning problems: a vector of doubles
  */
-typedef moeoDualRealObjectiveVector<DecompoMOTraits> DecompoMOObjectives;
+typedef moeoDualRealObjectiveVector<DecompoMOTraits, eoMinimizingDualFitness> DecompoMOObjectives;
 
 
 class DecompositionMO : public DecompositionBase<
-        GoalMO,
-        MOEO<
+        GoalMO, // goal type
+        MOEO< // base type
             DecompoMOObjectives, /* ObjectiveVector */
             eoMinimizingDualFitness, /*MOEOFitness*/
             double /*MOEODiversity*/

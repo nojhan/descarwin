@@ -6,11 +6,11 @@
 #include "../core/strategies.h"
 #include "../evaluation/yahsp.h"
 
-template<class EOT=daex::DecompositionMO>
+template<class EOT>
 class daemoYahspEval : public daeYahspEval<EOT>
 {
 public:
-    typedef typename daeYahspEval<EOT>::Fitness Fitness;
+    typedef typename EOT::Fitness Fitness;
 
     virtual Fitness objective_makespan( EOT& decompo )
     {
@@ -115,7 +115,7 @@ template<class EOT=daex::DecompositionMO>
 class daemoYahspEvalAdd : public daemoYahspEval<EOT>
 {
 public:
-    typedef typename daemoYahspEval<EOT>::Fitness Fitness;
+    // typedef typename EOT::Fitness Fitness;
 
     daemoYahspEvalAdd(
         unsigned int astar_weight, // FIXME default value?
@@ -140,7 +140,7 @@ template<class EOT=daex::DecompositionMO>
 class daemoYahspEvalMax : public daemoYahspEval<EOT>
 {
 public:
-    typedef typename daemoYahspEval<EOT>::Fitness Fitness;
+    // typedef typename EOT::Fitness Fitness;
 
     daemoYahspEvalMax(
         unsigned int astar_weight, // FIXME default value?
