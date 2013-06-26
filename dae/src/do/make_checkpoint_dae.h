@@ -2,6 +2,8 @@
 #ifndef _MAKE_CHECXPOINT_DAE_H_
 #define _MAKE_CHECKPOINT_DAE_H_
 
+#include <limits>
+
 #include <eo>
 
 #ifdef DAE_MO
@@ -78,10 +80,11 @@ eoDualStatSwitch<EOSTAT>& make_dual_stat_param( T& param, std::string name, eoSt
 #ifdef DAE_MO
 //! Add multi-objective (fitness-dependent) checkpoints to the checkpoint
 template<class EOT>
-void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state, eoPop<EOT>& pop, moeoArchive<EOT>& archive )
+void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state, eoPop<EOT>& pop, moeoArchive<EOT>& archive, eoParser & parser )
 {
     typedef typename EOT::ObjectiveVector OVT;
 
+    // NOTE: this is MANDATORY to update the pareto archive
     moeoArchiveUpdater<EOT> * arch_updater = new moeoArchiveUpdater<EOT>( archive, pop);
     state.storeFunctor( arch_updater );
     checkpoint.add( *arch_updater );
@@ -89,23 +92,29 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
     if( eo::log.getLevelSelected() >= eo::progress ) {
         // instanciate a metric comparing two Pareto front (hence a "binary" one)
         // use OVT, the type of the objective vectors
-        moeoContributionMetric<OVT> * m_contribution = new moeoContributionMetric<OVT>;
-        // state.storeFunctor( m_contribution ); // can't store this due to ambiguous base with a different template type // FIXME use smart pointers
-        // wrap it in an eoStat
-        eoStat<EOT,std::string>& contribution = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_contribution, "Cntrb", state );
-        // add it to the checkpoint
-        checkpoint.add( contribution );
-        clog_monitor.add( contribution );
 
-        // <JD> the moeo entropy metric segfaults for small distances, don't know why
-        // moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
-        // // state.storeFunctor( m_entropy );
-        // moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "Entropy" );
-        // state.storeFunctor( entropy );
-        // checkpoint.add( *entropy );
-        // clog_monitor.add( *entropy );
+        // get best fitness
+        // for us, has the form "fitness feasibility" (e.g. "722367 1")
+        eoStat<EOT,std::string>& best_fit_stat = make_dual_stat< eoBestFitnessStat<EOT> >( "BestFit", state );
 
-        moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,1.1);
+        // TODO implement "better" nth_element stats with different interpolations (linear and second moment?)
+        // we should use a ratio here, and not a position,
+        // because the size of a [un]feasible pop is unknown at runtime
+        double median_ratio = 0.5;
+        eoStat<EOT,std::string>& median_stat = make_dual_stat_param< eoNthElementStat<EOT> >( median_ratio, "MedFit", state );
+
+        checkpoint.add( best_fit_stat );
+        checkpoint.add( median_stat );
+        clog_monitor.add( best_fit_stat );
+        clog_monitor.add( median_stat );
+
+        // typename OVT::Type m( 0.0, true);
+        // typename OVT::Type c( 0.0, true);
+        typename OVT::Type m( std::numeric_limits<int>::max(), false);
+        typename OVT::Type c( std::numeric_limits<int>::max(), false);
+        OVT ref(m,c);
+        moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,ref);
+        // moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,1.1);
         eoStat<EOT,std::string>& hypervolume = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_hypervolume, "HypVol", state );
         checkpoint.add( hypervolume );
         clog_monitor.add( hypervolume );
@@ -123,6 +132,33 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         eoStat<EOT,std::string>& average_stat = make_dual_stat< moeoAverageObjVecStat<EOT> >("Avrg", state );
         checkpoint.add( average_stat );
         clog_monitor.add( average_stat );
+
+        moeoContributionMetric<OVT> * m_contribution = new moeoContributionMetric<OVT>;
+        // state.storeFunctor( m_contribution ); // can't store this due to ambiguous base with a different template type // FIXME use smart pointers
+        // wrap it in an eoStat
+        eoStat<EOT,std::string>& contribution = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_contribution, "Cntrb", state );
+        // add it to the checkpoint
+        checkpoint.add( contribution );
+        clog_monitor.add( contribution );
+
+        // <JD> the moeo entropy metric segfaults for small distances, don't know why
+        // moeoEntropyMetric<OVT> * m_entropy = new moeoEntropyMetric<OVT>;
+        // // state.storeFunctor( m_entropy );
+        // moeoBinaryMetricStat<EOT>* entropy = new moeoBinaryMetricStat<EOT>( *m_entropy, "Entropy" );
+        // state.storeFunctor( entropy );
+        // checkpoint.add( *entropy );
+        // clog_monitor.add( *entropy );
+
+
+        std::string out_dir = parser.valueOf<std::string>("out-dir");
+#ifdef _MSVC
+        std::string stmp = out_dir + "\arch";
+#else
+        std::string stmp = out_dir + "/arch"; // FIXME get the directory from the parser
+#endif
+        moeoArchiveObjectiveVectorSavingUpdater<EOT> * save_updater = new moeoArchiveObjectiveVectorSavingUpdater<EOT>(archive, stmp, /*count*/true);
+        state.storeFunctor(save_updater);
+        checkpoint.add(*save_updater);
     }
 
 }
@@ -241,7 +277,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
     //state.formatJSON("dae_state");
 
 #ifdef DAE_MO
-    add_stats_multi( *checkpoint, *clog_monitor, state, pop, archive );
+    add_stats_multi( *checkpoint, *clog_monitor, state, pop, archive, parser );
 #else
     add_stats_mono( *checkpoint, *clog_monitor, state );
 #endif
