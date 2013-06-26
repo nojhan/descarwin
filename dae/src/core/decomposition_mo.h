@@ -37,31 +37,29 @@ public:
 
 /**
  * Definition of the objective vector for multi-objective planning problems: a vector of doubles
+ *
+ * We use a dual fitness because we want to maintain unfeasible out of scope.
+ * We use a maximizing dual fitness because it is the default in EO and that the traits are in charge of minimizing.
+ *
+ * Replacement of population is determined on the fitness, not the objectives.
  */
-typedef moeoDualRealObjectiveVector<DecompoMOTraits, eoMinimizingDualFitness> DecompoMOObjectives;
+typedef moeoDualRealObjectiveVector<DecompoMOTraits, eoMaximizingDualFitness> DecompoMOObjectives;
 
 
 class DecompositionMO : public DecompositionBase<
         GoalMO, // goal type
         MOEO< // base type
             DecompoMOObjectives, /* ObjectiveVector */
-            eoMinimizingDualFitness, /*MOEOFitness*/
+            eoMaximizingDualFitness, /*MOEOFitness*/
             double /*MOEODiversity*/
         >
     >
 {
 public:
     typedef DecompoMOObjectives ObjectiveVector ;
-    typedef eoMinimizingDualFitness Fitness;
+    typedef eoMaximizingDualFitness Fitness; // default maximizing fitness with feasibility
     typedef double Diversity;
     typedef MOEO<ObjectiveVector,Fitness,Diversity> MOEOType;
-
-    /* FIXME tester s'il vaut mieux une comparaison lexicographique ou pas pour le multi-objectif
-     * dans l'algo MO de Mostepha, il n'y a pas de comparaison lexicographique sur la faisabilité,
-     * dans l'algo mono-objectif standard, elle est implémentée via operator> et operator<
-     * Il faut vérifier laquelle utiliser dans les deux cas.
-     * Pour ce faire, déplacer les operator> depuis Decomposition vers DecompositionBase.
-     */
 
 
     eoserial::Object* pack(void) const
