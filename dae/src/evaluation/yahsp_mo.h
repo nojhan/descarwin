@@ -11,10 +11,12 @@ class daemoYahspEval : public daeYahspEval<EOT>
 {
 public:
     typedef typename EOT::Fitness Fitness;
+    typedef typename EOT::ObjectiveVector::Base OVBase;
 
-    virtual Fitness objective_makespan( EOT& decompo )
+    virtual OVBase objective_makespan( EOT& decompo )
     {
-        return this->solve( decompo );
+        Fitness f = this->solve( decompo );
+        return OVBase( f.value(), f.is_feasible() );
     }
 
 
@@ -42,7 +44,7 @@ public:
 
         // get the fitness that correspond to the "makespan" objective
         // for unfeasible decomposition, that may be a penalized fitness
-        Fitness result = objective_makespan( decompo );
+        OVBase result = objective_makespan( decompo );
 
         // assign value + feasibility to the first objective (makespan)
         // result contains a pair<value,feasibility>
@@ -63,7 +65,7 @@ public:
             cost = result.value();
         }
         // assign value + feasibility to the second objective (cost)
-        objVector[1] = Fitness( cost, result.is_feasible() );
+        objVector[1] = OVBase( cost, result.is_feasible() );
 
         // assign value + feasibility to the whole objective vector
         // necessary because objective vectors implement Pareto domination (@see DualRealObjectiveVector::dominates)
