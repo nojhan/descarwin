@@ -348,7 +348,8 @@ int main ( int argc, char* argv[] )
     eo::log.flush();
 #endif
 #ifdef DAE_MO
-    moeoUnboundedArchive<T> archive;
+    moeoParetoDualObjectiveVectorComparator<T::ObjectiveVector> dual_cmp;
+    moeoUnboundedArchive<T> archive(dual_cmp);
 #endif
 
     // STOPPING CRITERIA
@@ -403,8 +404,7 @@ int main ( int argc, char* argv[] )
      ********************/
 
 #ifdef DAE_MO
-    // the best solution to a multi-objective problem is a Pareto front (an archive)
-    moeoUnboundedArchive<T> best = archive;
+    // nothing
 #else
     // best decomposition of all the runs, in case of multi-start
     // start at the best element of the init
@@ -559,6 +559,7 @@ int main ( int argc, char* argv[] )
                 std::cout << "," << *idecompo;// << std::endl;
             }
             std::cout << "]" << std::endl;
+            eo::log << "Pareto archive size: " << best.size() << std::endl;
 #else
             pop.push_back( empty_decompo );
             // push the best result, in case it was not in the last run
@@ -590,7 +591,7 @@ int main ( int argc, char* argv[] )
 # ifdef WITH_MPI
             p_pop_eval,
 # endif
-            pop, best, empty_decompo );
+            pop, archive, empty_decompo );
 
 # ifdef WITH_MPI
         if( with_multistart )
