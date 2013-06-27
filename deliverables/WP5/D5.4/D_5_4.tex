@@ -95,11 +95,11 @@
 \end{revisions}
 
 \begin{abstract}
-This document provides the description and experimentation of work conducted to improve the initialization phase of DaE's evolutionary engine. We focus, in particular, on initialization procedures built around an individual provided either by specific construction or by invoking external planners. Following the biological metaphor inherent to evolutionary algorithms, such procedures are usually called ``artificial insemination'' or ``inoculation'' in the literature, we choose to stick to the latter. Two experimental campaigns are reported here. 
+This document provides the description and experimentation of work conducted to improve the initialization phase of the \DAE's evolutionary engine. We focus, in particular, on initialization procedures built around an individual provided either by specific construction or by invoking external planners. Following the biological metaphor inherent to evolutionary algorithms, such procedures are usually called ``artificial insemination'' or ``inoculation'' in the literature, we choose to stick to the latter. Two experimental campaigns are reported here. 
 
-The first one is our early attempt at designing an inoculation procedure that builds the initial population around an individual constructed by our embedded planner, \YAHSP, with an additional routine designed to produce a consequently refined estimate of the critical parameter defining \YAHSP's exploratory allowance once the search has started, {$b_{max}$}. Experimental results show very poor performance and high risk of runs, with ``unlucky" random seeds, getting stuck in fruitless sampling of the search space. 
+The first one is our early attempt at designing an inoculation procedure that builds the initial population around an individual constructed by our embedded planner, \YAHSP, with an additional routine designed to produce a consequently refined estimate of the critical parameter defining \YAHSP's exploratory allowance once the search has started, {$b_{max}$}. Experimental results show very poor performance and high risk of runs, with ``unlucky'' random seeds, getting stuck in fruitless sampling of the search space. 
 
-The second set of experiments follows a different strategy, getting rid of \YAHSP as the inoculant provider on one hand and being far more parsimonious with {$b_{max}$} on the other hand. We use additional sampling both to compensate for {$b_{max}$}'s restricted increase and to produce the inoculant. We call this procedure ``Inoculation through mass selection''. Experimental results exhibit both substantial improvements in speed and risk reduction for our algorithm, albeit on a limited subset of the entire IPC benchmark. 
+The second set of experiments follows a different strategy, getting rid of \YAHSP\ as the inoculant provider on one hand and being far more parsimonious with {$b_{max}$} on the other hand. We use additional sampling both to compensate for {$b_{max}$}'s restricted increase and to produce the inoculant. We call this procedure ``Inoculation through mass selection''. Experimental results exhibit both substantial improvements in speed and risk reduction for our algorithm, albeit on a limited subset of the entire IPC benchmark. 
 
 \end{abstract}
 
@@ -123,7 +123,7 @@ Chinese Proverb
 
 Search is about finding things that are difficult to locate. Stochastic search, evolutionary or otherwise, is about injecting randomness in the process when the field is so large or labyrinthine one has no other choice anyway. The challenge however, like the devil, is in the details of that randomness. There are many things one can do to improve one's odds of finding what one is looking for: throwing more light in, work in teams, use binoculars, ask someone, run faster, search deeper and so forth. All of these tricks have counterparts in mathematical optimization and computational search: local sampling, parallel search, depth first search, external expert knowledge, relaxed constraints, hybrid algorithms, etc. It all boils down to injecting whatever form of intelligence, knowledge or power is available at reasonable cost in the stochastic process to tame and steer randomness in the right direction.
 
-Evolutionary algorithms offer many such avenues of improvement. They are usually made of many interconnected heuristically designed modules, each of which performing some portion of the traditional genetic loop with some flavor of randomness: initialization, selection, reproduction, blind variations, replacement, stopping criteria. Representation, helper or hybridized algorithms and genotype mappings can also benefit from efforts to build an intelligent bias for random search. \emph{DaE} makes no exception: it is an evolutionary algorithm coupled with an embedded AI planner. It has a convoluted workflow, five variation operators and dozens of parameters and routines, many of which have been designed or tuned with somewhat arbitrary randomness based ingredients which can be improved with externally provided intelligence.
+Evolutionary algorithms offer many such avenues of improvement. They are usually made of many interconnected heuristically designed modules, each of which performing some portion of the traditional genetic loop with some flavor of randomness: initialization, selection, reproduction, blind variations, replacement, stopping criteria. Representation, helper or hybridized algorithms and genotype mappings can also benefit from efforts to build an intelligent bias for random search. \DAE\ makes no exception: it is an evolutionary algorithm coupled with an embedded AI planner. It has a convoluted workflow, five variation operators and dozens of parameters and routines, many of which have been designed or tuned with somewhat arbitrary randomness based ingredients which can be improved with externally provided intelligence.
 
 In that perspective, the traditional evolutionary building block the present report deals with is \emph{initialization}. More specifically, we look at how the initial population, and therefore the entire algorithm, can be improved by being made less pointlessly random from the start. The idea is to find a way to start the search directly from an interesting zone instead of blindly sampling the search space as is usually done by default. One possible way to do this is known as \emph{inoculation}. In biology or medicine, inoculation refers to ``the placement of something that will grow or reproduce, and is most commonly used in respect of the introduction of a serum, vaccine, or antigenic substance into the body of a human or animal, especially to produce or boost immunity to a specific disease''. In our mathematical context we will seek to find a way to quickly construct one individual with a good fitness value or good building blocks and use variations of that individual to constitute the initial population. That individual, which we will call the \emph{inoculant} will serve as the vehicle for the injection of interesting search space information into the genetic population where it will be spread and sampled along with successive generations.  Obviously enough, this process relies on the assumption that we can design a way to fabricate this individual both quickly enough and with enough interesting material for inoculation to be worth the extra cost in algorithmic terms.
 
@@ -138,7 +138,7 @@ As mentioned earlier, the main rationale behind inoculation is to steer randomne
 
 \item[Motivation 1 : Bypassing ``Senseless Randomness''] 
 
-Optimization fitness plots are usually very steep over early iterations or generations. It usually means that vast portions of the search space can be quickly discarded as being senseless for the problem at hand where interesting things only happen within the bounds of a restricted set of parameter intervals. A reasonable approximation of these intervals can usually be obtained quickly, either by design, heuristics or sampling, and inoculation, based on that estimate can serve the purpose of ``starting directly from the bottom of the curve'' which can represent a usually small but sometimes substantial fraction of the total run time. Another example where large savings can be obtained by cutting through trivial search has to do with order based approaches, such as permutation based algorithms typical of combinatorial optimization, where early generations are usually spent running for a first reasonable permutation which makes sense with respect to problem data. The \emph{h1} heuristic used by \DAE is an example of substantial improvement obtained in this manner: it prevents the consideration of decompositions which do not make sense in terms of earliest possible start dates for atoms.
+Optimization fitness plots are usually very steep over early iterations or generations. It usually means that vast portions of the search space can be quickly discarded as being senseless for the problem at hand where interesting things only happen within the bounds of a restricted set of parameter intervals. A reasonable approximation of these intervals can usually be obtained quickly, either by design, heuristics or sampling, and inoculation, based on that estimate can serve the purpose of ``starting directly from the bottom of the curve'' which can represent a usually small but sometimes substantial fraction of the total run time. Another example where large savings can be obtained by cutting through trivial search has to do with order based approaches, such as permutation based algorithms typical of combinatorial optimization, where early generations are usually spent running for a first reasonable permutation which makes sense with respect to problem data. The \emph{h1} heuristic used by \DAE\ is an example of substantial improvement obtained in this manner: it prevents the consideration of decompositions which do not make sense in terms of earliest possible start dates for atoms.
 
 \item[Motivation 2 : Taking Time to Precompute]
 
@@ -172,7 +172,7 @@ One thing one might want to attempt before launching the actual search is to use
 %\newline
 %\newline
 
-In spite of these numerous possible motivations, there are at least two potential drawbacks to inoculation that the designer will want to keep in mind. The first one takes place within the traditional quest evolutionary computation practitioners are all familiar with: the infamous exploration/exploitation tradeoff. If helping the search by having it start from an interesting zone can obviously speed things up, it can also turn out be an insidious bias leading to a local optimum and therefore be a source of premature convergence. Several countermeasures can be imagined: use several inoculants coming from different external sources, build an initial population filling routine with a carefully crafted use of variations to ensure sufficient variety, having a mixed scheme with both inoculants and purely random individuals and so on. The second drawback is that inoculation procedures are, most of the time, highly problem specific and therefore force you to make a step away from the admittedly utopic dream of a generic solver.
+In spite of these numerous possible motivations, there are at least two potential drawbacks to inoculation that the designer will want to keep in mind. The first one takes place within the traditional quest evolutionary computation practitioners are all familiar with: the infamous exploration/exploitation tradeoff. If helping the search by having it start from an interesting zone can obviously speed things up, it can also turn out be an insidious bias leading to a local optimum and therefore be a source of premature convergence. Several countermeasures can be imagined: use several inoculants coming from different external sources, build an initial population filling routine with a carefully crafted use of variations to ensure sufficient variety, having a mixed scheme with both inoculants and purely random individuals and so on. The second drawback is that inoculation procedures are, most of the time, highly problem specific and therefore force you to make a step away from the admittedly utopian dream of a generic solver.
 
 Extensive discussion of inoculation to boost evolutionary search can be found in \cite{Surry96, SurryPhD}. An example of inoculation in a real-world context with substantial benefits can be found in \cite{semetGECCO06} where the technique is used to solve a railroad based combinatorial problem faster by using aforementioned motivations 1, 2 and 3.
 
@@ -183,10 +183,8 @@ Extensive discussion of inoculation to boost evolutionary search can be found in
 %Semet \cite{semetGECCO06}
 
 
-
-
 \newpage
-\chapter{Inoculation with Yahsp}
+\chapter{Inoculation with YAHSP}
 
 In this section, we describe and motivate the actual basic inoculation procedure we designed in the first place and present experimental results that show its inefficiency in several respects. We then introduce, also along with experiments, another way to boost our evolutionary initialization phase which brings improvements with respect to both stochastic risk and computation speed. We call this procedure Inoculation through Mass Selection (IMS).
 
@@ -218,7 +216,7 @@ The initial population will be filled with inoculant variants but to an extent t
 
 \section{Meet Adam!}
 
-The initialization/inoculation procedure works as follows and as outlined by algorithms 1 through 4. Algorithm 1 gives the global outline of our initialization, which work in two separate phases: the initial population is first built by gathering randomly generated individuals and then, an estimation for {$b_{max}$}, a critical parameter setting the embedded planner's exploratory allowance, is computed by manipulating the population. As outlined in algorithm 2 described in more depth elsewhere \cite{DBLP:conf/aips/BibaiSSV10}, the random generation procedure follows an intermediate goal setting heuristic framed by a minimal timestamp computing heuristic, {$h1$}, and randomly fills the individuals' predefined goals with random atoms picked while respecting mutex constraints. In the normal case, without inoculation, algorithm 3 proceeds to estimate the proper value for {$b_{max}$} in an incremental manner: its value is increased until a sufficient number of feasible individuals is present int the population as an indivdual, i.e. a decomposition of the planning problem in intermediate goals, can be declared feasible or not depending on how extensively Yahsp is allowed to work on it, which is determined by {$b_{max}$}.
+The initialization/inoculation procedure works as follows and as outlined by algorithms 1 through 4. Algorithm 1 gives the global outline of our initialization, which work in two separate phases: the initial population is first built by gathering randomly generated individuals and then, an estimation for {$b_{max}$}, a critical parameter setting the embedded planner's exploratory allowance, is computed by manipulating the population. As outlined in algorithm 2 described in more depth elsewhere \cite{DBLP:conf/aips/BibaiSSV10}, the random generation procedure follows an intermediate goal setting heuristic framed by a minimal timestamp computing heuristic, {$h1$}, and randomly fills the individuals' predefined goals with random atoms picked while respecting mutex constraints. In the normal case, without inoculation, algorithm 3 proceeds to estimate the proper value for {$b_{max}$} in an incremental manner: its value is increased until a sufficient number of feasible individuals is present int the population as an individual, i.e. a decomposition of the planning problem in intermediate goals, can be declared feasible or not depending on how extensively \YAHSP\ is allowed to work on it, which is determined by {$b_{max}$}.
 
 \begin{algorithm}[h!]
 \caption{Initialization}
@@ -275,7 +273,7 @@ The initialization/inoculation procedure works as follows and as outlined by alg
 }
 \end{algorithm}
 
-The inoculation procedure is an alternative to the aforementioned incremental {$b_{max}$} estimation procedure. It is detailed in algorithm 4. It works in several steps. First, it calls Yahshp for a quick solution on the entire planning problem. Then, this solution plan is converted to a decomposition with intermediate goals to make up an individual ready for genetic mixing. This new individual will serve as the \emph{inoculant}, we call it \emph{Adam} for reference purposes. The initial population is then reconstructed using identical copies of \emph{Adam}. A double loop routine follows, both to introduce diversity and to produce a relevant estimate for {$b_{max}$}. Following a classical constraint handling technique, we try to push the population towards the infeasibility border. To do so, \emph{delgoal} mutations are first applied to all individuals iteratively until a sufficient number of them are pushed to infeasibility. Then {$b_{max}$} is iteratively increased until the population reaches the specified ratio of feasible individuals back. Having done all that, the population is made of borderline feasible variants of Adam, a supposedly stronger than random individual, and {$b_{max}$} is set to a proper value. The search can start...
+The inoculation procedure is an alternative to the aforementioned incremental {$b_{max}$} estimation procedure. It is detailed in algorithm 4. It works in several steps. First, it calls \YAHSP\ for a quick solution on the entire planning problem. Then, this solution plan is converted to a decomposition with intermediate goals to make up an individual ready for genetic mixing. This new individual will serve as the \emph{inoculant}, we call it \emph{Adam} for reference purposes. The initial population is then reconstructed using identical copies of \emph{Adam}. A double loop routine follows, both to introduce diversity and to produce a relevant estimate for {$b_{max}$}. Following a classical constraint handling technique, we try to push the population towards the infeasibility border. To do so, \emph{delgoal} mutations are first applied to all individuals iteratively until a sufficient number of them are pushed to infeasibility. Then {$b_{max}$} is iteratively increased until the population reaches the specified ratio of feasible individuals back. Having done all that, the population is made of borderline feasible variants of Adam, a supposedly stronger than random individual, and {$b_{max}$} is set to a proper value. The search can start...
 
 So in terms of our formalism:
 
@@ -362,25 +360,25 @@ To evaluate the performance of our inoculation procedure, we conducted a number 
 
 In all cases, we use \dae's default parameters : a population size of 100, a deterministic tournament of size 5, 700 offsprings, a goal neighborhood radius of 2, changeAtom and delAtom mutations both with 0.8 probabilities (per atom), a crossover probability of 0.2, mutation probability of 0.8 and weights for delgoal, addgoal, delatom, addatom of 1,3,1 and 1 respectively. We use a bmax ratio of feasibility of 1\%, a bmaxlastweight of 3 and a bmaxincreasecoeff of 2.
 
-For the first set of experiments, we launch \dae with and without basic inoculation and center our observations on two parameters: the average fitness value for Adam as oppposed to the average fitness value of the best individual in a random population on one hand and the average speed at which the individuals can be processed, which we measure as the average time it takes to reach the first generation. All results are averaged over several seeds.
+For the first set of experiments, we launch \dae\ with and without basic inoculation and center our observations on two parameters: the average fitness value for Adam as opposed to the average fitness value of the best individual in a random population on one hand and the average speed at which the individuals can be processed, which we measure as the average time it takes to reach the first generation. All results are averaged over several seeds.
 
-As can be seen in figures \ref{fig:adam_el}, results are consistent over all test domains, here Elevators, Openstacks and Floortile and over all instances, of increasing difficulty: Adam has a very poor fitness value, as exemplified by the Elevators P01 case where it starts around 4000 where the average random population starts around 2000. Fitness values are less contrasted with Openstacks but still give the same picture as do the Floortiles results. In terms of speed, the qualitative conclusion is the same and even more spectacularly so, except for Floortile: inoculating Adam results in a considerably slower, up to a factor of 10, algorithm than proceeding with randomly generated individuals. Preliminary analysis suggest that Adam's poor performance is due to two factors: an excessive bmax due to the way its value is computed and an excessive length, probably due to a too straightforward inoculant builder.
+As can be seen in figures \ref{fig:adam_el}, results are consistent over all test domains, here \ELEVATORS, \OPENSTACKS\ and \FLOORTILE\ and over all instances, of increasing difficulty: Adam has a very poor fitness value, as exemplified by the \ELEVATORS\ P01 case where it starts around 4000 where the average random population starts around 2000. Fitness values are less contrasted with \OPENSTACKS\ but still give the same picture as do the \FLOORTILE\ results. In terms of speed, the qualitative conclusion is the same and even more spectacularly so, except for \FLOORTILE: inoculating Adam results in a considerably slower, up to a factor of 10, algorithm than proceeding with randomly generated individuals. Preliminary analysis suggest that Adam's poor performance is due to two factors: an excessive bmax due to the way its value is computed and an excessive length, probably due to a too straightforward inoculant builder.
 
-Additional experiments, not reported here, show that in addition, runs of \dae launched with inoculation are unable to improve fitness values efficiently over time: Adam is consistently bad regardless of how strongly one tries to perturb it and restrains the search very poor local minimum.
+Additional experiments, not reported here, show that in addition, runs of \dae\ launched with inoculation are unable to improve fitness values efficiently over time: Adam is consistently bad regardless of how strongly one tries to perturb it and restrains the search very poor local minimum.
 
 To sum up, our basic inoculation procedure offers three avenues of improvement: Adam is stupid, slow and stubborn. The next section offers an algorithmic variant that will try to address some of these shortcomings.
 
 \begin{figure}
 	\centering
 		\includegraphics[width=\textwidth]{pics/Elevators.eps}
-	\caption{Basic inoculation performance on Elevators}
+	\caption{Basic inoculation performance on \ELEVATORS}
 	\label{fig:adam_el}
 \end{figure}
 
 \begin{figure}
 	\centering
 		\includegraphics[width=\textwidth]{pics/Openstacks.eps}
-	\caption{Basic inoculation performance on Openstacks}
+	\caption{Basic inoculation performance on \OPENSTACKS}
 	\label{fig:adam_open}
 \end{figure}
 
@@ -388,7 +386,7 @@ To sum up, our basic inoculation procedure offers three avenues of improvement: 
 \begin{figure}
 	\centering
 		\includegraphics[width=\textwidth]{pics/Floortile.eps}
-	\caption{Basic inoculation performance on Floortile}
+	\caption{Basic inoculation performance on \FLOORTILE}
 	\label{fig:adam_floor}
 \end{figure}
 
@@ -419,14 +417,14 @@ To sum up, our basic inoculation procedure offers three avenues of improvement: 
 
 \section{Motivation and principle}
 
-While observing experimental logs of \dae runs performed with or without inoculation, we noticed a number of things in addition to the conclusions reported above. First of all, in many cases, particularly with the elevators domain, the first challenge out algorithm needs to meet is to find one feasible individual with which it is bound to start the search with our parameter settings. To do so, it follows our loop based bmax estimation procedures which tend to increase bmax exponentially to stand a greater chance to find a way for Yahsp to build a feasible individual aorund the decompositions. This heuristic works in practice but what we noticed is that it is very costly in terms of speed as runs ending up with high values of bmax tended to be extremely slow. Zooming out it looked like a factor of risk: the run either got a ``lucky'' random seed leading to a feasible individual quickly with a low value of bmax allowing sufficient speed afterward or it got an ``unlucky'' one and got, purely and simply, lost because of unacceptable resulting speed. Another thing we noticed is that benefit of strongly increasing bmax was questionable as many runs, with lucky seeds and therefore low bmax values, could find feasible individuals without difficulty.
+While observing experimental logs of \dae\ runs performed with or without inoculation, we noticed a number of things in addition to the conclusions reported above. First of all, in many cases, particularly with the \ELEVATORS\ domain, the first challenge our algorithm needs to meet is to find one feasible individual with which it is bound to start the search with our parameter settings. To do so, it follows our loop based bmax estimation procedures which tend to increase bmax exponentially to stand a greater chance to find a way for \YAHSP\ to build a feasible individual around the decompositions. This heuristic works in practice but what we noticed is that it is very costly in terms of speed as runs ending up with high values of bmax tended to be extremely slow. Zooming out it looked like a factor of risk: the run either got a ``lucky'' random seed leading to a feasible individual quickly with a low value of bmax allowing sufficient speed afterward or it got an ``unlucky'' one and got, purely and simply, lost because of unacceptable resulting speed. Another thing we noticed is that benefit of strongly increasing bmax was questionable as many runs, with lucky seeds and therefore low bmax values, could find feasible individuals without difficulty.
 
-From these observations and from those reported above concerning the poor performance of Adam, we derived a new way initialize, or inoculate our evolutionary algorithm: instead of using Yashp to find starting point and instead of increasing bmax to find a first feasible individual, we will simply use additional sampling. In other terms, we will regenerate the initial population randomly with a fixed, low, value of bmax until it contains a feasible individual, which will serve as the inoculant. This very simple scheme should prove useful to reduce the risk of lost runs and increase the average speed at very little cost. The procedure is summarized in algorithm 5 and  the following table:
+From these observations and from those reported above concerning the poor performance of Adam, we derived a new way to initialize, or inoculate our evolutionary algorithm: instead of using \YAHSP\ to find a starting point and instead of increasing bmax to find a first feasible individual, we will simply use additional sampling. In other terms, we will regenerate the initial population randomly with a fixed, low, value of bmax until it contains a feasible individual, which will serve as the inoculant. This very simple scheme should prove useful to reduce the risk of lost runs and increase the average speed at very little cost. The procedure is summarized in algorithm 5 and  the following table:
 
 
 \begin{algorithm}[h!]
 \caption{Inoculation through mass selection}
-\label{algoInit}
+\label{algoInitMass}
 {\small
 \begin{algorithmic}[1]
 \REQUIRE{$N, b_{max}\-fixed$} \hfill \COMMENT{initialization parameters}
@@ -439,7 +437,8 @@ From these observations and from those reported above concerning the poor perfor
 \FOR{$i \in [1..N] $}
 \STATE{$pop[i] \leftarrow GenerateIndividual(K)$} \hfill \COMMENT{random individuals with K intermediate goals}
 \IF{pop[i].isFeasible}
-\STATE{$goodguys++$}
+%\STATE{$goodguys++$}
+\STATE{$goodguys \leftarrow goodguys+1$}
 \ENDIF
 \ENDFOR
 \ENDWHILE
@@ -463,11 +462,11 @@ From these observations and from those reported above concerning the poor perfor
 
 \section{Experiments}
 
-For all experiments, we use the same paramter settings reported above.
+For all experiments, we use the same parameter settings reported above.
 
 \subsection{Consequences of increasing bmax}
 
-In this first experiment, we formalize our observations that rapidly increasing bmax in search for a first feasible individual is not a viable strategy. To see that, we draw large, random, populations of size 1000 with increasing values of bmax in ranges typical of those observed in runs of \dae  performed on Elevators P01. As can be seen in figure \ref{fig:bmax}, the number of feasible individuals practically ceases to increase significantly after a bmax value of 8! On the other hand, as one might have suspected, the time it takes to process individuals increases exponentially along with values of bmax as dictated by our estimation procedure. It is therefore clearly not beneficial to increase bmax senselessly: not only does it cost a lot in terms of speed but there is also simply almost no significant benefit to go beyond a certain bmax threshold, here 8.
+In this first experiment, we formalize our observations that rapidly increasing bmax in search for a first feasible individual is not a viable strategy. To see that, we draw large, random, populations of size 1000 with increasing values of bmax in ranges typical of those observed in runs of \dae\  performed on \ELEVATORS\ P01. As can be seen in figure \ref{fig:bmax}, the number of feasible individuals practically ceases to increase significantly after a bmax value of 8! On the other hand, as one might have suspected, the time it takes to process individuals increases exponentially along with values of bmax as dictated by our estimation procedure. It is therefore clearly not beneficial to increase bmax senselessly: not only does it cost a lot in terms of speed but there is also simply almost no significant benefit to go beyond a certain bmax threshold, here 8.
 
 \begin{figure}
 	\centering
@@ -485,13 +484,13 @@ As can be seen in figure \ref{fig:failRate}, the failure rate is quite high with
 \begin{figure}
 	\centering
 		\includegraphics[height=0.8\textheight]{pics/failRate_elevators.eps}
-	\caption{Proportion of lost runs on Elevators}
+	\caption{Proportion of lost runs on \ELEVATORS}
 	\label{fig:failRate}
 \end{figure}
 
 \subsection{Start overhead of successful runs}
 
-In the third experiment, we try to look at the cost of this new procedure. Regenerating new random populations and evaluating them is indeed costly as it takes significant time and the start of search is consequently delayed. Figure \ref{fig:overhead} compares the times it takes to reach the first generation in the three cases of interest: classic initiliazation, classic inoculation and inoculation through mass selection. Although the addional sampling cost is visible with respect to classic initialization, inoculation through mass selection clearly removes the considerable overhead observed with Yahsp based inoculation.
+In the third experiment, we try to look at the cost of this new procedure. Regenerating new random populations and evaluating them is indeed costly as it takes significant time and the start of search is consequently delayed. Figure \ref{fig:overhead} compares the times it takes to reach the first generation in the three cases of interest: classic initialization, classic inoculation and inoculation through mass selection. Although the additional sampling cost is visible with respect to classic initialization, inoculation through mass selection clearly removes the considerable overhead observed with \YAHSP\ based inoculation.
 
 \begin{figure}
 	\centering
@@ -508,7 +507,7 @@ In this fourth and last experiment, we observe the benefit of mass inoculation i
 	\centering
 		\includegraphics[width=0.6\textwidth]{pics/speed_elevators.eps}
 	\caption{Benefit of inoculation through mass selection in terms of average speed}
-	\label{fig:bmax}
+	\label{fig:bmax2}
 \end{figure}
 
 %\section{Smaller populations}
@@ -527,7 +526,7 @@ In this fourth and last experiment, we observe the benefit of mass inoculation i
 \newpage
 \chapter{Conclusion}
 
-Inoculation can be a very good way to improve an evolutionary algorithm's performance in terms of speed, solution quality or robustness. There many ways to inoculate the population with relevant information and many ways to take advantage of that knowledge. In the context of \dae, we tried two inoculation procedures. The first one, heuristically designed and based on our embedded planner, Yahsp, performs poorly: the resulting algorithm is slow, risky and produces low quality solutions. Experimental analysis however suggest that further work is required, particularly on the inoculant builder to tweak it and assess the actual benefit of using Yashp as a substance provider. Observation of experimental results additionally led us to imagine another, very simple, inoculation procedure based on extra sampling which successfully improves our algorithm on a number of benchmarks, in particular by reducing the stochastic risk of runs getting lost. Much further work is however needed to make this improvement robust and significant for all benchmark domains.
+Inoculation can be a very good way to improve an evolutionary algorithm's performance in terms of speed, solution quality or robustness. There are many ways to inoculate the population with relevant information and many ways to take advantage of that knowledge. In the context of \dae, we tried two inoculation procedures. The first one, heuristically designed and based on our embedded planner, \YAHSP, performs poorly: the resulting algorithm is slow, risky and produces low quality solutions. Experimental analysis however suggest that further work is required, particularly on the inoculant builder to tweak it and assess the actual benefit of using \YAHSP\ as a substance provider. Observation of experimental results additionally led us to imagine another, very simple, inoculation procedure based on extra sampling which successfully improves our algorithm on a number of benchmarks, in particular by reducing the stochastic risk of runs getting lost. Much further work is however needed to make this improvement robust and significant for all benchmark domains.
 
 \newpage
 \newpage
