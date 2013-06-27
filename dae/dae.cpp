@@ -464,7 +464,7 @@ int main ( int argc, char* argv[] )
             // push the best result, in case it was not in the last run
             // but produced by the init after the last search
             pop.push_back( best );
-#endif
+#endif // DAE_MO
 
 #ifndef NDEBUG
             // call the checkpoint, as if it was ending a generation
@@ -567,9 +567,9 @@ int main ( int argc, char* argv[] )
             //            pop_eval( pop, pop ); // FIXME normalement inutile
             // print_results( pop, time_start, run );
             std::cout << pop.best_element() << std::endl;
-#endif
+#endif // DAE_MO
             eo::log << eo::progress << "The end" << std::endl;
-#endif
+#endif // NDEBUG
         }
 
         private:
@@ -582,7 +582,7 @@ int main ( int argc, char* argv[] )
         moeoUnboundedArchive<T> & best;
 #else
         T & best;
-#endif
+#endif // DAE_MO
         T & empty_decompo;
     };
 
@@ -590,8 +590,14 @@ int main ( int argc, char* argv[] )
         FinallyBlock finallyBlock(
 # ifdef WITH_MPI
             p_pop_eval,
-# endif
-            pop, archive, empty_decompo );
+# endif // WITH_MPI
+            pop,
+#ifdef DAE_MO
+            archive,
+#else
+            best,
+#endif // DAE_MO
+            empty_decompo );
 
 # ifdef WITH_MPI
         if( with_multistart )
@@ -620,7 +626,7 @@ int main ( int argc, char* argv[] )
 
                 // call the checkpoint (log and stats output) on the pop from the init
                 checkpoint( pop );
-#endif
+#endif // NDEBUG
 
 # ifdef WITH_MPI
                 timerStat.start("main_run");
