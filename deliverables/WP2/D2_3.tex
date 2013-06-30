@@ -33,6 +33,7 @@
 \newcommand{\LAMA}{{\sc LAMA}}
 \newcommand{\TFD}{{\sc TFD}}
 \newcommand{\YAHSP}{{\sc YAHSP}}
+\newcommand{\LAO}{{\sc LaO}}
 
 \def\UU{{\mathbb{U}}}
 
@@ -124,14 +125,29 @@ A copy of the published paper is included after a brief recall of the context an
 \newpage
 \chapter{Failure of on-line control methods based on operator reward}
 
-When the DESCARWIN proposal was written, we had a clear idea in mind regarding on-line parameter control (see Deliverable 2.1 for the list of the now-standard vocabulary): because the INRIA partner had been involved in several works regarding on-line parameter control, we anticipated that the same approaches could be used within DaE framework.
+When the DESCARWIN proposal was written, we had a clear idea in mind regarding on-line parameter control (see Deliverable 2.1 for the list of the now-standard vocabulary): because the INRIA partner had been involved in several works regarding on-line parameter control, we anticipated that the same approaches could be used within \DAE\ framework. In particular, this concerned the on-line parameter control, where the parameters are modified during the run, depending on the history of the search, the idea was to port Adaptive Operator Selection (AOS) methods, for which the INRIA partner had a large expertise (PhD thesis of Alvaro Fialho entitled {\em Adaptive Operator Selection for Optimization} and defended in December 2010).
 
+The basic idea of AOS methods (see Deliverable 2.1, Chapter 4) relies on two components: whenever an operator is applied, its impact is recorded, and some {\em reward} is given to the operator, usually based on the fitness improvement, i.e., depending whether the fitness of the offspring is better than that of the parent(s). The second component is a decision mechanism that uses the past rewards of all operators to decide which one to use next. There are several such decision mechanisms, e.g. Probability Matching, Adaptive Pursuit, and the family of Multi-Armed bandit based methods developed by Alvaro Fialho in his PhD. But all of them are based on some reward that is computed from the fitness improvement brought by the operators - and such rewards are zero if the fitness does not increase in the population. Note that this is true even for the rank-based mechanism that is described in detail in Chapter 4 of Deliverable 2.1, rank-based mechanism that was our preferred candidate AOS for \DAE\ because of its invariance by monotonous transformation of the fitness, and is hence independent of any fitness scaling, the Achille's heel of most AOS method based on fitness improvement.
+
+\begin{figure}[h!]
 \begin{center}
 \includegraphics[width=0.9\textwidth,height=6cm]{fitnessBehavior.png}
 \end{center}
+\end{figure}
+
+
+During \DAE\ runs, however, it turned out that very few fitness improvements do take place -- mostly because there are very few possible fitness values, at least when reaching regions of the search space around the optimum. Figure \ref{fig:fitnessImprovement} displays typical evolution of the best fitness in the population during two \DAE\ runs, for two large instances of two different IPC domains, {\tt crewplanning} and the temporal {\tt openstack}: the best fitness in the population goes through only 3 values for {\tt openstack}, and less than a dozen for {\tt crewplanning}. There is hence little hope that AOS based on fitness improvement (even, as said above, the champion rank-based AOS) can learn which operators perform best with so few example of improving operations.
+
+After some preliminary experiments that confirmed this trend, it was decided to 
+\begin{enumerate}
+ \item not waste any more time trying to run some Adaptive Operator Selection method to \DAE\ context
+ \item investigate the {\em Learn-and-Optimize} (\LAO) approach that had been developped with Mátyás Brendel within the project; Indeed, \LAO\ can be seen as a somehow intermediate method between off-line and on-line method, as it learns how to predict the best parameters from solved instances (hence off-line), but later determines the optimal parameters for new and unseen instances: this is done automatically, if not during the run -- and at least a single run is needed for each new instance, by contrast to pure off-line method who require many runs to adjust the parameters for any instance.
+ \item put more efforts on the multi-objective case, because the topic was gaining interest in the AI Planning community (again -- see Deliverable 3.3). And it turned out that indeed some more efforts were needed for off-line parameter setting when going from single- to multi-objective contexts.
+\end{enumerate}
+The rest of the deliverable will thus detail the work done on \LAO\ following the preliminary work that has been introduced in Deliverable 2.2, Chapter 3, that unfortunately didn't bring much improvement over the preliminary results. Then we will turn to the specific work done in the context of Pareto-based multi-objective optimization, in relationship with Deliverable 3.3.
 
 \newpage	
-\chapter{Further work on LaO}
+\chapter{Further work on \LAO}
 
 \section{Improvements}
 
