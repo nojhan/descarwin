@@ -107,13 +107,13 @@ Experiments on on-line parameter control}}
 \begin{abstract}
 This deliverable does not exactly match its initial description that had been made in the original Description of Work of the DESCARWIN proposal. It turned out indeed that the methods that we had in mind when writing the proposal couldn't work in the framework of AI planning as approached with DaE, due to the very small number of different fitness values encountered during DaE runs. This will be detailed in the first Chapter 2 of this deliverable. \\
 
-On the other hand, the Learn-and-Optimize framework (as described in Deliverable 2.2, Chapter 2) can be thought of as an intermediate method between off-line and on-line learning: if the optimizer is installed in some production line, and has to solve a sequence of instances of the same domain, then the instance-based method Learn-and-Optimize is a way to adjust the parameters of the optimizer to the current instance automatically, without any human intervention, i.e., at runtime. A lot of efforts were devoted to further developments of the LaO method \ldots that turned out however to fail to improve the initial results. Furthermore, this was confirmed when LaO was submitted to the IPC'7 competition, where unfortunately it obtained rather poor results - in part only because of the lack of time for preparation before the post-doc in charge, Matthias Brendel, left the project. This is detailed in Chapter 3, and a copy of the short paper that was required to present the candidate planners for the competition is appended.\\
+On the other hand, the Learn-and-Optimize framework (as described in Deliverable 2.2, Chapter 2) can be thought of as an intermediate method between off-line and on-line learning: if the optimizer is installed in some production line, and has to solve a sequence of instances of the same domain, then the instance-based method Learn-and-Optimize is a way to adjust the parameters of the optimizer to the current instance automatically, without any human intervention, i.e., at runtime. A lot of efforts were devoted to further developments of the \LAO\ method \ldots that turned out however to fail to improve the initial results. Furthermore, this was confirmed when \LAO\ was submitted to the IPC'7 competition, where unfortunately it obtained rather poor results - in part only because of the lack of time for preparation before the post-doc in charge, Mátyás Brendel, left the project. This is detailed in Chapter 3, and a copy of the paper that was submitted with the candidate planner for the competition is appended.\\
 
-Also, and as planned in the original workplan, our effort had to turn to the multi-objectivization of Divide-and-Evolve, and of course this also includes adapting the parameter tuning methodology to the multi-objective context. It also turned out that a new framework for off-line parameter tuning, called ParamILS (see reference [XXX] in Chapter 4), developed at University of British Columbia, was gaining popularity, because of the excellent ratio (performance / CPU cost) it obtained compared to the Racing procedure that we had been using up to then (described in Chapter 1 of Deliverable 2.1). We hence decided to modify our off-line tuning method and to exclusively use ParamILS further on. Details of ParamILS and our implementation are briefly given in Chapter 4.\\
+Also, and as planned in the original workplan, our effort had to turn to the multi-objectivization of Divide-and-Evolve, and of course this also includes adapting the parameter tuning methodology to the multi-objective context. It also turned out that a new framework for off-line parameter tuning, called ParamILS (see reference [4] in Chapter 4), developed at University of British Columbia, was gaining popularity, because of the excellent ratio (performance / CPU cost) it obtained compared to the Racing procedure that we had been using up to then (described in Chapter 1 of Deliverable 2.1). We hence decided to modify our off-line tuning method and to exclusively use ParamILS further on. Details of ParamILS and our implementation are briefly given in Chapter 4, together with some samples trajectories in the fitness space.\\
 
 As mentioned above, the new framework was initially set up for the multi-objective work on DaE, and one issue that had not been planned ahead arose: which metric use within ParamILS to assess the performance of the different parameter sets? For the Pareto-based multi-objective algorithms, the Hypervolume was an obvious candidate, and it turned out it performed very well indeed. But for the aggregation approach, in which a single-objective DaE is used to optimize a weighted sum of the objectives, the obvious choice was to use, for each of the runs optimizing a weighed sum of objectives, the very same fitness, i.e., the very same weighted sum. However, it turned out that a better choice was to also use the hypervolume indicator, even though different from the metric that each run optimizes, as demonstrated in Chapter 5. 
 
-As a matter of fact, this work was published as ``Khouadjia, M. , Schoenauer, M. , Vidal, V. , Dréo, J. and Savéant, P.. Quality Measures of Parameter Tuning for Aggregated Multi-Objective Temporal Planning. In Panos Pardalos and Guiseppe Nicosia, eds.: LION'7 -- 7th Learning and Intelligent OptimizatioN Conference, Springer Verlag, LNCS : To appear. Catania, Italy. January 2013.''
+This work was published as ``Khouadjia, M. , Schoenauer, M. , Vidal, V. , Dréo, J. and Savéant, P.. Quality Measures of Parameter Tuning for Aggregated Multi-Objective Temporal Planning. In Panos Pardalos and Guiseppe Nicosia, eds.: LION'7 -- 7th Learning and Intelligent OptimizatioN Conference, Springer Verlag, LNCS : To appear. Catania, Italy. January 2013.''
 
 A copy of the published paper is included after a brief recall of the context and main results, in Chapter 5.
 
@@ -128,7 +128,7 @@ A copy of the published paper is included after a brief recall of the context an
 % \chapter{Introduction}
 
 \newpage
-\chapter{Failure of on-line control methods based on operator reward}
+\chapter{Failure of on-line control methods based on operator rewards}
 
 When the DESCARWIN proposal was written, we had a clear idea in mind regarding on-line parameter control (see Deliverable 2.1 for the list of the now-standard vocabulary): because the INRIA partner had been involved in several works regarding on-line parameter control, we anticipated that the same approaches could be used within \DAE\ framework. In particular, this concerned the on-line parameter control, where the parameters are modified during the run, depending on the history of the search, the idea was to port Adaptive Operator Selection (AOS) methods, for which the INRIA partner had a large expertise (PhD thesis of Alvaro Fialho entitled {\em Adaptive Operator Selection for Optimization} and defended in December 2010).
 
@@ -138,6 +138,8 @@ The basic idea of AOS methods (see Deliverable 2.1, Chapter 4) relies on two com
 \begin{center}
 \includegraphics[width=0.9\textwidth,height=6cm]{fitnessBehavior.png}
 \end{center}
+\caption{Typical evolution of the fitness during some \DAE\ runs.}
+\label{fig:fitnessImprovement}
 \end{figure}
 
 
@@ -152,7 +154,7 @@ After some preliminary experiments that confirmed this trend, it was decided to
 The rest of the deliverable will thus detail the work done on \LAO\ following the preliminary work that has been introduced in Deliverable 2.2, Chapter 3, that unfortunately didn't bring much improvement over the preliminary results. Then we will turn to the specific work done in the context of Pareto-based multi-objective optimization, in relationship with Deliverable 3.3.
 
 \newpage	
-\chapter{Further work on \LAO}
+\chapter{Efforts on LaO}
 
 \section{Improvements}
 
@@ -184,7 +186,7 @@ Also we tried an indirect model using Rank-SVM regression. Here, after optimizin
 
 \end{itemize}
 
-\section{Lao at IPC11}
+\section{LaO at IPC11}
 
 \newpage
 \includepdf[height=30cm,pages=-,offset=2.2cm -4cm]{ipc2011.pdf}
@@ -196,7 +198,7 @@ It is widely acknowledged today that off-line parameter tuning has somehow reach
 
 The off-line parameter tunning problem can be informally stated as a meta-optimization algorithm: given an algorithm, a set of parameters for the algorithm and a set of input data, 
 find parameter values under which the algorithm achieves the best possible performance on the input data.
-To avoid potential confusion between algorithms whose performance is optimized and algorithms used for carrying out that optimization task, we refer to the former as target algorithms and to the latter as configuration procedures (or simply configurators). This setup is illustrated in Figure~\ref{fig:paramIlsfreamwork}.
+To avoid potential confusion between algorithms whose performance is optimized and algorithms used for carrying out that optimization task, we refer to the former as target algorithms and to the latter as configuration procedures (or simply configurators). This setup is illustrated in Figure~\ref{fig:paramIlsframework}.
 
 \begin{figure}[h!]
  \centering
@@ -204,7 +206,7 @@ To avoid potential confusion between algorithms whose performance is optimized a
  \caption{ParamILS framework: A configuration scenario includes an algorithm to be configured and a collection of problem instances.
 A configuration procedure executes the target algorithm with specified parameter settings on some or all of the instances, receives information about the performance of these runs, and uses
 this information to decide which subsequent parameter configurations to evaluate.}
-\label{fig:paramIlsfreamwork}
+\label{fig:paramIlsframework}
 \end{figure}
 
 ParamILS~\cite{hutter2009paramils} is suited to any parameterized algorithm whose parameters can be discretized. ParamILS searches through the space of possible parameter configurations, evaluating configurations by running the algorithm to be optimized on a set of benchmark instances. Users should provide
@@ -250,6 +252,37 @@ Figure \ref{fig:paramILS-trajectories} displays the behavior of ParamILS when ot
 
 As discussed in previous Chapter, when tuning the parameters of some target multi-objective algorithm (evolutionary or not), a natural metric for measuring the performance of the algorithm is the hypervolume w.r.t. some reference set (if at all possible, the true Pareto front of the problem at hand). This metric has been used in all experiments done in this project for Pareto-based multi-objective optimization (see Deliverable 3.3 Chapter 2).
 
+Figures \ref{fig:trajectoryParamILS-aggreg1} and \ref{fig:trajectoryParamILS-aggreg2} show examples of trajectories for ParamILS while tuning all $\alpha$-runs on the different \MULTIZENO\ instances. Contrary to Figure \ref{fig:paramILS-trajectories}, some optimal parameter sets are here found rather late in the runs (e.g., 
+
+\newpage
+
+ \begin{figure}[h!]
+\centering
+ \subfloat[ParamIls$_{H}$ on $zeno3e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Add_trajeth.png}}
+  \subfloat[ParamIls$_{Fitness}$ on $zeno3e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Add_trajetb.png}}\qquad
+  \subfloat[ParamIls$_{H}$ on $zeno3e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Max_trajeth.png}}
+   \subfloat[ParamIls$_{Fitness}$ on $zeno3e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Max_trajetb.png}}\qquad
+  \subfloat[ParamIls$_{H}$ on $zeno6e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Add_trajeth.png}}
+   \subfloat[ParamIls$_{Fitness}$ on $zeno6e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Add_trajetb.png}}\qquad
+ \caption{Sample ParamILS trajectoris on MultiZeno instances }
+\label{fig:trajectoryParamILS-aggreg1}
+ \end{figure}
+ 
+ \clearpage 
+\newpage
+
+ \begin{figure}[h!]
+\centering  
+  \subfloat[ParamIls$_{H}$ on $zeno6e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Max_trajeth.png}} 
+  \subfloat[ParamIls$_{Fitness}$ on $zeno6e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Max_trajetb.png}}\qquad
+  \subfloat[ParamIls$_{H}$ on $zeno9e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Add_trajeth.png}}
+   \subfloat[ParamIls$_{F}$ on $zeno9e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Add_trajetb.png}}\qquad
+   \subfloat[ParamIls$_{H}$on$zeno9e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Max_trajeth.png}}
+  \subfloat[ParamIls$_{F}$ on $zeno9e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Max_trajetb.png}}\qquad
+ \caption{Sample ParamILS trajectoris on MultiZeno instances }
+\label{fig:trajectoryParamILS-aggreg2}
+\end{figure}
+
 
 \newpage
 \includepdf[height=32cm,pages=-,offset=2.2cm -4cm]{lion_final.pdf}
@@ -282,7 +315,7 @@ In the Planning and Learning Part of IPC2011 (IPC), there were 5 domains publish
 \centering
 \begin{tabular}{l c c c c c c}
 \hline\hline
-Name & \# of iterations & \# of training instances &  ANN-error & quality-ratio LaO& quality-ratio ANN \\ 
+Name & \# of iterations & \# of training instances &  ANN-error & quality-ratio \LAO& quality-ratio ANN \\ 
 \hline
 Ferry & 12 & 32 & 0.17 & 1.06 & 0.59   \\
 Freecell& 12 & 108 & 0.08 & 1.09 & 1.05   \\
@@ -323,7 +356,7 @@ Table \ref{table:domains} shows the data for each domain, as you can see from th
 
 5 iterations of CMA-ES were carried out, followed by one ANN and one gene-transfer, and this cycle were iterated in the algorithm. This means that for example CMA-ES was running for 50 iterations for the Grid domain.
 
-The ANN had 3 fully connected layers, and the hidden layer had the same number of neurons as the input. Learning was done by the conventional back-propagation algorithm, which is the default in FANN. The ANN was only trained for 50 iterations in one iterations of LaO, so that we avoid over-training. Over the 10 iterations of LaO this means that 500 iterations of the ANN was carried out.
+The ANN had 3 fully connected layers, and the hidden layer had the same number of neurons as the input. Learning was done by the conventional back-propagation algorithm, which is the default in FANN. The ANN was only trained for 50 iterations in one iterations of \LAO, so that we avoid over-training. Over the 10 iterations of \LAO\ this means that 500 iterations of the ANN was carried out.
 
 Termination criterion in the competition was simply the available time, the algorithm was running for several weeks parallel on our cluster, which is used also for other research, i.e. only a small number of 4 or 8-core processors were available for each domain in average.
 
@@ -332,4 +365,4 @@ The parameters of DAEx controlled are described in table \ref{table:parameters}.
 \section{Future Work}
 \label{section:future}	
 
-Since LaO is only a framework, as indicated other kind of learning methods, and other kind of optimization techniques may be tried. Also the benefit of gene-transfer and/or cross-over might be investigated further. One shall also test, how inter-domain generalization works. Maybe it is possible to learn a mapping for all the domains, since the features may grasp the specificity of a domain. Naturally, the set of features may always be extended, or tested. Feature-selection would become important only if data with a considerable number of features and instances are present. This is not the case yet.
+Since \LAO\ is only a framework, as indicated other kind of learning methods, and other kind of optimization techniques may be tried. Also the benefit of gene-transfer and/or cross-over might be investigated further. One shall also test, how inter-domain generalization works. Maybe it is possible to learn a mapping for all the domains, since the features may grasp the specificity of a domain. Naturally, the set of features may always be extended, or tested. Feature-selection would become important only if data with a considerable number of features and instances are present. This is not the case yet.
