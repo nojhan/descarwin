@@ -252,19 +252,26 @@ Figure \ref{fig:paramILS-trajectories} displays the behavior of ParamILS when ot
 
 As discussed in previous Chapter, when tuning the parameters of some target multi-objective algorithm (evolutionary or not), a natural metric for measuring the performance of the algorithm is the hypervolume w.r.t. some reference set (if at all possible, the true Pareto front of the problem at hand). This metric has been used in all experiments done in this project for Pareto-based multi-objective optimization (see Deliverable 3.3 Chapter 2).
 
-Figures \ref{fig:trajectoryParamILS-aggreg1} and \ref{fig:trajectoryParamILS-aggreg2} show examples of trajectories for ParamILS while tuning all $\alpha$-runs on the different \MULTIZENO\ instances. Contrary to Figure \ref{fig:paramILS-trajectories}, some optimal parameter sets are here found rather late in the runs (e.g., 
+On the other hand, when tackling some single objective optimization problem and aiming at solution quality, the usual metric used for ParamILS is the best fitness reached by the target algorithm for a given parameter set. 
+
+Furthermore, the validation of the Pareto-based multi-objective approach needs to achieve some comparison with the classical and straightforward aggregation approach (see Deliverable 3.3 Chapter 3), in which you run several single-objective runs trying to optimize a weighted sum of the objectives, say $\alpha F_1 + (1-\alpha) F_2$, $F_1$ and $F_2$ being the two objectives, and $\alpha$ taking values in $[0, 1]$ (such a run is called $\alpha$-run). Hence, in order to give the best chances to the aggregation approach, we decided to tune independently the parameters for each of the $\alpha$-runs. A natural metric for ParamILS when tuning the parameters of an $\alpha$-run would thus be the same weighted sum $\alpha F_1 + (1-\alpha) F_2$.
+
+However, the ultimate goal of the different $\alpha$-runs is that their final populations are merged together, and the non-dominated points inside this merged population are the output of the ''run`` (aggregation of all $\alpha$-runs). And the performance of the ''run`` will be measured by the hypervolume measure of this output. As a consequence, it turned out to be a better idea to also measure the quality of a single $\alpha$-run by its hypervolume -- even though it uses internally the weighted fitness. This is detailed in the following paper, published as ``Khouadjia, M. , Schoenauer, M. , Vidal, V. , Dréo, J. and Savéant, P.. Quality Measures of Parameter Tuning for Aggregated Multi-Objective Temporal Planning. In Panos Pardalos and Guiseppe Nicosia, eds.: LION'7 -- 7th Learning and Intelligent OptimizatioN Conference, Springer Verlag, LNCS : To appear. Catania, Italy. January 2013.''
+
+
+As a complement of the paper reproduced at the end of this Chapter, Figures \ref{fig:trajectoryParamILS-aggreg1} and \ref{fig:trajectoryParamILS-aggreg2} (next pages) show examples of trajectories for ParamILS while tuning all $\alpha$-runs on the different \MULTIZENO\ instances. Contrary to Figure \ref{fig:paramILS-trajectories}, some optimal parameter sets are here found rather late in the runs (e.g., the $1$-run on Figure \ref{fig:trajectoryParamILS-aggreg1}-e or the $0$-run on Figure \ref{fig:trajectoryParamILS-aggreg1}-f).
 
 \newpage
 
  \begin{figure}[h!]
 \centering
- \subfloat[ParamIls$_{H}$ on $zeno3e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Add_trajeth.png}}
-  \subfloat[ParamIls$_{Fitness}$ on $zeno3e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Add_trajetb.png}}\qquad
-  \subfloat[ParamIls$_{H}$ on $zeno3e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Max_trajeth.png}}
-   \subfloat[ParamIls$_{Fitness}$ on $zeno3e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Max_trajetb.png}}\qquad
-  \subfloat[ParamIls$_{H}$ on $zeno6e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Add_trajeth.png}}
-   \subfloat[ParamIls$_{Fitness}$ on $zeno6e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Add_trajetb.png}}\qquad
- \caption{Sample ParamILS trajectoris on MultiZeno instances }
+ \subfloat[ParamILS$_{H}$ on $zeno3_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Add_trajeth.png}}
+  \subfloat[ParamILS$_{Fitness}$ on $zeno3_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Add_trajetb.png}}\qquad
+  \subfloat[ParamILS$_{H}$ on $zeno3_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Max_trajeth.png}}
+   \subfloat[ParamILS$_{Fitness}$ on $zeno3_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno3e_Max_trajetb.png}}\qquad
+  \subfloat[ParamILS$_{H}$ on $zeno6_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Add_trajeth.png}}
+   \subfloat[ParamILS$_{Fitness}$ on $zeno6_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Add_trajetb.png}}\qquad
+ \caption{Sample ParamILS trajectories on MultiZeno instances }
 \label{fig:trajectoryParamILS-aggreg1}
  \end{figure}
  
@@ -273,13 +280,13 @@ Figures \ref{fig:trajectoryParamILS-aggreg1} and \ref{fig:trajectoryParamILS-agg
 
  \begin{figure}[h!]
 \centering  
-  \subfloat[ParamIls$_{H}$ on $zeno6e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Max_trajeth.png}} 
-  \subfloat[ParamIls$_{Fitness}$ on $zeno6e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Max_trajetb.png}}\qquad
-  \subfloat[ParamIls$_{H}$ on $zeno9e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Add_trajeth.png}}
-   \subfloat[ParamIls$_{F}$ on $zeno9e_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Add_trajetb.png}}\qquad
-   \subfloat[ParamIls$_{H}$on$zeno9e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Max_trajeth.png}}
-  \subfloat[ParamIls$_{F}$ on $zeno9e_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Max_trajetb.png}}\qquad
- \caption{Sample ParamILS trajectoris on MultiZeno instances }
+  \subfloat[ParamILS$_{H}$ on $zeno6_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Max_trajeth.png}} 
+  \subfloat[ParamILS$_{Fitness}$ on $zeno6_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno6e_Max_trajetb.png}}\qquad
+  \subfloat[ParamILS$_{H}$ on $zeno9_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Add_trajeth.png}}
+   \subfloat[ParamILS$_{F}$ on $zeno9_{cost}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Add_trajetb.png}}\qquad
+   \subfloat[ParamILS$_{H}$on$zeno9_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Max_trajeth.png}}
+  \subfloat[ParamILS$_{F}$ on $zeno9_{risk}$]{\includegraphics[width=0.45\textwidth]{zeno9e_Max_trajetb.png}}\qquad
+ \caption{Sample ParamILS trajectories on MultiZeno instances }
 \label{fig:trajectoryParamILS-aggreg2}
 \end{figure}
 
@@ -288,11 +295,15 @@ Figures \ref{fig:trajectoryParamILS-aggreg1} and \ref{fig:trajectoryParamILS-agg
 \includepdf[height=32cm,pages=-,offset=2.2cm -4cm]{lion_final.pdf}
 \newpage
 
+\chapter{Conclusion}
+\label{conclusion}
+This Deliverable was supposed to describe works (and results!) about on-line tuning of parameters. Unfortunately, the ideas we had, and the hints we followed, inspired by previous work on the INRIA partner, turned out to be some sort of dead-ends. First, the Adaptive Operator Selection was demonstrated to be useless when facing fitness landscapes with large plateaux (i.e. very few changes in the fitness) when getting close to good individuals. But also, the \LAO\ approach, developed within the project, and which is as close from on-line tuning as you can get when staying at the instance level, also showed some weaknesses, probably suffering from the lack of good features to represent the instance characteristics (something which is not new either, in the Machine Learning community at least).
 
+But the failure of dynamic procedures for on-line parameter tuning is not quite new either in the Evolutionary Computation world: Indeed, as pointed out by Ken DeJong, {\em Perhaps the most interesting thing to note today, after more than 30 years of experimenting with dynamic parameter setting strategies, is that, with one exception, none of them are used routinely in every day practice. The one exception are the strategies used by the Evolution Strategies community for mutation step size adaptation."} (in ``Parameter Setting in EAs: a 30 Year Perspective'', in Lobo, F., Lima, C., Michalewicz, Z., eds., {\em Parameter Setting in Evolutionary Algorithms}, Springer Verlag, 2007).
 
-% \chapter{Conclusion}
-% \label{conclusion}
+So it seems that AI Planning will not, at the moment at least, and contrary to what we thought possible when starting DESCARWIN the project, be a second exception to be opposed to Ken Dejong's rather pessimistic statement \ldots
 
+However, the end of this Deliverable (Chapter 5) and the surprising result about ParamILS metric for aggregated approach to multi-objective optimization should convince us that there is always some more work to do, even though sometimes where we were not expecting it -- this is the beauty of scientific research.
 
 % \chapter{References}
 % \bibliographystyle{alpha}
