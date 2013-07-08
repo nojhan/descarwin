@@ -1,3 +1,4 @@
+; MULTIZENO Scénario A (IJCAI 2013)
 
 (define (problem MULTIZENO-A)
  (:domain multi-zeno-travel)
