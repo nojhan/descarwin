@@ -21,7 +21,7 @@
 \newcommand{\captionfont}{\footnotesize}
 
 \graphicspath{{images/}{../images/}}
-\usepackage{tikz}                                                                                                                                                                                    
+\usepackage{tikz}
 \usetikzlibrary{arrows,shapes,calc}
 
 \newcommand{\SET}[1]  {\ensuremath{\mathcal{#1}}}
@@ -137,6 +137,47 @@
 
 \hyphenation{resolution occlusions}
 %%
+
+
+% macros from ijcai2013 paper
+\def\dae{{\em Divide-and-Evolve}}
+\def\DAE{{\sc DaE}}
+\def\DAEX{{\sc DaE$_{\text{X}}$}}
+%\def\DAEYAHSP{{\sc DaE$_{\text{YAHSP}}$}}
+\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
+\def\PARADISEO{{\sc ParadisEO-MOEO}}
+\def\YAHSP{{\sc YAHSP}}
+\def\CPT{{\sc CPT}}
+\def\modae{{\em Multiobjective Divide-and-Evolve}}
+\def\MODAE{{\sc MO-DaE}}
+\newcommand{\MODAEYAHSP}{{\sc MO-DaE$_{\text{YAHSP}}$}}
+\newcommand{\MODAEX}{{\sc MO-DaE$_{\text{X}}$}}
+\newcommand{\MOLPG}{{\sc MO-LPG}}
+\def\ZENO{{\sc Zeno}}
+\def\MULTIZENO{{\sc MultiZeno}}
+\def\PARAMILS{{\sc ParamILS}}
+\def\IBEAH{{\sc IBEA$_{\text{H}}$}}
+
+\def\WMAKESPAN{{W-makespan}}
+\def\WCOST{{W-cost}}
+
+\newcommand{\ZENOTRAVEL}{{\sc ZenoTravel}}
+\newcommand{\OPENSTACKS}{{\sc Openstacks}}
+\newcommand{\ELEVATORS}{{\sc Elevators}}
+\newcommand{\CREWPLANNING}{{\sc CrewPlanning}}
+\newcommand{\FLOORTILE}{{\sc Floortile}}
+\newcommand{\PARCPRINTER}{{\sc ParcPrinter}}
+
+\newcommand{\mycomments}[1]{\textcolor{red}{#1}}
+% \newcommand{\mycomments}[1]{~}
+
+% bullets for itemize lists
+\renewcommand{\labelitemi}{$\bullet$}
+\renewcommand{\labelitemii}{$\cdot$}
+\renewcommand{\labelitemiii}{$\diamond$}
+\renewcommand{\labelitemiv}{$\ast$}
+
+
 \begin{poster}%
   % Poster Options
   {
@@ -236,96 +277,99 @@ bgColorTwo=lavender,
 \newcommand{\colouredcircle}{%
 \tikz{\useasboundingbox (-0.2em,-0.32em) rectangle(0.2em,0.32em); \draw[draw=black,fill=lightblue,line width=0.03em] (0,0) circle(0.18em);}}
 
+
 \headerbox{Motivation}{name=problem,column=0,row=0}{
-xxxxxxxxxxxxxxxxxxxxx :
-\begin{enumerate}\compresslist
-\item A
-\item B
-\item C
-\item D
-\end{enumerate}
-XXXXXXXXXX
 
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-
-\vspace{0.3em}
-}
-    
-\headerbox{Multiobjective Evolutionary Algorithms}{name=method,column=0,below=problem}{
-XXXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-
-\vspace{0.3em}
-}
-    
-\headerbox{Multiobjective Divide-and-Evolve}{name=flight_model,column=1,span=2,row=0}{
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
+Real-world  problems  generally  involve
+several  antagonistic  objectives,  like
+makespan   and   cost    for    planning
+problems.   The   only   approaches   to
+multiobjective  AI  Planning   rely   on
+linear combinations of  objectives,  and
+metric  sensitive  planners,  that   are
+able  to  give   different   plans   for
+different   metrics,   and   hence    to
+eventually   approximate   the    Pareto
+front  (i.e.    the   set   of   optimal
+trade-offs  between   the   antagonistic
+objectives).
 
 \vspace{0.3em}
 }
 
-\headerbox{Benchmark Domains and Instances}{name=sector_model,column=1,span=2,below=flight_model}{
-XXXXXXXXXX
 
-XXXXXXXXXX
+\headerbox{Multiobjective Divide-and-Evolve}{name=MODAE,column=1,span=2,row=0}{
 
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
-
-XXXXXXXXXX
+XXXXXXXXX
 
 \vspace{0.3em}
 }
 
-\headerbox{Results}{name=optimization,column=1,span=2,below=sector_model}{
+
+\headerbox{Multiobjective EA}{name=MOEA,column=0,below=problem}{
+
+Evolutionary   Algorithms   (EAs)   are:
+metaheuristic stochastic  search,  using
+randomized    mutations/crossovers    to
+produce solutions and natural  selection
+of  the  fittest.
+
+The multiobjective method used  here  is
+an    Indicator    Based    Evolutionary
+Algorithms,   with    the    hypervolume
+indicator (\IBEAH).
+
+\vspace{0.3em}
+}
+
+\headerbox{Divide-and-Evolve}{name=DAE,column=0,below=MOEA}{
+
+Divide-and-Evolve (\DAE) is an
+evolutionary  planner  that   embeds   a
+classical planner and feeds  it  with  a
+sequence of subproblems.
+
+\begin{center}
+\includegraphics[width=1.0\textwidth]{DAEx}
+% \includegraphics[scale=0.3]{DAEx}
+\end{center}
+
+\DAE\ can embed  any  existing  planner.
+The  lookahead heuristic-based
+satisficing    planner \YAHSP\
+%\cite{Vidal2004}
+has  been  demonstrated
+to  be  the  best   choice   when   used
+within  \DAE\
+%\cite{bibai-EvoCOP2010}
+.
+
+\vspace{0.3em}
+}
+
+
+
+\headerbox{Benchmark Domains}{name=bench,column=0,below=DAE}{
+
+Highly   simplified   version   of   the
+well-known   IPC   domain   \ZENOTRAVEL,
+with    the    exact    Pareto    front:
+
+\begin{center}
+\includegraphics[width=0.75\textwidth,angle=180]{../figures/generiqueMiniMulti180}
+\end{center}
+
+Modifications  of   IPC-2011   problems,
+(\ELEVATORS,  \FLOORTILE,  \PARCPRINTER\
+and \OPENSTACKS)
+
+% \vspace{0.3em}
+}
+\headerbox{Experiments}{name=experiments,column=1,span=2,below=MODAE}{
+
+}
+
+\headerbox{Results}{name=results,column=1,span=2,below=experiments}{
 XXXXXXXXXX
 
 XXXXXXXXXX
@@ -350,22 +394,10 @@ XXXXXXXXXX
 
 \vspace{0.3em}
 }
-		
-\headerbox{Acknowledgement}{name=source,column=2,below=optimization,above=bottom}{This work was partially funded by the DESCARWIN ANR project (ANR-09-COSI-002)}
-    
-\headerbox{Conclusion}{name=further_research,column=1,span=1,below=optimization,above=bottom}{
-XXXXXXXXXX
 
-XXXXXXXXXX
 
-XXXXXXXXXX
 
-XXXXXXXXXX
-\vspace{0.3em}
-}
-		
-		
-\headerbox{Divide-and-Evolve}{name=queries,column=0,below=method}{
+\headerbox{Conclusion}{name=conclusion,column=1,span=2,below=results}{
 XXXXXXXXXX
 
 XXXXXXXXXX
@@ -376,12 +408,16 @@ XXXXXXXXXX
 \vspace{0.3em}
 }
 
-	
-\headerbox{Experiments}{name=references,column=0,,below=queries,above=bottom}{
+\headerbox{Acknowledgement}{name=acknowledgment,column=1,below=conclusion,span=1,above=bottom}{
+This work was partially funded by the DESCARWIN ANR project (ANR-09-COSI-002)
+}
 
-    }
+\headerbox{URL}{name=URL,column=2,below=conclusion,span=1,above=bottom}{
+    QR-code
+}
+
+
 
 \end{poster}
-
 \end{document}
 
