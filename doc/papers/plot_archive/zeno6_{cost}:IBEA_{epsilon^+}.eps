@@ -1,0 +1,3094 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: zeno6eTimeWeightedStrategy_{cost}:IBEA_{epsilon^+}.eps
+%%Creator: gnuplot 4.2 patchlevel 6 
+%%CreationDate: Thu Jul 19 15:47:38 2012
+%%DocumentFonts: (atend)
+%%BoundingBox: 50 50 410 302
+%%EndComments
+%%BeginProlog
+/gnudict 256 dict def
+gnudict begin
+%
+% The following 6 true/false flags may be edited by hand if required
+% The unit line width may also be changed
+%
+/Color true def
+/Blacktext false def
+/Solid false def
+/Dashlength 1 def
+/Landscape false def
+/Level1 false def
+/Rounded false def
+/TransparentPatterns false def
+/gnulinewidth 5.000 def
+/userlinewidth gnulinewidth def
+%
+/vshift -46 def
+/dl1 {
+  10.0 Dashlength mul mul
+  Rounded { currentlinewidth 0.75 mul sub dup 0 le { pop 0.01 } if } if
+} def
+/dl2 {
+  10.0 Dashlength mul mul
+  Rounded { currentlinewidth 0.75 mul add } if
+} def
+/hpt_ 31.5 def
+/vpt_ 31.5 def
+/hpt hpt_ def
+/vpt vpt_ def
+Level1 {} {
+/SDict 10 dict def
+systemdict /pdfmark known not {
+  userdict /pdfmark systemdict /cleartomark get put
+} if
+SDict begin [
+  /Title (zeno6eTimeWeightedStrategy_{cost}:IBEA_{epsilon^+}.eps)
+  /Subject (gnuplot plot)
+  /Creator (gnuplot 4.2 patchlevel 6 )
+  /Author (Mostepha khouadjia)
+%  /Producer (gnuplot)
+%  /Keywords ()
+  /CreationDate (Thu Jul 19 15:47:38 2012)
+  /DOCINFO pdfmark
+end
+} ifelse
+%
+% Gnuplot Prolog Version 4.2 (August 2006)
+%
+/M {moveto} bind def
+/L {lineto} bind def
+/R {rmoveto} bind def
+/V {rlineto} bind def
+/N {newpath moveto} bind def
+/Z {closepath} bind def
+/C {setrgbcolor} bind def
+/f {rlineto fill} bind def
+/vpt2 vpt 2 mul def
+/hpt2 hpt 2 mul def
+/Lshow {currentpoint stroke M 0 vshift R 
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse} def
+/Rshow {currentpoint stroke M dup stringwidth pop neg vshift R
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse} def
+/Cshow {currentpoint stroke M dup stringwidth pop -2 div vshift R 
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse} def
+/UP {dup vpt_ mul /vpt exch def hpt_ mul /hpt exch def
+  /hpt2 hpt 2 mul def /vpt2 vpt 2 mul def} def
+/DL {Color {setrgbcolor Solid {pop []} if 0 setdash}
+ {pop pop pop 0 setgray Solid {pop []} if 0 setdash} ifelse} def
+/BL {stroke userlinewidth 2 mul setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+/AL {stroke userlinewidth 2 div setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+/UL {dup gnulinewidth mul /userlinewidth exch def
+	dup 1 lt {pop 1} if 10 mul /udl exch def} def
+/PL {stroke userlinewidth setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+% Default Line colors
+/LCw {1 1 1} def
+/LCb {0 0 0} def
+/LCa {0 0 0} def
+/LC0 {1 0 0} def
+/LC1 {0 1 0} def
+/LC2 {0 0 1} def
+/LC3 {1 0 1} def
+/LC4 {0 1 1} def
+/LC5 {1 1 0} def
+/LC6 {0 0 0} def
+/LC7 {1 0.3 0} def
+/LC8 {0.5 0.5 0.5} def
+% Default Line Types
+/LTw {PL [] 1 setgray} def
+/LTb {BL [] LCb DL} def
+/LTa {AL [1 udl mul 2 udl mul] 0 setdash LCa setrgbcolor} def
+/LT0 {PL [] LC0 DL} def
+/LT1 {PL [4 dl1 2 dl2] LC1 DL} def
+/LT2 {PL [2 dl1 3 dl2] LC2 DL} def
+/LT3 {PL [1 dl1 1.5 dl2] LC3 DL} def
+/LT4 {PL [6 dl1 2 dl2 1 dl1 2 dl2] LC4 DL} def
+/LT5 {PL [3 dl1 3 dl2 1 dl1 3 dl2] LC5 DL} def
+/LT6 {PL [2 dl1 2 dl2 2 dl1 6 dl2] LC6 DL} def
+/LT7 {PL [1 dl1 2 dl2 6 dl1 2 dl2 1 dl1 2 dl2] LC7 DL} def
+/LT8 {PL [2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 4 dl2] LC8 DL} def
+/Pnt {stroke [] 0 setdash gsave 1 setlinecap M 0 0 V stroke grestore} def
+/Dia {stroke [] 0 setdash 2 copy vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath stroke
+  Pnt} def
+/Pls {stroke [] 0 setdash vpt sub M 0 vpt2 V
+  currentpoint stroke M
+  hpt neg vpt neg R hpt2 0 V stroke
+ } def
+/Box {stroke [] 0 setdash 2 copy exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath stroke
+  Pnt} def
+/Crs {stroke [] 0 setdash exch hpt sub exch vpt add M
+  hpt2 vpt2 neg V currentpoint stroke M
+  hpt2 neg 0 R hpt2 vpt2 V stroke} def
+/TriU {stroke [] 0 setdash 2 copy vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath stroke
+  Pnt} def
+/Star {2 copy Pls Crs} def
+/BoxF {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath fill} def
+/TriUF {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath fill} def
+/TriD {stroke [] 0 setdash 2 copy vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath stroke
+  Pnt} def
+/TriDF {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath fill} def
+/DiaF {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath fill} def
+/Pent {stroke [] 0 setdash 2 copy gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath stroke grestore Pnt} def
+/PentF {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath fill grestore} def
+/Circle {stroke [] 0 setdash 2 copy
+  hpt 0 360 arc stroke Pnt} def
+/CircleF {stroke [] 0 setdash hpt 0 360 arc fill} def
+/C0 {BL [] 0 setdash 2 copy moveto vpt 90 450 arc} bind def
+/C1 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C2 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C3 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C4 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 180 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C5 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc
+	2 copy moveto
+	2 copy vpt 180 270 arc closepath fill
+	vpt 0 360 arc} bind def
+/C6 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C7 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C8 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 270 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C9 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 270 450 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C10 {BL [] 0 setdash 2 copy 2 copy moveto vpt 270 360 arc closepath fill
+	2 copy moveto
+	2 copy vpt 90 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C11 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 180 arc closepath fill
+	2 copy moveto
+	2 copy vpt 270 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C12 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 180 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C13 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc closepath fill
+	2 copy moveto
+	2 copy vpt 180 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C14 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 360 arc closepath fill
+	vpt 0 360 arc} bind def
+/C15 {BL [] 0 setdash 2 copy vpt 0 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/Rec {newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto
+	neg 0 rlineto closepath} bind def
+/Square {dup Rec} bind def
+/Bsquare {vpt sub exch vpt sub exch vpt2 Square} bind def
+/S0 {BL [] 0 setdash 2 copy moveto 0 vpt rlineto BL Bsquare} bind def
+/S1 {BL [] 0 setdash 2 copy vpt Square fill Bsquare} bind def
+/S2 {BL [] 0 setdash 2 copy exch vpt sub exch vpt Square fill Bsquare} bind def
+/S3 {BL [] 0 setdash 2 copy exch vpt sub exch vpt2 vpt Rec fill Bsquare} bind def
+/S4 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt Square fill Bsquare} bind def
+/S5 {BL [] 0 setdash 2 copy 2 copy vpt Square fill
+	exch vpt sub exch vpt sub vpt Square fill Bsquare} bind def
+/S6 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill Bsquare} bind def
+/S7 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill
+	2 copy vpt Square fill Bsquare} bind def
+/S8 {BL [] 0 setdash 2 copy vpt sub vpt Square fill Bsquare} bind def
+/S9 {BL [] 0 setdash 2 copy vpt sub vpt vpt2 Rec fill Bsquare} bind def
+/S10 {BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt Square fill
+	Bsquare} bind def
+/S11 {BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt2 vpt Rec fill
+	Bsquare} bind def
+/S12 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill Bsquare} bind def
+/S13 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill
+	2 copy vpt Square fill Bsquare} bind def
+/S14 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill
+	2 copy exch vpt sub exch vpt Square fill Bsquare} bind def
+/S15 {BL [] 0 setdash 2 copy Bsquare fill Bsquare} bind def
+/D0 {gsave translate 45 rotate 0 0 S0 stroke grestore} bind def
+/D1 {gsave translate 45 rotate 0 0 S1 stroke grestore} bind def
+/D2 {gsave translate 45 rotate 0 0 S2 stroke grestore} bind def
+/D3 {gsave translate 45 rotate 0 0 S3 stroke grestore} bind def
+/D4 {gsave translate 45 rotate 0 0 S4 stroke grestore} bind def
+/D5 {gsave translate 45 rotate 0 0 S5 stroke grestore} bind def
+/D6 {gsave translate 45 rotate 0 0 S6 stroke grestore} bind def
+/D7 {gsave translate 45 rotate 0 0 S7 stroke grestore} bind def
+/D8 {gsave translate 45 rotate 0 0 S8 stroke grestore} bind def
+/D9 {gsave translate 45 rotate 0 0 S9 stroke grestore} bind def
+/D10 {gsave translate 45 rotate 0 0 S10 stroke grestore} bind def
+/D11 {gsave translate 45 rotate 0 0 S11 stroke grestore} bind def
+/D12 {gsave translate 45 rotate 0 0 S12 stroke grestore} bind def
+/D13 {gsave translate 45 rotate 0 0 S13 stroke grestore} bind def
+/D14 {gsave translate 45 rotate 0 0 S14 stroke grestore} bind def
+/D15 {gsave translate 45 rotate 0 0 S15 stroke grestore} bind def
+/DiaE {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath stroke} def
+/BoxE {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath stroke} def
+/TriUE {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath stroke} def
+/TriDE {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath stroke} def
+/PentE {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath stroke grestore} def
+/CircE {stroke [] 0 setdash 
+  hpt 0 360 arc stroke} def
+/Opaque {gsave closepath 1 setgray fill grestore 0 setgray closepath} def
+/DiaW {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V Opaque stroke} def
+/BoxW {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V Opaque stroke} def
+/TriUW {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V Opaque stroke} def
+/TriDW {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V Opaque stroke} def
+/PentW {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  Opaque stroke grestore} def
+/CircW {stroke [] 0 setdash 
+  hpt 0 360 arc Opaque stroke} def
+/BoxFill {gsave Rec 1 setgray fill grestore} def
+/Density {
+  /Fillden exch def
+  currentrgbcolor
+  /ColB exch def /ColG exch def /ColR exch def
+  /ColR ColR Fillden mul Fillden sub 1 add def
+  /ColG ColG Fillden mul Fillden sub 1 add def
+  /ColB ColB Fillden mul Fillden sub 1 add def
+  ColR ColG ColB setrgbcolor} def
+/BoxColFill {gsave Rec PolyFill} def
+/PolyFill {gsave Density fill grestore grestore} def
+/h {rlineto rlineto rlineto gsave closepath fill grestore} bind def
+%
+% PostScript Level 1 Pattern Fill routine for rectangles
+% Usage: x y w h s a XX PatternFill
+%	x,y = lower left corner of box to be filled
+%	w,h = width and height of box
+%	  a = angle in degrees between lines and x-axis
+%	 XX = 0/1 for no/yes cross-hatch
+%
+/PatternFill {gsave /PFa [ 9 2 roll ] def
+  PFa 0 get PFa 2 get 2 div add PFa 1 get PFa 3 get 2 div add translate
+  PFa 2 get -2 div PFa 3 get -2 div PFa 2 get PFa 3 get Rec
+  gsave 1 setgray fill grestore clip
+  currentlinewidth 0.5 mul setlinewidth
+  /PFs PFa 2 get dup mul PFa 3 get dup mul add sqrt def
+  0 0 M PFa 5 get rotate PFs -2 div dup translate
+  0 1 PFs PFa 4 get div 1 add floor cvi
+	{PFa 4 get mul 0 M 0 PFs V} for
+  0 PFa 6 get ne {
+	0 1 PFs PFa 4 get div 1 add floor cvi
+	{PFa 4 get mul 0 2 1 roll M PFs 0 V} for
+ } if
+  stroke grestore} def
+%
+/languagelevel where
+ {pop languagelevel} {1} ifelse
+ 2 lt
+	{/InterpretLevel1 true def}
+	{/InterpretLevel1 Level1 def}
+ ifelse
+%
+% PostScript level 2 pattern fill definitions
+%
+/Level2PatternFill {
+/Tile8x8 {/PaintType 2 /PatternType 1 /TilingType 1 /BBox [0 0 8 8] /XStep 8 /YStep 8}
+	bind def
+/KeepColor {currentrgbcolor [/Pattern /DeviceRGB] setcolorspace} bind def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 8 8 L 0 8 M 8 0 L stroke} 
+>> matrix makepattern
+/Pat1 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 8 8 L 0 8 M 8 0 L stroke
+	0 4 M 4 8 L 8 4 L 4 0 L 0 4 L stroke}
+>> matrix makepattern
+/Pat2 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 0 8 L
+	8 8 L 8 0 L 0 0 L fill}
+>> matrix makepattern
+/Pat3 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -4 8 M 8 -4 L
+	0 12 M 12 0 L stroke}
+>> matrix makepattern
+/Pat4 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -4 0 M 8 12 L
+	0 -4 M 12 8 L stroke}
+>> matrix makepattern
+/Pat5 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -2 8 M 4 -4 L
+	0 12 M 8 -4 L 4 12 M 10 0 L stroke}
+>> matrix makepattern
+/Pat6 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -2 0 M 4 12 L
+	0 -4 M 8 12 L 4 -4 M 10 8 L stroke}
+>> matrix makepattern
+/Pat7 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 8 -2 M -4 4 L
+	12 0 M -4 8 L 12 4 M 0 10 L stroke}
+>> matrix makepattern
+/Pat8 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 -2 M 12 4 L
+	-4 0 M 12 8 L -4 4 M 8 10 L stroke}
+>> matrix makepattern
+/Pat9 exch def
+/Pattern1 {PatternBgnd KeepColor Pat1 setpattern} bind def
+/Pattern2 {PatternBgnd KeepColor Pat2 setpattern} bind def
+/Pattern3 {PatternBgnd KeepColor Pat3 setpattern} bind def
+/Pattern4 {PatternBgnd KeepColor Landscape {Pat5} {Pat4} ifelse setpattern} bind def
+/Pattern5 {PatternBgnd KeepColor Landscape {Pat4} {Pat5} ifelse setpattern} bind def
+/Pattern6 {PatternBgnd KeepColor Landscape {Pat9} {Pat6} ifelse setpattern} bind def
+/Pattern7 {PatternBgnd KeepColor Landscape {Pat8} {Pat7} ifelse setpattern} bind def
+} def
+%
+%
+%End of PostScript Level 2 code
+%
+/PatternBgnd {
+  TransparentPatterns {} {gsave 1 setgray fill grestore} ifelse
+} def
+%
+% Substitute for Level 2 pattern fill codes with
+% grayscale if Level 2 support is not selected.
+%
+/Level1PatternFill {
+/Pattern1 {0.250 Density} bind def
+/Pattern2 {0.500 Density} bind def
+/Pattern3 {0.750 Density} bind def
+/Pattern4 {0.125 Density} bind def
+/Pattern5 {0.375 Density} bind def
+/Pattern6 {0.625 Density} bind def
+/Pattern7 {0.875 Density} bind def
+} def
+%
+% Now test for support of Level 2 code
+%
+Level1 {Level1PatternFill} {Level2PatternFill} ifelse
+%
+/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont
+dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall
+currentdict end definefont pop
+/MFshow {
+   { dup 5 get 3 ge
+     { 5 get 3 eq {gsave} {grestore} ifelse }
+     {dup dup 0 get findfont exch 1 get scalefont setfont
+     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6
+     get exch 4 get {show} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq
+     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5
+     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div
+     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get
+     show 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop
+     pop aload pop M} ifelse }ifelse }ifelse }
+     ifelse }
+   forall} bind def
+/MFwidth {0 exch { dup 5 get 3 ge { 5 get 3 eq { 0 } { pop } ifelse }
+ {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont
+     6 get stringwidth pop add} {pop} ifelse} ifelse} forall} bind def
+/MLshow { currentpoint stroke M
+  0 exch R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/MRshow { currentpoint stroke M
+  exch dup MFwidth neg 3 -1 roll R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/MCshow { currentpoint stroke M
+  exch dup MFwidth -2 div 3 -1 roll R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/XYsave    { [( ) 1 2 true false 3 ()] } bind def
+/XYrestore { [( ) 1 2 true false 4 ()] } bind def
+end
+%%EndProlog
+gnudict begin
+gsave
+50 50 translate
+0.050 0.050 scale
+0 setgray
+newpath
+(Helvetica) findfont 140 scalefont setfont
+1.000 UL
+LTb
+1.000 UL
+LTa
+854 788 M
+6136 0 V
+stroke
+LTb
+854 788 M
+63 0 V
+6073 0 R
+-63 0 V
+stroke
+770 788 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 0)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+854 1469 M
+6136 0 V
+stroke
+LTb
+854 1469 M
+63 0 V
+6073 0 R
+-63 0 V
+stroke
+770 1469 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 0.2)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+854 2150 M
+6136 0 V
+stroke
+LTb
+854 2150 M
+63 0 V
+6073 0 R
+-63 0 V
+stroke
+770 2150 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 0.4)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+854 2830 M
+6136 0 V
+stroke
+LTb
+854 2830 M
+63 0 V
+6073 0 R
+-63 0 V
+stroke
+770 2830 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 0.6)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+854 3511 M
+4645 0 V
+1407 0 R
+84 0 V
+stroke
+LTb
+854 3511 M
+63 0 V
+6073 0 R
+-63 0 V
+stroke
+770 3511 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 0.8)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+854 4191 M
+4645 0 V
+1407 0 R
+84 0 V
+stroke
+LTb
+854 4191 M
+63 0 V
+6073 0 R
+-63 0 V
+stroke
+770 4191 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 1)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+854 4872 M
+6136 0 V
+stroke
+LTb
+854 4872 M
+63 0 V
+6073 0 R
+-63 0 V
+stroke
+770 4872 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 1.2)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+854 448 M
+0 4424 V
+stroke
+LTb
+854 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+854 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 0)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+1877 448 M
+0 4424 V
+stroke
+LTb
+1877 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+1877 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 100)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+2899 448 M
+0 4424 V
+stroke
+LTb
+2899 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+2899 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 200)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+3922 448 M
+0 4424 V
+stroke
+LTb
+3922 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+3922 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 300)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+4945 448 M
+0 4424 V
+stroke
+LTb
+4945 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+4945 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 400)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+5967 448 M
+0 2681 V
+0 1680 R
+0 63 V
+stroke
+LTb
+5967 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+5967 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 500)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+6990 448 M
+0 4424 V
+stroke
+LTb
+6990 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+6990 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 600)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTb
+854 4872 N
+854 448 L
+6136 0 V
+0 4424 V
+-6136 0 V
+Z stroke
+LCb setrgbcolor
+280 2660 M
+currentpoint gsave translate 90 rotate 0 0 moveto
+[ [(Helvetica) 140.0 0.0 true true 0 (Attainment)]
+] -46.7 MCshow
+grestore
+LTb
+LCb setrgbcolor
+3922 98 M
+[ [(Helvetica) 140.0 0.0 true true 0 (Time \(seconds\))]
+] -46.7 MCshow
+LTb
+1.000 UP
+1.000 UL
+LTb
+1.000 UP
+1.000 UL
+LT0
+0.00 0.00 1.00 C LTb
+6339 4739 M
+[ [(Helvetica) 140.0 0.0 true true 0 (20-30)]
+] -46.7 MRshow
+LT0
+0.00 0.00 1.00 C 6423 4739 M
+399 0 V
+920 788 M
+66 227 V
+66 227 V
+66 113 V
+66 341 V
+66 227 V
+66 0 V
+66 113 V
+66 114 V
+66 113 V
+66 113 V
+66 227 V
+66 0 V
+66 0 V
+66 227 V
+66 0 V
+66 227 V
+66 0 V
+65 227 V
+66 0 V
+66 113 V
+66 0 V
+66 114 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriDF
+986 1015 TriDF
+1052 1242 TriDF
+1118 1355 TriDF
+1184 1696 TriDF
+1250 1923 TriDF
+1316 1923 TriDF
+1382 2036 TriDF
+1448 2150 TriDF
+1514 2263 TriDF
+1580 2376 TriDF
+1646 2603 TriDF
+1712 2603 TriDF
+1778 2603 TriDF
+1844 2830 TriDF
+1910 2830 TriDF
+1976 3057 TriDF
+2042 3057 TriDF
+2107 3284 TriDF
+2173 3284 TriDF
+2239 3397 TriDF
+2305 3397 TriDF
+2371 3511 TriDF
+2437 3511 TriDF
+2503 3624 TriDF
+2569 3624 TriDF
+2635 3624 TriDF
+2701 3624 TriDF
+2767 3624 TriDF
+2833 3738 TriDF
+2899 3738 TriDF
+2965 3738 TriDF
+3031 3738 TriDF
+3097 3738 TriDF
+3163 3738 TriDF
+3229 3738 TriDF
+3295 3738 TriDF
+3361 3738 TriDF
+3427 3738 TriDF
+3493 3738 TriDF
+3559 3738 TriDF
+3625 3738 TriDF
+3691 3738 TriDF
+3757 3738 TriDF
+3823 3738 TriDF
+3889 3738 TriDF
+3955 3738 TriDF
+4021 3738 TriDF
+4087 3738 TriDF
+4153 3738 TriDF
+4219 3738 TriDF
+4285 3738 TriDF
+4351 3738 TriDF
+4417 3738 TriDF
+4482 3738 TriDF
+4548 3738 TriDF
+4614 3738 TriDF
+4680 3738 TriDF
+4746 3738 TriDF
+4812 3738 TriDF
+4878 3738 TriDF
+4944 3738 TriDF
+5010 3738 TriDF
+5076 3738 TriDF
+5142 3738 TriDF
+5208 3738 TriDF
+5274 3851 TriDF
+5340 3851 TriDF
+5406 3851 TriDF
+5472 3965 TriDF
+5538 3965 TriDF
+5604 3965 TriDF
+5670 3965 TriDF
+5736 3965 TriDF
+5802 3965 TriDF
+5868 3965 TriDF
+5934 4078 TriDF
+6000 4078 TriDF
+6066 4078 TriDF
+6132 4078 TriDF
+6198 4191 TriDF
+6264 4191 TriDF
+6330 4191 TriDF
+6396 4191 TriDF
+6462 4191 TriDF
+6528 4191 TriDF
+6594 4191 TriDF
+6660 4191 TriDF
+6726 4191 TriDF
+6792 4191 TriDF
+6857 4191 TriDF
+6923 4191 TriDF
+6989 4191 TriDF
+6622 4739 TriDF
+1.000 UP
+1.000 UL
+LT0
+0.20 0.80 0.20 C LTb
+6339 4599 M
+[ [(Helvetica) 140.0 0.0 true true 0 (24-28)]
+] -46.7 MRshow
+LT0
+0.20 0.80 0.20 C 6423 4599 M
+399 0 V
+920 788 M
+66 114 V
+66 227 V
+66 226 V
+66 227 V
+66 341 V
+66 340 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 227 V
+66 113 V
+65 0 V
+66 114 V
+66 113 V
+66 0 V
+66 113 V
+66 341 V
+66 227 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 BoxF
+986 902 BoxF
+1052 1129 BoxF
+1118 1355 BoxF
+1184 1582 BoxF
+1250 1923 BoxF
+1316 2263 BoxF
+1382 2376 BoxF
+1448 2376 BoxF
+1514 2376 BoxF
+1580 2376 BoxF
+1646 2376 BoxF
+1712 2376 BoxF
+1778 2376 BoxF
+1844 2490 BoxF
+1910 2490 BoxF
+1976 2717 BoxF
+2042 2830 BoxF
+2107 2830 BoxF
+2173 2944 BoxF
+2239 3057 BoxF
+2305 3057 BoxF
+2371 3170 BoxF
+2437 3511 BoxF
+2503 3738 BoxF
+2569 3851 BoxF
+2635 3851 BoxF
+2701 3851 BoxF
+2767 3851 BoxF
+2833 3851 BoxF
+2899 3851 BoxF
+2965 3851 BoxF
+3031 3851 BoxF
+3097 3851 BoxF
+3163 3851 BoxF
+3229 3851 BoxF
+3295 3851 BoxF
+3361 3851 BoxF
+3427 3851 BoxF
+3493 3851 BoxF
+3559 3851 BoxF
+3625 3965 BoxF
+3691 3965 BoxF
+3757 3965 BoxF
+3823 3965 BoxF
+3889 3965 BoxF
+3955 3965 BoxF
+4021 3965 BoxF
+4087 3965 BoxF
+4153 3965 BoxF
+4219 3965 BoxF
+4285 3965 BoxF
+4351 3965 BoxF
+4417 3965 BoxF
+4482 3965 BoxF
+4548 3965 BoxF
+4614 3965 BoxF
+4680 3965 BoxF
+4746 3965 BoxF
+4812 3965 BoxF
+4878 3965 BoxF
+4944 3965 BoxF
+5010 4078 BoxF
+5076 4078 BoxF
+5142 4078 BoxF
+5208 4078 BoxF
+5274 4078 BoxF
+5340 4078 BoxF
+5406 4078 BoxF
+5472 4078 BoxF
+5538 4078 BoxF
+5604 4078 BoxF
+5670 4078 BoxF
+5736 4078 BoxF
+5802 4078 BoxF
+5868 4078 BoxF
+5934 4078 BoxF
+6000 4078 BoxF
+6066 4078 BoxF
+6132 4191 BoxF
+6198 4191 BoxF
+6264 4191 BoxF
+6330 4191 BoxF
+6396 4191 BoxF
+6462 4191 BoxF
+6528 4191 BoxF
+6594 4191 BoxF
+6660 4191 BoxF
+6726 4191 BoxF
+6792 4191 BoxF
+6857 4191 BoxF
+6923 4191 BoxF
+6989 4191 BoxF
+6622 4599 BoxF
+1.000 UP
+1.000 UL
+LT0
+1.00 0.00 0.00 C LTb
+6339 4459 M
+[ [(Helvetica) 140.0 0.0 true true 0 (28-26)]
+] -46.7 MRshow
+LT0
+1.00 0.00 0.00 C 6423 4459 M
+399 0 V
+920 788 M
+66 567 V
+66 114 V
+66 227 V
+66 0 V
+66 113 V
+66 341 V
+66 113 V
+66 0 V
+66 113 V
+66 227 V
+66 114 V
+66 113 V
+66 227 V
+66 340 V
+66 0 V
+66 454 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 113 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 Star
+986 1355 Star
+1052 1469 Star
+1118 1696 Star
+1184 1696 Star
+1250 1809 Star
+1316 2150 Star
+1382 2263 Star
+1448 2263 Star
+1514 2376 Star
+1580 2603 Star
+1646 2717 Star
+1712 2830 Star
+1778 3057 Star
+1844 3397 Star
+1910 3397 Star
+1976 3851 Star
+2042 3851 Star
+2107 3851 Star
+2173 3851 Star
+2239 3851 Star
+2305 3851 Star
+2371 3851 Star
+2437 3965 Star
+2503 3965 Star
+2569 4078 Star
+2635 4191 Star
+2701 4191 Star
+2767 4191 Star
+2833 4191 Star
+2899 4191 Star
+2965 4191 Star
+3031 4191 Star
+3097 4191 Star
+3163 4191 Star
+3229 4191 Star
+3295 4191 Star
+3361 4191 Star
+3427 4191 Star
+3493 4191 Star
+3559 4191 Star
+3625 4191 Star
+3691 4191 Star
+3757 4191 Star
+3823 4191 Star
+3889 4191 Star
+3955 4191 Star
+4021 4191 Star
+4087 4191 Star
+4153 4191 Star
+4219 4191 Star
+4285 4191 Star
+4351 4191 Star
+4417 4191 Star
+4482 4191 Star
+4548 4191 Star
+4614 4191 Star
+4680 4191 Star
+4746 4191 Star
+4812 4191 Star
+4878 4191 Star
+4944 4191 Star
+5010 4191 Star
+5076 4191 Star
+5142 4191 Star
+5208 4191 Star
+5274 4191 Star
+5340 4191 Star
+5406 4191 Star
+5472 4191 Star
+5538 4191 Star
+5604 4191 Star
+5670 4191 Star
+5736 4191 Star
+5802 4191 Star
+5868 4191 Star
+5934 4191 Star
+6000 4191 Star
+6066 4191 Star
+6132 4191 Star
+6198 4191 Star
+6264 4191 Star
+6330 4191 Star
+6396 4191 Star
+6462 4191 Star
+6528 4191 Star
+6594 4191 Star
+6660 4191 Star
+6726 4191 Star
+6792 4191 Star
+6857 4191 Star
+6923 4191 Star
+6989 4191 Star
+6622 4459 Star
+1.000 UP
+1.000 UL
+LT0
+0.55 0.00 0.55 C LTb
+6339 4319 M
+[ [(Helvetica) 140.0 0.0 true true 0 (32-24)]
+] -46.7 MRshow
+LT0
+0.55 0.00 0.55 C 6423 4319 M
+399 0 V
+920 788 M
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 227 V
+66 113 V
+66 0 V
+66 0 V
+66 113 V
+66 114 V
+66 113 V
+66 0 V
+66 114 V
+66 113 V
+66 114 V
+66 0 V
+65 113 V
+66 0 V
+66 0 V
+66 114 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 113 V
+66 114 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 227 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 227 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 CircleF
+986 788 CircleF
+1052 788 CircleF
+1118 902 CircleF
+1184 902 CircleF
+1250 902 CircleF
+1316 1129 CircleF
+1382 1242 CircleF
+1448 1242 CircleF
+1514 1242 CircleF
+1580 1355 CircleF
+1646 1469 CircleF
+1712 1582 CircleF
+1778 1582 CircleF
+1844 1696 CircleF
+1910 1809 CircleF
+1976 1923 CircleF
+2042 1923 CircleF
+2107 2036 CircleF
+2173 2036 CircleF
+2239 2036 CircleF
+2305 2150 CircleF
+2371 2263 CircleF
+2437 2263 CircleF
+2503 2263 CircleF
+2569 2263 CircleF
+2635 2263 CircleF
+2701 2376 CircleF
+2767 2376 CircleF
+2833 2376 CircleF
+2899 2376 CircleF
+2965 2376 CircleF
+3031 2376 CircleF
+3097 2376 CircleF
+3163 2376 CircleF
+3229 2490 CircleF
+3295 2490 CircleF
+3361 2603 CircleF
+3427 2717 CircleF
+3493 2717 CircleF
+3559 2830 CircleF
+3625 2830 CircleF
+3691 2830 CircleF
+3757 2830 CircleF
+3823 2830 CircleF
+3889 2830 CircleF
+3955 2830 CircleF
+4021 2830 CircleF
+4087 3057 CircleF
+4153 3057 CircleF
+4219 3057 CircleF
+4285 3057 CircleF
+4351 3057 CircleF
+4417 3057 CircleF
+4482 3057 CircleF
+4548 3057 CircleF
+4614 3057 CircleF
+4680 3057 CircleF
+4746 3057 CircleF
+4812 3057 CircleF
+4878 3057 CircleF
+4944 3057 CircleF
+5010 3057 CircleF
+5076 3057 CircleF
+5142 3057 CircleF
+5208 3057 CircleF
+5274 3057 CircleF
+5340 3057 CircleF
+5406 3057 CircleF
+5472 3057 CircleF
+5538 3057 CircleF
+5604 3057 CircleF
+5670 3057 CircleF
+5736 3170 CircleF
+5802 3170 CircleF
+5868 3170 CircleF
+5934 3170 CircleF
+6000 3170 CircleF
+6066 3170 CircleF
+6132 3170 CircleF
+6198 3170 CircleF
+6264 3170 CircleF
+6330 3170 CircleF
+6396 3170 CircleF
+6462 3170 CircleF
+6528 3397 CircleF
+6594 3397 CircleF
+6660 3397 CircleF
+6726 3397 CircleF
+6792 3397 CircleF
+6857 3397 CircleF
+6923 3397 CircleF
+6989 3397 CircleF
+6622 4319 CircleF
+1.000 UP
+1.000 UL
+LT0
+0.00 0.00 0.00 C LTb
+6339 4179 M
+[ [(Helvetica) 140.0 0.0 true true 0 (36-22)]
+] -46.7 MRshow
+LT0
+0.00 0.00 0.00 C 6423 4179 M
+399 0 V
+920 788 M
+66 794 V
+66 341 V
+66 0 V
+66 340 V
+66 113 V
+66 227 V
+66 227 V
+66 0 V
+66 114 V
+66 226 V
+66 0 V
+66 0 V
+66 114 V
+66 113 V
+66 0 V
+66 114 V
+66 0 V
+65 0 V
+66 113 V
+66 114 V
+66 0 V
+66 113 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriU
+986 1582 TriU
+1052 1923 TriU
+1118 1923 TriU
+1184 2263 TriU
+1250 2376 TriU
+1316 2603 TriU
+1382 2830 TriU
+1448 2830 TriU
+1514 2944 TriU
+1580 3170 TriU
+1646 3170 TriU
+1712 3170 TriU
+1778 3284 TriU
+1844 3397 TriU
+1910 3397 TriU
+1976 3511 TriU
+2042 3511 TriU
+2107 3511 TriU
+2173 3624 TriU
+2239 3738 TriU
+2305 3738 TriU
+2371 3851 TriU
+2437 3965 TriU
+2503 3965 TriU
+2569 3965 TriU
+2635 3965 TriU
+2701 3965 TriU
+2767 4078 TriU
+2833 4078 TriU
+2899 4078 TriU
+2965 4078 TriU
+3031 4078 TriU
+3097 4191 TriU
+3163 4191 TriU
+3229 4191 TriU
+3295 4191 TriU
+3361 4191 TriU
+3427 4191 TriU
+3493 4191 TriU
+3559 4191 TriU
+3625 4191 TriU
+3691 4191 TriU
+3757 4191 TriU
+3823 4191 TriU
+3889 4191 TriU
+3955 4191 TriU
+4021 4191 TriU
+4087 4191 TriU
+4153 4191 TriU
+4219 4191 TriU
+4285 4191 TriU
+4351 4191 TriU
+4417 4191 TriU
+4482 4191 TriU
+4548 4191 TriU
+4614 4191 TriU
+4680 4191 TriU
+4746 4191 TriU
+4812 4191 TriU
+4878 4191 TriU
+4944 4191 TriU
+5010 4191 TriU
+5076 4191 TriU
+5142 4191 TriU
+5208 4191 TriU
+5274 4191 TriU
+5340 4191 TriU
+5406 4191 TriU
+5472 4191 TriU
+5538 4191 TriU
+5604 4191 TriU
+5670 4191 TriU
+5736 4191 TriU
+5802 4191 TriU
+5868 4191 TriU
+5934 4191 TriU
+6000 4191 TriU
+6066 4191 TriU
+6132 4191 TriU
+6198 4191 TriU
+6264 4191 TriU
+6330 4191 TriU
+6396 4191 TriU
+6462 4191 TriU
+6528 4191 TriU
+6594 4191 TriU
+6660 4191 TriU
+6726 4191 TriU
+6792 4191 TriU
+6857 4191 TriU
+6923 4191 TriU
+6989 4191 TriU
+6622 4179 TriU
+1.000 UP
+1.000 UL
+LT0
+1.00 0.00 1.00 C LTb
+6339 4039 M
+[ [(Helvetica) 140.0 0.0 true true 0 (40-20)]
+] -46.7 MRshow
+LT0
+1.00 0.00 1.00 C 6423 4039 M
+399 0 V
+920 788 M
+66 227 V
+66 0 V
+66 0 V
+66 114 V
+66 340 V
+66 0 V
+66 340 V
+66 227 V
+66 227 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 114 V
+66 0 V
+66 113 V
+65 114 V
+66 227 V
+66 113 V
+66 0 V
+66 0 V
+66 113 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 227 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriUF
+986 1015 TriUF
+1052 1015 TriUF
+1118 1015 TriUF
+1184 1129 TriUF
+1250 1469 TriUF
+1316 1469 TriUF
+1382 1809 TriUF
+1448 2036 TriUF
+1514 2263 TriUF
+1580 2263 TriUF
+1646 2263 TriUF
+1712 2263 TriUF
+1778 2263 TriUF
+1844 2376 TriUF
+1910 2490 TriUF
+1976 2490 TriUF
+2042 2603 TriUF
+2107 2717 TriUF
+2173 2944 TriUF
+2239 3057 TriUF
+2305 3057 TriUF
+2371 3057 TriUF
+2437 3170 TriUF
+2503 3284 TriUF
+2569 3284 TriUF
+2635 3284 TriUF
+2701 3284 TriUF
+2767 3284 TriUF
+2833 3284 TriUF
+2899 3397 TriUF
+2965 3624 TriUF
+3031 3624 TriUF
+3097 3624 TriUF
+3163 3624 TriUF
+3229 3624 TriUF
+3295 3624 TriUF
+3361 3738 TriUF
+3427 3851 TriUF
+3493 3851 TriUF
+3559 3851 TriUF
+3625 3851 TriUF
+3691 3851 TriUF
+3757 3851 TriUF
+3823 3851 TriUF
+3889 3851 TriUF
+3955 3851 TriUF
+4021 3851 TriUF
+4087 3851 TriUF
+4153 3851 TriUF
+4219 3851 TriUF
+4285 3851 TriUF
+4351 3851 TriUF
+4417 3851 TriUF
+4482 3851 TriUF
+4548 3965 TriUF
+4614 3965 TriUF
+4680 3965 TriUF
+4746 3965 TriUF
+4812 4078 TriUF
+4878 4078 TriUF
+4944 4078 TriUF
+5010 4078 TriUF
+5076 4191 TriUF
+5142 4191 TriUF
+5208 4191 TriUF
+5274 4191 TriUF
+5340 4191 TriUF
+5406 4191 TriUF
+5472 4191 TriUF
+5538 4191 TriUF
+5604 4191 TriUF
+5670 4191 TriUF
+5736 4191 TriUF
+5802 4191 TriUF
+5868 4191 TriUF
+5934 4191 TriUF
+6000 4191 TriUF
+6066 4191 TriUF
+6132 4191 TriUF
+6198 4191 TriUF
+6264 4191 TriUF
+6330 4191 TriUF
+6396 4191 TriUF
+6462 4191 TriUF
+6528 4191 TriUF
+6594 4191 TriUF
+6660 4191 TriUF
+6726 4191 TriUF
+6792 4191 TriUF
+6857 4191 TriUF
+6923 4191 TriUF
+6989 4191 TriUF
+6622 4039 TriUF
+1.000 UP
+1.000 UL
+LT0
+0.50 0.00 0.00 C LTb
+6339 3899 M
+[ [(Helvetica) 140.0 0.0 true true 0 (44-18)]
+] -46.7 MRshow
+LT0
+0.50 0.00 0.00 C 6423 3899 M
+399 0 V
+920 788 M
+66 114 V
+66 227 V
+66 340 V
+66 340 V
+66 227 V
+66 114 V
+66 226 V
+66 227 V
+66 227 V
+66 0 V
+66 0 V
+66 227 V
+66 227 V
+66 0 V
+66 113 V
+66 114 V
+66 113 V
+65 114 V
+66 0 V
+66 0 V
+66 340 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriUF
+986 902 TriUF
+1052 1129 TriUF
+1118 1469 TriUF
+1184 1809 TriUF
+1250 2036 TriUF
+1316 2150 TriUF
+1382 2376 TriUF
+1448 2603 TriUF
+1514 2830 TriUF
+1580 2830 TriUF
+1646 2830 TriUF
+1712 3057 TriUF
+1778 3284 TriUF
+1844 3284 TriUF
+1910 3397 TriUF
+1976 3511 TriUF
+2042 3624 TriUF
+2107 3738 TriUF
+2173 3738 TriUF
+2239 3738 TriUF
+2305 4078 TriUF
+2371 4078 TriUF
+2437 4078 TriUF
+2503 4078 TriUF
+2569 4078 TriUF
+2635 4078 TriUF
+2701 4078 TriUF
+2767 4078 TriUF
+2833 4078 TriUF
+2899 4078 TriUF
+2965 4078 TriUF
+3031 4078 TriUF
+3097 4078 TriUF
+3163 4078 TriUF
+3229 4078 TriUF
+3295 4078 TriUF
+3361 4078 TriUF
+3427 4078 TriUF
+3493 4078 TriUF
+3559 4078 TriUF
+3625 4078 TriUF
+3691 4078 TriUF
+3757 4078 TriUF
+3823 4078 TriUF
+3889 4078 TriUF
+3955 4078 TriUF
+4021 4078 TriUF
+4087 4078 TriUF
+4153 4078 TriUF
+4219 4191 TriUF
+4285 4191 TriUF
+4351 4191 TriUF
+4417 4191 TriUF
+4482 4191 TriUF
+4548 4191 TriUF
+4614 4191 TriUF
+4680 4191 TriUF
+4746 4191 TriUF
+4812 4191 TriUF
+4878 4191 TriUF
+4944 4191 TriUF
+5010 4191 TriUF
+5076 4191 TriUF
+5142 4191 TriUF
+5208 4191 TriUF
+5274 4191 TriUF
+5340 4191 TriUF
+5406 4191 TriUF
+5472 4191 TriUF
+5538 4191 TriUF
+5604 4191 TriUF
+5670 4191 TriUF
+5736 4191 TriUF
+5802 4191 TriUF
+5868 4191 TriUF
+5934 4191 TriUF
+6000 4191 TriUF
+6066 4191 TriUF
+6132 4191 TriUF
+6198 4191 TriUF
+6264 4191 TriUF
+6330 4191 TriUF
+6396 4191 TriUF
+6462 4191 TriUF
+6528 4191 TriUF
+6594 4191 TriUF
+6660 4191 TriUF
+6726 4191 TriUF
+6792 4191 TriUF
+6857 4191 TriUF
+6923 4191 TriUF
+6989 4191 TriUF
+6622 3899 TriUF
+1.000 UP
+1.000 UL
+LT0
+1.00 0.39 0.28 C LTb
+6339 3759 M
+[ [(Helvetica) 140.0 0.0 true true 0 (48-16)]
+] -46.7 MRshow
+LT0
+1.00 0.39 0.28 C 6423 3759 M
+399 0 V
+920 788 M
+66 0 V
+66 114 V
+66 113 V
+66 227 V
+66 113 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 227 V
+66 0 V
+65 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 113 V
+66 0 V
+66 114 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 114 V
+66 113 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+65 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriUF
+986 788 TriUF
+1052 902 TriUF
+1118 1015 TriUF
+1184 1242 TriUF
+1250 1355 TriUF
+1316 1469 TriUF
+1382 1469 TriUF
+1448 1469 TriUF
+1514 1469 TriUF
+1580 1469 TriUF
+1646 1469 TriUF
+1712 1582 TriUF
+1778 1582 TriUF
+1844 1582 TriUF
+1910 1582 TriUF
+1976 1809 TriUF
+2042 1809 TriUF
+2107 1809 TriUF
+2173 1923 TriUF
+2239 1923 TriUF
+2305 1923 TriUF
+2371 1923 TriUF
+2437 2036 TriUF
+2503 2036 TriUF
+2569 2150 TriUF
+2635 2150 TriUF
+2701 2150 TriUF
+2767 2150 TriUF
+2833 2150 TriUF
+2899 2263 TriUF
+2965 2263 TriUF
+3031 2376 TriUF
+3097 2376 TriUF
+3163 2490 TriUF
+3229 2603 TriUF
+3295 2603 TriUF
+3361 2603 TriUF
+3427 2603 TriUF
+3493 2603 TriUF
+3559 2603 TriUF
+3625 2717 TriUF
+3691 2717 TriUF
+3757 2717 TriUF
+3823 2717 TriUF
+3889 2830 TriUF
+3955 2830 TriUF
+4021 2830 TriUF
+4087 2944 TriUF
+4153 3057 TriUF
+4219 3057 TriUF
+4285 3170 TriUF
+4351 3170 TriUF
+4417 3170 TriUF
+4482 3284 TriUF
+4548 3284 TriUF
+4614 3284 TriUF
+4680 3284 TriUF
+4746 3284 TriUF
+4812 3284 TriUF
+4878 3397 TriUF
+4944 3397 TriUF
+5010 3511 TriUF
+5076 3511 TriUF
+5142 3511 TriUF
+5208 3624 TriUF
+5274 3624 TriUF
+5340 3624 TriUF
+5406 3624 TriUF
+5472 3624 TriUF
+5538 3624 TriUF
+5604 3624 TriUF
+5670 3624 TriUF
+5736 3624 TriUF
+5802 3624 TriUF
+5868 3624 TriUF
+5934 3624 TriUF
+6000 3624 TriUF
+6066 3624 TriUF
+6132 3624 TriUF
+6198 3624 TriUF
+6264 3624 TriUF
+6330 3624 TriUF
+6396 3624 TriUF
+6462 3738 TriUF
+6528 3738 TriUF
+6594 3738 TriUF
+6660 3738 TriUF
+6726 3738 TriUF
+6792 3738 TriUF
+6857 3738 TriUF
+6923 3738 TriUF
+6989 3738 TriUF
+6622 3759 TriUF
+1.000 UP
+1.000 UL
+LT0
+1.00 0.08 0.58 C LTb
+6339 3619 M
+[ [(Helvetica) 140.0 0.0 true true 0 (52-14)]
+] -46.7 MRshow
+LT0
+1.00 0.08 0.58 C 6423 3619 M
+399 0 V
+920 788 M
+66 454 V
+66 227 V
+66 340 V
+66 341 V
+66 226 V
+66 341 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 114 V
+66 113 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriUF
+986 1242 TriUF
+1052 1469 TriUF
+1118 1809 TriUF
+1184 2150 TriUF
+1250 2376 TriUF
+1316 2717 TriUF
+1382 2717 TriUF
+1448 2717 TriUF
+1514 2717 TriUF
+1580 2717 TriUF
+1646 2717 TriUF
+1712 2830 TriUF
+1778 2830 TriUF
+1844 2944 TriUF
+1910 3057 TriUF
+1976 3057 TriUF
+2042 3057 TriUF
+2107 3057 TriUF
+2173 3057 TriUF
+2239 3057 TriUF
+2305 3057 TriUF
+2371 3057 TriUF
+2437 3057 TriUF
+2503 3170 TriUF
+2569 3170 TriUF
+2635 3170 TriUF
+2701 3284 TriUF
+2767 3284 TriUF
+2833 3284 TriUF
+2899 3284 TriUF
+2965 3284 TriUF
+3031 3284 TriUF
+3097 3397 TriUF
+3163 3397 TriUF
+3229 3397 TriUF
+3295 3511 TriUF
+3361 3511 TriUF
+3427 3511 TriUF
+3493 3624 TriUF
+3559 3624 TriUF
+3625 3624 TriUF
+3691 3624 TriUF
+3757 3738 TriUF
+3823 3738 TriUF
+3889 3738 TriUF
+3955 3851 TriUF
+4021 3851 TriUF
+4087 3851 TriUF
+4153 3851 TriUF
+4219 3851 TriUF
+4285 3965 TriUF
+4351 3965 TriUF
+4417 3965 TriUF
+4482 3965 TriUF
+4548 3965 TriUF
+4614 3965 TriUF
+4680 3965 TriUF
+4746 3965 TriUF
+4812 3965 TriUF
+4878 3965 TriUF
+4944 3965 TriUF
+5010 3965 TriUF
+5076 3965 TriUF
+5142 4078 TriUF
+5208 4078 TriUF
+5274 4191 TriUF
+5340 4191 TriUF
+5406 4191 TriUF
+5472 4191 TriUF
+5538 4191 TriUF
+5604 4191 TriUF
+5670 4191 TriUF
+5736 4191 TriUF
+5802 4191 TriUF
+5868 4191 TriUF
+5934 4191 TriUF
+6000 4191 TriUF
+6066 4191 TriUF
+6132 4191 TriUF
+6198 4191 TriUF
+6264 4191 TriUF
+6330 4191 TriUF
+6396 4191 TriUF
+6462 4191 TriUF
+6528 4191 TriUF
+6594 4191 TriUF
+6660 4191 TriUF
+6726 4191 TriUF
+6792 4191 TriUF
+6857 4191 TriUF
+6923 4191 TriUF
+6989 4191 TriUF
+6622 3619 TriUF
+1.000 UP
+1.000 UL
+LT0
+0.40 0.80 0.67 C LTb
+6339 3479 M
+[ [(Helvetica) 140.0 0.0 true true 0 (56-12)]
+] -46.7 MRshow
+LT0
+0.40 0.80 0.67 C 6423 3479 M
+399 0 V
+920 788 M
+66 114 V
+66 227 V
+66 113 V
+66 227 V
+66 113 V
+66 114 V
+66 227 V
+66 0 V
+66 113 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 226 V
+66 114 V
+66 227 V
+65 113 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriUF
+986 902 TriUF
+1052 1129 TriUF
+1118 1242 TriUF
+1184 1469 TriUF
+1250 1582 TriUF
+1316 1696 TriUF
+1382 1923 TriUF
+1448 1923 TriUF
+1514 2036 TriUF
+1580 2150 TriUF
+1646 2150 TriUF
+1712 2150 TriUF
+1778 2150 TriUF
+1844 2150 TriUF
+1910 2376 TriUF
+1976 2490 TriUF
+2042 2717 TriUF
+2107 2830 TriUF
+2173 2944 TriUF
+2239 2944 TriUF
+2305 2944 TriUF
+2371 2944 TriUF
+2437 3057 TriUF
+2503 3170 TriUF
+2569 3170 TriUF
+2635 3170 TriUF
+2701 3170 TriUF
+2767 3170 TriUF
+2833 3170 TriUF
+2899 3284 TriUF
+2965 3284 TriUF
+3031 3397 TriUF
+3097 3397 TriUF
+3163 3397 TriUF
+3229 3397 TriUF
+3295 3397 TriUF
+3361 3511 TriUF
+3427 3511 TriUF
+3493 3511 TriUF
+3559 3511 TriUF
+3625 3511 TriUF
+3691 3511 TriUF
+3757 3511 TriUF
+3823 3511 TriUF
+3889 3511 TriUF
+3955 3511 TriUF
+4021 3624 TriUF
+4087 3624 TriUF
+4153 3624 TriUF
+4219 3624 TriUF
+4285 3624 TriUF
+4351 3624 TriUF
+4417 3738 TriUF
+4482 3738 TriUF
+4548 3738 TriUF
+4614 3738 TriUF
+4680 3738 TriUF
+4746 3738 TriUF
+4812 3851 TriUF
+4878 3851 TriUF
+4944 3851 TriUF
+5010 3851 TriUF
+5076 3851 TriUF
+5142 3851 TriUF
+5208 3851 TriUF
+5274 3851 TriUF
+5340 3851 TriUF
+5406 3851 TriUF
+5472 3851 TriUF
+5538 3851 TriUF
+5604 3851 TriUF
+5670 3851 TriUF
+5736 3851 TriUF
+5802 3851 TriUF
+5868 3851 TriUF
+5934 3851 TriUF
+6000 3851 TriUF
+6066 3851 TriUF
+6132 3851 TriUF
+6198 3851 TriUF
+6264 3851 TriUF
+6330 3851 TriUF
+6396 3851 TriUF
+6462 3851 TriUF
+6528 3851 TriUF
+6594 3851 TriUF
+6660 3851 TriUF
+6726 3851 TriUF
+6792 3851 TriUF
+6857 3851 TriUF
+6923 3851 TriUF
+6989 3851 TriUF
+6622 3479 TriUF
+1.000 UP
+1.000 UL
+LT0
+1.00 0.84 0.00 C LTb
+6339 3339 M
+[ [(Helvetica) 140.0 0.0 true true 0 (60-10)]
+] -46.7 MRshow
+LT0
+1.00 0.84 0.00 C 6423 3339 M
+399 0 V
+920 788 M
+66 567 V
+66 341 V
+66 340 V
+66 227 V
+66 0 V
+66 0 V
+66 113 V
+66 114 V
+66 0 V
+66 113 V
+66 227 V
+66 0 V
+66 114 V
+66 113 V
+66 340 V
+66 114 V
+66 0 V
+65 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriUF
+986 1355 TriUF
+1052 1696 TriUF
+1118 2036 TriUF
+1184 2263 TriUF
+1250 2263 TriUF
+1316 2263 TriUF
+1382 2376 TriUF
+1448 2490 TriUF
+1514 2490 TriUF
+1580 2603 TriUF
+1646 2830 TriUF
+1712 2830 TriUF
+1778 2944 TriUF
+1844 3057 TriUF
+1910 3397 TriUF
+1976 3511 TriUF
+2042 3511 TriUF
+2107 3511 TriUF
+2173 3511 TriUF
+2239 3624 TriUF
+2305 3624 TriUF
+2371 3624 TriUF
+2437 3738 TriUF
+2503 3738 TriUF
+2569 3738 TriUF
+2635 3738 TriUF
+2701 3738 TriUF
+2767 3738 TriUF
+2833 3738 TriUF
+2899 3738 TriUF
+2965 3738 TriUF
+3031 3851 TriUF
+3097 3851 TriUF
+3163 3851 TriUF
+3229 3851 TriUF
+3295 3851 TriUF
+3361 3851 TriUF
+3427 3851 TriUF
+3493 3851 TriUF
+3559 3965 TriUF
+3625 3965 TriUF
+3691 3965 TriUF
+3757 3965 TriUF
+3823 3965 TriUF
+3889 3965 TriUF
+3955 3965 TriUF
+4021 3965 TriUF
+4087 3965 TriUF
+4153 3965 TriUF
+4219 3965 TriUF
+4285 3965 TriUF
+4351 3965 TriUF
+4417 3965 TriUF
+4482 3965 TriUF
+4548 3965 TriUF
+4614 3965 TriUF
+4680 3965 TriUF
+4746 4078 TriUF
+4812 4078 TriUF
+4878 4078 TriUF
+4944 4078 TriUF
+5010 4078 TriUF
+5076 4078 TriUF
+5142 4078 TriUF
+5208 4078 TriUF
+5274 4078 TriUF
+5340 4078 TriUF
+5406 4078 TriUF
+5472 4078 TriUF
+5538 4191 TriUF
+5604 4191 TriUF
+5670 4191 TriUF
+5736 4191 TriUF
+5802 4191 TriUF
+5868 4191 TriUF
+5934 4191 TriUF
+6000 4191 TriUF
+6066 4191 TriUF
+6132 4191 TriUF
+6198 4191 TriUF
+6264 4191 TriUF
+6330 4191 TriUF
+6396 4191 TriUF
+6462 4191 TriUF
+6528 4191 TriUF
+6594 4191 TriUF
+6660 4191 TriUF
+6726 4191 TriUF
+6792 4191 TriUF
+6857 4191 TriUF
+6923 4191 TriUF
+6989 4191 TriUF
+6622 3339 TriUF
+1.000 UP
+1.000 UL
+LT0
+0.70 0.13 0.13 C LTb
+6339 3199 M
+[ [(Helvetica) 140.0 0.0 true true 0 (all-points)]
+] -46.7 MRshow
+LT0
+0.70 0.13 0.13 C 6423 3199 M
+399 0 V
+920 788 M
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 114 V
+66 113 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 227 V
+66 113 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 114 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 113 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+66 114 V
+66 227 V
+66 0 V
+66 0 V
+66 0 V
+66 0 V
+65 0 V
+66 0 V
+66 0 V
+920 788 TriUF
+986 788 TriUF
+1052 788 TriUF
+1118 788 TriUF
+1184 788 TriUF
+1250 788 TriUF
+1316 788 TriUF
+1382 788 TriUF
+1448 788 TriUF
+1514 788 TriUF
+1580 788 TriUF
+1646 788 TriUF
+1712 788 TriUF
+1778 788 TriUF
+1844 788 TriUF
+1910 788 TriUF
+1976 788 TriUF
+2042 788 TriUF
+2107 788 TriUF
+2173 788 TriUF
+2239 788 TriUF
+2305 788 TriUF
+2371 788 TriUF
+2437 902 TriUF
+2503 902 TriUF
+2569 902 TriUF
+2635 902 TriUF
+2701 902 TriUF
+2767 902 TriUF
+2833 902 TriUF
+2899 902 TriUF
+2965 902 TriUF
+3031 902 TriUF
+3097 902 TriUF
+3163 902 TriUF
+3229 902 TriUF
+3295 902 TriUF
+3361 1015 TriUF
+3427 1129 TriUF
+3493 1242 TriUF
+3559 1242 TriUF
+3625 1355 TriUF
+3691 1355 TriUF
+3757 1355 TriUF
+3823 1355 TriUF
+3889 1469 TriUF
+3955 1469 TriUF
+4021 1469 TriUF
+4087 1696 TriUF
+4153 1809 TriUF
+4219 1809 TriUF
+4285 1923 TriUF
+4351 1923 TriUF
+4417 1923 TriUF
+4482 1923 TriUF
+4548 1923 TriUF
+4614 1923 TriUF
+4680 1923 TriUF
+4746 1923 TriUF
+4812 1923 TriUF
+4878 1923 TriUF
+4944 1923 TriUF
+5010 2036 TriUF
+5076 2036 TriUF
+5142 2036 TriUF
+5208 2150 TriUF
+5274 2150 TriUF
+5340 2150 TriUF
+5406 2150 TriUF
+5472 2150 TriUF
+5538 2150 TriUF
+5604 2150 TriUF
+5670 2150 TriUF
+5736 2263 TriUF
+5802 2263 TriUF
+5868 2263 TriUF
+5934 2263 TriUF
+6000 2263 TriUF
+6066 2263 TriUF
+6132 2376 TriUF
+6198 2376 TriUF
+6264 2376 TriUF
+6330 2376 TriUF
+6396 2376 TriUF
+6462 2490 TriUF
+6528 2717 TriUF
+6594 2717 TriUF
+6660 2717 TriUF
+6726 2717 TriUF
+6792 2717 TriUF
+6857 2717 TriUF
+6923 2717 TriUF
+6989 2717 TriUF
+6622 3199 TriUF
+1.000 UL
+LTb
+854 4872 N
+854 448 L
+6136 0 V
+0 4424 V
+-6136 0 V
+Z stroke
+1.000 UP
+1.000 UL
+LTb
+stroke
+grestore
+end
+showpage
+%%Trailer
+%%DocumentFonts: Helvetica

@@ -1,0 +1,962 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{geometry}
+\geometry{hmargin=0.5cm,vmargin=0.5cm}
+\usepackage[utf8x]{inputenc}
+                            % not available on your system
+\usepackage[table]{xcolor}
+% \usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}        % standard LaTeX graphics tool                            % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{url}
+\usepackage{caption,subfig}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+%\maketitle
+
+ 
+
+\section*{IBEA Vs Aggregation}
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3_{cost}:IBEA_{H^-}.eps} } 
+ \subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3ei_{cost}:Aggregation.eps} } \qquad
+\caption{$Zeno3_{cost}$}
+ \end{figure*}
+\begin{figure*}[h!]
+\centering
+ \subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6ei_{cost}:Aggregation.eps} } \qquad
+\caption{$Zeno6_{cost}$}
+\end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{cost}:Aggregation.eps} }  \qquad
+\caption{$Zeno9_{cost}$}
+\end{figure*}
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3_{risk}:IBEA_{H^-}.eps} } 
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 30}\qquad
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3ei_{risk}:Aggregation.eps} } \qquad
+\caption{$Zeno3_{risk}$}
+\end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6ei_{risk}:Aggregation.eps} } \qquad
+\caption{$Zeno6_{risk}$}
+\end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:Aggregation.eps} }  \qquad
+\caption{$Zeno9_{risk}$}
+ \end{figure*}
+ \clearpage 
+\newpage
+\section*{IBEA Vs Adaptive-IBEA }
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3_{cost}:IBEA_{H^-}.eps} } 
+ \subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3evect_{cost}:IBEA_{H^-}.eps} } \qquad
+\caption{$Zeno3_{cost}$}
+ \end{figure*}
+\begin{figure*}[h!]
+\centering
+ \subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6evect_{cost}:IBEA_{H^-}.eps} } \qquad
+\caption{$Zeno6_{cost}$}
+\end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno9_{cost}$}
+\end{figure*}
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3_{risk}:IBEA_{H^-}.eps} } 
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 30}\qquad
+\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3evect_{risk}:IBEA_{H^-}.eps} } \qquad
+ \caption{$Zeno3_{risk}$}
+ \end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6evect_{risk}:IBEA_{H^-}.eps} } \qquad
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno6_{risk}$}
+ \end{figure*}
+
+
+\clearpage 
+\newpage
+\section*{IBEA Vs AdaptiveWeight-IBEA }
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3_{cost}:IBEA_{H^-}.eps} } 
+ \subfloat[$AWIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3eadapt_{cost}:IBEA_{H^-}.eps} } \qquad
+ \caption{$Zeno3_{cost}$}
+ \end{figure*}
+ \begin{figure*}[h!]
+\centering
+ \subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[$AWIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6eadapt_{cost}:IBEA_{H^-}.eps} } \qquad
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno6_{cost}$}
+\end{figure*}
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3_{risk}:IBEA_{H^-}.eps} } 
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 30}\qquad
+\subfloat[$AWIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3eadapt_{risk}:IBEA_{H^-}.eps} } \qquad
+\caption{$Zeno3_{risk}$}
+\end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[$AWIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6eadapt_{risk}:IBEA_{H^-}.eps} } \qquad
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno6_{risk}$}
+ \end{figure*}
+
+  
+
+
+
+\clearpage 
+\newpage
+\section*{Study on Varing Aggregation Parameter  }
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{cost}:alpha=0.0.eps} } 
+ \subfloat[$\alpha=0.3$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{cost}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.7$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{cost}:alpha=0.7.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{cost}:alpha=1.0.eps} }  
+\subfloat[overall]{\includegraphics[scale=0.6, bb=50 50 410 302]
+{../plot_archive/zeno3ealpha_{cost}:overall.eps} } \qquad 
+\subfloat[rate]{\includegraphics[scale=0.6, bb=50 50 410 302]
+{../plot_archive/zeno3ealpha_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno3_{cost}$}
+\end{figure*}
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{risk}:alpha=0.0.eps} } 
+ \subfloat[$\alpha=0.3$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{risk}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.7$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{risk}:alpha=0.7.eps} } \qquad
+\subfloat[$\alpha=1.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{risk}:alpha=1.0.eps} } 
+\subfloat[overall]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{risk}:overall.eps} }  \qquad
+\subfloat[rate]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno3_{risk}$}
+\end{figure*}
+
+
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{cost}:alpha=0.0.eps} } 
+ \subfloat[$\alpha=0.3$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{cost}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.7$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{cost}:alpha=0.7.eps} } \qquad
+\subfloat[$\alpha=1.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{cost}:alpha=1.0.eps} }  
+\subfloat[overall]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{cost}:overall.eps} } \qquad
+\subfloat[rate]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno6_{cost}$}
+\end{figure*}
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{risk}:alpha=0.0.eps} } 
+ \subfloat[$\alpha=0.3$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{risk}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.7$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{risk}:alpha=0.7.eps} } \qquad
+\subfloat[$\alpha=1.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{risk}:alpha=1.0.eps} }  
+\subfloat[overall]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{risk}:overall.eps} } \qquad
+\subfloat[rate]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno6_{risk}$}
+\end{figure*}
+
+\clearpage 
+\newpage
+\section*{Aggregation with dynamic weights ( obtained after ParamIls tuning)}
+
+\begin{figure*}[h!]
+\centering
+\subfloat[ Cost]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3eadapts_{cost}:Aggregation.eps} } 
+ \subfloat[Risk]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3eadapts_{risk}:Aggregation.eps} } \qquad
+ 
+\caption{$Zeno3$}
+\end{figure*}
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[Cost]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6eadapts_{cost}:Aggregation.eps} } 
+ \subfloat[Risk]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6eadapts_{risk}:Aggregation.eps} } \qquad
+ 
+\caption{$Zeno6$}
+\end{figure*}
+ 
+ 
+ 
+\begin{figure*}[h!]
+\centering
+\subfloat[Cost]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9eadapts_{cost}:Aggregation.eps} } 
+ %\subfloat[Risk]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6eadapts_{risk}:Aggregation.eps} } \qquad
+ 
+\caption{$Zeno9$}
+\end{figure*}
+ 
+ 
+\clearpage 
+\newpage
+\section*{Aggregation with mutation on strategies ( obtained after ParamIls tuning)}
+ 
+ \begin{figure*}[h!]
+ 
+\centering
+\subfloat[ Cost]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3evect_{cost}:Aggregation.eps} } 
+ \subfloat[Risk]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3evect_{risk}:Aggregation.eps} } \qquad
+ 
+\caption{$Zeno3$}
+\end{figure*}
+
+ \begin{figure*}[h!]
+\centering
+\subfloat[Cost]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6evect_{cost}:Aggregation.eps} } 
+ \subfloat[Risk]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6evect_{risk}:Aggregation.eps} } \qquad
+ 
+\caption{$Zeno6$}
+\end{figure*}
+ 
+  
+\clearpage 
+\newpage
+ 
+\begin{figure*}[h!]
+\centering
+\subfloat[Cost]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:Aggregation.eps} } 
+ %\subfloat[Risk]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6evect_{risk}:Aggregation.eps} } \qquad
+ 
+\caption{$Zeno9$}
+\end{figure*}
+ 
+ 
+\clearpage 
+\newpage
+\section*{ParamILS Tuning}
+
+ \begin{figure*}[h!]
+\centering
+ \subfloat[$zeno3e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3e_Add_trajet.eps}}
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[$zeno3e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3e_Max_trajet.eps}}\qquad
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[$zeno6e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6e_Add_trajet.eps}}
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[$zeno6e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6e_Max_trajet.eps}}\qquad
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[$zeno9e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9e_Add_trajet.eps}}
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[$zeno9e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9e_Max_trajet.eps}}
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \caption{ParamILS Tuning on ZenoMiniMulti}
+ 
+\end{figure*}
+  
+\clearpage 
+\newpage
+ 
+% \begin{figure*}[h!]
+% \centering
+% \subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno3ealpha_{cost}:alpha=0.0.eps} } 
+% \subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno3ealpha_{cost}:alpha=0.05.eps} } \qquad
+% \subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno3ealpha_{cost}:alpha=0.3.eps} }  
+% \subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno3ealpha_{cost}:alpha=0.5.eps} } \qquad
+% \subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno3ealpha_{cost}:alpha=0.55.eps} } 
+% \subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno3ealpha_{cost}:alpha=0.7.eps} } \qquad
+% \subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno3ealpha_{cost}:alpha=1.0.eps} }  
+% \subfloat[overall]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm] {../plot_archive/zeno3ealpha_{cost}:overall.eps} } \qquad 
+% \subfloat[rate]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm] {../plot_archive/zeno3ealpha_{cost}:rate.eps} } 
+% %\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+% %\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+% \caption{Attainment plots for Aggregation on Zeno3 $_{cost}$ instances.}
+% \end{figure*}
+
+ 
+\clearpage 
+\newpage
+\section*{Tuning with Hypervolume Metric}
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:alpha=0.05.eps} } \qquad 
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:alpha=0.1.eps} }
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:alpha=0.3.eps} } \qquad 
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:alpha=0.55.eps} } \qquad 
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:alpha=1.0.eps} } \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3ealpha_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno3 $_{risk}$ instances.}
+\end{figure*}
+
+
+ 
+\clearpage 
+\newpage
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:alpha=0.05.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:alpha=0.1.eps} }
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:alpha=1.0.eps} }  \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno6 $_{cost}$ instances.}
+\end{figure*}
+
+ 
+\clearpage 
+\newpage
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:alpha=0.05.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:alpha=0.1.eps} }
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:alpha=0.3.eps} } \qquad 
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:alpha=1.0.eps} }  \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6ealpha_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno6 $_{risk}$ instances.}
+\end{figure*}
+
+ 
+% \clearpage 
+% \newpage
+%   \begin{figure*}[h!]
+% \centering
+% \subfloat[$\alpha=0.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:alpha=0.0.eps} } 
+%  \subfloat[$\alpha=0.05$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:alpha=0.05.eps} }\qquad
+%  \subfloat[$\alpha=0.3$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:alpha=0.3.eps} } \qquad
+% \subfloat[$\alpha=0.55$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:alpha=0.5.eps} }\qquad
+% \subfloat[$\alpha=0.5$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:alpha=0.55.eps} } \qquad
+% \subfloat[$\alpha=0.7$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:alpha=0.7.eps} } 
+% \subfloat[$\alpha=1.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:alpha=1.0.eps} }  \qquad
+% \subfloat[overall]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:overall.eps} }  
+% \subfloat[rate]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:rate.eps} } 
+% %\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+% %\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+% \caption{$Zeno9_{cost}$}
+% \end{figure*}
+%   
+% \clearpage 
+% \newpage
+%   \begin{figure*}[h!]
+% \centering
+% \subfloat[$\alpha=0.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:alpha=0.0.eps} } 
+%  \subfloat[$\alpha=0.05$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:alpha=0.05.eps} }\qquad
+%  \subfloat[$\alpha=0.3$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:alpha=0.3.eps} } \qquad
+% \subfloat[$\alpha=0.55$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:alpha=0.5.eps} }\qquad
+% \subfloat[$\alpha=0.5$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:alpha=0.55.eps} } \qquad
+% \subfloat[$\alpha=0.7$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:alpha=0.7.eps} } 
+% \subfloat[$\alpha=1.0$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:alpha=1.0.eps} }  \qquad
+% \subfloat[overall]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:overall.eps} }  
+% \subfloat[rate]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:rate.eps} } 
+% %\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+% %\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+% \caption{$Zeno9_{risk}$}
+% \end{figure*}
+
+  \clearpage 
+  \newpage
+  \begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:alpha=0.0.eps} } 
+ \subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:alpha=0.05.eps} }\qquad
+ \subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:alpha=0.1.eps} }
+ \subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:alpha=1.0.eps} }  \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno9_{cost}$}
+\end{figure*}
+
+
+  \clearpage 
+  \newpage
+  \begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:alpha=0.0.eps} } 
+ \subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:alpha=0.05.eps} }\qquad
+ \subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:alpha=0.1.eps} }
+ \subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:alpha=1.0.eps} }  \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9ealpha_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno9_{risk}$}
+\end{figure*}
+
+
+ 
+ \begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno9ei_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[$BEA_{H^-}$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} } \qquad
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno9$}
+ \end{figure*}
+
+
+\clearpage 
+\newpage
+
+\begin{figure*} 
+ \centering
+\subfloat[$zeno3_{cost}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Add_ibeahyper-pareto.eps}}
+\subfloat[$zeno3_{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Max_ibeahyper-pareto.eps}}\\
+ \subfloat[$zeno6_{cost}$] {\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Add_ibeahyper-pareto.eps}}
+ \subfloat[$zeno6_{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Max_ibeahyper-pareto.eps}}\\
+ \subfloat[$zeno9_{cost}$] {\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Add_ibeahyper-pareto.eps}}
+ \subfloat[$zeno9_{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Max_ibeahyper-pareto.eps}}\\
+ 
+\caption{Pareto fronts of IBEA$_{H}$}
+\end{figure*}
+
+ 
+\clearpage 
+\newpage
+\begin{figure*} 
+ \centering
+\subfloat[$zeno3_{cost}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Add_aggregation-pareto.eps}}
+\subfloat[$zeno3_{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Max_aggregation-pareto.eps}}\\
+ \subfloat[$zeno6_{cost}$] {\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Add_aggregation-pareto.eps}}
+ \subfloat[$zeno6_{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Max_aggregation-pareto.eps}}\\
+ \subfloat[$zeno9_{cost}$] {\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Add_aggregation-pareto.eps}}
+ \subfloat[$zeno9_{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Max_aggregation-pareto.eps}}\\
+ 
+\caption{Pareto fronts of Aggregation}
+\end{figure*}
+ 
+ 
+\clearpage 
+\newpage
+ 
+
+\section*{IBEA Vs Aggregation}
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3_{cost}:IBEA_{H^-}.eps} } 
+ \subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{cost}:overall.eps} } \qquad
+\caption{$Zeno3_{cost}$}
+ \end{figure*}
+\begin{figure*}[h!]
+\centering
+ \subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{cost}:overall.eps} } \qquad
+\caption{$Zeno6_{cost}$}
+\end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{cost}:overall.eps} }  \qquad
+\caption{$Zeno9_{cost}$}
+\end{figure*}
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3_{risk}:IBEA_{H^-}.eps} } 
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 30}\qquad
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno3ealpha_{risk}:overall.eps} } \qquad
+\caption{$Zeno3_{risk}$}
+\end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno6ealpha_{risk}:overall.eps} } \qquad
+\caption{$Zeno6_{risk}$}
+\end{figure*}
+\begin{figure*}[h!]
+\centering
+\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ei_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[Aggregation]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9ealpha_{risk}:overall.eps} }  \qquad
+\caption{$Zeno9_{risk}$}
+ \end{figure*}
+ 
+ \clearpage 
+\newpage
+
+
+
+ 
+  \begin{figure}
+ \centering
+  \subfloat[zeno3$-{cost}$]{ \includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno3ealpha-Add-hyperia.eps}}
+ % zeno3_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[zeno3$-{risk}$]{\includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno3ealpha-Max-hyperia.eps}}\\
+ % zeno3_hyper_{risk}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[zeno6$-{cost}$]{ \includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno6ealpha-Add-hyperia.eps}}
+ % zeno6e_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno6$-{risk}$]{ \includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno6ealpha-Max-hyperia.eps}}\\
+ % zeno6e_hyper_{risk}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno9$-{cost}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9ealpha-Add-hyperia.eps}}
+  \subfloat[zeno9$-{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9ealpha-Max-hyperia.eps}}\\
+ % zeno9_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Hypervolume}
+\end{figure}
+
+ 
+ \clearpage 
+\newpage
+
+
+
+ \clearpage 
+\newpage
+
+\section*{ParamILS }
+
+ \begin{figure*}[h!]
+\centering
+ \subfloat[ParamIls$_{H}$ on $zeno3e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3e_Add_trajeth.eps}}
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[ParamIls$_{Fitness}$ on $zeno3e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3e_Add_trajetb.eps}}\qquad
+  
+  \subfloat[ParamIls$_{H}$ on $zeno3e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3e_Max_trajeth.eps}}
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+   \subfloat[ParamIls$_{Fitness}$ on $zeno3e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno3e_Max_trajetb.eps}}\qquad
+   
+  \subfloat[ParamIls$_{H}$ on $zeno6e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6e_Add_trajeth.eps}}
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+   \subfloat[ParamIls$_{Fitness}$ on $zeno6e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6e_Add_trajetb.eps}}\qquad
+   
+  \subfloat[ParamIls$_{H}$ on $zeno6e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6e_Max_trajeth.eps}} 
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+   \subfloat[ParamIls$_{Fitness}$ on $zeno6e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno6e_Max_trajetb.eps}}\qquad
+  
+ \end{figure*}
+ 
+ \clearpage 
+\newpage
+
+ \begin{figure*}[h!]
+\centering  
+
+  \subfloat[ParamIls$_{H}$ on $zeno9e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9e_Add_trajeth.eps}}
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+   \subfloat[ParamIls$_{F}$ on $zeno9e_{cost}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9e_Add_trajetb.eps}}\qquad
+   \subfloat[ParamIls$_{H}$on$zeno9e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9e_Max_trajeth.eps}}
+  \subfloat[ParamIls$_{F}$ on $zeno9e_{risk}$]{\includegraphics[scale=0.6, bb=50 50 410 302]{../plot_archive/zeno9e_Max_trajetb.eps}}\qquad
+ % zeno3e_Add_trajet.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \caption{ParamILS Tuning on ZenoMiniMulti}
+ 
+\end{figure*}
+
+
+ 
+
+
+\clearpage 
+\newpage
+
+\scriptsize
+\section*{Tuning with Hypervolume Metric}
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:alpha=0.05.eps} } \qquad 
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:alpha=0.1.eps} }
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:alpha=0.3.eps} } \qquad 
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:alpha=0.55.eps} } \qquad 
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:alpha=1.0.eps} } \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealpha_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno3 $_{risk}$ instances.}
+\end{figure*}
+
+
+ 
+\clearpage 
+\newpage
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:alpha=0.05.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:alpha=0.1.eps} }
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:alpha=1.0.eps} }  \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno6 $_{cost}$ instances.}
+\end{figure*}
+
+ 
+\clearpage 
+\newpage
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:alpha=0.05.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:alpha=0.1.eps} }
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:alpha=0.3.eps} } \qquad 
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:alpha=1.0.eps} }  \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealpha_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno6 $_{risk}$ instances.}
+\end{figure*}
+
+ \clearpage 
+  \newpage
+  \begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:alpha=0.0.eps} } 
+ \subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:alpha=0.05.eps} }\qquad
+ \subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:alpha=0.1.eps} }
+ \subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:alpha=1.0.eps} }  \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno9_{cost}$}
+\end{figure*}
+
+
+  \clearpage 
+  \newpage
+  \begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:alpha=0.0.eps} } 
+ \subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:alpha=0.05.eps} }\qquad
+ \subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:alpha=0.1.eps} }
+ \subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:alpha=1.0.eps} }  \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealpha_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{$Zeno9_{risk}$}
+\end{figure*}
+
+
+
+\clearpage 
+\newpage
+
+
+ \section*{Tuning with Fitness Metric}
+
+ \begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:alpha=0.05.eps} } \qquad 
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:alpha=0.1.eps} } 
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:alpha=0.3.eps} } \qquad 
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:alpha=0.55.eps} }\qquad  
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:alpha=1.0.eps} } \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:overall.eps} }   
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno3 $_{cost}$ instances.}
+\end{figure*}
+
+\clearpage 
+\newpage
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:alpha=0.05.eps} } \qquad 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:alpha=0.1.eps} } 
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:alpha=0.55.eps}} \qquad  
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:alpha=0.7.eps} }
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:alpha=1.0.eps} } \qquad
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno3ealphafit_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno3 $_{risk}$ instances.}
+\end{figure*}
+
+
+ 
+\clearpage 
+\newpage
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:alpha=0.05.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:alpha=0.1.eps} } 
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:alpha=0.3.eps} } \qquad
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:alpha=0.55.eps} } \qquad
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:alpha=1.0.eps} } \qquad 
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:overall.eps} }  
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno6 $_{cost}$ instances.}
+\end{figure*}
+
+
+
+ 
+\clearpage 
+\newpage
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:alpha=0.05.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:alpha=0.1.eps} } 
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:alpha=0.3.eps} } \qquad 
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:alpha=0.55.eps} } \qquad 
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:alpha=1.0.eps} }  \qquad 
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:overall.eps} } 
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno6ealphafit_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno6 $_{risk}$ instances.}
+\end{figure*}
+
+
+\clearpage 
+\newpage
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:alpha=0.05.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:alpha=0.1.eps} } 
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:alpha=0.3.eps} } \qquad 
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:alpha=0.55.eps} } \qquad 
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:alpha=1.0.eps} }  \qquad 
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:overall.eps} } 
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{cost}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno9 $_{cost}$ instances.}
+\end{figure*}
+
+
+  \clearpage 
+  \newpage
+
+\begin{figure*}[h!]
+\centering
+\subfloat[$\alpha=0.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:alpha=0.0.eps} } 
+\subfloat[$\alpha=0.05$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:alpha=0.05.eps} } \qquad
+\subfloat[$\alpha=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:alpha=0.1.eps} } 
+\subfloat[$\alpha=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:alpha=0.3.eps} } \qquad 
+\subfloat[$\alpha=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:alpha=0.5.eps} } 
+\subfloat[$\alpha=0.55$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:alpha=0.55.eps} } \qquad 
+\subfloat[$\alpha=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:alpha=0.7.eps} } 
+\subfloat[$\alpha=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:alpha=1.0.eps} }  \qquad 
+\subfloat[overall]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:overall.eps} } 
+\subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.45]{../plot_archive/zeno9ealphafit_{risk}:rate.eps} } 
+%\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps} } 
+%\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{risk}:IBEA_{H^-}.eps} }  \qquad
+\caption{Attainment plots for Aggregation on Zeno9 $_{risk}$ instances.}
+\end{figure*}
+
+
+
+\begin{table}
+\scriptsize
+\begin{tabular}{|l|l|l|}
+\hline
+Parameters 	&	   Range 	&	Description\\					
+\hline									
+bmax-init 	&	[10e3,10e6]	&	 Number of allowed expanded nodes for the initial computation of b${-max}$\\					
+bmax-fixed	&	[10e3,10e6]	&	 Fixed number of allowed expanded nodes\\					
+bmax-increase-coef	&	[1,5]	&	Multiplier increment for the computation of $b-{max}$\\					
+bmax-last-weight 	&	[1,5]	&	 Weighting for the $b-{max}$ used during the last search towards the end goal\\					
+astar-weight 	&	[0-5]	&	  Weighting for the optimizing  A* heuristic during the search\\					
+fitness-penalty 	&	[10e2,10e3]	&	 Penalty in the unfeasible fitnesses computation\\					
+fitness-weight 	&	[10,30]	&	 Unknown weight in the feasible and unfeasible fitness computation\\					
+lmax-initcoef 	&	[5,20]	&	 l-max will be set to the size of the chrono partition * this coefficient\\					
+lmin 	&	1	&	 Minimum number of goals in a decomposition\\					
+lenght-weight	&	[1,5]	&	 Weighting for the optimizing lenght during the search\\					
+cost-weight 	&	[1,5]	&	  Weighting for the optimizing cost during the search\\					
+makespan-add-weight 	&	[1,5]	&	Weighting for the optimizing  makespan-add during the search  \\					
+makespan-max-weight 	&	[1,5]	&	 Weighting for the optimizing makespan-max during the search\\					
+maxGen	&	-1	&	 Maximum number of generations\\	
+maxTime	&  \{300,600,900\}	& Maximum running time in seconds\\						
+pop-size 	&	[10,300]	&	 Population Size\\					
+maxtry-candidate	&	[10,100]	&	  Maximum number of atoms for a candidate in the changeAtom mutation\\					
+maxtry-mutex	&	[10,100]	&	 Maximum number of atoms  for mutexes in the changeAtom mutation\\					
+proba-change	&	[0,1]	&	  Probability to change an atom for the changeAtom mutation\\					
+proba-cross	&	[0,1]	&	 Probability to apply a cross-over\\					
+proba-del-atom	&	[0,1]	&	 Average probability to delete an atom for the delAtom mutation\\					
+proba-mut	&	[0,1]	&	  Probability to apply one of the mutation\\					
+radius	&	[1,10]	&	  Number of neighbour goals to consider for the addGoal mutation\\					
+rand-yahsp-seed	&	{0,1}	&	 flag  for the random initilaization of yahsp at each optimization\\					
+w-addatom	&	[1,10]	&	  Relative weight defining the probability to call the addAtom mutation\\					
+w-addgoal	&	[1,10]	&	  Relative weight defining the probability to call the addGoal mutation\\					
+w-delatom	&	[1,10]	&	 Relative weight defining the probability to call the delAtom mutation\\					
+w-delgoal	&	[1,10]	&	 Relative weight defining the probability to call the delGoal mutation\\												
+\hline				
+\end{tabular}
+\caption{MO-DAEYAHSP Parameters}
+\label{tab:paramters}
+\end{table}
+
+
+
+
+\begin{table}
+\scriptsize
+\begin{tabular}{|l|c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c|}
+\hline
+\multirow{3}*{Parameters} & \multicolumn{16}{|c|}{Aggregation Parameter} \\
+    \cline{2-17}
+			    & \multicolumn{8}{c||}{$ParamILS_{H}$}  & \multicolumn{8}{c|}{$ParamILS_{F}$} \\
+    \cline{2-17}
+			    &  0.0 & 0.05 & 0.1& 0.3 & 0.5 & 0.55&  0.7 & 1.0 &  0.0 & 0.05 & 0.1 & 0.3 & 0.5 & 0.55 & 0.7 & 1.0 \\
+\hline 
+ Makespan-add-weight 	& 3 & 3& 3& 2& 2&2&  0 & 0& 0& 0 &0 & 0&  5& 5& 1 & 4\\
+  Cost-weight  &  0 & 0 & 0 & 4 & 3 &  3 & 3 & 4 &  2 & 4& 4& 2& 1 & 1& 0& 1\\
+  Pop-size &  100 & 100 & 200 & 200 & 100  &  100  & 200 &300 &    200 & 300 &300 & 100 & 100 &100 &100& 100\\
+  Proba-cross &0.5& 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 1.0 & 0.8 & 0.8& 0.1& 0.2& 0.2& 0.5& 0.8& 0.2& 0.1\\
+  Proba-mut & 0.8 & 0.2 & 0.2 & 0.2 & 0.2 & 0.2 & 0.5 & 1.0 &  0.5& 1.0 & 0.5& 1.0& 1.0& 1.0& 0.8& 1.0\\
+  Radius &  3 & 3 &10 & 1 & 7 & 7& 1& 5 &  3 & 3& 1& 3& 5& 5& 10& 3\\
+  Proba-Change & 0.5  & 0.5 &0.5 & 1.0 & 0.8 & 0.5 &0.5 & 0.8  & 0.8 & 0.8 & 0.8& 0.5& 0.0 & 1.0& 0.8 & 0.5\\
+  Proba-del-atom & 0.1 & 0.0 &0.0  &0.1 & 0.5 &0.5   &0.5& 0.0 & 0.1& 0.8& 0.0 & 0.8& 1.0 & 0.8& 0.5 & 0.5\\
+  w-addatom & 1 & 1 & 5 & 5& 5& 5& 5& 5&  3& 10 & 3& 10& 3& 5& 5& 3\\
+  w-addgoal & 5 & 1 & 5 & 7 & 7 &7 & 0 &0 & 3 & 7 & 10 & 10 & 10 & 10 & 10& 10\\
+  w-delatom & 3 & 3 & 1 & 5 & 10 & 1 & 7 & 0 &  3 & 5 & 10 & 0 & 10 & 10 & 3 & 1 \\
+  w-delgoal & 5 & 5& 5 & 7 & 10 & 3 & 7 & 10& 1 & 7 & 1 & 1& 0 & 1 & 10 & 1\\
+   \hline
+\end{tabular}
+
+\caption{ParamIlS on zeno6$_{cost}$}
+\label{tab:paramters}
+\end{table}
+
+
+
+\begin{table}
+\scriptsize
+\begin{tabular}{|l|c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|c|}
+\hline
+\multirow{3}*{Parameters} & \multicolumn{16}{|c|}{Aggregation Parameter} \\
+    \cline{2-17}
+			    & \multicolumn{8}{c||}{$ParamILS_{H}$}  & \multicolumn{8}{c|}{$ParamILS_{F}$} \\
+    \cline{2-17}
+			    &  0.0 & 0.05 & 0.1& 0.3 & 0.5 & 0.55&  0.7 & 1.0 &  0.0 & 0.05 & 0.1 & 0.3 & 0.5 & 0.55 & 0.7 & 1.0 \\
+\hline 
+ Makespan-add-weight 	& 4 &  4 & 0 & 0& 0& 0& 0& 0&  5 & 2& 0& 1& 2& 0& 4& 5 \\
+  Cost-weight & 0 & 4& 4& 2& 4 & 1& 4& 4& 3 & 3& 4& 1& 3& 5& 3& 1 \\
+  Pop-size   & 300 & 200& 100& 100& 100& 200& 300& 300& 100 & 200 & 200 & 100 & 200 & 300 & 300& 50 \\
+  Proba-cross & 0.1& 0.8& 1.0& 1.0& 1.0& 1.0& 1.0& 1.0 & 1.0 & 0.2 & 0.5 & 0.2 & 0.5 & 0.5 & 0.1 & 0.0 \\
+  Proba-mut & 1.0 & 0.8& 0.5& 0.8& 1.0& 0.8& 1.0& 0.8& 1.0 & 0.5 & 0.8& 0.8 & 1.0 & 1.0 & 0.2 & 0.8 \\
+  Radius &  5& 3 & 5& 1& 5& 3& 5& 10& 1 & 3 & 10 & 3 & 1 & 1 & 3 & 5 \\
+  Proba-Change & 1.0 & 0.1 & 0.2& 0.2& 0.2& 0.2& 0.5& 1.0  & 0.0 & 0.0 & 0.1 & 0.8 & 0.8 & 0.2 & 0.8 & 0.5 \\
+  Proba-del-atom & 0.8 & 0.8& 1.0& 0.0 & 1.0 & 0.2 & 0.0 & 0.5 & 0.2 & 1.0 & 0.2 & 0.5 & 0.0 & 0.8 & 0.2 & 0.1 \\
+  w-addatom & 7 &  10 & 3 &  0& 3& 5 & 7& 1 &  0 & 7 & 5 & 1 & 1& 3 & 7 & 1 \\
+  w-addgoal & 10 & 7& 3 & 5& 5& 7 & 7& 7 & 5 & 5& 10 & 1 & 7 & 7& 3 & 10 \\
+  w-delatom & 3& 3& 1& 0& 1& 5& 1& 0 & 5 & 1 & 1& 3 & 10 & 0 & 1 & 7\\
+  w-delgoal & 1& 7 & 3& 3& 3& 7& 3& 5& 10 & 10 & 7 & 1 & 10 & 5 & 0 & 5 \\
+   \hline
+\end{tabular}
+
+\caption{ParamIlS on zeno3$_{risk}$}
+\label{tab:paramters}
+\end{table}
+
+
+
+
+\end{document}

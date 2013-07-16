@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Creator: fig2dev Version 3.2 Patchlevel 5d -->
+
+<!-- CreationDate: Sun Nov 11 06:50:29 2012 -->
+
+<!-- Magnification: 1.000 -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="4.9in"
+   height="3.8in"
+   viewBox="963 588 5896 4518"
+   id="svg3004"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="generiqueMiniMulti.fig">
+  <metadata
+     id="metadata3098">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3096" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1231"
+     inkscape:window-height="1000"
+     id="namedview3094"
+     showgrid="false"
+     inkscape:zoom="2.4064327"
+     inkscape:cx="166.08278"
+     inkscape:cy="156.43037"
+     inkscape:window-x="49"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g3006" />
+  <g
+     style="fill:none;stroke-width:0.025in"
+     id="g3006"
+     transform="translate(0,-22.223126)">
+    <!-- Line -->
+    <polyline
+       points="3900,3000 3900,4200 "
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polyline3008" />
+    <!-- Line -->
+    <polyline
+       points="3900,1200 3900,2400 "
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polyline3010" />
+    <!-- Line -->
+    <polyline
+       points="4350,2700 6000,2700 "
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polyline3012" />
+    <!-- Line -->
+    <polyline
+       points="1800,2700 3450,2700 "
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="polyline3014" />
+    <!-- Arc -->
+    <path
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt"
+       d="m 3900,1200 a 2175,2175 0 0 0 0,3000"
+       id="path3016"
+       inkscape:connector-curvature="0" />
+    <!-- Arc -->
+    <path
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt"
+       d="M 4350,900 A 2299,2299 0 0 1 6300,2400"
+       id="path3018"
+       inkscape:connector-curvature="0" />
+    <!-- Arc -->
+    <path
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt"
+       d="M 1500,2400 A 2035,2035 0 0 1 3450,900"
+       id="path3020"
+       inkscape:connector-curvature="0" />
+    <!-- Arc -->
+    <path
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt"
+       d="M 1500,3000 A 2035,2035 0 0 0 3450,4500"
+       id="path3022"
+       inkscape:connector-curvature="0" />
+    <!-- Arc -->
+    <path
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt"
+       d="M 4350,4500 A 2299,2299 0 0 0 6300,3000"
+       id="path3024"
+       inkscape:connector-curvature="0" />
+    <!-- Circle -->
+    <circle
+       cx="5596"
+       cy="3975"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3026"
+       d="m 5852,3975 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="5596"
+       sodipodi:cy="3975"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Circle -->
+    <circle
+       cx="2189"
+       cy="4035"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3028"
+       d="m 2445,4035 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="2189"
+       sodipodi:cy="4035"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Circle -->
+    <circle
+       cx="2144"
+       cy="1395"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3030"
+       d="m 2400,1395 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="2144"
+       sodipodi:cy="1395"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Circle -->
+    <circle
+       cx="5519"
+       cy="1380"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3032"
+       d="m 5775,1380 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="5519"
+       sodipodi:cy="1380"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Circle -->
+    <circle
+       cx="2579"
+       cy="2700"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3034"
+       d="m 2835,2700 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="2579"
+       sodipodi:cy="2700"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Circle -->
+    <circle
+       cx="3419"
+       cy="3315"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3036"
+       d="m 3675,3315 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="3419"
+       sodipodi:cy="3315"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Circle -->
+    <circle
+       cx="3914"
+       cy="1875"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3038"
+       d="m 4170,1875 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="3914"
+       sodipodi:cy="1875"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Circle -->
+    <circle
+       cx="5234"
+       cy="2700"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3040"
+       d="m 5490,2700 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="5234"
+       sodipodi:cy="2700"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Circle -->
+    <circle
+       cx="3899"
+       cy="3525"
+       r="256"
+       style="fill:#ffffff;stroke:#000000;stroke-width:7"
+       id="circle3042"
+       d="m 4155,3525 c 0,141.3849 -114.6151,256 -256,256 -141.3849,0 -256,-114.6151 -256,-256 0,-141.3849 114.6151,-256 256,-256 141.3849,0 256,114.6151 256,256 z"
+       sodipodi:cx="3899"
+       sodipodi:cy="3525"
+       sodipodi:rx="256"
+       sodipodi:ry="256" />
+    <!-- Ellipse -->
+    <ellipse
+       transform="translate(4612,4912)"
+       rx="412"
+       ry="187"
+       style="fill:#cccccc;stroke:#000000;stroke-width:7"
+       id="ellipse3044"
+       d="M 412,0 C 412,103.27725 227.54132,187 0,187 -227.54132,187 -412,103.27725 -412,0 c 0,-103.27725 184.45868,-187 412,-187 227.54132,0 412,83.72275 412,187 z"
+       cx="0"
+       cy="0"
+       sodipodi:cx="0"
+       sodipodi:cy="0"
+       sodipodi:rx="412"
+       sodipodi:ry="187" />
+    <!-- Ellipse -->
+    <ellipse
+       transform="translate(4687,3187)"
+       rx="412"
+       ry="187"
+       style="fill:#cccccc;stroke:#000000;stroke-width:7"
+       id="ellipse3046"
+       d="M 412,0 C 412,103.27725 227.54132,187 0,187 -227.54132,187 -412,103.27725 -412,0 c 0,-103.27725 184.45868,-187 412,-187 227.54132,0 412,83.72275 412,187 z"
+       cx="0"
+       cy="0"
+       sodipodi:cx="0"
+       sodipodi:cy="0"
+       sodipodi:rx="412"
+       sodipodi:ry="187" />
+    <!-- Ellipse -->
+    <ellipse
+       transform="translate(4537,1387)"
+       rx="412"
+       ry="187"
+       style="fill:#cccccc;stroke:#000000;stroke-width:7"
+       id="ellipse3048"
+       d="M 412,0 C 412,103.27725 227.54132,187 0,187 -227.54132,187 -412,103.27725 -412,0 c 0,-103.27725 184.45868,-187 412,-187 227.54132,0 412,83.72275 412,187 z"
+       cx="0"
+       cy="0"
+       sodipodi:cx="0"
+       sodipodi:cy="0"
+       sodipodi:rx="412"
+       sodipodi:ry="187" />
+    <!-- Line: box -->
+    <rect
+       x="975"
+       y="2400"
+       width="825"
+       height="600"
+       rx="0"
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="rect3050" />
+    <!-- Line: box -->
+    <rect
+       x="3450"
+       y="600"
+       width="900"
+       height="600"
+       rx="0"
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="rect3052" />
+    <!-- Line: box -->
+    <rect
+       x="6000"
+       y="2400"
+       width="825"
+       height="600"
+       rx="0"
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="rect3054" />
+    <!-- Line: box -->
+    <rect
+       x="3450"
+       y="2400"
+       width="900"
+       height="600"
+       rx="0"
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="rect3056" />
+    <!-- Line: box -->
+    <rect
+       x="3450"
+       y="4200"
+       width="900"
+       height="600"
+       rx="0"
+       style="stroke:#000000;stroke-width:7;stroke-linecap:butt;stroke-linejoin:miter"
+       id="rect3058" />
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="3600"
+       y="975"
+       font-style="normal"
+       font-weight="normal"
+       font-size="216"
+       id="text3060"
+       style="font-size:216px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">City 1</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="1050"
+       y="2775"
+       font-style="normal"
+       font-weight="normal"
+       font-size="216"
+       id="text3062"
+       style="font-size:216px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">City 0</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="6075"
+       y="2775"
+       font-style="normal"
+       font-weight="normal"
+       font-size="216"
+       id="text3064"
+       style="font-size:216px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">City 4</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="3525"
+       y="2775"
+       font-style="normal"
+       font-weight="normal"
+       font-size="216"
+       id="text3066"
+       style="font-size:216px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">City 2</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="3600"
+       y="4575"
+       font-style="normal"
+       font-weight="normal"
+       font-size="216"
+       id="text3068"
+       style="font-size:216px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">City 3</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="4513.6465"
+       y="5016.3491"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3070"
+       style="font-size:257.6076355px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times"
+       transform="scale(1.0070958,0.99295417)">3</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="4622.2271"
+       y="3266.6653"
+       font-style="normal"
+       font-weight="normal"
+       font-size="216"
+       id="text3072"
+       style="font-size:216px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">2</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="4483.3389"
+       y="1466.6653"
+       font-style="normal"
+       font-weight="normal"
+       font-size="216"
+       id="text3074"
+       style="font-size:216px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">1</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="5527.2231"
+       y="4091.6653"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3076"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">9</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="2099.4463"
+       y="4147.7769"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3078"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">3</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="2504.4463"
+       y="2801.6653"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3080"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">2</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="5163.3345"
+       y="2812.7769"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3082"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">8</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="2066.1116"
+       y="1492.7769"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3084"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">1</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="3344.4463"
+       y="3412.7769"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3086"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">5</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="3810"
+       y="3645"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3088"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">6</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="3810"
+       y="1980"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3090"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">4</text>
+    <!-- Text -->
+    <text
+       xml:space="preserve"
+       x="5445"
+       y="1485"
+       font-style="normal"
+       font-weight="normal"
+       font-size="288"
+       id="text3092"
+       style="font-size:288px;font-style:normal;font-weight:normal;text-anchor:start;fill:#000000;font-family:Times">7</text>
+  </g>
+</svg>

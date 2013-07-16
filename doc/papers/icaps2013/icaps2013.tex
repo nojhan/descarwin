@@ -1,0 +1,165 @@
+\documentclass[letterpaper]{article}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\frenchspacing
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage[utf8]{inputenc}
+\usepackage{algorithm}
+\usepackage[noend]{algorithmic}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{array}
+
+\algsetup{indent=1.8em}
+\renewcommand{\algorithmiccomment}[1]{// #1}
+
+%\title{Divide-and-Evolve: the Booster for Sub-Optimal Planner}
+%\title{A Meta-Algorithm to Boost Domain-Independent Planners}
+
+%\title{An Evolutionary Metaheuristic for Domain-Independent Satisficing Planning}
+% \title{Evolutionary State Decomposition for Domain-Independent Satisficing Planning}
+%\title{An Evolutionary Metaheuristic Based on State Decomposition for Domain-Independent Satisficing Planning}
+
+\title{Pareto Multi-Objective AI Planning: Benchmarks and First Results}
+%\author{M.~R. Khouadjia \inst{1} \and M. Schoenauer\inst{1}\and V. Vidal\inst{2}  \and J. Dr\'eo\inst{3} \and P. Sav\'eant\inst{3}}
+\author{M.~R. Khouadjia \and M. Schoenauer \and V. Vidal \and J. Dr\'eo \and P. Sav\'eant}
+
+% Please leave SVN version number $Revision: 989 $
+%\author{Blind submission \#67}
+
+%\title{Pareto Multi-Objective AI Planning: Benchmarks and First Results}
+%%Benchmarks for Evolutionary Multi-Objective AI Planning}
+%
+% \titlerunning{Pareto Multi-Objective AI Planning}  % abbreviated title (for running head)
+%                                     also used for the TOC unless
+%                                     \toctitle is used
+%
+% \author{Mostepha~R. Khouadjia \inst{1} \and Marc Schoenauer\inst{1}\and
+% Vincent Vidal\inst{2}  \and Johann Dr\'eo\inst{3} \and Pierre Sav\'eant\inst{3}}
+%
+% \authorrunning{Mostepha~R. Khouadjia et \textit{al.}} % abbreviated author list (for running head)
+%
+%%%% list of authors for the TOC (use if author list has to be modified)
+% \tocauthor{Mostepha~R. Khouadjia, Marc Schoenauer, Vincent Vidal, Johann Dr\'eo, and Pierre Sav\'eant}
+%
+% \institute{TAO Project, INRIA Saclay \&  LRI Paris-Sud University, Orsay, France\\%Universit\'{e} Paris-Sud
+% \email{\{mostepha-redouane.khouadjia, marc.schoenauer\}@inria.fr},\\ %WWW home page:
+%\texttt{http://users/\homedir iekeland/web/welcome.html}
+% \and
+% ONERA-DCSD, Toulouse, France\\
+% \email{Vincent.Vidal@onera.fr}\\
+%  \and
+%  THALES Research \& Technology, Palaiseau, France\\
+%  \email{\{johann.dreo, pierre.saveant\}@thalesgroup.com}\\
+% }
+
+
+\newcommand{\pp}{planning tasks}
+\newcommand{\PP}{planning task}
+\newcommand{\dae}{{\em Divide-and-Evolve}}
+\newcommand{\DAEI}{{\sc DaE}}
+\newcommand{\DAEII}{{\sc DaE2}}
+\newcommand{\DAEX}{{\sc DaE$_{\text{X}}$}}
+\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
+\newcommand{\MODAEYAHSP}{{\sc MO-DaE$_{\text{YAHSP}}$}}
+\newcommand{\CPT}{{\sc CPT}}
+\newcommand{\LPG}{{\sc LPG}}
+\newcommand{\LAMA}{{\sc LAMA}}
+\newcommand{\TFD}{{\sc TFD}}
+\newcommand{\YAHSP}{{\sc YAHSP}}
+\newcommand{\OPENSTACKS}{{\sc Openstacks}}
+\newcommand{\ELEVATORS}{{\sc Elevators}}
+\newcommand{\CREWPLANNING}{{\sc CrewPlanning}}
+\newcommand{\FLOORTILE}{{\sc Floortile}}
+\newcommand{\PARCPRINTER}{{\sc ParcPrinter}}
+% \def\UU{{\rm I\hspace{-0.50ex}U}}
+%\def\UU{{\mathbf{I\hspace{-0.50ex}U}}}
+\def\UU{{\mathbb{U}}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+To-date AI planners tackle multi-objective planning problems by turning them into single-objective problems, e.g., using linear aggregation of the different objectives, or optimizing one of the objectives after setting the others as constraints. When they exist and can be applied, direct Pareto-based approaches, that return a set of solutions representing an approximation of the best possible trade-offs between the objectives (aka the Pareto Front of the problem) are usually much more computationally efficient, and can theoretically reach the true Pareto front of any multi-objective problem, no matter its shape. 
+
+Divide-and-Evolve (\DAEX) is an evolutionary planner that slices a planning problem into hopefully simpler sub-problems, and relies on the classical (single-objective) planner $X$ to solve each sub-problem in turn. \MODAEYAHSP, the multi-objective indicator-based version of \DAEYAHSP, repeatedly asks \YAHSP\ to optimize one of the objectives. The choice of which objective \YAHSP\ should optimize is however crucial, and several strategies can be designed.
+
+But there are today no multi-objective benchmarks such as the (single-objective) ones that have been proposed for the different IPC competitions. This paper exploits this corpus by proposing a systematic way to ``multi-objectivize`` of some IPC domains -- together with some toy problems where the exact solution (Pareto Front) is known. A sound experimental campaign comparing several on-line strategies for the choice of objective \YAHSP\ should optimize within \MODAEYAHSP, and the baseline aggregated approach, can then be performed: its first results are discussed here.
+\end{abstract}
+
+\section{Introduction}
+blablabla
+
+
+
+
+\section{Multi-Objectivization of IPC-7 domains}
+\label{testbench}
+In this section we suggest a way to build upon IPC-7 satisficing tracks instances a set of multiobjective planning problems describes in PDDL.
+Two satisficing tracks were open at IPC-7: sequential satisficing, i.e., sequential STRIPS planning in which actions have a cost and where the total cost is to me minimized, and temporal satisficing, where actions have a duration and can be run in parallel and where the total makespan is to be minimized.
+In order to produce non-trivial Pareto fronts, the two criteria must be antagonist. 
+Hence, we retain three ways of generating multiobjective instances. When the domains appeared in both tracks, with the same instances and with the cost increases as well as the duration, a simple merge is enough. This was the case for \ELEVATORS.
+
+For some domains, the cost values did not ensure that both objectives would be antagonist. This is the case for \CREWPLANNING, \FLOORTILE, and \PARCPRINTER.
+For these instances we choose to set arbitrarily the cost values to a maximum cost less the value of the duration.
+
+Finally for the \OPENSTACKS\ domain, the cost version adds an action which penalize the use of a new resource (here a stack). These scheme is very general and can be applied to any scheduling problem with resources (with more resource, things get done faster, but cost more). For this dommain we simply added this cost action into the temporal domain.
+
+Note that all domains where action durations or costs were uniformly equal to one were rejected outright. But of course we could look closer to the application domain and decide on a multiobjective semantics introduction.
+
+\subsection{\ELEVATORS}
+
+For \ELEVATORS\ a simple mixing of both sequential and temporal domains is straightforward: fast moves are more costly than slow moves. Hence the original values of both objectives could be used as is, by simply adding the increasing/decreasing effect of the cost on the actions of the temporal domain. A typical action then looks like:
+
+\begin{verbatim}
+(:action move-up-slow
+   :parameters (?lift - slow-elevator ?f1 - count ?f2 - count)
+   :duration (= ?duration (travel-slow-temp ?f1 ?f2))
+   :precondition (and (lift-at ?lift ?f1) 
+                      (above ?f1 ?f2 )
+                      (reachable-floor ?lift ?f2) )
+   :effect (and (lift-at ?lift ?f2) 
+                (not (lift-at ?lift ?f1)) 
+                (increase (total-cost) (travel-slow-cost ?f1 ?f2))))
+\end{verbatim}
+
+\subsection{\CREWPLANNING, \FLOORTILE, and \PARCPRINTER}
+
+For \CREWPLANNING, \FLOORTILE, and \PARCPRINTER, the existing values of the cost did not ensure that both objectives would be antagonist. Hence, it was decided to arbitrarily set the cost values to a maximum cost less the value of the duration, thus ensuring the antagonism of both objectives. A typical action from the \CREWPLANNING\ domain then looks like:
+
+\begin{verbatim}
+(:durative-action change_filter
+  :parameters (?fs - FilterState ?c - CrewMember ?d - Day)
+  :duration (= ?duration 60)
+  :condition (and (at start (available ?c))
+                  (over all (currentday ?c ?d)))
+  :effect (and (at start (not (available ?c)))
+               (at end (available ?c))
+               (at end (changed ?fs ?d))
+               (increase (total-cost) (- 10000 60))))
+\end{verbatim}
+
+
+\subsection{\OPENSTACKS}
+
+For \OPENSTACKS, the temporal version starts from a stack with a fixed size and tries to find the shortest trip whereas the cost version does not limit the size of the stack but adds an action of cost 1 for each stack opening. This action was simply added to the temporal version:
+
+\begin{verbatim}
+(:action open-new-stack
+  :duration (= ?duration 1)
+  :parameters (?open ?new-open - count)
+  :precondition (and (stacks-avail ?open)
+                     (next-count ?open ?new-open))
+  :effect (and (not (stacks-avail ?open))
+               (stacks-avail ?new-open) 
+               (increase (total-cost) 1)))
+\end{verbatim}
+
+
+
+\end{document}
+

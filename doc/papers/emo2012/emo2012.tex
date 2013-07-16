@@ -1,0 +1,895 @@
+% This is LLNCS.DEM the demonstration file of
+% the LaTeX macro package from Springer-Verlag
+% for Lecture Notes in Computer Science,
+% version 2.4 for LaTeX2e as of 16. April 2010
+%
+\documentclass{llncs}
+%\usepackage[numbers, sort&compress, square, comma]{natbib}
+% \usepackage[lsnumbers, sort&compress, sEquare, comma]{natbib}    
+% \usepackage{multirow}                             % not available on your system
+\usepackage[table]{xcolor}
+% \usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}        % standard LaTeX graphics tool                            % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{url}
+\usepackage{caption,subfig}
+
+% \usepackage{draftwatermark}
+% \SetWatermarkText{TO BE REVISED}
+% \SetWatermarkLightness{0.6}
+% \SetWatermarkScale{4}
+
+%            \usepackage[bottom]{footmisc}% places footnotes at page bottom
+%            \usepackage{algorithm}
+% \usepackage{algorithmic}
+% \usepackage{float}
+% \usepackage{url}
+% \usepackage{caption,subfig}
+% \usepackage{textcomp}
+% \usepackage{stfloats}
+% \usepackage[table]{xcolor}
+% \usepackage{lscape}
+% \usepackage{type1cm}  
+%\usepackage{graphicx}
+%\usepackage{makeidx}  % allows for indexgeneration
+%
+
+\def\dae{{\em Divide-and-Evolve}}
+\def\DAE{{\sc DaE}}
+\def\DAEX{{\sc DaE$_{\text{X}}$}}
+%\def\DAEYAHSP{{\sc DaE$_{\text{YAHSP}}$}}
+\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
+\def\PARADISEO{{\sc ParadisEO-MOEO}}
+\def\YAHSP{{\sc YAHSP}}
+\def\modae{{\em Multi-Objective Divide-and-Evolve}}
+\def\MODAE{{\sc MO-DaE}}
+\def\ZENO{{\sc Zeno}}
+\def\MULTIZENO{{\sc MultiZeno}}
+\def\PARAMILS{{\sc ParamILS}}
+
+\begin{document}
+
+\mainmatter              % start of the contributions
+%
+% \title{Performance of \DAE\ on a Benchmark for Multi-Objective  AI Planning}
+\title{Multi-Objective AI Planning: \\ Evaluating \DAEYAHSP\ on a Tunable Benchmark}
+%%Benchmarks for Evolutionary Multi-Objective AI Planning}
+%
+\titlerunning{Evolutionary Multi-Objective AI Planning}  % abbreviated title (for running head)
+%                                     also used for the TOC unless
+%                                     \toctitle is used
+%
+\author{M.~R. Khouadjia \inst{1} \and M. Schoenauer\inst{1}\and
+V. Vidal\inst{2}  \and J. Dr\'eo\inst{3} \and P. Sav\'eant\inst{3}}
+% \author{Mostepha~R. Khouadjia \inst{1} \and Marc Schoenauer\inst{1}\and
+% Vincent Vidal\inst{2}  \and Johann Dr\'eo\inst{3} \and Pierre Savéant\inst{3}}
+%
+\authorrunning{Mostepha~R. Khouadjia et \textit{al.}} % abbreviated author list (for running head)
+%
+%%%% list of authors for the TOC (use if author list has to be modified)
+\tocauthor{Mostepha~R. Khouadjia, Marc Schoenauer, Vincent Vidal, Johann Dr\'eo, and Pierre Sav\'eant}
+%
+\institute{TAO Project-team, INRIA Saclay \&  LRI, Universit\'e Paris-Sud, Orsay, France\\%Universit\'{e} Paris-Sud
+\email{\{mostepha-redouane.khouadjia,marc.schoenauer\}@inria.fr},\\ %WWW home page:
+%\texttt{http://users/\homedir iekeland/web/welcome.html}
+\and
+ONERA-DCSD, Toulouse, France\\
+\email{Vincent.Vidal@onera.fr}\\
+ \and
+ THALES Research \& Technology, Palaiseau, France\\
+ \email{\{johann.dreo, pierre.saveant\}@thalesgroup.com}\\
+}
+
+\maketitle              % typeset the title of the contribution
+\renewcommand{\thefootnote}{}
+\begin{abstract}
+All standard Artifical Intelligence (AI) planners to-date can only handle a single objective, and the only way for them to take into account multiple objectives is by aggregation of the objectives. Furthermore, and in deep contrast with the single objective case, there exists no benchmark problems on which to test the algorithms for multi-objective planning.
+
+\dae\ (\DAE) is an evolutionary planner that won the (single-objective) deterministic temporal satisficing track in the last International Planning Competition. Even though it uses intensively the classical (and hence single-objective) planner \YAHSP\ ({\em Yet Another Heuristic Search Planner}), it is possible to turn \DAEYAHSP\ into a multi-objective evolutionary planner.
+
+A tunable benchmark suite for multi-objective planning is first proposed, and the performances of several variants of multi-objective \DAEYAHSP\ are compared on different instances of this benchmark, hopefully paving the road to further multi-objective competitions in AI planning.\footnote{This work was partially funded by DESCARWIN ANR project (ANR-09-COSI-002).}
+
+% \keywords{ Temporal Planning Problems, Divide-and-Evolve, Evolutionary Algorithms,  Multi-objective Optimization. }
+
+\end{abstract}
+%
+\section{Introduction}
+
+
+An AI Planning problem (see e.g. \cite{AIplanningBook2004}) is defined by a set of predicates, a set of actions, an initial state and a goal state. A state is a set of non-exclusive instantiated predicates, or (Boolean) atoms. An action is defined by a set of {\em pre-conditions} and a set of {\em effects}: the action can be executed only if all pre-conditions are true in the current state, and after an action has been executed, the effects of the action modify the state: the system enters a new state.
+A plan in AI Planning is a sequence of actions that transforms the initial state into the goal state. 
+The goal of AI Planning is to find a plan that minimizes some quantity related to the actions: number of actions, or sum of action costs in case actions have different costs, or makespan in the case of temporal planning, when actions have a duration and can eventually be executed in parallel. All these problems are P-SPACE.
+
+A simple planning problem in the domain of logistics is given in Figure \ref{fig.instance}: the problem involves cities, passengers, and planes. Passengers can be transported from one city to another, following the links on the figure. One plane can only carry one passenger at a time from one city to another, and the flight duration (number on the link) is the same whether or not the plane carries a passenger (this defines the {\em domain} of the problem). In the simplest non-trivial {\em instance} of such domain, there are 3 passengers and 2 planes. In the initial state, all passengers and planes are in {\tt city 0}, and in the goal state, all passengers must be in {\tt city 4}. The not-so-obvious optimal solution has a total makespan of 8 and is left as a teaser for the reader.
+
+% XXX ajouter les références XXX\\
+AI Planning is a very active field of research, as witnessed by the success of the ICAPS conferences (\url{http://icaps-conferences.org}), and its Intenational Planning Comptetition (IPC), where the best planners in the world compete on a set of problems. This competition has lead the researchers to design a common language to describe planning problems, PDDL (Planning Domain Definition Language). Two main categories of planners can be distinguished: {\em exact planners} are guaranteed to find the optimal solution \ldots if given enough time; {\em satisficing planners} give the best possible solution, but with no optimality guarantee. A complete description of the state-of-the-art planners is far beyond the scope of this paper. 
+
+However, to the best of our knowledge, all existing planners are single objective (i.e. optimize one criterion, the number of actions, the cost, or makespan, depending on the type of problem), whereas most real-world problems are in fact multi-objective and involve several contradictory objectives that need to be optimized simultaneously. For instance, in logistics, the decision maker must generally find a trade-off between duration and cost (or/and risk). 
+
+An obvious solution is to aggregate the different objectives into a single objective, generally a fixed linear combination of all objectives. Early work in that area used some twist in PDDL 2.0 \cite{do2003sapa,refanidis2003multiobjective,gerevini2008}. PDDL 3.0, on the other hand, explicitly offered hooks for several objectives x, and a new track of IPC was dedicated to aggregated multiple objectives: the ``net-benefit'' track took place in 2006 \cite{chen2006temporal} and 2008 \cite{edelkamp2009optimal}, \ldots but was canceled in 2011 because of the small number of entries.
+In any case, no truly multi-objective approach to multi-objective planning has been proposed since the very preliminary proof-of-concept in the first \dae\ paper \cite{Schoenauer2006}. 
+
+One goal of this paper is to build on this preliminary work, and to discuss various issues related to the challenge of solving multi-objective problems with an evolutionary algorithm that is heavily based on a single-objective planner (\YAHSP\ \cite{Vidal2004}) -- and in particular to compare different state-of-the-art multi-objective evolutionary schemes when used within \DAEYAHSP.
+However, experimental comparison requires benchmark problems. Whereas the IPC have validated a large set of benchmark domains, with several instances of increasing complexity in each domain, nothing yet exists for multi-objective planning. The other goal of this paper is to propose a tunable set of benchmark instances, based on a simplified model of the IPC logistics domain \ZENO\ illustrated in Fig. \ref{fig.instance}. One advantage of this multi-objective benchmark is that the exact Pareto Front is known, at least for its simplest instances.
+ 
+The paper is organized as follows: Section \ref{sec:dae} rapidly introduces \dae, more precisely the representation and variation operators that have been used in the single-objective version of \DAEYAHSP\ that won the temporal deterministic satisficing track at the last IPC in 2011. 
+Section \ref{modae} details the multi-objective version of \DAE, and in particular introduces the 4 variants of multi-objective schemes that will be experimentally compared in this paper.
+Section \ref{benchmark} details the proposed original benchmark, called \MULTIZENO, and gives hints about how to generate instances of different complexities within this framework. Section \ref{sec:condition} details the different series of experiments, whose results are discussed in Section \ref{sec:experiments}. Section \ref{sec:conclusion} concludes the paper, giving hints about further research directions.
+
+
+\section{Divide-and-Evolve}
+\label{sec:dae}
+Let ${\cal P}_D(I,G)$ denote the planning problem defined on domain $D$ (the predicates, the objects, and the actions), with initial state $I$ and goal state $G$. In STRIPS representation model~\cite{Fikes1971}, a state is a list of Boolean atoms defined using the predicates of the domain, instantiated with the domain objects.  
+
+In order to solve  ${\cal P}_D(I,G)$, the basic idea of \DAEX\ is to find a sequence of states $S_1, \ldots, S_n$, and to use some embedded planner $X$ to solve the series of planning problems ${\cal P}_D(S_{k},S_{k+1})$, for $k \in [0,n]$ (with the convention that $S_0 = I$ and $S_{n+1} = G$).
+The generation and optimization of the sequence of states $(S_i)_{i \in [1,n]}$  is driven by an evolutionary algorithm. After each of the sub-problems ${\cal P}_D(S_{k},S_{k+1})$ has been solved by the embedded planner, the concatenation of the corresponding plans (possibly compressed to take into account possible parallelism in the case of temporal planning) is a solution of the initial problem. In case one sub-problem cannot be solved by the embedded solver, the individual is said {\em unfeasible} and its fitness is highly penalized in order to ensure that feasible individuals always have a better fitness than unfeasible ones, and are selected only when there are not enough feasible individual. A thorough description of \DAEX\ can be found in \cite{Bibai2010}. The following rest of this section will focus on the evolutionary parts of \DAEX.
+
+\subsection{Representation and Initialization}
+An individual in \DAEX\ is hence a  variable-length list of states of the given domain.
+However, the size of the space of lists of complete states rapidly becomes untractable when the number of objects increases. Moreover, goals of planning problems need only to be defined as partial states, involving a subset of the objects, and the aim is to find a state such that all atoms of the goal state are true. An individual in \DAEX\ is thus a variable-length list of partial states, and a partial state is a variable-length list of atoms.
+
+Previous work with \DAEX\ on different domains of planning problems from the
+IPC benchmark series have demonstrated the need for a very careful choice of the atoms that are used to build the partial states \cite{bibai-EvoCOP2010}. 
+The method that is used today to build the partial states is based on a heuristic estimation, for each atom, of the earliest time from which it can become true~\cite{Haslum2000}. %Such estimation can be obtained
+%by any admissible heuristic function (e.g $h^1$, $h^2$, $\ldots$~\cite{Haslum2000}). 
+These earliest start times are then used in order to restrict the candidate atoms for each partial state:
+the number of states is uniformly drawn between 1 and the number of estimated start times; For every chosen time, the number of atoms per state is uniformly chosen between 1 and the number of atoms of the corresponding restriction.
+Atoms are then added one by one: an atom is uniformly drawn in the allowed set of atoms (based on earliest possible start time), and added to the individual if it is not mutually exclusive (in short, {\em mutex}) with any other atom that is already there. Note that only an approximation of the complete mutex relation between atoms is known from the description of the problem, and the remaining mutexes will simply be gradually eliminated by selection, because they make the resulting individual unfeasible. 
+
+To summarize, an individual in \DAEX\ is represented by a variable-length time-consistent sequence of partial states, and each partial state is a variable-length list of atoms that are not pairwise mutex. 
+% Furthermore, all variation operators that manipulate the representation maintain the chronology between atoms and the approximated consistency of a state, i.e. avoid pairwise mutexes.
+
+\subsection{Variation Operators}
+
+Crossover and mutation operators are defined on the \DAEX\ representation in a straightforward manner - though constrained by the heuristic chronology and the partial mutex relation between atoms.
+
+A simple one-point crossover is used, adapted to variable-length representation: both crossover points are independently chosen, uniformly in both parents. However, only one offspring is kept, the one that respects the approximate chronological constraint on the successive states. The crossover operator is applied with a population-level crossover probability.
+
+Four different mutation operators are included: first, a population-level mutation probability is used; one an individual has been designated for mutation, the choice between the four mutation operators is made according to user-defined relative weights.
+%Because an individual is a variable length list of states, and a state is a variable length list of atoms,
+The four possible mutations operate either at the individual level, by adding (addState) or removing (delState) a state, or at the state level by adding (addAtom) or removing (delAtom) some atoms in a uniformly chose state. 
+
+All mutation operators maintain the approximate chronology between the intermediate states (i.e., when adding a state, or an atom in a state), and the local consistency within all states (i.e. avoid pairwise mutexes).
+
+\subsection{Hybridization}
+\DAEX\ uses an external embedded planner to solve the sequence of sub-problems defined by the ordered list of partial states.
+Any existing planner can in theory be used. However, there is no need for an optimality guarantee when solving the intermediate problems in order for \DAEX\ to obtain good quality results~\cite{Bibai2010}. Hence, and because several calls to this embedded planner are necessary for a single fitness evaluation, a sub-optimal but fast planner is used: \YAHSP~\cite{Vidal2004} is a lookahead 
+strategy planning system for sub-optimal planning which uses the  actions in the relaxed plan to compute reachable states in order to speed up the search process.
+
+For any given $k$, if the chosen embedded planner succeeds in solving $ P_{D} (S_k, S_{k+1} )$, the final complete state is computed by executing the solution plan
+from $S_k$, and becomes the initial state of the next problem. If all the sub-problems are solved by the  embedded planner, 
+the individual is called \textit{feasible}, and the concatenation of the plans for all sub-problems  is a
+global solution plan for $P_{D} (S_{0} = I, S_{n+1} = G)$. However, this plan can in general be further optimized by rescheduling some of its actions, in a step called
+compression. The computation of all objective values is done from the compressed plan of the given individual.
+% However, as soon as the chosen embedded planner fails to solve one $ P_{D} (S_k, S_{k+1} )$  sub-problem, the following sub-problem $ P_{D} (S_k+1, S_{k+2} )$ cannot be even tackled
+% by the chosen embedded planner, as its initial state is in fact partially unknown.
+% Hence no quality in term of number of action, cost or makespan can be given to this individual. All such individuals receive a fitness that is higher than that
+% of any feasible individual. Furthermore, in order to nevertheless give some selection pressure toward feasible individuals, such fitness takes into account the
+% proportion of sub-problems solved. 
+% Finally, because the initial population contains randomly generated individuals, some of them might contain some sub-problems that are in fact more difficult
+% than the original global problems. It was thus necessary to limit the embedded planner by imposing some complexity bound in order to discard too difficult
+% sub-problems.
+%  However, though it is hoped that all sub-problems will ultimately be easy to solve, such limitation should not be too strong in order to nevertheless
+% leave some degree of freedom to the search for solutions. Here,  YAHSP  has been limited by a maximal number of backtracks (resp. a maximal number of nodes) that it is allowed to use to
+% solve any of the sub-problems. Those bounds are determined  for each run by a two-step process: first, the initial population is evaluated using a very high
+% bound (e.g. 10e4 backtracks or nodes); the bounds for the rest of the run are then chosen as the median of the actual number of backtracks (resp. nodes) that
+% have been used to find the solutions during these initial evaluations.
+Finally, because the rationale for \DAEX\ is that all sub-problems should hopefully be easier than the initial global problem, and for computational performance reason, the search capabilities of the embedded planner \YAHSP\ are limited by setting a maximal number of nodes that it is allowed to expand to solve any of the sub-problems (see again \cite{Bibai2010} for more details).
+ 
+
+\section{Multi-Objective Divide-and-Evolve}
+\label{modae}
+In some sense, the multi-objectivization of \DAEX\ is straightforward -- as it is for most evolutionary algorithms.
+The ``only'' parts of the algorithm that require some modification are the selection parts, be it the parental selection, that chooses which individual from the population are allowed to breed, and the environmental selection (aka replacement), 
+that decides which individuals among parents and offspring will survive to the next generation. 
+Several schemes have been proposed in the EMOA literature (see e.g. Section \ref{sec:evolutionaryMOA}), and the end of this Section will briefly introduce the ones that have been used in this work. However, a prerequisite is that all objectives are evaluated for all potential solutions, and the challenge here is that the embedded planner \YAHSP\ performs its search based on only one objective.
+ 
+\subsection{Multi-objectivization Strategies}
+\label{sec:strategies}
+Even though \YAHSP\  (like all known planners to-date) only solves planning problems based on one objective. However, it is possible since PDDL 3.0 to add some other quantities (aka Soft Constraints or Preferences \cite{gerevini2006preferences}) that are simply computed throughout the execution of the final plan, without interfering with the search. 
+% Even though the embedded planner only optimizes one objective, 
+% it will return the values of both objectives if they are defined in the domain definition PDDL file. 
+% It is hoped that the evolutionary algorithm will find a sequential partitioning of the problem that will nevertheless allow the global 
+% minimization of both objectives: this will be demonstrated in the following and discussed in Section \ref{sec:discussion}.
+
+The very first proof-of-concept of multi-objective \DAEX\ \cite{Schoenauer2006}, though using an exact planner in lieu of the satisficing planner \YAHSP, implemented the simplest idea with respect to the second objective: ignore it (though computing its value for all individuals) at the level of the embedded planner, and let the evolutionary multi-objective take care of it. However, though \YAHSP\ can only handle one objective at a time, it can handle either one in turn, provided they are both defined in the PDDL domain definition file. Hence a whole bunch of smarter strategies become possible, depending on which objective \YAHSP\ is asked to optimize every time it runs on a sub-problem. Beyond the fixed strategies, in which \YAHSP\ always uses the same objective throughout  \DAEYAHSP\ runs, a simple dynamic randomized strategy has been used in this work: 
+Once the planner is called for a given individual, the choice of which strategy to apply is made according to roulette-wheel selection based on user-defined relative weights; In the end, it will return the values of both objectives. 
+It is hoped that the evolutionary algorithm will find a sequential partitioning of the problem that will nevertheless allow the global minimization of both objectives. Section \ref{resultsStrategies} will experimentally compare the fixed strategies and the dynamic randomized strategy where the objective that \YAHSP\ uses is chosen with equal probability among both objectives.
+
+Other possible strategies include adaptive strategies, where each individual, or even each intermediate state in every individual, would carry a strategy parameter telling \YAHSP\ which strategy to use -- and this strategy parameter would be subject to mutation, too. This is left for further work. 
+
+% 
+\subsection{Evolutionary Multi-Objective Schemes}
+\label{sec:evolutionaryMOA}
+
+Several Multi-Objective EAs (MOEAs) have been proposed in the recent years, and this work is concerned with comparing some of the most popular ones when used within the multi-objective version of \DAEYAHSP.
+More precisely, the following selection/reproduction schemescan be applied to any representation, and will be experimented with here: NSGA-II~\cite{Deb2002}, SPEA2~\cite{Zitzler2002}, and IBEA~\cite{Zitzler2004}. They will now be quickly introduced in turn.
+
+% The {\bf Non-dominated Sorting Genetic Algorithm} (NSGA-II) \cite{Deb2002} first performs a Pareto ranking of the population: the non-dominated individuals are given rank 1, and removed from the population. The non-dominated remaining individuals are given rank 2 and the process continues until all individuals have received a Pareto rank. 
+
+The {\bf Non-dominated Sorting Genetic Algorithm} (NSGA-II) has been proposed by Deb et \textit{al.}~\cite{Deb2002}. % and it is considered as the most widely used multi-objective resolution method.
+At each generation, the solutions contained in the current  population are ranked into successive Pareto fronts in the objective space. Individuals mapping to vectors from the first front all belong to
+the best efficient set; individuals mapping to vectors from the second front all belong to the second best efficient set; and so on.
+Two values are then assigned for every solution of the population. The first one corresponds to the rank of the Pareto front the corresponding solution
+belongs to, and represents the quality of the solution in terms of convergence. The second one, the crowding distance, consists in
+estimating the density of solutions surrounding a particular point in the objective space, and represents the quality of the solution in
+terms of diversity.  A solution is said to be better than another solution if it has a better rank value, or in case of equality, if it has a larger crowding distance.
+
+The {\bf Strength Pareto Evolutionary Algorithm} (SPEA)~\cite{Zitzler2001}, introduces an improved fitness assignment strategy. It intrinsically handles an internal fixed-size archive that is used during the selection step to create offspring solutions. At a given iteration of the algorithm, each population and archive member $x$ is assigned a strength value $S(x)$ representing the number
+of solutions it dominates. Then, the fitness value $F (x)$ of solution $x$ is calculated by summing the strength values of all individuals that $x$ currently dominates. Additionally,
+a diversity preservation strategy is used, based on a nearest neighbor technique.
+The selection step consists of a binary tournament with replacement applied on the internal archive only.
+Last, given that the SPEA2 archive has a fixed size storage capacity, a pruning mechanism based on fitness and diversity information is used when the non-dominated set is too large. 
+
+The {\bf Indicator-Based Evolutionary Algorithm} (IBEA) \cite{Zitzler2004}
+introduces a total order between solutions by means of a binary quality indicator. 
+The fitness assignment scheme of this evolutionary algorithm is based on a pairwise comparison of solutions contained 
+in  the current population with respect to a binary quality indicator $I$. Each individual $x$ is assigned a fitness value $F (x)$ measuring the ``loss in quality'' that would result from removing $x$ from the current
+population. Different indicators can be used. The most two popular, that will be used in this work, are the additive $\epsilon$-indicator ($I_{\epsilon^+}$ ) and the hypervolume
+difference indicator ($I_{H^-}$ )  as defined in ~\cite{Zitzler2004}. 
+Each indicator  $I (x, x')$ gives the minimum value by which a solution $x \in X$  can be translated in the objective space to weakly dominate
+another solution $x' \in X$. 
+%The selection scheme for reproduction is a binary tournament between randomly chosen individuals. 
+%The replacement is based on an iterative elitist strategy that consists in deleting, one-by-one, the worst individuals, and in updating the fitness values of the remaining solutions each time there is a deletion;
+%this is iterated until the required population size is reached.  Moreover, 
+An archive stores solutions mapping to potentially non-dominated points in order to prevent their loss during the stochastic search process.
+
+
+
+\begin{figure}[tb]
+\begin{center}
+ \includegraphics[width=0.5\textwidth]{./miniMulti.eps}
+ % instance.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=0 0 509 388
+\caption{A schematic view of \MULTIZENO, a simple benchmark transportation problem: Durations of available flights are attached to the corresponding edges, costs/risks are attached to landing in the central cities (in grey circles).}
+\label{fig.instance}
+\end{center}
+\end{figure}
+
+\section{A Benchmark Suite for Multi-Objective Temporal Planning}
+\label{benchmark}
+
+This section details the proposed benchmark test suite for multi-objective temporal planning, based on  the simple domain that is schematically described in Figure \ref{fig.instance}. The reader will have by now solved the little puzzle set in the Introduction, and found the solution with makespan 8 (flying 2 passengers to {\tt city 1}, one plane continues with its passenger to {\tt city 4} while the other plane flies back empty to {\tt city 0}, the plane in city {\tt city 4} returns empty to {\tt city 1} while the other plane brings the last passenger there, and the goal is reached after both planes bring both remaining passengers to {\tt city 4}). The rationale for this solution is that no plane ever stays idle.
+
+In order to turn this problem into a not-too-unrealistic logistics multi-objective problem, some costs or some risks are added to all 3 central cities (1 to 3). This leads to two types of problems: In the \MULTIZENO$_{Cost}$, the second objective is an additive objective: each plane has to pay the corresponding tax every time it lands in that city; In the \MULTIZENO$_{Risk}$, the second objective is similar to a risk, and the maximal value encountered during the complete execution of a plan is to be minimized. 
+
+In both cases, there are 3 obvious points that belong to the Pareto Front: the solution with minimal makespan described above, and the similar solutions that use respectively {\tt city 2} and {\tt city 3} in lieu of {\tt city 1}. The values of the makespans are respectively 8, 16 and 24, and the values of the costs are, for each solution, 4 times the value of the single landing tax, and exactly the value of the involved risk. For the risk case, there is no other point on the Pareto Front, as a single landing on a high-risk city sets the risk of the whole plan to a high risk. For the cost model however, there are other points on the Pareto Front, as different cities can be used for the different passengers. For instance, in the case of Figure \ref{fig.instance}, this leads to a Pareto Front made of 5 points, (8,12), (16,8), and (24,4) (going only through {\tt city 1}, {\tt 2} and {\tt 3} respectively), plus (12,10) and (20,6). Only the first 3 are the Pareto Front in the risk case.
+
+
+\subsection{Tuning the Complexity}
+There are several ways to make this first simple instance more or less complex. A first possibility is to  add passengers. In this work, only bunches of 3 passengers have been considered, in order to be able to easily derive some obvious Pareto-optimal solutions, using several times the little trick to avoid leaving any plane idle. For instance, it is easy to derive all the Pareto solutions for 6 and 9 passengers -- and in the following, the corresponding instances will be termed \MULTIZENO3,  \MULTIZENO6, and  \MULTIZENO9\ respectively (sub-scripted with the type of second objective -- cost or risk).
+% (see the corresponding Pareto fronts on Figure \ref{fig:zeno6_Add} and \ref{fig:zeno9_Add}.
+
+Of course, the number of planes could also be increased, though the number of passengers needs to remain larger than the number of planes to allow for non-trivial Pareto front. However, departing from the 3 passengers to 2 planes ratio would make the Pareto front not easy to identify any more.
+
+Another possibility is to increase the number of central cities: this creates more points on the Pareto front, using either plans in which a single city is used for all passengers, or plans that use several different cities for different passengers (while nevertheless using the same trick to ensure no plane stays idle). In such configuration too the exact Pareto front remains easy to identify: further work will investigate this line of complexification.
+
+% 
+% \begin{figure*}
+% \centering{
+% \subfloat[\MULTIZENO3$_{cost}$]{ \includegraphics[width=0.32\textwidth]{zeno3e.eps}
+% \label{fig:zeno3_Add}}
+% \subfloat[\MULTIZENO6$_{cost}$] { \includegraphics[width=0.32\textwidth]{zeno6e.eps}
+% \label{fig:zeno6_Add}} 
+% \subfloat[\MULTIZENO9$_{cost}$] { \includegraphics[width=0.32\textwidth]{zeno9e.eps}
+% \label{fig:zeno9_Add}}\\
+%  
+% \caption{The exact Pareto Fronts for the \MULTIZENO  instances with the cost (1--2--3).}
+% \label{fig:zenoParetoFronts}}
+% \end{figure*}
+
+\subsection{Modifying the shape of the Pareto Front}
+
+Another way to change the difficulty of the problem without increasing its complexity is to tune the different values of the flight times and the cost/risk at each city. Such changes does not modify the number of points on the Pareto Front, but does change its shape in the objective space. For instance, simply modifying the cost $\alpha$ of {\tt city2}, the central city in Figure \ref{fig.instance},
+between 1 and 3 (the costs of respectively {\tt city1} and {\tt city3}), the Pareto Front, which is linear for $\alpha=2$ becomes strictly convex for $\alpha < 2$ and strictly concave for $\alpha > 2$, as can be seen for two extreme cases ($\alpha = 1.1$ and $\alpha = 2.9$) on Figure \ref{fig:zeno3ParetoFronts}. Further work will address the identification of the correct domain parameters in order to reach a given shape of the Pareto front.
+
+\begin{figure*}[tb]
+\centering{
+\subfloat[$\alpha=1.1$]{ \includegraphics[width=0.32\textwidth]{zeno6i.eps}
+\label{fig:zeno6i_Add}}
+\subfloat[$\alpha=2$ (Fig. \ref{fig.instance})] { \includegraphics[width=0.32\textwidth]{zeno6e.eps}
+\label{fig:zeno6e_Add}} 
+\subfloat[$\alpha=2.9$] { \includegraphics[width=0.32\textwidth]{zeno6s.eps}
+\label{fig:zeno6s_Add}}\\
+ 
+\caption{The exact Pareto Fronts for the \MULTIZENO6 problem for different values of the cost $\alpha$ of {\tt city2} (those of {\tt city1} and {\tt city3} being $3$ and $1$ respectively).}
+\label{fig:zeno3ParetoFronts}}
+\end{figure*}
+
+\section{Experimental Conditions}
+\label{sec:condition}
+\paragraph{Implementation:} All proposed multi-objective approaches (see Section \ref{sec:evolutionaryMOA}) have been implemented within the \PARADISEO\ framework \cite{paradiseo}. 
+% \footnote{\url{http://paradiseo.gforge.inria.fr/}}. 
+All experiments were performed on the \MULTIZENO3,  \MULTIZENO6, and  \MULTIZENO9 instances. The first objective is the makespan, and the second objective either the (additive) cost or the (maximal) risk, as discussed in Section \ref{benchmark}. The values of the different flight durations and cost/risks are those given on Figure \ref{fig.instance} except otherwise stated.
+
+\paragraph{Parameter tuning:} All user-defined parameters have been tuned using the  framework \PARAMILS\
+% \footnote{\url{http://www.cs.ubc.ca/labs/beta/Projects/ParamILS/}}~
+\cite{ParamILS-JAIR}.  \PARAMILS\ handles any parameterized algorithm whose parameters can be discretized. Based on Iterated Local Search (ILS), \PARAMILS\ searches
+through the space of possible parameter configurations, evaluating configurations by running the algorithm to be optimized on a set of benchmark instances, searching for the configuration that yields
+overall best performance across the benchmark problems. Here, both the parameters of the multi-objective algorithms (including the internal parameters of the variation operators -- see \cite{Bibai:2010:GPT:1830483.1830528}) and \YAHSP\ specific parameters (including the relative weights of the possible strategies (see Section \ref{sec:strategies}) have been subject to \PARAMILS\ optimization. For the purpose of this work, parameters were tuned anew for each instance (see \cite{Bibai:2010:GPT:1830483.1830528} for a discussion about the generality of such parameter tuning, that falls beyond the scope of this paper).
+
+\paragraph{Performance Metric:} The quality measure used by \PARAMILS\ to optimize \DAEYAHSP\ is the unary hypervolume  $I_{H^-}$~\cite{Zitzler2004} of the set of non-dominated points output by the algorithm with respect to the complete true Pareto front (only instances where the true Pareto front is fully known have been experimented with). The lower the better (a value of 0 indicates that the exact Pareto front has been reached). 
+
+However, and because the true front is known exactly, and is made of a few scattered points (at most 17 for \MULTIZENO9\ in this paper), it is also possible to visually monitor when each point of the front is discovered by the algorithm. This allows some deeper comparison between algorithms even when none has found the whole front. Such {\em attainment plots} will be used in the following, together with more classical plots of hypervolume vs time.
+
+For all experiments, 30 independent runs were performed. Note that all the performance assessment procedures, including the hypervolume calculations, have been achieved using the PISA performance assessment tool suite \cite{Bleuler2003}. % \footnote{\url{http://www.tik.ee.ethz.ch/pisa/}}.
+
+\paragraph{Stopping Criterion:} Because different fitness evaluations involve different number calls to \YAHSP\ -- and because \YAHSP\ runs can have different computational costs too, depending on the difficulty of the sub-problem being solved -- the stopping criterion was a fixed amount of CPU time rather than the usual number of fitness evaluation. These absolute limits were set to 300, 600, and 900 seconds respectively for  \MULTIZENO3,  \MULTIZENO6, and  \MULTIZENO9.
+
+ 
+% The default values for \DAEYAHSP\ internal parameters are taken from the reference paper~\cite{Bibai2010} and have not been further tuned for this work.
+% The population size for all MOEA variants has been set to $100$ individuals, and $1000$ generations were systematically run. Of course, all these parameters should be tuned in further work.
+% Furthermore, the embedded planner \YAHSP\  is constrained with a maximal number of expanded nodes. Depending on the complexity of the planning task, this number varies
+% from few  to thousands nodes. In our work this parameter takes values in the range $10 000$ to $1$ million and is determined during the initialization (see \cite{Bibai2010} for details).
+ 
+%However, since our instances are relatively small, we have fixed this number to  $10^6$ .
+% \begin{table*}[h]
+% \centering
+% \scriptsize
+% \begin{tabular}{l c c c}
+% \hline\hline
+% Name & Min & Max & Default \\ 
+% \hline
+% Probability of crossover & 0.0 & 1 & 0.8 \\
+% Probability of mutation & 0.0& 1& 0.2 \\
+% Rate of mutation add station& 0& 10& 1 \\
+% Rate of mutation delete station& 0& 10& 3 \\
+% Rate of mutation add atom& 0& 10& 1 \\
+% Rate of mutation delete atom& 0& 10& 1 \\
+% Mean average for mutations& 0.0& 1& 0.8 \\
+% Time interval radius& 0& 10& 2 \\
+% Maximum number of states& 5& 50& 20 \\
+% Maximum number of nodes & 100& 10e6& 10e4 \\
+% Population size& 10& 300& 100 \\
+% Number of offspring & 100& 2 000& 700 \\
+% \hline
+% \end{tabular}
+% \caption{\DAE\ parameters: bounds for \PARAMILS, and default values from \cite{Bibai:2010:GPT:1830483.1830528}.}
+% \label{table:parameters}
+% \end{table*} 
+
+% \subsection{My Results}
+% \begin{itemize}
+% %Pareto Front found 
+%  \item 2 times by SPEA2 for the COST case 1-10-100
+%  \item 1 time by SPEA2 for the RISK case 1-10-100
+% %\item 
+% \end{itemize}
+
+\section{Experimental Results}
+\label{sec:experiments}
+
+\subsection{Comparing Multi-Objective Schemes}
+The first series of experiments presented here are concerned with the comparison of the different multi-objective schemes briefly introduced in Section \ref{sec:evolutionaryMOA}.
+Figure \ref{fig:zenoHypervolume} displays a summary of experiments of all 4 variants for \MULTIZENO\ instances for both the {\em Cost} and {\em Risk} problems.  
+
+Some clear conclusions can be drawn from these results, that are confirmed by the statistical analyses presented in Table \ref{table:tests} using Wilcoxon signed rank test with 95\% confidence level.
+First, looking at the minimal values of the hypervolume reached by the different algorithms shows that, as expected, the difficulty of the problems increases with the number of passengers, and for a given complexity, the {\em Risk} problems are more difficult to solve than the {\em Cost} ones.
+Second, from the plots and the statistical tests, it can be seen that NSGA-II is outperformed by all other variants on all problems, SPEA2 by both indicator-based variants on most  instances, and $IBEA_{H^-}$ is a clear winner over $IBEA_{\varepsilon^+}$ except on \MULTIZENO6$_{risk}$.
+
+More precisely, Figure \ref{fig2:zenoParetofront} show the cumulated final populations of all 30 runs in the objective space together with the true Pareto front for \MULTIZENO6-9$_{cost}$ problems: the situation is not as bad as it seemed from Figure \ref{fig:zenoHypervolume}-(e) for \MULTIZENO9$_{cost}$, as most solutions that are returned by $IBEA_{H^-}$ are close to the Pareto front (this is even more true on \MULTIZENO6$_{cost}$ problem).
+A dynamic view of the attainment plots is given in Figure \ref{fig:strategiesYahsp}-(c): two points of the Pareto front are more difficult to reach than the others, namely (48,16) and (56,12).
+
+%  
+ \begin{figure}[htbp!]
+ \centering{
+ \subfloat[\MULTIZENO3$_{cost}$]{ \includegraphics[width=0.48\textwidth,height=3cm,bb=50 50 410 302]{zeno3_hyper_{cost}.eps}
+ % zeno3_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \label{fig-a:zeno3Hypervolume}} 
+ \subfloat[\MULTIZENO3$_{risk}$]{\includegraphics[width=0.48\textwidth,height=3cm,bb=50 50 410 302]{zeno3_hyper_{risk}.eps}
+ % zeno3_hyper_{risk}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\label{fig-b:zeno3Hypervolume}}\\ 
+ \subfloat[\MULTIZENO6$_{cost}$]{ \includegraphics[width=0.48\textwidth,height=3cm,bb=50 50 410 302]{zeno6e_hyper_{cost}.eps}
+ % zeno6e_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\label{fig-a:zeno6Hypervolume}}  
+  \subfloat[\MULTIZENO6$_{risk}$]{ \includegraphics[width=0.48\textwidth,height=3cm,bb=50 50 410 302]{zeno6e_hyper_{risk}.eps}
+ % zeno6e_hyper_{risk}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\label{fig-b:zeno6Hypervolume}}  \\
+  \subfloat[\MULTIZENO9$_{cost}$]{\includegraphics[width=0.48\textwidth,height=3cm,bb=50 50 410 302]{zeno9_hyper_{cost}.eps}
+\label{fig-a:zeno9Hypervolume}}  
+  \subfloat[\MULTIZENO9$_{risk}$]{\includegraphics[width=0.48\textwidth,height=3cm,bb=50 50 410 302]{zeno9_hyper_{risk}.eps}
+ % zeno9_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\label{fig-b:zeno9Hypervolume}}\\
+\caption{Evolution of the Hypervolume indicator $I_{H^-}$ (averaged over 30 runs) on \MULTIZENO\ instances (see Table \ref{table:tests} for statistical significances).}
+ \label{fig:zenoHypervolume}}
+\end{figure}
+
+
+\begin{figure}[tb]
+ \centering{
+%  \subfloat[\MULTIZENO3$_{cost}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{zeno3_Add_ibeahyper-pareto.eps}
+% \label{fig2-a:zeno3AddParetofrontareto}}
+\subfloat[\MULTIZENO6$_{cost}$]{\includegraphics[width=0.48\textwidth,height=3cm,bb=50 50 410 302]{zeno6_Add_ibeahyper-pareto.eps}
+\label{fig2-b:zeno6AddParetofrontareto}}
+ % nsgaZenoMax.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=0 0 374 278 
+ \subfloat[\MULTIZENO9$_{cost}$]{\includegraphics[width=0.48\textwidth,height=3cm,bb=50 50 410 302]{zeno9_Add_ibeahyper-pareto.eps}
+\label{fig2-c:zeno9AddParetofrontareto}}
+ % paretofrontZeno9ewAdd.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=0 0 389 305
+ \caption{Pareto fronts of IBEA$_{H^-}$ on \MULTIZENO\ instances.}
+ \label{fig2:zenoParetofront}}
+\end{figure}
+
+
+\begin{table*}[tb]
+\scriptsize
+\caption{Wilcoxon signed rank tests at 95\% confidence level (I$_{H^-}$ metric).}
+\label{table:tests}
+\centering
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|c|c|c|c|}
+
+   \hline
+    \multirow{2}*{Instances}  &  \multirow{2}*{Algorithms}	 	&  \multicolumn{4}{c|}{ Algorithms}\\
+    \cline{3-6}
+			      &            		 	       		& $NSGAII$  &  $IBEA_{\varepsilon^+}$   & $IBEA_{H^-}$  & $SPEA2$  \\
+   \hline
+  \multirow{4}*{\textit{Zeno3}$_{cost}$} &$NSGAII$       	     &  --     & 		$\equiv$     &  	$\equiv$   	&  	$\equiv$   \\
+				
+			      &  $IBEA_{\varepsilon^+}$  	   			& $\equiv$  	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	$\equiv$  	&		$\equiv$  &--	&	$\equiv$    \\
+			      &    $SPEA2$       		  			& $\equiv$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+  \hline
+  \multirow{4}*{\textit{Zeno3}$_{risk}$} & $NSGAII$ 	    			&		-- 					&$\equiv$  		& $\equiv$  	& $\equiv$ \\
+	      & $IBEA_{\varepsilon^+}$   	   	 	    		&$\equiv$ 						&-- 			&$\equiv$  	&  \cellcolor [gray]{0.8}$\succ$  \\
+	      &  $IBEA_{H^-}$     		&$\equiv$ 			& $\equiv$  						&-- 	 & \cellcolor [gray]{0.8}$\succ$   \\
+	      &  $SPEA2$      		&$\equiv$  &  \cellcolor [gray]{0.8}$ \prec$		&  \cellcolor [gray]{0.8}$\prec$  & --   \\
+%  \hline
+ \hline
+  \multirow{4}*{\textit{Zeno6}$_{cost}$} &$NSGAII$       	     &  --     & 		 \cellcolor [gray]{0.8}$ \prec$    &   \cellcolor [gray]{0.8}$ \prec$  	&  	 \cellcolor [gray]{0.8}$ \prec$   \\
+				
+			      &  $IBEA_{\varepsilon^+}$  	   		&	\cellcolor [gray]{0.8}$\succ$ 	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	\cellcolor [gray]{0.8}$\succ$ 	&		$\equiv$  &--	&	$\equiv$    \\
+			      &    $SPEA2$       		  		&	\cellcolor [gray]{0.8}$\succ$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+  \hline
+
+
+  \multirow{4}*{\textit{Zeno6}$_{risk}$} & $NSGAII$ 	    			&		-- 					& \cellcolor [gray]{0.8}$ \prec$   		&  \cellcolor [gray]{0.8}$ \prec$  	&$\equiv$   \\
+	      & $IBEA_{\varepsilon^+}$   	   	 	    		&\cellcolor [gray]{0.8}$\succ$ 						&-- 			&\cellcolor [gray]{0.8}$\succ$  	& \cellcolor [gray]{0.8}$\succ$ \\
+	      &  $IBEA_{H^-}$     		&\cellcolor [gray]{0.8}$\succ$ 			&  \cellcolor [gray]{0.8}$ \prec$   						&-- 	 & \cellcolor [gray]{0.8}$\succ$  \\
+	      &  $SPEA2$      		& $\equiv$   &  \cellcolor [gray]{0.8}$ \prec$  			& \cellcolor [gray]{0.8}$ \prec$   & --   \\
+ \hline
+   \hline
+  \multirow{4}*{\textit{Zeno9}$_{cost}$} &$NSGAII$       	     &  --     & 		\cellcolor [gray]{0.8}$ \prec$     &  \cellcolor [gray]{0.8}$ \prec$   	&  	\cellcolor [gray]{0.8}$ \prec$  \\
+				
+			      &  $IBEA_{\varepsilon^+}$  	   			& \cellcolor [gray]{0.8}$\succ$ 	   & 	--       		& 	\cellcolor [gray]{0.8}$ \prec$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	\cellcolor [gray]{0.8}$\succ$ 	&		\cellcolor [gray]{0.8}$\succ$   &--	&	$\equiv$    \\
+			      &    $SPEA2$       		  			& \cellcolor [gray]{0.8}$\succ$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+  \hline
+
+
+  \multirow{4}*{\textit{Zeno9}$_{risk}$} &$NSGAII$       	     &  --     & 		\cellcolor [gray]{0.8}$ \prec$     &  	\cellcolor [gray]{0.8}$ \prec$ 	&  	\cellcolor [gray]{0.8}$ \prec$   \\				
+			      &  $IBEA_{\varepsilon^+}$  	   		&	\cellcolor [gray]{0.8}$\succ$  	   & 	--     & 	\cellcolor [gray]{0.8}$ \prec$	&	$\equiv$      \\
+			    &    $IBEA_{H^-}$     	& \cellcolor [gray]{0.8}$\succ$	& \cellcolor [gray]{0.8}$\succ$	  & 	--	&	$\equiv$     \\
+			      &    $SPEA2$       		  			&\cellcolor [gray]{0.8}$\succ$ 	&	$\equiv$ 	&	$\equiv$ 		 &  --  \\
+  \hline
+\end{tabular} 
+\end{center}
+\end{table*}
+
+
+
+\begin{figure}[tb]
+ \centering{
+
+\subfloat[\MULTIZENO6$_{cost}$]{\includegraphics[width=0.48\textwidth,height=3.8cm, bb=50 50 410 302]{zeno6eStratAdd_{cost}:IBEA_{H^-}_{makespan_add-cost}.eps}}
+%%%
+\subfloat[\MULTIZENO6$_{risk}$]{\includegraphics[bb=50 50 410 302,width=0.48\textwidth,height=3.8cm]{zeno6_{risk}:IBEA_{H^-}.eps}}
+
+ \caption{Attainment plots for IBEA$_{H^-}$ on \MULTIZENO6\ instances.}
+ \label{fig:attainment}}
+\end{figure}
+
+
+
+
+
+\subsection{Influence of \YAHSP\ Strategy}
+\label{resultsStrategies}
+Next series of experiments aimed at identifying the influence of the chosen strategy for \YAHSP\ (see Section \ref{sec:strategies}). Figure \ref{fig:strategiesYahsp}-(a) (resp. \ref{fig:strategiesYahsp}-(b)) shows the attainment plots for the strategy in which \YAHSP\ always optimizes the makespan (resp. the cost) on problem \MULTIZENO6$_{cost}$. Both extreme strategies lead to much worse results than the mixed strategy of Figure \ref{fig:attainment}-(a), as no run discovers the whole front (last line, that never leaves the x-axis). Furthermore, and as could be expected, the makespan-only strategy discovers very rapidly the extreme points of the Pareto front that have a small makespan (points (20,30), (24,28) and (28,26)) and hardly discovers the other end of the Pareto front (points with makespan greater than 48), while it is exactly the opposite for the cost-only strategy. This confirms the need for a strategy that incorporates both approaches. % -- even if the randomized one chosen here might not be the 
+best possible choice.
+
+Note that similar conclusion could have been drawn from \PARAMILS\ results on parameter tuning (see Section \ref{sec:condition}): the choice of \YAHSP\ strategy was one of the parameters tuned by \PARAMILS\ \ldots and the tuned values for the weights of both strategies were always more or less equal.
+
+
+\begin{figure*}[h!]
+\centering{
+\subfloat[\YAHSP\ optimizes makespan]{\includegraphics[width=0.48\textwidth,height=3.4cm,bb=50 50 410 302]{zeno6eStratAdd_{cost}:IBEA_{H^-}_{makespan_add}.eps}}
+%  % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[\YAHSP\ optimizes cost] {\includegraphics[width=0.48\textwidth,height=3.4cm,bb=50 50 410 302]{zeno6eStratAdd_{cost}:IBEA_{H^-}_{cost}.eps}} \qquad
+ % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302 
+% \subfloat[IBEA$_{H^-}$:makespan -- cost]{\includegraphics[scale=0.5, bb=50 50 410 302]{zeno6eStratAdd_{cost}:IBEA_{H^-}_{makespan_add-cost}.eps}}\qquad
+%  % zeno3eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \caption{Attainment plots for two search strategies on  \MULTIZENO6$_{cost}$.}
+\label{fig:strategiesYahsp}}
+\end{figure*}
+
+\subsection{Shape of the Pareto Front}
+
+Figure \ref{fig:allFronts} displays the attainment plots of IBEA$_{H^-}$ for both extreme Pareto fronts shown on Figure \ref{fig:zeno3ParetoFronts} -- while the corresponding plot for the linear case $\alpha=2$ is that of Figure \ref{fig:attainment}-(a). 
+Whereas the concave front is fully identified in 40\% of the runs (right), the complete front for the strictly convex case (left) is never reached: in the latter case, the 4 most extreme points are found by 90\% of the runs in less than 200 seconds, while the central points are hardly ever found. We hypothesize that the handling of \YAHSP\ strategy regarding which objective to optimize (see Section \ref{sec:strategies}) has a greater influence in the case of this strictly convex front than when the front is linear ($\alpha=2$) or almost linear, even if strictly concave ($\alpha=2.9$). In any case, no aggregation technique could ever solve the latter case, whereas it is here solved in 40\% of the runs by \DAEYAHSP.
+
+
+
+% To illustrate the search capabilities of our hybrid algorithms, we include in Figure~\ref{fig2:zenoParetofront} the  attainment of the Pareto fronts reached by the different algorithms
+% when solving the instance problem MultiZenoTravel by considering the second objective as the total cost or risk.
+% The attainment is given as a rate of runs that have reached the whole Pareto front solutions  over 30 attempts. The stopping criterion of the different algorithms has been fixed to 300, 600, 900 seconds respectively for  \MULTIZENO3,  \MULTIZENO6 and  \MULTIZENO9.  XXXXX
+% In the case of \MULTIZENO3$_{cost}$ (see Figure~\ref{fig:att_zeno3_cost}), the exact Pareto front is constituted of 5 solutions.
+% We can observe that all the algorithms have obtained the entire front. Furthermore, the rate of total attainment of IBEA$_{H^-}$ and IBEA$_{\epsilon^+}$ is 1, which means that all their runs  have reached the exact Pareto front. 
+% Where SPEA2 and NSGA-II have performed an attainment rate around 0.8. That observation attests a good convergence and distribution towards the Pareto front. 
+% When we deal with \MULTIZENO3$_{risk}$ (Figure~\ref{fig:att_zeno3_risk}), NSGA-II performs significantly less than the other algorithms.
+% Its attainment rate is close to 0.6, where the rest of algorithms have a rate around 1. \\
+% For the instance \MULTIZENO6$_{cost}$ (Figure~\ref{fig:att_zeno6_cost}), similar performances are provided. The exact Pareto front is constituted from eleven solutions.
+% Both the indicator-based approaches outperform the other algorithms and obtain an attainment rate around 0.8, where NSGA-II and SPEA2 reach a rate less than 0.2.
+% As given in Figure~\ref{fig:att_zeno6_risk}, when the second objective is the risk, only the indicator-based approaches have reached a significant attainment's rate, even if the different points of the Pareto front have been reached separately. 
+% For \MULTIZENO9$_{cost}$, the  results are quite similar between them, although we can appreciate some slight differences (Figure~\ref{fig:att_zeno9_cost}).
+% No algorithm has reached all the 17 solutions of the Pareto front. This tendency is confirmed with the risk case of the instance (Figure~\ref{fig:att_zeno9_risk}).\\
+% It is interesting to note that the size of instances  and the  second considered objective, seem to affect the efficiency of the algorithms. The algorithms provide  better solutions on small instances and when considering the cost as second objective.
+% The evolution of the quality of solutions is computed according to $I_{H^-}$ indicator and is depicted for each instance in Figure~\ref{fig:zenoHypervolume}.
+% In detail, the curves of Figure~\ref{fig:zenoHypervolume}(a,b), Figure~\ref{fig:zenoHypervolume}(c,d) and Figure~\ref{fig:zenoHypervolume}(e,f) are 
+% respectively obtained on the instance \MULTIZENO3, \MULTIZENO6 and \MULTIZENO9 by considering the second objective as total cost or risk.
+% At first sight, the outcomes obtained show that the algorithms converge far more quickly towards the optimal Pareto front when considering  the size of the instances (number of passengers). 
+% The convergence is faster for \MULTIZENO3 comparatively to the remaining instances.
+% We can see that a great part of the optimization is achieved in the first half of time allowed for the optimization. The improvement of the quality of solutions is quite slow after this amount of time.
+% When dealing with the instance \MULTIZENO3 and \MULTIZENO6, we can observe  that the indicator based-approaches IBEA$_{H^-}$ and IBEA$_{\epsilon^+}$ outperform NSGA-II and SPEA2. 
+% This observation is true for both cost and risk cases. While on the instance \MULTIZENO9, it appears that the previous observation is maintained for the cost case, where for the risk case,  SPEA2 is  more efficient than the other algorithms.
+% As mentioned in Section~\ref{sec:evolutionaryMOA}, \YAHSP\  works only on one single objective. 
+% However, we have adopted  a  search strategy that allows \YAHSP\ to switch from one objective to another during the search. 
+% This is done according to a roulette-wheel selection between the objectives to optimize 'makespan' and 'cost/risk'. 
+% Figure~\ref{fig:strategiesYahsp}  shows the  attainment of  the true Pareto front by IBEA$_{H^-}$ when considering either a single objective or both (makespan, cost, makespan--cost) on \MULTIZENO6 instance.
+% We can observe that each strategy  achieves  a high rate of solutions 
+% that optimize  the concerned objective. The combination of both strategies  covers the whole Pareto set of solutions and obtains a 
+% global attainment rate that is  80\% of the runs that have been performed.
+ 
+
+
+
+
+
+
+
+% 
+%  
+% \begin{figure*}
+% \centering{
+% \subfloat[1-1.1-3] {\includegraphics[scale=0.6, bb=50 50 410 302]{./zeno3ci_{cost}:IBEA_{H^-}.eps}}
+% \subfloat[1-2-3] {\includegraphics[scale=0.6, bb=50 50 410 302]{./zeno3_{cost}:IBEA_{H^-}.eps}}\qquad
+% \subfloat[1-2.9-3] {\includegraphics[scale=0.6, bb=50 50 410 302]{./zeno3cs_{cost}:IBEA_{H^-}.eps}}
+%  \caption{Attainment of IBEA$_{H^-}$ over different shapes of Pareto fronts of \MULTIZENO3.}}
+% \end{figure*}
+
+
+\begin{figure}[tb!]
+\centering{
+\subfloat[cost(city2)=1.1] {\includegraphics[width=0.48\textwidth,height=3.4cm, bb=50 50 410 302]{./zeno6di_{cost}:IBEA_{H^-}.eps}}
+%\subfloat[1-2-3] {\includegraphics[scale=0.6, bb=50 50 410 302]{./zeno6_{cost}:IBEA_{H^-}.eps}}\qquad
+\subfloat[cost(city2)=2.9] {\includegraphics[width=0.48\textwidth,height=3.4cm, bb=50 50 410 302]{./zeno6ds_{cost}:IBEA_{H^-}.eps}}
+ \caption{Attainment plots for different Pareto fronts for \MULTIZENO6$_{cost}$.}
+\label{fig:allFronts}}
+\end{figure}
+
+
+
+ 
+% To illustrate the search capabilities of our hybrid algorithms, we include in Figure~\ref{fig2:zenoParetofront} the Pareto fronts reached by the different algorithms
+% when solving the instance problem MultiZenoTravel with the second objective as the  total cost.
+% %For this instance, we compute by hand the optimal Pareto front that is constituted by five solutions when considering  the cost as second objective
+% In the case of \MULTIZENO3$_{cost}$, we observe that the fronts obtained by  NSGA-II, IBEA$_{\epsilon^+}$ and SPEA2 have a better convergence and distribution of solutions than IBEA$_{H^-}$. 
+% Besides, all the solutions have converged towards the true Pareto front, while in IBEA$_{H^-}$ fronts some 
+% solutions have not. For the instance \MULTIZENO6$_{cost}$ and  \MULTIZENO9$_{cost}$, the fronts are quite similar between them, although we can appreciate some slight differences.\\
+% The evolution of the quality of solutions is computed according to $I_{H^-}$ indicator and is depicted for each instance in Figure~\ref{fig3:zenoHypervolume}.
+% In detail, the curves of Figure~\ref{fig3:zenoHypervolume} are  obtained on the  MultiZenoTravel instances by considering the second objective as total cost or risk.
+% At first sight, the outcomes obtained show that algorithms converge far more quickly towards the optimal Pareto front  when considering the
+%  risk case than  in the total cost case.
+% In detail, we can see that a great part of the optimization is achieved around the first 400  and 50 generations respectively for the cost and risk case and that the improvement of the quality of solutions is quite slow after these generations.
+% Depending on the instance, we can see two different scenarios:
+% When dealing with the total cost case (Figure~\ref{fig3:zenoHypervolume}(a,c, e)), it seems that for the instance \MULTIZENO3$_{cost}$ and \MULTIZENO9$_{cost}$ ,  NSGA-II outperforms SPEA2, IBEA$_{\epsilon^+}$ and IBEA$_{H^-}$.
+% While, on the instance \MULTIZENO6$_{cost}$, it appears that the algorithms  are quite equivalent.\\
+% %If we are now interested in the realistic instances (Fig. 10(c, d)), the quality of solutions follows practically the
+% However, when considering the risk case (Figure~\ref{fig3:zenoHypervolume}(b,d, f)), the quality of solutions  for all algorithms 
+% follows practically the same evolution on the instances  \MULTIZENO3$_{risk}$ and  \MULTIZENO6$_{risk}$. 
+% Even if the  convergence of SPEA appears to be a bit slower than the other algorithms.
+% Whilst on \MULTIZENO9$_{risk}$, the other algorithms are better in terms of convergence than SPEA2.
+% It is interesting to note that the size of instances  and the  second considered objective, seem to  influence the efficiency of the algorithms.
+% SPEA2 and IBEA$_{\epsilon^+}$  provide  better solutions on small instances,  whereas NSGA-II and IBEA$_{H^-}$ have better convergence and distribution  towards the optimal Pareto front on 
+% large instances. However, the performances are similar when considering the risk as second objective except for \MULTIZENO9$_{risk}$.
+% %Depending on the instance, we can see that two different scenarios:
+
+% \subsection{Performance Assessment}
+
+%  A set of 30 runs per instance has been performed for each algorithms.
+% % In order to evaluate the quality of the approximations for every
+% %instance, we follow the protocol proposed in~\cite{Fonseca2005}.
+% % For a given instance, let $Z^{all}$ denote the union of the outputs that
+% % we obtained during all our experiments. Note that this set probably contains both dominated and non-dominated points, as a given approximation may contain
+% % vectors dominating the ones of another approximation, and vice versa.\\
+% % We first compute a reference set $Z^*_N$ containing all the non-dominated points of $Z^{all}$. 
+% % Second, we define $z^{min} = (z^{min}_1 ,\ldots, z^{min}_n)$ an $z^max =(z^{max}_1 ,\ldots, z^{max}_n)$, where $z^{min}_k$ (resp. $z^{max}_k$) denotes the lower (resp. upper)
+% %  bound for the $k^{th}$ objective for all the points contained in $Z^{all}$.
+% % In order to give a roughly equal range to the objective functions, values are normalized with respect to $z^min$ and $z^{max}$.
+% % Then, to measure the quality of an output set $A$ in comparison to $Z^*_N$ , we compute the difference between these two sets by using the unary hypervolume
+% % metric~\cite{Zitzler2004}, $z^{max}$ being the reference point. 
+% In order to measure the quality of an output set of solutions $A$ in comparison to a reference set $Z^*_N$, we compute the difference between these two sets by using the unary hypervolume
+% metric~\cite{Zitzler2004}. The hypervolume computes the volume (in objective function space) comparatively to $Z^*_N$. The closer this measure to 0, the better is the approximation $A$.
+% %. The hypervolume difference indicator ($I^-_H $) computes the portion of the objective
+% %space that is weakly dominated by $Z^*_N$ and not by $A$. The closer this measure to 0, the better is the approximation $A$~\cite{Zitzler2004}.
+% % Furthermore, we also consider the additive $\epsilon$-indicator proposed in~\cite{Zitzler2004}. %The unary additive $\epsilon$-indicator ($I^1_{\epsilon^+}$ ) gives the minimum factor by which an approximation $A$ has to be translated in the objective
+% %space to dominate the reference set $Z^*_N$. 
+% %Note that both $I^-_H $  and $I^1_{\epsilon^+}$ values are to be minimized. and $I^1_{\epsilon^+}$  measures
+% Thus, for each test instance, we obtain 30 $I^-_H $ measures  corresponding to the 30  runs performed for each algorithm. 
+% Once all these values are computed, we perform a statistical analysis for a pairwise comparison of methods. To this end, we use the Wilcoxon signed rank test. For a given
+% test instance, and with respect to a \textit{p}-value of 0.05 and to the metric under consideration, this statistical test reveals if
+% the sample of approximation sets obtained by a given search method is significantly better than the one of another search
+% method, or if there is no significant difference between both of them. Note that all the performance assessment procedures have been achieved using
+% the performance assessment tool suite provided in PISA\footnote{http://www.tik.ee.ethz.ch/pisa/}.%~\cite{Bleuler2003}.
+
+% A widely-used way to compare different multi-objective algorithms is to perform statistical tests based on the evolution of some measure of performance during several runs. A set of 30 runs per instance has been performed for each algorithms. The $I^-_H $ metric has been chosen here, using as reference set the union of all solutions found by at least one run of one algorithm.
+% Wilcoxon signed rank tests with confidence level 0.05 using this $I^-_H $ metric have been done on the results for all instances (Zeno3-6-9) and all variants of \MODAE\ (NSGA-II, SPEA2, IBEA$_{H^-}$ and IBEA$_{\epsilon^+}$: except for the \MULTIZENO3$_{cost}$ instance, where no statistical difference appears, algorithms vary in terms of performance.
+% Indicator based approaches appear to be more efficient than all the other algorithms on the (Zeno-6-9) instances. While SPEA2 seems to be better than NSGA-II on these instances for the cost case.
+
+
+% \begin{figure*}[h!]
+% \centering{
+% \subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{cost}:NSGA-II.eps} }
+%  % zeno3_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+% \subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{cost}:IBEA_{H^-}.eps}}\\
+%  % zeno3eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{cost}:IBEA_{epsilon^+}.eps}}
+%  % zeno3eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{cost}:SPEA2.eps}}\\
+%  % zeno3e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{cost}:rate.eps}}
+%  % zeno3_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \caption{Attainment of Pareto fronts on \MULTIZENO3$_{cost}$}
+% \label{fig:att_zeno3_cost}}
+% \end{figure*}
+%  
+%  
+% \begin{figure*}[h!]
+% \centering{
+% \subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{cost}:NSGA-II.eps} }
+%  % zeno6_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+% \subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{cost}:IBEA_{H^-}.eps}}\\
+%  % zeno6eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{cost}:IBEA_{epsilon^+}.eps}}
+%  % zeno6eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{cost}:SPEA2.eps}}\\
+%  % zeno6e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{cost}:rate.eps}}
+%  % zeno6_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+% \caption{Attainment of Pareto fronts on \MULTIZENO6$_{cost}$}
+% \label{fig:att_zeno6_cost}}
+% \end{figure*}
+%  
+% \begin{figure*}[h!]
+% \centering{
+% \subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{risk}:NSGA-II.eps}}
+%  % zeno6_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+% \subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{risk}:IBEA_{H^-}.eps}}\\
+%  % zeno6eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{risk}:IBEA_{epsilon^+}.eps}}
+%  % zeno6eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{risk}:SPEA2.eps}}\\
+%  % zeno6e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno6_{risk}:rate.eps}}
+%  % zeno6_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \caption{Attainment of Pareto fronts on \MULTIZENO6$_{risk}$}
+% \label{fig:att_zeno6_risk}}
+% \end{figure*}
+ 
+
+% \begin{figure*}[h!]
+% \centering{
+% \subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{cost}:NSGA-II.eps} }
+%  % zeno9_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+% \subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{cost}:IBEA_{H^-}.eps}}\\
+%  % zeno9eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{cost}:IBEA_{epsilon^+}.eps}}
+%  % zeno9eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{cost}:SPEA2.eps}}\\
+%  % zeno9e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{cost}:rate.eps}}
+%  % zeno9_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \caption{Attainment of Pareto fronts on \MULTIZENO9$_{cost}$}
+% \label{fig:att_zeno9_cost}}
+% \end{figure*}
+% 
+% \begin{figure*}[h!]
+% \centering{
+% \subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{risk}:NSGA-II.eps}}
+%  % zeno9_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+% \subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{risk}:IBEA_{H^-}.eps}}\\
+%  % zeno9eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{risk}:IBEA_{epsilon^+}.eps}}
+%  % zeno9eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{risk}:SPEA2.eps}}\\
+%  % zeno9e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno9_{cost}:rate.eps}}
+%  % zeno9_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \caption{Attainment of Pareto fronts on \MULTIZENO9$_{risk}$}
+% \label{fig:att_zeno9_risk}}
+% \end{figure*}
+
+
+
+
+
+% 
+% \begin{table*}[h]
+% \scriptsize
+% \caption{Algorithms comparison according to Kruskal-Wallis test with respect of the I$_{H^-}$ metric.}
+% \label{table:tests}
+% \centering
+% 
+% \begin{center}
+% \scriptsize
+% \begin{tabular}{|l|l|c|c|c|c|}
+% 
+%    \hline
+%     \multirow{2}*{Instances}  &  \multirow{2}*{Algorithms}	 	&  \multicolumn{4}{c|}{ Algorithms}\\
+%     \cline{3-6}
+% 			      &            		 	       		& $NSGAII$  &  $IBEA_{\varepsilon^+}$   & $IBEA_{H^-}$  & $SPEA2$  \\
+%    \hline
+%   \multirow{4}*{\textit{Zeno3}$_{cost}$} &$NSGAII$       	     &  --     & 		$\equiv$     &  	$\equiv$   	&  	$\equiv$   \\
+% 				
+% 			      &  $IBEA_{\varepsilon^+}$  	   			& $\equiv$  	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+% 			      &    $IBEA_{H^-}$   	 	        	& 	$\equiv$  	&		$\equiv$  &--	&	$\equiv$    \\
+% 			      &    $SPEA2$       		  			& $\equiv$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+%   \hline
+%   \multirow{4}*{\textit{Zeno3}$_{risk}$} & $NSGAII$ 	    			&		-- 					&$\equiv$  		& $\equiv$  	& $\equiv$ \\
+% 	      & $IBEA_{\varepsilon^+}$   	   	 	    		&$\equiv$ 						&-- 			&$\equiv$  	&  $\equiv$  \\
+% 	      &  $IBEA_{H^-}$     		&$\equiv$ 			& $\equiv$  						&-- 	 & $\equiv$   \\
+% 	      &  $SPEA2$      		&$\equiv$  & $\equiv$ 			&$\equiv$  & --   \\
+%  \hline
+%  \hline
+%   \multirow{4}*{\textit{Zeno6}$_{cost}$} & $NSGAII$ 	    			&		-- 					&  \cellcolor [gray]{0.8}$ \prec$		&  \cellcolor [gray]{0.8}$ \prec$ 	&  \cellcolor [gray]{0.8}$ \prec$ \\
+% 	      & $IBEA_{\varepsilon^+}$   	   	 	    		&\cellcolor [gray]{0.8}$\succ$ 							&-- 			&$\equiv$  	&  $\equiv$  \\
+% 	      &  $IBEA_{H^-}$     		&\cellcolor [gray]{0.8}$\succ$ 			& $\equiv$  						&-- 	 & $\equiv$   \\
+% 	      &  $SPEA2$      		&\cellcolor [gray]{0.8}$\succ$ 	  & $\equiv$ 			&$\equiv$  & --   \\
+%  \hline
+%  \hline
+%  \multirow{4}*{\textit{Zeno6}$_{risk}$} & $NSGAII$ 	    			&		-- 					& \cellcolor [gray]{0.8}$ \prec$   		&  \cellcolor [gray]{0.8}$ \prec$  	&$\equiv$   \\
+% 	      & $IBEA_{\varepsilon^+}$   	   	 	    		&\cellcolor [gray]{0.8}$\succ$ 						&-- 			&\cellcolor [gray]{0.8}$\succ$  	& \cellcolor [gray]{0.8}$\succ$ \\
+% 	      &  $IBEA_{H^-}$     		&\cellcolor [gray]{0.8}$\succ$ 			&  \cellcolor [gray]{0.8}$ \prec$   						&-- 	 & \cellcolor [gray]{0.8}$\succ$  \\
+% 	      &  $SPEA2$      		& $\equiv$   &  \cellcolor [gray]{0.8}$ \prec$  			& \cellcolor [gray]{0.8}$ \prec$   & --   \\
+%  \hline
+%    \hline
+%   \multirow{4}*{\textit{Zeno9}$_{cost}$} &$NSGAII$       	     &  --     & 		\cellcolor [gray]{0.8}$ \prec$      &  	\cellcolor [gray]{0.8}$ \prec$  	&  	\cellcolor [gray]{0.8}$ \prec$  \\
+% 				
+% 			      &  $IBEA_{\varepsilon^+}$  	   			& \cellcolor [gray]{0.8}$\succ$ 		   & 	--       		& 	\cellcolor [gray]{0.8}$ \prec$ 	&	\cellcolor [gray]{0.8}$\succ$ 	   \\
+% 			      &    $IBEA_{H^-}$   	 	        	& 	\cellcolor [gray]{0.8}$\succ$ 		&		\cellcolor [gray]{0.8}$\succ$ 	  &--	&	\cellcolor [gray]{0.8}$\succ$ 	   \\
+% 			      &    $SPEA2$       		  			& \cellcolor [gray]{0.8}$\succ$ 			&	$\equiv$ 	&	\cellcolor [gray]{0.8}$ \prec$ 			 &  --  \\
+%   \hline
+%  \multirow{4}*{\textit{Zeno9}$_{risk}$} &$NSGAII$       	     &  --     & 		\cellcolor [gray]{0.8}$ \prec$     &  	$\equiv$   	&  	\cellcolor [gray]{0.8}$ \prec$   \\				
+% 			      &  $IBEA_{\varepsilon^+}$  	   		&	\cellcolor [gray]{0.8}$\succ$  	   & 	--       		& 	\cellcolor [gray]{0.8}$\succ$ 	&	$\equiv$      \\
+% 			      &    $IBEA_{H^-}$   	 	        	& 	$\equiv$  	&		\cellcolor [gray]{0.8}$ \prec$   &--	&	\cellcolor [gray]{0.8}$ \prec$     \\
+% 			      &    $SPEA2$       		  			&\cellcolor [gray]{0.8}$\succ$ 	&	$\equiv$ 	&	\cellcolor [gray]{0.8}$\succ$ 			 &  --  \\
+%   \hline
+% 
+% \end{tabular} 
+% \end{center}
+% \end{table*}
+
+
+% \section{Discussion}
+% \label{sec:discussion}
+% The multi-objectivization of \DAEX\ was sketched in \cite{Schoenauer2006}. However, the primitive version of \DAEX\ that it relied on was rather limited, and required a lot of human expertise in order to choose which predicate to use in the representation of states.
+% 
+% Though the Pareto dominance, and hence the Pareto-based ranking and strength computations, are comparison-based, the indicators are not -- hence the differences observed between the 3-2-1 and the 100-10-1 costs for cities 1-3. 
+% 
+%  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \begin{figure}[tb!]
+% \centering{
+% % \subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{risk}:NSGA-II.eps} }
+% %  % zeno3_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+% \subfloat[\MULTIZENO3]{\includegraphics[bb=50 50 410 302,scale=0.48]{zeno3_{risk}:IBEA_{H^-}.eps}}
+% \subfloat[\MULTIZENO6]{\includegraphics[bb=50 50 410 302,scale=0.48]{zeno6_{risk}:IBEA_{H^-}.eps}}\\
+%  % zeno3eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% % \subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{risk}:IBEA_{epsilon^+}.eps}}
+% %  % zeno3eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% % \subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{risk}:SPEA2.eps}}\\
+% %  % zeno3e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% % \subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{zeno3_{risk}:rate.eps}}
+%  % zeno3_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \caption{Attainment of Pareto fronts of IBEA$_{H^-}$ on \MULTIZENO3-6$_{risk}$ instances.}
+% \label{fig:att_zeno3_risk}}
+% \end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\section{Conclusion and Perspectives}
+\label{sec:conclusion}
+% Building on the very preliminary work in \cite{Schoenauer2006}, 
+The contributions of this paper are twofold. Firstly, \MULTIZENO, an original benchmark test suite for multi-objective temporal planning, has been detailed, and several levers identified that allow to generate more or less complex instances, that have been confirmed experimentally: increasing the number of passengers obviously makes the problem more difficult; modifying the cost of reaching the cities and the duration of the flights is another way to make the problem harder, though deeper work is required to identify the consequences of each modification.
+Secondly, several multi-objectivization of \DAEX, an efficient evolutionary planner in the single-objective case, have been proposed.
+
+However, even though the hypervolume-based IBEA$_{H^-}$ clearly emerged as the best choice, the experimental comparison of those variants on the  \MULTIZENO\ benchmark raises more questions than it brings answers. The sparseness of the Pareto Front has been identified as a possible source for the rather poor performance of all variants for moderately large instances, particularly for the {\em risk} type of instances. Some smoothening of the objectives could be beneficial to tackle this issue (e.g., counting for the number of times each risk level is hit rather than simply accounting for the maximal value reached). Another direction of research is to combat the non-symmetry of the results, due to the fact that the embedded planner only optimizes one objective. Further work will investigate a self-adaptive approach to the choice of which objective to give \YAHSP\ to optimize. Finally, the validation of the proposed multi-objective \DAEYAHSP\ can only be complete after a thorough comparison with the existing 
+aggregation approaches -- though it is clear that aggregation approaches will not be able to identify the whole Pareto front in case it has some concave parts, whereas the results reported here show that \DAEYAHSP\ can reasonably do it.
+
+% \textcolor{red}{\bf NE PAS OUBLIER DE REMERCIER/CITER l'ANR}
+% This work was partially funded by DESCARWIN ANR project (ANR-09-COSI-002).
+
+{\small
+\bibliographystyle{splncs}
+\bibliography{emob}
+}
+
+\end{document}
+
+
+Mail de Vincent
+===============
+
+2 papiers d'avant PDDL3.0 :
+
+@article{do2003sapa,
+  title={Sapa: A multi-objective metric temporal planner},
+  author={Do, M.B. and Kambhampati, S.},
+  journal={J. Artif. Intell. Res. (JAIR)},
+  volume={20},
+  pages={155--194},
+  year={2003}
+}
+
+@article{refanidis2003multiobjective,
+  title={Multiobjective heuristic state-space planning},
+  author={Refanidis, I. and Vlahavas, I.},
+  journal={Artificial Intelligence},
+  volume={145},
+  number={1},
+  pages={1--32},
+  year={2003},
+  publisher={Elsevier}
+}
+
+
+Depuis PDDL3.0, dont la ref est dessous, tous les planners du track
+"net-benefit" sont censés résoudre ce type de problème (multi-objectifs avec
+aggrégation) :
+
+@inproceedings{gerevini2006preferences,
+  title={Preferences and soft constraints in PDDL3},
+  author={Gerevini, A. and Long, D.},
+  booktitle={ICAPS Workshop on Planning with Preferences and Soft Constraints},
+  pages={46--53},
+  year={2006}
+}
+
+
+
+Gagnant 2006 : SGPLAN
+
+@article{chen2006temporal,
+  title={Temporal planning using subgoal partitioning and resolution in SGPlan},
+  author={Chen, Y. and Wah, B.W. and Hsu, C.W.},
+  journal={Journal of Artificial Intelligence Research},
+  volume={26},
+  number={1},
+  pages={323--369},
+  year={2006},
+  publisher={AI Access Foundation}
+}
+
+Gagnant 2008 : GAMER
+
+@inproceedings{edelkamp2009optimal,
+  title={Optimal symbolic planning with action costs and preferences},
+  author={Edelkamp, S. and Kissmann, P.},
+  booktitle={Proc. of the 21st International Joint Conference on Artificial Intelligence (IJCAI 2009)},
+  pages={1690--1695},
+  year={2009}
+}
+
+Compétition 2011 : track net-benefit annulée !

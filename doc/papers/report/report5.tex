@@ -1,0 +1,282 @@
+
+\documentclass[a4paper,10pt]{article}
+\usepackage{geometry}
+\geometry{hmargin=0.5cm,vmargin=0.5cm}
+\usepackage[utf8x]{inputenc}
+                            % not available on your system
+\usepackage[table]{xcolor}
+% \usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}        % standard LaTeX graphics tool                            % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{url}
+\usepackage{caption,subfig}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+%\maketitle 
+
+  \clearpage 
+  \newpage
+
+% 
+% \begin{figure*}[h!]
+% \centering
+% \subfloat[$proba_{mutation}=0.001$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.001.eps} } 
+% \subfloat[$proba_{mutation}=0.01$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.01.eps} } \qquad
+% \subfloat[$proba_{mutation}=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.1.eps} }  
+% \subfloat[$proba_{mutation}=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.3.eps} } \qquad 
+% \subfloat[$proba_{mutation}=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.5.eps} } 
+% \subfloat[$proba_{mutation}=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.7.eps} } \qquad
+% \subfloat[$proba_{mutation}=0.9$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.9.eps} } 
+% \subfloat[$proba_{mutation}=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=1.0.eps} } \qquad 
+% \subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.55] {../plot_archive/zeno6eIndi_{cost}:rate.eps} } 
+% %\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+% %\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+% \caption{Attainment plots for $IBEA_{INDIV}$ on Zeno6 $_{cost}$ instances.}
+% \end{figure*}
+% 
+% 
+% 
+%  
+% 
+% \begin{figure*}[h!]
+% \centering
+% \subfloat[$proba_{mutation}=0.001$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:ibea=0.001.eps} } 
+% \subfloat[$proba_{mutation}=0.01$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:ibea=0.01.eps} } \qquad
+% \subfloat[$proba_{mutation}=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:ibea=0.1.eps} }  
+% \subfloat[$proba_{mutation}=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:ibea=0.3.eps} } \qquad 
+% \subfloat[$proba_{mutation}=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:ibea=0.5.eps} } 
+% \subfloat[$proba_{mutation}=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:ibea=0.7.eps} } \qquad
+% \subfloat[$proba_{mutation}=0.9$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:ibea=0.9.eps} } 
+% \subfloat[$proba_{mutation}=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:ibea=1.0.eps} } \qquad 
+% \subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.55] {../plot_archive/zeno6eGoal_{cost}:rate.eps} } 
+% %\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+% %\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+% \caption{Attainment plots for $IBEA_{Goal}$ on Zeno6 $_{cost}$ instances.}
+% \end{figure*}
+
+
+% 
+% \begin{figure*}[h!]
+% \centering
+% \subfloat[$proba_{mutation}=0.001$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.001.eps} } 
+% \subfloat[$proba_{mutation}=0.01$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.01.eps} } \qquad
+% \subfloat[$proba_{mutation}=0.1$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.1.eps} }  
+% \subfloat[$proba_{mutation}=0.3$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.3.eps} } \qquad 
+% \subfloat[$proba_{mutation}=0.5$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.5.eps} } 
+% \subfloat[$proba_{mutation}=0.7$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.7.eps} } \qquad
+% \subfloat[$proba_{mutation}=0.9$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=0.9.eps} } 
+% \subfloat[$proba_{mutation}=1.0$]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:ibea=1.0.eps} } \qquad 
+% \subfloat[rate]{\includegraphics[bb=50 50 410 302,scale=0.55] {../plot_archive/zeno6eIndi_{cost}:rate.eps} } 
+% %\subfloat[$IBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps} } 
+% %\subfloat[$AIBEA_{H^-}$]{\includegraphics[scale=0.5, bb=50 50 410 302]{../plot_archive/zeno9evect_{cost}:IBEA_{H^-}.eps} }  \qquad
+% \caption{Attainment plots for $IBEA_{INDIV}$ on Zeno6 $_{cost}$ instances.}
+% \end{figure*}
+% 
+% 
+% 
+%  
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[Individual strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3eInd_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[Goal strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3eGoal_{cost}:IBEA_{H^-}.eps} }\\ 
+\subfloat[Mixte strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3eMix_{cost}:IBEA_{H^-}.eps} } 
+\caption{Attainment plots for $IBEA$ on Zeno3 $_{cost}$ instances.}
+\end{figure*}
+
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[Individual strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3eInd_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[Goal strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3eGoal_{risk}:IBEA_{H^-}.eps} }\\ 
+\subfloat[Mixte strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno3eMix_{cost}:IBEA_{H^-}.eps} } 
+\caption{Attainment plots for $IBEA$ on Zeno3 $_{risk}$ instances.}
+\end{figure*}
+
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[Individual strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[Goal strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{cost}:IBEA_{H^-}.eps} }\\ 
+\subfloat[Mixte strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eMix_{cost}:IBEA_{H^-}.eps} } 
+\caption{Attainment plots for $IBEA$ on Zeno6 $_{cost}$ instances.}
+\end{figure*}
+
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[Individual strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eIndi_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[Goal strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eGoal_{risk}:IBEA_{H^-}.eps} }\\ 
+\subfloat[Mixte strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno6eMix_{risk}:IBEA_{H^-}.eps} } 
+\caption{Attainment plots for $IBEA$ on Zeno6 $_{risk}$ instances.}
+\end{figure*}
+
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[Individual strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9eInd_{cost}:IBEA_{H^-}.eps} } 
+\subfloat[Goal strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9eGoal_{cost}:IBEA_{H^-}.eps} }\\ 
+\subfloat[Mixte strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9eMix_{cost}:IBEA_{H^-}.eps} } 
+\caption{Attainment plots for $IBEA$ on Zeno9 $_{cost}$ instances.}
+\end{figure*}
+
+
+
+\begin{figure*}[h!]
+\centering
+\subfloat[Individual strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9eInd_{risk}:IBEA_{H^-}.eps} } 
+\subfloat[Goal strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9eGoal_{risk}:IBEA_{H^-}.eps} }\\ 
+\subfloat[Mixte strategy]{\includegraphics[bb=50 50 410 302,scale=0.55]{../plot_archive/zeno9eMix_{risk}:IBEA_{H^-}.eps} } 
+\caption{Attainment plots for $IBEA$ on Zeno9 $_{risk}$ instances.}
+\end{figure*}
+
+
+
+
+% 
+% \begin{figure*}[h!]
+% \centering
+%  \subfloat[Zeno6] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno6eStrat_Add_dae_pareto.eps} }
+%  \subfloat[Zeno9] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno9eStrat_Add_dae_pareto.eps} }
+%  \caption{Yahsp}
+% \end{figure*}
+%  
+
+
+
+
+ \begin{figure*}[h!]
+ \centering
+  \subfloat[Zeno3] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno3GlobLevelDaeYahsp_Add_dae_pareto.eps} }
+  \subfloat[Zeno6] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno6GlobLevelDaeYahsp_Add_dae_pareto.eps} }\\
+  \subfloat[Zeno9] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno9GlobLevelDaeYahsp_Add_dae_pareto.eps} }
+  \caption{YAHSP with single strategy (cost/makespan)}
+ \end{figure*}
+ 
+ 
+% 
+%  \begin{figure*}[h!]
+%  \centering
+%   \subfloat[Zeno3] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno3StratlevelDaeYahsp_Add_dae_pareto.eps} }
+%   \subfloat[Zeno6] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno6StratlevelDaeYahsp_Add_dae_pareto.eps} }\\
+%   \subfloat[Zeno9] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno9StratlevelDaeYahsp_Add_dae_pareto.eps} }
+%   \caption{YAHSP with strategy applied at individual level and  goal level (with probability=1.0 at each iteration)}
+%  \end{figure*}
+%   
+  
+  
+  
+ 
+
+ \begin{figure*}[h!]
+ \centering
+  \subfloat[Zeno3] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno3Strat_Add_dae_pareto.eps} }
+  \subfloat[Zeno6] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno6Strat_Add_dae_pareto.eps} }\\
+  \subfloat[Zeno9] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno9Strat_Add_dae_pareto.eps} }
+  \caption{YAHSP with strategy applied at goal level (with mutation probability=1.0 for each sub-goal)}
+ \end{figure*}
+  
+%   
+ \begin{figure*}[h!]
+ \centering
+  \subfloat[openstacks-p01] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/openstacks_p01_Add_ibeahyper_pareto.eps} }
+  \subfloat[openstacks-p05] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/openstacks_p05_Add_ibeahyper_pareto.eps} } \\
+  \subfloat[openstacks-p10] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/openstacks_p10_Add_ibeahyper_pareto.eps} }
+  \subfloat[openstacks-p15] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/openstacks_p15_Add_ibea_pareto.eps}}\\
+  \subfloat[openstacks-p20] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/openstacks_p20_Add_ibea_pareto.eps} }
+  \begin{center}
+ 
+ % openstacks_p10_Add_ibeahyper_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\end{center}
+
+  
+  \caption{openstacks}
+ % openstacks_p01_Add_ibeahyper_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \end{figure*}
+
+  
+ \begin{figure*}[h!]
+ \centering
+   \subfloat[floortile0]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/foortile_pfile0__Add_ibeahyper_pareto.eps}}
+    \subfloat[floortile3]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/floortile_pfile3_Add_ibea_pareto.eps}}\\
+     \subfloat[floortile4]{ \includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/floortile_pfile4_Add_ibea_pareto.eps}}
+
+ % foortile_pfile0__Add_ibeahyper_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \caption{foortile}
+ \end{figure*}
+ 
+ 
+ 
+  
+ \begin{figure*}[h!]
+\centering
+\subfloat[elevators-p01-p04]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/elevators_p01-p04_Add_ibea_pareto.eps} }
+\subfloat[elevators-p05-p07]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/elevators_p05-p07_Add_ibea_pareto.eps}}\\
+\subfloat[elevators-p10]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/elevators_p10_Add_ibea_pareto.eps} }
+% foortile_pfile0__Add_ibeahyper_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{elevators}
+ \end{figure*}
+ 
+ 
+ \section{LPG}
+ 
+ 
+  \begin{figure*}[h!]
+ \begin{center}
+ \subfloat[elevator-p01-p04]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/elevator_p01-p04_Add_lpg_pareto.eps}}
+ % elevator_p01-p04_Add_lpg_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[floortile0]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/foortilePfile0_Add_lpg_pareto.eps}}\\
+ \subfloat[floortile3]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/foortilePfile3_Add_lpg_pareto.eps}}
+ \subfloat[floortile4]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/foortilePfile4_Add_lpg_pareto.eps} }\\
+ \subfloat[openstacks-p01]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/openstacks_p01_Add_lpg_pareto.eps}}
+ 
+\end{center}
+  \end{figure*}
+
+
+
+  \begin{figure*}[h!]
+ \begin{center}
+ \subfloat[elevator-p01-p04]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/openstacks_p01_Add_p_pareto-graphic.eps}}
+ % elevator_p01-p04_Add_lpg_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[floortile0]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/floortilePfile0_Add_p_pareto-graphic.eps}}\\
+ \subfloat[floortile3]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/floortilePfile3_Add_p_pareto-graphic.eps}}
+ \subfloat[floortile4]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/floortilePfile4_Add_p_pareto-graphic.eps} }\\
+ \subfloat[openstacks-p01]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/elevators_p01-p04_Add_p_pareto-graphic.eps}}
+ 
+\end{center}
+
+
+  \end{figure*}
+ 
+% 
+%  \begin{figure*}[h!]
+%  \centering
+%    \subfloat[zenoTravel-zfile1] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zenoTravel_zfile1__Add_ibeahyper_pareto.eps}}
+%     \subfloat[zenoTravel-zfile10] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zenoTravel_zfile10_Add_ibeahyper_pareto.eps}}
+%  % zenoTravel_zfile1__Add_ibeahyper_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%    \caption{zenoTravel}
+%  \end{figure*}
+%  
+%  \begin{figure*}[h!]
+%  \centering
+%   \subfloat [zeno3e-LPG] {\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno3elg_Add_daelpg_pareto.eps}}
+%  % zeno3elg_Add_daelpg_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%   \caption{LPG}
+%  \end{figure*}
+
+
+\end{document}

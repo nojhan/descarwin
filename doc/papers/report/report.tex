@@ -1,0 +1,1337 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8x]{inputenc}
+                            % not available on your system
+\usepackage[table]{xcolor}
+% \usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}        % standard LaTeX graphics tool                            % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{url}
+\usepackage{caption,subfig}
+
+% Title Page
+\title{A General Freamwork for Tuning Parameter in Multi-objective $DAE_{x}$}
+\author{M.R. Khouadjia, M. Schoenauer, V. Vidal, J. Dréo and P. Savéant}
+
+
+\def\dae{{\em Divide-and-Evolve}}
+\def\DAE{{\sc DaE}}
+\def\DAEX{{\sc DaE$_{\text{X}}$}}
+\def\DAEYAHSP{{\sc DaE$_{\text{YAHSP}}$}}
+%\newcommand{\DAEYAHSP}{{\sc DaE$_{\text{YAHSP}}$}}
+\def\PARADISEO{{\sc ParadisEO-MOEO}}
+\def\YAHSP{{\sc YAHSP}}
+\def\modae{{\em Multi-Objective Divide-and-Evolve}}
+\def\MODAE{{\sc MO-DaE}}
+\def\ZENO{{\sc ZenoTravel}}
+\def\MULTIZENO{{\sc MultiZenoTravel}}
+\def \EA {{\sc Evolutionary Algorithms (EA)}}
+\def \PARAMILS {{ParamILS}}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+The identification of performance-optimizing parameter settings is an important part of the development and application of algorithms. 
+We describe an automatic framework for this tuning for \dae (DaE) algorithm. DaE is an evolutionary planner that won the (single-objective) temporal planning track in the last International Planning Competition.
+More formally, we provide a framework for optimizing a target algorithm’s performance on a given class of problem instances based on some metrics of multi-objective optimization.
+Even though it uses intensively the classical planner YAHSP, a single-objective planner, it is possible to turn \DAEYAHSP into a multi-objective evolutionary planner.
+The framework is based on a three-tier hierarchy of a problem, an evolutionary algorithm (EA), and a tuner.
+ We validate our framework with several variants of multi-objective  \DAEYAHSP and propose tunable benchmark for multi-objective planning based on \ZENO  instances.
+ By using our automated algorithm configuration procedures, we achieved substantial and consistent performance improvements.
+\end{abstract}
+
+
+
+
+\section{Introduction}
+ 
+
+Parameter tuning is basically a general optimization problem applied to find the best parameters configuration for complex algorithms. This complexity grows up when we hybridize these algorithms with other heuristics or methods.
+
+Whereas the efficiency of metaheuristics ans specialy \EA has been demonstrated on several application domains \cite{practice08,ParameterSettingBook07}, they usually need computationally expensive parameter tuning. 
+ 
+Being a general optimization problem, there are as many parameter tuning algorithms as optimization techniques.
+
+However, several specialized methods have been proposed, and the most prominent ones today are Racing \cite{birattari2002}, REVAC \cite{Nannen07}, SPO \cite{SPO:CEC05},
+
+and ParamILS \cite{ParamILS-JAIR}. All these approaches face the same crucial generalization issue: can a parameter set 
+
+that has been optimized for a given problem be successfully used for another one? The answer of course depends on the similarity of both problems.
+
+We consider the configuration of an evolutionary algorithm (EA) as a search problem in the space of its parameters and, consequently, 
+
+we perceive a tuning method as a search algorithm in this space. This space grows up exponentially when the algorithm is hybridized with other algorithms or search methods.
+
+In our context of AI Planning, \dae is an evolutionary planner which is a hybridization of an evolutionnary algorithm with conventional single objective planner  YAHSP.
+
+This hybridation leads to increse the number of parameters and then complexity of parameter tuning task. 
+
+Therefore, when  we deal with multi-objective problems, setting these parameters should respect  the different objectives to optimize. 
+
+In this report, we  provide a framework for optimizing a target algorithm’s performance on a given class of problem instances based on some metrics of multi-objective optimization.
+  
+The paper is organized as follows: AI Planning Problems and the Divide-and-Evolve algorithm are briefly introduced in section  \ref{section:planning}, more precisely the representation and variation operators that have been used in the single-objective version of \DAEYAHSP. 
+ 
+Section \ref{benchmark} will detail the proposed benchmark, called \MULTIZENO, and give hints about how to generate instances of different complexities within the proposed framework.
+
+Section \ref{sec:evolutionaryMOA} will rapidly introduce the 4 variants of multi-objective schemes, then the general conceptual framework for parameter tuning is outlined in Section \ref{section:framework}.
+
+These multi-objective algorithms will be experimentally tuned in Section \ref{sec:experiments} on some of the simplest instances of the \MULTIZENO\ benchmark. 
+
+Those results will be discussed in Section \ref{sec:discussion}, and Section \ref{sec:conclusion} will conclude the paper, giving  hints about further research directions.
+
+ 
+
+% 
+% 
+% 
+% The rest of this paper is organized as follows: 
+% 
+% We begin with an introductory treatment of EAs and their parameters in Section 2. Then the general
+% conceptual framework for parameter tuning is outlined in Section 3. It is
+% summarized by Figure 3, that shows that the solutions of a tuning problem
+% depend on 1) the problem(s) to be solved, 2) the EA used, 3) the utility
+% function that denes how we measure algorithm quality, and 4) the tuning
+% method. Section 4 elaborates on the third component, the utility function,
+% discussing various notions of algorithm performance and robustness, followed
+% by a discussion of robustness and EA design in Section 5. The fourth com-
+% ponent, the tuner, is the main subject of two sections. Section 6 describes
+% three dierent ways to distinguish and classify tuning methods. Two of these
+% 2focus on algorithmic details, the third one also takes the intended usage into
+% account. The actual survey in Section 7 is structured by this latter one.
+% Finally, Section 8 makes the link between parameter tuning and research
+% methodology, giving recommendations towards a more tuning-aware prac-
+% tice
+% 
+% 
+% 
+% 
+% 
+% 
+
+
+
+
+\section{AI Planning}
+
+An AI Planning problem is defined by a set of predicates, a set of actions, an initial state and a goal state. A state is a set of non-exclusive instantiated predicates, or (Boolean) atoms. An action is defined by a set of {\em pre-conditions} and a set of {\em effects}: the action can be executed only if all pre-conditions are true in the current state, and after an action has been executed, the effects of the action modify the state: the system enters a new state.
+A plan in AI Planning is a sequence of actions that transforms the initial state into a  goal state. 
+The goal of AI Planning is to find a plan that minimizes some quantity related to the actions: number of actions for STRIPS problems, sum of action costs in case actions have different costs, or makespan in the case of temporal planning, when actions have a duration and can eventually be executed in parallel. All these problems are P-SPACE.
+
+A simple planning problem in the domain of logistics (inspired by the well-known {\ZENO} problem of IPC series) is given in Figure \ref{fig.instance}: the problem involves cities, passengers, and planes. Passengers can be transported from one city to another, following the links on the figure. One plane can only carry one passenger at a time from one city to another, and the flight duration (number on the link) is the same whether or not the plane carries a passenger (this defines the {\em domain} of the problem). In the simplest non-trivial {\em instance} of such domain, there are 3 passengers and 2 planes. In the initial state, all passengers and planes are in {\tt city 0}, and in the goal state, all passengers must be in {\tt city 4}. The not-so-obvious solution has a total makespan of 8 and is left as a teaser for the reader.
+
+% XXX ajouter les références XXX\\
+AI Planning is a very active field of research, as witnessed by the success of the ICAPS series of yearly conferences, and the biannual competition IPC, where the best planners in the world compete on a set of problems. This competition leads researchers to design a common language to describe planning problems, PDDL (Planning Domain Definition Language). Several planners have been successful in the IPC competition in the past, and two main categories can be distinguished, exact planners, that are guaranteed to find the optimal solution \ldots if given enough time, and satisficing planners, that hopefully give a good solution in a reasonable time. A complete description of these state-of-the-art planners is far beyond the scope of this paper. 
+
+However, to the best of our knowledge, all existing planners are single objective (i.e. optimize one criterion, the number of actions, cost or makespan), whereas most real-world problems are in fact multi-objective and involve several contradictory objectives that need to be optimized simultaneously. For instance, in logistics, the decision maker must generally find a trade-off between duration and cost (or/and risk). 
+
+An obvious solution is to aggregate the several objectives, and to optimize a fixed linear combination of them. Early work in that area used some twist in PDDL 2.0 \cite{do2003sapa,refanidis2003multiobjective,gerevini2008}. PDDL 3.0, on the other hand, explicitly offered hooks for several objectives \cite{gerevini2006preferences}, and a new track of IPC was dedicated to aggregated multiple objectives: the ``net-benefit'' track took place in 2006 \cite{chen2006temporal} and 2008 \cite{edelkamp2009optimal}, \ldots but was cancelled in 2011 because of the small number of entries.
+In any case, no truly multi-objective approach has been proposed since the very preliminary proof-of-concept in the first \dae\ paper \cite{Schoenauer2006}. 
+
+One goal of this paper is to build on this preliminary work, and to discuss various issues related to the challenge of solving multi-objective problems with an evolutionary algorithm that is heavily based on a single-objective planner (YAHSP \cite{Vidal2004}) -- and in particular to compare different state-of-the-art multi-objective evolutionary schemes when used within \DAEYAHSP.
+However, experimental comparison requires benchmark problems. Whereas the IPC have validated a large set of benchmark domains, with several instances of increasing complexity in each domain, nothing exists yet for multi-objective planning. The other goal of this paper is to propose a tunable set of benchmark instances, based on the simplified model of the logistics \ZENO\ mentioned above. One advantage of this multi-objective benchmark is that the exact Pareto Front is known, at least for its simplest instances.
+ 
+
+
+\section{Divide-and-Evolve}
+\label{sec:dae}
+A planning problem ${\cal P}_D(I,G)$ is defined on a domain $D$ that defines the predicates, the objects, and the actions. $I$ and $G$ are respectively the initial and goal states. In STRIPS representation model~\cite{Fikes1971}, a state is a list of Boolean atoms defined using the predicates of the domain, instantiated with the domain objects.  
+
+In order to solve  ${\cal P}_D(I,G)$, the basic idea of \DAEX\ is to find a sequence of states $S_1, \ldots, S_n$, and to use some embedded planner $X$ to solve the series of planning problems ${\cal P}_D(S_{k},S_{k+1})$, for $k \in [0,n]$ (with the convention that $S_0 = I$ and $S_{n+1} = G$).
+The generation and optimization of the sequence of states $(S_i)_{i \in [1,n]}$  is driven by an evolutionary algorithm. After each of the sub-problems ${\cal P}_D(S_{k},S_{k+1})$ has been solved by the embedded planner, the concatenation of the corresponding plans (possibly compressed to take into account possible parallelism in the case of temporal planning) is a solution of the initial problem. In case one sub-problem cannot be solved by the embedded solver, the individual is unfeasible (and will not be selected at next selection step). A detailed description of \DAEX\ can be found in \cite{Bibai2010}. The following section will focus on the evolutionary parts of \DAEX.
+
+\subsection{Representation and Initialization}
+An individual in \DAEX\ is hence a  variable length list of partial states of the given domain, and a partial state is a variable length list of atoms. Not all objects are specified in a partial state:
+%However, searching the space of complete states would result in a rapid explosion of the size of the search space. Moreover, goals of
+%planning problem need only to be defined as partial states. It thus seems more practical to search only sequences of partial states,
+%and to limit the choice of possible atoms used within such partial states. However, this raises the issue of the choice of the atoms to be used to represent individuals, among
+%all possible atoms. 
+Previous work with \DAEX\ on different domains of planning problems from the
+IPC benchmark series have demonstrated the need for a very careful choice of the atoms that are used to build the partial states \cite{bibaiIPC6,bibai-EvoCOP2010}. 
+
+The method used today to build the partial states is based on an estimation of the earliest time from which an atom can become true. %Such estimation can be obtained
+%by any admissible heuristic function (e.g $h^1$, $h^2$, $\ldots$~\cite{Haslum2000}). 
+These earliest start times are then used in order to restrict the candidate atoms for each partial state:
+the number of states is uniformly drawn between 1 and the number of estimated start times; For every chosen time, the number of atoms per state is uniformly chosen between 1 and the number of atoms of the corresponding restriction.
+Atoms are then chosen one by one, uniformly in the allowed set of atoms, and added to the individual if they are not mutually exclusive (in short, {\em mutex}) with any other atom that is already there. Note that only an approximation of the complete mutex relation between atoms is known from the description of the problem -- remaining mutexes will simply be eliminated by selection, as the resulting individual will be unfeasible. 
+An individual in \DAEX\ is hence represented as a variable length ordered time-consistent list of partial states, and each state is a variable-length list of atoms that are not pairwise mutex. Furthermore, all operators that manipulate the representation maintain the chronology between atoms and the approximated consistency of a state, i.e. avoid pairwise mutexes.
+
+\subsection{Variation Operators }
+
+A simple one-point crossover is used, adapted to variable-length representation in that both crossover points are independently chosen, uniformly in both parents.
+
+Four different mutation operators have been designed, and once an individual has been chosen for mutation (according to a population-level mutation rate),
+the choice of which mutation to apply is made according to user-defined relative weights.
+%Because an individual is a variable length list of states, and a state is a variable length list of atoms,
+The mutation operator can act at both levels: at the individual level by adding (addState) or removing (delState) a state; or at the state level by adding (addAtom) or removing (delAtom) some atoms in the given
+state. As already mentioned, the initialization and the variation operators maintain the chronology between atoms in a sequence of states and the local consistency 
+of a state, i.e. avoid pairwise mutexes.
+
+\subsection{Hybridization}
+\DAEX\ is hybridized with an external embedded planner to solve the sequence of sub-problems defined by the list of partial states.
+Any existing planner can in theory be used, but since guaranty of optimality at all calls is not mandatory in order for \DAEX\ to obtain good quality results~\cite{Bibai2010}, and because a huge number of calls to this embedded planner will be necessary, a sub-optimal but fast planner is now used: YAHSP~\cite{Vidal2004} is a lookahead 
+strategy planning system for sub-optimal planning which uses the  actions in the relaxed plan to compute reachable states in order to speed up the search process.
+
+For any given $k$, if the chosen embedded planner succeeds in solving $ P_{D} (S_k, S_{k+1} )$, the final complete state is computed by executing the solution plan
+from $S_k$, and becomes the initial state of the next problem. If all the sub-problems are solved by the  embedded planner, 
+the individual is called \textit{feasible}, and the concatenation of the plans for all sub-problems  is a
+global solution plan for $P_{D} (S_{0} = I, S_{n+1} = G)$. However, this plan can in general be further optimized by rescheduling some of its actions, in a step called
+compression. The computation of all objective values (makespan, risk, cost) is done from the compressed plan of the given individual.
+% However, as soon as the chosen embedded planner fails to solve one $ P_{D} (S_k, S_{k+1} )$  sub-problem, the following sub-problem $ P_{D} (S_k+1, S_{k+2} )$ cannot be even tackled
+% by the chosen embedded planner, as its initial state is in fact partially unknown.
+% Hence no quality in term of number of action, cost or makespan can be given to this individual. All such individuals receive a fitness that is higher than that
+% of any feasible individual. Furthermore, in order to nevertheless give some selection pressure toward feasible individuals, such fitness takes into account the
+% proportion of sub-problems solved. 
+% Finally, because the initial population contains randomly generated individuals, some of them might contain some sub-problems that are in fact more difficult
+% than the original global problems. It was thus necessary to limit the embedded planner by imposing some complexity bound in order to discard too difficult
+% sub-problems.
+%  However, though it is hoped that all sub-problems will ultimately be easy to solve, such limitation should not be too strong in order to nevertheless
+% leave some degree of freedom to the search for solutions. Here,  YAHSP  has been limited by a maximal number of backtracks (resp. a maximal number of nodes) that it is allowed to use to
+% solve any of the sub-problems. Those bounds are determined  for each run by a two-step process: first, the initial population is evaluated using a very high
+% bound (e.g. 10e4 backtracks or nodes); the bounds for the rest of the run are then chosen as the median of the actual number of backtracks (resp. nodes) that
+% have been used to find the solutions during these initial evaluations.
+Finally, because the rationale for \DAEX\ is that all sub-problems should be easier than the initial global problem, and for performance reason, the embedded planner is limited by a maximal number of nodes that it is allowed to expand to solve any of the sub-problems.
+ 
+\subsection{Multi-Objective Divide-and-Evolve}
+\label{modae}
+In some sense, the multi-objectivization of \DAEX\ is straightforward -- as it is for most evolutionary algorithms. The ``only'' parts of the algorithm that
+require some modification are the selection parts, be it the parental selection, that chooses which individual from the population are allowed to breed, 
+and the environmental selection (aka replacement), that decides which individuals among parents and offspring will survive to the next generation.
+Several schemes have been proposed in the EMOA literature (see e.g. Section \ref{sec:evolutionaryMOA}). 
+The main issue with \DAEX\ is hence the computation of the fitness: the embedded planner (be it YAHSP or any other known planner to-date) uses a single objective. 
+However, it is possible since PDDL 3.0 to add some other 'objectives' (aka Soft Constraints or Preferences \cite{gerevini2006preferences})
+that are simply computed throughout the execution of a plan. 
+% Even though the embedded planner only optimizes one objective, it will return the values of both objectives if they are defined in the domain definition PDDL file. 
+% It is hoped that the evolutionary algorithm will find a sequential partitioning of the problem that will nevertheless allow the global minimization of both objectives: 
+% this will be demonstrated in the following and discussed in Section \ref{sec:discussion}.
+Even though the embedded planner only optimizes one objective, it can change its behavior during the search process.
+Indeed, we have integrated different strategies into the planner that allow to optimize independently either the first objective (makespan) or the second one (cost/risk).
+Once the planner is called for a given individual, the choice of which strategy to apply is made according to user-defined relative weights. At the end, it will return the values of both objectives if they are defined in the domain definition PDDL file. 
+It is hoped that the evolutionary algorithm will find a sequential partitioning of the problem that will nevertheless allow the global minimization of both objectives: 
+ this will be demonstrated in the following and discussed in Section \ref{sec:discussion}.
+\section{Evolutionary Multi-Objective Algorithms}
+\label{sec:evolutionaryMOA}
+
+This work is concerned with Pareto-based evolutionary multi-objective algorithms (see e.g. \cite{Deb-book}). Several Multi-Objective EAs (MOEAs) have appeared in the recent years, and this work will use the selection/reproduction steps of the following ones, that are considered state-of-the-art today and  are usable with any representation: NSGA-II~\cite{Deb2002}, SPEA2~\cite{Zitzler2001}, and IBEA~\cite{Zitzler2004}.
+
+% The {\bf Non-dominated Sorting Genetic Algorithm} (NSGA-II) \cite{Deb2002} first performs a Pareto ranking of the population: the non-dominated individuals are given rank 1, and removed from the population. The non-dominated remaining individuals are given rank 2 and the process continues until all individuals have received a Pareto rank. 
+
+The {\bf Non-dominated Sorting Genetic Algorithm} (NSGA-II) has been proposed by Deb et \textit{al.}~\cite{Deb2002}. % and it is considered as the most widely used multi-objective resolution method.
+At each generation,  the solutions contained in the current  population are ranked into several classes. 
+Individuals mapping to vectors from the first front all belong to
+the best efficient set; individuals mapping to vectors from the second front all belong to the second best efficient set; and so on.
+Two values are then assigned for every solution of the population. The first one corresponds to the rank  the corresponding solution
+belongs to, and represents the quality of the solution in terms of convergence. The second one, the crowding distance, consists in
+estimating the density of solutions surrounding a particular point of the objective space, and represents the quality of the solution in
+terms of diversity.  A solution is said to be better than another solution if it has a best rank value, or in case of equality, if it has
+the best crowding distance.
+
+The {\bf Strength Pareto Evolutionary Algorithm} (SPEA)~\cite{Zitzler2001}, introduces an improved fitness assignment strategy. It intrinsically handles an internal archive of fixed size that is used during the selection step to create offspring solutions. At a given iteration of the algorithm, to each population and archive member $x$ is assigned a strength value $S(x)$ representing the number
+of solutions it dominates. Then, the fitness value $F (x)$ of solution $x$ is calculated by summing the strength values of all individuals solution $x$ currently dominates. Additionally,
+a diversity preservation strategy, based on a nearest neighbor technique, is incorporated.
+The selection step consists of a binary tournament with replacement applied on the internal archive only.
+At last, given that the SPEA2 archive has a fixed size storage capacity, a bounding mechanism based on fitness and diversity information is used when the non-dominated set is too large. 
+
+The {\bf Indicator-Based Evolutionary Algorithm} (IBEA) \cite{Zitzler2004}
+introduces a total order between solutions by means of a binary quality indicator. 
+The fitness assignment scheme of this evolutionary algorithm is based on a pairwise comparison of solutions contained 
+in  the current population with respect to a binary quality indicator $I$. To each individual $x$ is assigned a fitness value $F (x)$ measuring the ``loss in quality'' if $x$ was removed from the current
+population. Different indicators can be used in this framework. The most two popular, that will be used in this work, are the additive $\epsilon$-indicator ($I_{\epsilon^+}$ ) and the hypervolume
+difference indicator ($I_{H^-}$ )  as defined in ~\cite{Zitzler2004}. 
+Each indicator  $I (x, x')$ gives the minimum value by which a solution $x \in X$  can be translated in the objective space to weakly dominate
+another solution $x' \in X$. 
+%The selection scheme for reproduction is a binary tournament between randomly chosen individuals. 
+%The replacement is based on an iterative elitist strategy that consists in deleting, one-by-one, the worst individuals, and in updating the fitness values of the remaining solutions each time there is a deletion;
+%this is iterated until the required population size is reached.  Moreover, 
+An archive stores solutions mapping to potentially non-dominated points in order to prevent their loss during the stochastic search process.
+
+
+\section{A Benchmark Domain for Multi-Objective Temporal Planning}
+\label{benchmark}
+
+\begin{figure}[tb!]
+\begin{center}
+ \includegraphics[width=0.5\textwidth]{./miniMulti.eps}
+ % instance.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=0 0 509 388
+\caption{A schematic view of \MULTIZENO, a simple benchmark transportation problem: Durations of available flights are attached to the corresponding edges, costs/risks are attached to landing in the central cities (in the grey circles).}
+\label{fig.instance}
+\end{center}
+\end{figure}
+
+This section will detail the simple domain for multi-objective temporal planning that is described in Figure \ref{fig.instance}. The reader will have by now solved the little puzzle set in the Introduction, and found the solution with makespan 8 (flying 2 passengers to {\tt city 1}, one plane continues with its passenger to {\tt city 4} while the other plane flies back empty to {\tt city 0}, the plane in city {\tt city 4} returns empty to {\tt city 1} while the other plane brings the last passenger there, and the goal is reached after both planes bring both remaining passengers to {\tt city 4}). 
+
+In order to turn this problem into a not-too-unrealistic logistics multi-objective problem, some costs, or risks, are added to all 3 central cities (1 to 3). This leads to two types of problems: In the \MULTIZENO$_{Cost}$, the second objective is an additive objective: each plane has to pay the corresponding tax every time it lands in that city; In the \MULTIZENO$_{Risk}$, the second objective is similar to a risk, and the maximal value encountered during the complete execution of a plan is to be minimized. 
+
+In both cases however, there are 3 obvious points that belong to the Pareto Front: the solution with minimal makespan described above, and the similar solutions that use respectively {\tt city 2} and {\tt city 3} in lieu of {\tt city 1}. The values of the makespans are respectively 8, 16 and 24, and the values of the costs are, for each solution, 4 times the value of the single landing tax, and exactly the value of the involved risk. For the risk case, there is no other point on the Pareto Front, as a single landing on a high-risk city sets the risk of the whole plan to a high risk. For the cost model however, there are other points on the Pareto Front, as different cities can be used for the different passengers. For instance, in the case of Figure \ref{fig.instance}, this leads to a Pareto Front made of 5 points, (8,12), (16,8), and (24,4) (going only through {\tt city 1}, {\tt 2} and {\tt 3} respectively), plus (12,10) and (20,6), while only the first 3 are the Pareto Front in the risk case.
+
+There are several ways to complexify this benchmark. A first possibility is to modify the relative values of the taxes/risks on the central cities: two sets of values will be used in the following, the (3-2-1) case depicted on Figure \ref{fig.instance}, and the (100-10-1) case (the one introduced in \cite{Schoenauer2006}), somehow representing another extreme of the spectrum of possible values. A second way is to add passengers. Sticking to bunches of 3 passengers in order to be able to easily derive some obvious Pareto-optimal solutions, 6 and 9 passengers will be experimented with, in addition to the simple case of 3 passengers. Finally, the number of central cities can be increased -- this will be the subject of on-going work.
+
+
+
+\section{ParamILS: Iterated Local Search in Parameter Configuration Space}
+ParamILS~\cite{hutter2009paramils} is a tool for parameter optimization. It works for any parameterized algorithm whose parameters can be discretized. ParamILS searches
+through the space of possible parameter configurations, evaluating configurations by running the algorithm to be optimized on a set of benchmark instances.
+Users shoud provide :
+\begin{itemize}
+\item a parametric algorithm A (executable to be called from the command line),
+\item  all parameters and their possible values (parameters need to be configurable
+from the command line), and
+\item all parameters and their possible values (parameters need to be configurable
+from the command line), and 
+\item  a set of benchmark problems, S.
+ \end{itemize}
+Users can also choose from a multitude of optimization objectives, reaching from minimizing average runtime to maximizing median approximation qualities.
+ParamILS then executes algorithm A with different combinations of parameters on instances sampled from S, searching for the configuration that yields
+overall best performance across the benchmark problems.\\
+The parameter tunning problem we consider in this work can be informally stated as follows: given an algorithm, a set of parameters for the algorithm and a set of input data, 
+find parameter values under which the algorithm achieves the best possible performance on the input data.
+To avoid potential confusion between algorithms whose performance is optimized and algorithms used for carrying out that optimization task,
+we refer to the former as target algorithms and to the latter as configuration procedures (or simply configurators). This setup is illustrated in Figure~\ref{fig:paramIlsfreamwork}.
+Different algorithm configuration problems have also been considered in the literature, including setting parameters on a per-instance basis and adapting the parameters while the algorithm
+is running but have not been treated in this work.\\
+In our context, the procedure corresponds to a manually-executed local search in parameter configuration space. Specifically, it corresponds to an iterative first improvement procedure with a search
+space consisting of all possible configurations, an objective function that quantifies the performance achieved by the target multi-objective algorithm with a given configuration, and a neighbourhood relation based on
+the modification of one single parameter value at a time (i.e., a “one-exchange” neighbourhood).\\
+Thus, the idea behind ParamILS is to  employ iterated local search (ILS)~\cite{lourencco2003iterated} to search for performance-optimizing parameter configurations. ILS is a prominent stochastic
+local search method that builds a chain of local optima by iterating through a main loop consisting of (1) a solution perturbation to escape from local optima, (2) a subsidiary local search procedure and
+(3) an acceptance criterion to decide whether to keep or reject a newly obtained candidate solution.
+When we deal with multi-objective problem, the optimal solution is not a single solution, but a set of non-dominated solutions called Pareto optimal solutions.
+This set of solutions represents the compromise solutions between the different conflicting objectives. 
+In order to measure the quality of ParamIls output that is a set of solutions $A$ in comparison to a reference set $Z^*_N$, we compute the difference between these two sets by using the unary hypervolume
+metric~\cite{Zitzler2004}. The hypervolume computes the volume (in objective function space) comparatively to $Z^*_N$. The closer this measure to 0, the better is the approximation $A$.
+In general, the reference set $Z^*_N$ may be the optimal Pareto front or extracted from the union of all obtained fronts.  
+%The pseudo-code of Multi-objective ParamILS is given in the Algorihtm~\ref{}.
+Consider the following  the main steps of parameter optimization process of our Muli-objective ParamIls freamwork:
+\begin{enumerate}
+ \item  Begin with some initial parameter configuration;
+ \item Experiment with ILS heuristic by modifications to single parameter values, accepting new configurations whenever
+they result in improved performance according to \textit{Hypervolume} metric;
+\item Repeat step 2 until no single-parameter change yields an improvements.
+\end{enumerate}
+
+
+ 
+
+% In details, we address the first and most important of the previously mentioned dimensions of automated algorithm configuration, the search strategy, by describing an iterated local search framework called ParamILS. To start with, we fix the other two dimensions, using an unvarying
+% benchmark set of instances and fixed cutoff times for the evaluation of each parameter configuration.
+% Thus, the stochastic optimization problem of algorithm configuration reduces to a simple optimization problem, namely to find the parameter configuration that yields the lowest mean runtime
+% on the given benchmark set. 
+
+% Consider the following manual parameter optimization process:
+% 1. begin with some initial parameter configuration;
+% 2. experiment with modifications to single parameter values, accepting new configurations whenever
+% they result in improved performance;
+% 3. repeat step 2 until no single-parameter change yields an improvement.
+% 
+% Viewing this manual procedure as a local search algorithm is advantageous because it suggests
+% the automation of the procedure as well as its improvement by drawing on ideas from the stochastic
+% local search community. For example, note that the procedure stops as soon as it reaches a local optimum
+% (a parameter configuration that cannot be improved by modifying a single parameter value).
+% 
+% 
+% A more sophisticated approach is to employ iterated local search (ILS; Lourenc¸o, Martin & St¨utzle,
+% 2002) to search for performance-optimizing parameter configurations. ILS is a prominent stochastic
+% local search method that builds a chain of local optima by iterating through a main loop consisting of
+% (1) a solution perturbation to escape from local optima, (2) a subsidiary local search procedure and
+% (3) an acceptance criterion to decide whether to keep or reject a newly obtained candidate solution.
+% ParamILS (given in pseudocode as Algorithm 1) is an ILS method that searches parameter configuration
+% space. It uses a combination of default and random settings for initialization, employs
+% iterative first improvement as a subsidiary local search procedure, uses a fixed number (s) of random
+% moves for perturbation, and always accepts better or equally-good parameter configurations,
+% but re-initializes the search at random with probability prestart.4 Furthermore, it is based on a
+% one-exchange neighbourhood, that is, we always consider changing only one parameter at a time.
+% ParamILS deals with conditional parameters by excluding all configurations from the neighbourhood
+% of a configuration  that differ only in a conditional parameter that is not relevant in .
+
+
+\begin{figure}[h!]
+ \centering
+ \includegraphics[scale=0.5, bb=0 0 673 343]{./schema.eps}
+ % schema.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=0 0 673 343
+ \caption{ParamILS framework: A configuration scenario includes an algorithm to be configured and a collection of problem instances.
+A configuration procedure executes the target algorithm with specified parameter settings on some or all of the instances, receives information about the performance of these runs, and uses
+this information to decide which subsequent parameter configurations to evaluate.}
+\label{fig:paramIlsfreamwork}
+\end{figure}
+\bibliographystyle{plain}
+\bibliography{ppsnb}
+
+\section{Experiments \& Discussions}
+
+ 
+This section presents an experimental analysis of the proposed approaches (Section \ref{sec:dae}) applied to the benchmark problems described above (Section \ref{benchmark}). 
+The proposed approaches has been implemented within the \PARADISEO\ framework \url{http://paradiseo.gforge.inria.fr/}.
+The algorithms' parameters have been tuned with our multi-objective \PARAMILS. 
+Depending on the size of the instance, we allowed a fixed  duration as a cutoff time (or captime), after which each run of an algorithm will be terminated if still running for a given parameter configuration, where the tuner timeout has been fixed to 3 days.
+
+Table~\ref{tab:paramters} describes the parameters that have been tuned and their possible values interval. 
+The best configuration found by MO-\PARAMILS for  the different algorithms  on \MULTIZENO are given from Table~\ref{tab:zeno3_costParam} to Table~\ref{tab:zeno9_risktParam}.
+For each configuration, the average of the hypervolume is given after 11 independent runs.
+
+
+\begin{table}
+\scriptsize
+\begin{tabular}{|l|l|l|}
+\hline
+Parameters 	&	   Range 	&	Description\\					
+\hline									
+bmax-init 	&	[10e3,10e6]	&	 Number of allowed expanded nodes for the initial computation of b${-max}$\\					
+bmax-fixed	&	[10e3,10e6]	&	 Fixed number of allowed expanded nodes\\					
+bmax-increase-coef	&	[1,5]	&	Multiplier increment for the computation of $b-{max}$\\					
+bmax-last-weight 	&	[1,5]	&	 Weighting for the $b-{max}$ used during the last search towards the end goal\\					
+astar-weight 	&	[0-5]	&	  Weighting for the optimizing  A* heuristic during the search\\					
+fitness-penalty 	&	[10e2,10e3]	&	 Penalty in the unfeasible fitnesses computation\\					
+fitness-weight 	&	[10,30]	&	 Unknown weight in the feasible and unfeasible fitness computation\\					
+lmax-initcoef 	&	[5,20]	&	 l-max will be set to the size of the chrono partition * this coefficient\\					
+lmin 	&	1	&	 Minimum number of goals in a decomposition\\					
+lenght-weight	&	[1,5]	&	 Weighting for the optimizing lenght during the search\\					
+cost-weight 	&	[1,5]	&	  Weighting for the optimizing cost during the search\\					
+makespan-add-weight 	&	[1,5]	&	Weighting for the optimizing  makespan-add during the search  \\					
+makespan-max-weight 	&	[1,5]	&	 Weighting for the optimizing makespan-max during the search\\					
+maxGen	&	-1	&	 Maximum number of generations\\	
+maxTime	&  \{300,600,900\}	& Maximum running time in seconds\\						
+pop-size 	&	[10,300]	&	 Population Size\\					
+maxtry-candidate	&	[10,100]	&	  Maximum number of atoms for a candidate in the changeAtom mutation\\					
+maxtry-mutex	&	[10,100]	&	 Maximum number of atoms  for mutexes in the changeAtom mutation\\					
+proba-change	&	[0,1]	&	  Probability to change an atom for the changeAtom mutation\\					
+proba-cross	&	[0,1]	&	 Probability to apply a cross-over\\					
+proba-del-atom	&	[0,1]	&	 Average probability to delete an atom for the delAtom mutation\\					
+proba-mut	&	[0,1]	&	  Probability to apply one of the mutation\\					
+radius	&	[1,10]	&	  Number of neighbour goals to consider for the addGoal mutation\\					
+rand-yahsp-seed	&	{0,1}	&	 flag  for the random initilaization of yahsp at each optimization\\					
+w-addatom	&	[1,10]	&	  Relative weight defining the probability to call the addAtom mutation\\					
+w-addgoal	&	[1,10]	&	  Relative weight defining the probability to call the addGoal mutation\\					
+w-delatom	&	[1,10]	&	 Relative weight defining the probability to call the delAtom mutation\\					
+w-delgoal	&	[1,10]	&	 Relative weight defining the probability to call the delGoal mutation\\												
+\hline				
+\end{tabular}
+\caption{MO-DAEYAHSP Parameters}
+\label{tab:paramters}
+\end{table}
+
+
+\subsection{Results}
+To illustrate the search capabilities of our hybrid algorithms, the  attainment of the Pareto fronts reached by the different algorithms
+is plotted when solving the instance problem MultiZenoTravel.  The attainment is given as a percentage of the reached points over 30 runs  for each algorithm. 
+%For this instance, we compute by hand the optimal Pareto front that is constituted by five solutions when considering  the cost as second objective
+In the case of MultiZenoTravel3$_{cost}$ (see Figure~\ref{fig:att_zeno3_cost}), the exact Pareto front is constituted of 5 points. 
+We can observe that all the algorithms have obtained the entire front. Furthermore, the rate of attainment of IBEA$_{H^-}$ is 1, which means that the entire set of the 30 experiments have reached the exact Pareto front. Where IBEA$_{\epsilon^+}$, SPEA2 and NSGA-II 
+have performed an attainment rate upper than 0.8. That observation confirms a good convergence and distribution towards the Pareto front. 
+When we deal with MultiZenoTravel3$_{risk}$ (Figure~\ref{fig:att_zeno3_risk}), NSGA-II performs significantly less than the other algorithms.
+Its attainment rate is close to 0.6, where the rest of algorithms have a rate around 1. \\
+For the instance MultiZenoTravel6$_{cost}$(Figure~\ref{fig:att_zeno6_cost}), similar performances are provided. Eleven points constitute the Pareto front. 
+The indicator-based approches outperform the other algorithms and obtain an attainement rate around 0.8. Where NSGA-II and SPEA2 reach a rate less than 0.2.
+As given in Figure~\ref{fig:att_zeno6_risk}, when the second objective is the risk, only the indicator-based approaches have reached a significant attainment's rate, even if the different points of the Pareto front have been reached separately. 
+For MultiZenoTravel9$_{cost}$, the  results are quite similar between them, although we can appreciate some slight differences(Figure~\ref{fig:att_zeno9_cost}).
+No algorithm has reached all the 19 point of the Pareto front. This tendency is confirmed with the risk case of the instance(Figure~\ref{fig:att_zeno9_risk}).\\
+It is interesting to note that the size of instances  and the  second considered objective, 
+seem to  influence the efficiency of the algorithms. The algorithms provide  better solutions on small instances and when when considering the cost as second objective.
+
+ 
+\subsection{Performance Assessment}
+ A set of 30 runs per instance has been performed for each algorithms.
+% In order to evaluate the quality of the approximations for every
+%instance, we follow the protocol proposed in~\cite{Fonseca2005}.
+% For a given instance, let $Z^{all}$ denote the union of the outputs that
+% we obtained during all our experiments. Note that this set probably contains both dominated and non-dominated points, as a given approximation may contain
+% vectors dominating the ones of another approximation, and vice versa.\\
+% We first compute a reference set $Z^*_N$ containing all the non-dominated points of $Z^{all}$. 
+% Second, we define $z^{min} = (z^{min}_1 ,\ldots, z^{min}_n)$ an $z^max =(z^{max}_1 ,\ldots, z^{max}_n)$, where $z^{min}_k$ (resp. $z^{max}_k$) denotes the lower (resp. upper)
+%  bound for the $k^{th}$ objective for all the points contained in $Z^{all}$.
+% In order to give a roughly equal range to the objective functions, values are normalized with respect to $z^min$ and $z^{max}$.
+% Then, to measure the quality of an output set $A$ in comparison to $Z^*_N$ , we compute the difference between these two sets by using the unary hypervolume
+% metric~\cite{Zitzler2004}, $z^{max}$ being the reference point. 
+In order to measure the quality of an output set of solutions $A$ in comparison to a reference set $Z^*_N$, we compute the difference between these two sets by using the unary hypervolume
+metric~\cite{Zitzler2004}. The hypervolume computes the volume (in objective function space) comparatively to $Z^*_N$. The closer this measure to 0, the better is the approximation $A$.
+%. The hypervolume difference indicator ($I^-_H $) computes the portion of the objective
+%space that is weakly dominated by $Z^*_N$ and not by $A$. The closer this measure to 0, the better is the approximation $A$~\cite{Zitzler2004}.
+% Furthermore, we also consider the additive $\epsilon$-indicator proposed in~\cite{Zitzler2004}. %The unary additive $\epsilon$-indicator ($I^1_{\epsilon^+}$ ) gives the minimum factor by which an approximation $A$ has to be translated in the objective
+%space to dominate the reference set $Z^*_N$. 
+%Note that both $I^-_H $  and $I^1_{\epsilon^+}$ values are to be minimized. and $I^1_{\epsilon^+}$  measures
+Thus, for each test instance, we obtain 30 $I^-_H $ measures  corresponding to the 30  runs performed for each algorithm. 
+Once all these values are computed, we perform a statistical analysis for a pairwise comparison of methods. To this end, we use the Wilcoxon signed rank test. For a given
+test instance, and with respect to a \textit{p}-value of 0.05 and to the metric under consideration, this statistical test reveals if
+the sample of approximation sets obtained by a given search method is significantly better than the one of another search
+method, or if there is no significant difference between both of them. Note that all the performance assessment procedures have been achieved using
+the performance assessment tool suite provided in PISA\footnote{http://www.tik.ee.ethz.ch/pisa/}.%~\cite{Bleuler2003}.
+
+A widely-used way to compare different multi-objective algorithms is to perform statistical tests based on the evolution of some measure of performance during several runs. The $I^-_H $ metric has been chosen here, using as reference set the union of all solutions found by at least one run of one algorithm.
+Wilcoxon signed rank tests with confidence level 0.05 using this $I^-_H $ metric have been done on the results for all instances (zeno3-6-9) and all variants of \MODAE\ (NSGA-II, SPEA2, IBEA$_{Hyp}$ and IBEA$_{Eps}$: Except for the MultiZenoTravel6$_{risk}$ instance, where  SPEA2 appears to be less efficient that all other algorithms, 
+no statistical difference appears. 
+
+\begin{figure*}[h]
+\centering{
+\subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{cost}:NSGA-II.eps} }
+ % zeno3_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+\subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{cost}:IBEA_{H^-}.eps}}\\
+ % zeno3eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{cost}:IBEA_{epsilon^+}.eps}}
+ % zeno3eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{cost}:SPEA2.eps}}\\
+ % zeno3e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{cost}:rate.eps}}
+ % zeno3_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Attainement of Pareto fronts on MultiZenoTravel3$_{cost}$}
+\label{fig:att_zeno3_cost}}
+\end{figure*}
+ 
+\begin{figure*}[h]
+\centering{
+\subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{risk}:NSGA-II.eps} }
+ % zeno3_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+\subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{risk}:IBEA_{H^-}.eps}}\\
+ % zeno3eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{risk}:IBEA_{epsilon^+}.eps}}
+ % zeno3eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{risk}:SPEA2.eps}}\\
+ % zeno3e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno3_{risk}:rate.eps}}
+ % zeno3_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Attainement of Pareto fronts on MultiZenoTravel3$_{risk}$}
+\label{fig:att_zeno3_risk}}
+\end{figure*}
+ 
+\begin{figure*}[h]
+\centering{
+\subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{cost}:NSGA-II.eps} }
+ % zeno6_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+\subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{cost}:IBEA_{H^-}.eps}}\\
+ % zeno6eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{cost}:IBEA_{epsilon^+}.eps}}
+ % zeno6eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{cost}:SPEA2.eps}}\\
+ % zeno6e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{cost}:rate.eps}}
+ % zeno6_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+\label{fig:att_zeno6_cost}
+\caption{Attainement of Pareto fronts on MultiZenoTravel6$_{cost}$}}
+\end{figure*}
+ 
+\begin{figure*}[h]
+\centering{
+\subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{risk}:NSGA-II.eps}}
+ % zeno6_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+\subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{risk}:IBEA_{H^-}.eps}}\\
+ % zeno6eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{risk}:IBEA_{epsilon^+}.eps}}
+ % zeno6eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{risk}:SPEA2.eps}}\\
+ % zeno6e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno6_{risk}:rate.eps}}
+ % zeno6_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Attainement of Pareto fronts on MultiZenoTravel6$_{risk}$}
+\label{fig:att_zeno6_risk}}
+\end{figure*}
+ 
+
+
+\begin{figure*}[h]
+\centering{
+\subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{cost}:NSGA-II.eps} }
+ % zeno9_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+\subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{cost}:IBEA_{H^-}.eps}}\\
+ % zeno9eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{cost}:IBEA_{epsilon^+}.eps}}
+ % zeno9eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{cost}:SPEA2.eps}}\\
+ % zeno9e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{cost}:rate.eps}}
+ % zeno9_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Attainement of Pareto fronts on MultiZenoTravel9$_{cost}$}
+\label{fig:att_zeno9_cost}}
+\end{figure*}
+
+\begin{figure*}[h]
+\centering{
+\subfloat[NSGA-II] {\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{risk}:NSGA-II.eps}}
+ % zeno9_{cost}:NSGA-II.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302}
+\subfloat[IBEA$_{H^-}$]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{risk}:IBEA_{H^-}.eps}}\\
+ % zeno9eStoppingTime_{cost}:IBEA_{H^-}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[IBEA$_{\epsilon^+}$]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{risk}:IBEA_{epsilon^+}.eps}}
+ % zeno9eStoppingTime_{cost}:IBEA_{epsilon^+}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[SPEA2]{ \includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{risk}:SPEA2.eps}}\\
+ % zeno9e_{cost}:SPEA2.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\subfloat[Rate]{\includegraphics[bb=50 50 410 302,scale=0.5]{../plot_archive/zeno9_{cost}:rate.eps}}
+ % zeno9_{cost}:rate.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Attainement of Pareto fronts on MultiZenoTravel9$_{risk}$}
+\label{fig:att_zeno9_risk}}
+\end{figure*}
+  
+ 
+
+
+\section{Discussion}
+\label{sec:discussion}
+The multi-objectivization of \DAEX\ was sketched in \cite{Schoenauer2006}. However, the primitive version of \DAEX\ that it relied on was rather limited, and required a lot of human expertise in order to choose which predicate to use in the representation of states.
+
+Though the Pareto dominance, and hence the Pareto-based ranking and strength computations, are comparison-based, the indicators are not -- hence the differences observed between the 3-2-1 and the 100-10-1 costs for cities 1-3. 
+
+ 
+
+
+
+\section{Conclusion \& Perspectives}
+\label{sec:conclusion}
+Building on the very preliminary work in \cite{Schoenauer2006}, the contributions of this paper are twofold. Firstly, \MULTIZENO, an original benchmark domain for multi-objective temporal planning has been detailed, and several levers identified that allow to generate more or less complex instances: increasing the number of passengers obviously makes the problem more difficult; modifying the costs of the cities and the durations of the flights is another path for complexification, though deeper work is required to identify the consequences of each modification.
+Secondly, several multi-objectivization of \DAEX, an efficient evolutionary planner in the single-objective case, have been proposed, based on 4 popular MOEAs (NSGA-II, SPEA2, and two variants of IBEA).
+However, the experimental comparisons of those variants on the discrete \MULTIZENO\ benchmark raises more questions than it brings answers: the sparseness of the Pareto Front for the small instances has been identified as a possible source for the rather poor performances of all variants, and suggests that rather different strategies should be designed in such contexts. Another direction of research, more directly linked to the proposed \MODAE\ approach,  is of course to combat the non-symmetry of the results, due to the fact that the embedded planner is single objective, and at the moment only optimizes on one objective, letting evolution handle the trade-offs. A straightforward modification is to alternate some way or another the optimization by the embedded planner between both objectives, or more generally to use some aggregation of the objective within the embedded planner: this is the subject of on-going work. 
+
+ 
+ 
+\begin{table}[h]
+\scriptsize
+\begin{tabular}{|l|l|l|l|l|}
+
+\hline
+Parameters & NSGA-II & IBEA$-{Hyper}$ &IBEA$-{Epsilon}$ &    SPEA2\\
+\hline
+astar-weight		&	10	&	10	&	10	&	10		\\
+bmax-fixed		&	10e6	&	10e6	&	10e6	&	10e6		\\
+bmax-increase-coef		&	1	&	1	&	1	&	1		\\
+bmax-init		&	10e6	&	10e6	&	10e6	&	10e6		\\
+bmax-last-weight		&	1	&	1	&	1	&	1		\\
+fitness-penalty		&	10e3	&	10e3	&	10e3	&	10e3		\\
+fitness-weight		&	15	&	15	&	15	&	15		\\
+lmax-initcoef		&	20	&	20	&	20	&	20		\\
+lmin		&	1	&	1	&	1	&	1		\\
+makespan-add-weight		&	3	&	5	&	5	&	2		\\
+makespan-max-weight		&	0	&	0	&	0	&	5		\\
+lenght-weight		&	4	&	4	&	4	&	2		\\
+cost-weight		&	1	&	1	&	1	&	1		\\
+maxGen		&	-1	&	-1	&	-1	&	-1		\\
+maxtry-candidate		&	100	&	100	&	100	&	100		\\
+maxtry-mutex		&	100	&	100	&	100	&	100		\\
+popSize		&	30	&	30	&	30	&	20		\\
+proba-change		&	0.5	&	0.5	&	1.0	&	0.1		\\
+proba-cross		&	0.1	&	0.2	&	0.2	&	0.1		\\
+proba-del-atom		&	0.8	&	0.8	&	0.1	&	1		\\
+proba-mut		&	1.0	&	0.1	&	1.0	&	0.2		\\
+radius		&	1	&	5	&	1	&	7		\\
+rand-yahsp-seed		&	1	&	1	&	1	&	1		\\
+steadyGen		&	-1	&	-1	&	-1	&	-1		\\
+w-addatom		&	0	&	0	&	0	&	3		\\
+w-addgoal		&	5	&	10	&	10	&	10		\\
+w-delatom		&	3	&	10	&	10	&	7		\\
+w-delgoal		&	3	&	0	&	0	&	10		\\
+maxTime		&	300	&	300	&	300	&	300		\\
+\hline
+hypervolume		&	 0.0	&	 0.0	&	 0.0	&	 0.0		\\
+\hline
+
+\end{tabular}
+
+\caption{Zeno3$-{cost}$ parameters}
+\label{tab:zeno3_costParam}
+\end{table}
+
+
+
+% \begin{center}
+% \begin{landscape}
+
+\begin{table}[h]
+\scriptsize
+\begin{tabular}{|l|l|l|l|l|}
+
+\hline
+ Parameters  		&	NSGA-II 	&	IBEA$-{Hyper}$	&	IBEA$-{Epsilon}$	&	SPEA2\\
+\hline
+astar-weight	&	10	&	10	&	10	&	10	\\
+bmax-fixed	&	10e5	&	10e5	&	10e5	&	10e5	\\
+bmax-increase-coef	&	1	&	1	&	1	&	1	\\
+bmax-init	&	10e4	&	10e4	&	10e4	&	10e4	\\
+bmax-last-weight	&	1	&	1	&	1	&	1	\\
+cost-weight	&	2	&	1	&	1	&	1	\\
+fitness-penalty	&	10e3	&	10e3	&	10e3	&	10e3	\\
+fitness-weight	&	15	&	15	&	15	&	15	\\
+lenght-weight	&	3	&	0	&	0	&	0	\\
+lmax-initcoef	&	20	&	20	&	20	&	20	\\
+lmin	&	1	&	1	&	1	&	1	\\
+makespan-add-weight	&	3	&	1	&	1	&	1	\\
+makespan-max-weight	&	0	&	0	&	0	&	0	\\
+maxGen	&	0	&	0	&	0	&	0	\\
+maxtry-candidate	&	100	&	100	&	100	&	100	\\
+maxtry-mutex	&	100	&	100	&	100	&	100	\\
+popSize	&	50	&	30	&	30	&	30	\\
+proba-change	&	0.8	&	1.0	&	1.0	&	1.0	\\
+roba-cross	&	0.1	&	0.2	&	0.2	&	0.2	\\
+proba-del-atom	&	0.8	&	1.0	&	1.0	&	1.0	\\
+proba-mut	&	0.8	&	0.2	&	0.2	&	0.2	\\
+radius	&	5	&	5	&	5	&	5	\\
+rand-yahsp-seed	&	1	&	1	&	1	&	1	\\
+steadyGen	&	-1	&	-1	&	-1	&	-1	\\
+w-addatom	&	7	&	7	&	10	&	3	\\
+w-addgoal	&	7	&	10	&	10	&	7	\\
+w-delatom	&	3	&	5	&	5	&	5	\\
+w-delgoal	&	7	&	5	&	5	&	5	\\
+maxTime	&	600	&	600	&	600	&	600	\\
+\hline
+Hypervolume	&	0.0	&	0.0	&	0.0	&	0.0	\\
+\hline
+
+\end{tabular}
+\caption{Zeno6$-{cost}$ parameters}
+\end{table}
+
+
+
+\begin{table}[h]
+\scriptsize
+\begin{tabular}{|l|l|l|l|l|}
+
+\hline 
+Parameters  	&	NSGA-II 	&	IBEA$-{Hyper}$	&	IBEA$-{Epsilon}$	&	SPEA2	\\
+\hline
+astar-weight	&	10	&	10	&	10	&	10	\\
+bmax-fixed	&	10e5	&	10e5	&	10e5	&	10e5	\\
+bmax-increase-coef	&	1	&	1	&	1	&	1	\\
+bmax-init	&	10e4	&	10e4	&	10e4	&	10e4	\\
+bmax-last-weight	&	1	&	1	&	1	&	1	\\
+cost-weight	&	1	&	1	&	3	&	1	\\
+fitness-penalty	&	10e3	&	10e3	&	10e3	&	10e3	\\
+fitness-weight	&	15	&	15	&	15	&	15	\\
+lenght-weight	&	4	&	0	&	0	&	0	\\
+lmax-initcoef	&	20	&	20	&	20	&	20	\\
+lmin	&	1	&	1	&	1	&	1	\\
+makespan-add-weight	&	5	&	1	&	1	&	1	\\
+makespan-max-weight	&	0	&	0	&	3	&	0	\\
+maxGen	&	0	&	0	&	0	&	0	\\
+maxtry-candidate	&	100	&	100	&	100	&	100	\\
+maxtry-mutex	&	100	&	100	&	100	&	100	\\
+popSize	&	30	&	30	&	100	&	30	\\
+proba-change	&	0.5	&	1.0	&	0.8	&	0.2	\\
+proba-cross	&	0.5	&	0.2	&	0.5	&	0.2	\\
+proba-del-atom	&	0.8	&	1.0	&	0.8	&	1.0	\\
+proba-mut	&	0.1	&	1.0	&	0.1	&	0.2	\\
+radius	&	5	&	5	&	7	&	5	\\
+rand-yahsp-seed	&	1	&	1	&	1	&	1	\\
+steadyGen	&	-1	&	-1	&	-1	&	-1	\\
+w-addatom	&	3	&	3	&	1	&	7	\\
+w-addgoal	&	10	&	1	&	5	&	10	\\
+w-delatom	&	3	&	5	&	7	&	5	\\
+w-delgoal	&	0	&	5	&	5	&	5	\\
+maxTime	&	900	&	900	&	900	&	900	\\
+\hline
+Hypervolume	&	0.247	&	0.094	&	 0.12	&	0.106	\\
+\hline
+
+
+\end{tabular}
+\caption{Zeno9$-{cost}$ parameters}
+\end{table}
+
+ \begin{table}[h]	
+\scriptsize										
+\begin{tabular}{|l|l|l|l|l|}
+
+\hline											
+Parameters & NSGA-II &  IBEA$-{Hyper}$ &  IBEA$-{Epsilon}$ & SPEA2\\
+\hline											
+astar-weight	&	10	&	10		&	10		&	10	\\
+bmax-fixed	&	10e5	&	10e5		&	10e5		&	10e5	\\
+bmax-increase-coef	&	1	&	1		&	1		&	1	\\
+bmax-init	&	10e4	&	10e4		&	10e4		&	10e4	\\
+bmax-last-weight	&	1	&	1		&	1		&	1	\\
+cost-weight	&	3	&	3		&	1		&	1	\\
+fitness-penalty	&	10e3	&	10e3		&	10e3		&	10e3	\\
+fitness-weight	&	15	&	15		&	15		&	15	\\
+lenght-weight	&	0	&	0		&	1		&	1	\\
+lmax-initcoef	&	20	&	20		&	20		&	20	\\
+lmin	&	1	&	1		&	1		&	1	\\
+makespan-add-weight	&	2	&	0		&	1		&	1	\\
+makespan-max-weight	&	1	&	3		&	1		&	1	\\
+maxGen	&	0	&	0		&	0		&	0	\\
+maxtry-candidate	&	100	&	100		&	100		&	100	\\
+maxtry-mutex	&	100	&	100		&	100		&	100	\\
+popSize	&	200	&	100		&	100		&	100	\\
+proba-change	&	0.0	&	0.0		&	0.8		&	0.8	\\
+proba-cross	&	0.8	&	0.5		&	0.2		&	0.2	\\
+proba-del-atom	&	0.8	&	0.8		&	0.5		&	0.5	\\
+proba-mut	&	0.1	&	0.8		&	0.8		&	0.8	\\
+radius	&	7	&	7		&	3		&	3	\\
+rand-yahsp-seed	&	1	&	1		&	1		&	1	\\
+steadyGen	&	-1	&	-1		&	-1		&	-1	\\
+w-addatom	&	1	&	1		&	1		&	1	\\
+w-addgoal	&	5	&	5		&	1		&	1	\\
+w-delatom	&	1	&	7		&	3		&	3	\\
+w-delgoal	&	5	&	5		&	1		&	1	\\
+\hline											
+hypervolume	&	0.035	&	0.0		&	0.0		&	0.0	\\
+\hline
+
+\end{tabular}
+\caption{Zeno3$-{risk}$ parameters}
+\end{table}
+
+
+ \begin{table}	[h]
+\scriptsize											
+\begin{tabular}{|l|l|l|l|l|}									
+
+\hline	
+Parameters & NSGA-II &  IBEA$-{Hyper}$ &  IBEA$-{Epsilon}$ & SPEA2\\	
+\hline
+astar-weight	&	10	&	10		&	10	&	10	\\
+bmax-fixed	&	10e6	&	10e6		&	10e6	&	10e6	\\
+bmax-increase-coef	&	1	&	1		&	1	&	1	\\
+bmax-init	&	10e6	&	10e6		&	10e6	&	10e6	\\
+bmax-last-weight	&	1	&	1		&	1	&	1	\\
+cost-weight	&	1	&	1		&	4	&	3	\\
+fitness-penalty	&	10e3	&	10e3		&	10e3	&	10e3	\\
+fitness-weight	&	15	&	15		&	15	&	15	\\
+lenght-weight	&	1	&	1		&	3	&	2	\\
+lmax-initcoef	&	20	&	20		&	20	&	20	\\
+lmin	&	1	&	1		&	1	&	1	\\
+makespan-add-weight	&	1	&	1		&	0	&	2	\\
+makespan-max-weight	&	1	&	1		&	0	&	0	\\
+maxGen	&	0	&	0		&	0	&	0	\\
+maxtry-candidate	&	100	&	100		&	100	&	100	\\
+maxtry-mutex	&	100	&	100		&	100	&	100	\\
+popSize	&	100	&	100		&	10	&	100	\\
+proba-change	&	0.8	&	0.8		&	0.2	&	1.0	\\
+proba-cross	&	0.2	&	0.2		&	0.2	&	0.1	\\
+proba-del-atom	&	0.5	&	0.5		&	1.0	&	0.5	\\
+proba-mut	&	0.8	&	0.8		&	1.0	&	0.8	\\
+radius	&	3	&	3		&	3	&	1	\\
+rand-yahsp-seed	&	1	&	1		&	1	&	1	\\
+steadyGen	&	-1	&	-1		&	-1	&	-1	\\
+w-addatom	&	1	&	1		&	10	&	1	\\
+w-addgoal	&	1	&	1		&	1	&	3	\\
+w-delatom	&	3	&	3		&	3	&	10	\\
+w-delgoal	&	1	&	7		&	3	&	3	\\
+\hline										
+Hypervolume	&	0.25	&	0.1		&	0.07	&	0.125	\\
+\hline
+
+
+\end{tabular}
+\caption{Zeno6$-{risk}$ parameters}
+\end{table}
+
+
+
+\begin{table}[h]	
+\scriptsize										
+\begin{tabular}{|l|l|l|l|l|}	
+\hline										
+Parameters & NSGA-II &  IBEA$-{Hyper}$ &  IBEA$-{Epsilon}$ & SPEA2\\	
+\hline	
+astar-weight	&	10	&	10	&	10	&	10	\\
+bmax-fixed	&	10e6	&	10e5	&	10e6	&	10e6	\\
+bmax-increase-coef	&	1	&	1	&	1	&	1	\\
+bmax-init	&	10e6	&	10e4	&	10e6	&	10e6	\\
+bmax-last-weight	&	1	&	1	&	1	&	1	\\
+cost-weight	&	0	&	0	&	4	&	1	\\
+fitness-penalty	&	10e3	&	10e3	&	10e3	&	10e3	\\
+fitness-weight	&	15	&	15	&	15	&	15	\\
+lenght-weight	&	5	&	0	&	4	&	0	\\
+lmax-initcoef	&	20	&	20	&	20	&	20	\\
+lmin	&	1	&	1	&	1	&	1	\\
+makespan-add-weight	&	3	&	0	&	1	&	4	\\
+makespan-max-weight	&	4	&	5	&	5	&	2	\\
+maxGen	&	0	&	0	&	-1	&	0	\\
+maxtry-candidate	&	100	&	100	&	100	&	100	\\
+maxtry-mutex	&	100	&	100	&	100	&	100	\\
+popSize	&	20	&	100	&	200	&	50	\\
+proba-change	&	0.0	&	0.2	&	0.5	&	0.1	\\
+proba-cross	&	1.0	&	0.5	&	0.2	&	0.5	\\
+proba-del-atom	&	0.1	&	0.8	&	0.1	&	0.8	\\
+proba-mut	&	0.1	&	0.1	&	0.1	&	0.5	\\
+radius	&	1	&	7	&	5	&	5	\\
+rand-yahsp-seed	&	1	&	1	&	1	&	1	\\
+steadyGen	&	-1	&	-1	&	-1	&	-1	\\
+w-addatom	&	10	&	1	&	1	&	7	\\
+w-addgoal	&	0	&	3	&	0	&	7	\\
+w-delatom	&	5	&	7	&	10	&	0	\\
+w-delgoal	&	5	&	5	&	0	&	1	\\
+\hline																		
+Hypervolume	&	 0.35625	&	0.35625	&		&	0.368	\\
+\hline
+
+\end{tabular}
+\caption{Zeno9$-{risk}$ parameters}
+\label{tab:zeno9_risktParam}
+\end{table}
+
+ \begin{figure}
+ \centering
+ \subfloat[zeno3$-{cost}$]{ \includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno3_hyper_{cost}.eps}}
+ % zeno3_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[zeno3$-{risk}$]{\includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno3_hyper_{risk}.eps}}\\
+ % zeno3_hyper_{risk}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[zeno6$-{cost}$]{ \includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno6e_hyper_{cost}.eps}}
+ % zeno6e_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno6$-{risk}$]{ \includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno6e_hyper_{risk}.eps}}\\
+ % zeno6e_hyper_{risk}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno9$-{cost}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_hyper_{cost}.eps}}
+  \subfloat[zeno9$-{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_hyper_{risk}.eps}}\\
+ % zeno9_hyper_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Hypervolume}
+\end{figure}
+
+ 
+\begin{table*}[h]
+\scriptsize
+\caption{Algorithms comparison according to Wilcoxon signed rank test with respect of the I$_{H^-}$ metric.}
+\label{table:tests}
+\centering
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|c|c|c|c|}
+
+   \hline
+    \multirow{2}*{Instances}  &  \multirow{2}*{Algorithms}	 	&  \multicolumn{4}{c|}{ Algorithms}\\
+    \cline{3-6}
+			      &            		 	       		& $NSGAII$  &  $IBEA_{\varepsilon^+}$   & $IBEA_{H^-}$  & $SPEA2$  \\
+   \hline
+  \multirow{4}*{\textit{Zeno3}$_{cost}$} &$NSGAII$       	     &  --     & 		$\equiv$     &  	$\equiv$   	&  	$\equiv$   \\
+				
+			      &  $IBEA_{\varepsilon^+}$  	   			& $\equiv$  	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	$\equiv$  	&		$\equiv$  &--	&	$\equiv$    \\
+			      &    $SPEA2$       		  			& $\equiv$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+  \hline
+  \multirow{4}*{\textit{Zeno3}$_{risk}$} & $NSGAII$ 	    			&		-- 					&$\equiv$  		& $\equiv$  	& $\equiv$ \\
+	      & $IBEA_{\varepsilon^+}$   	   	 	    		&$\equiv$ 						&-- 			&$\equiv$  	&  \cellcolor [gray]{0.8}$\succ$  \\
+	      &  $IBEA_{H^-}$     		&$\equiv$ 			& $\equiv$  						&-- 	 & \cellcolor [gray]{0.8}$\succ$   \\
+	      &  $SPEA2$      		&$\equiv$  &  \cellcolor [gray]{0.8}$ \prec$		&  \cellcolor [gray]{0.8}$\prec$  & --   \\
+ \hline
+ \hline
+  \multirow{4}*{\textit{Zeno6}$_{cost}$} &$NSGAII$       	     &  --     & 		 \cellcolor [gray]{0.8}$ \prec$    &   \cellcolor [gray]{0.8}$ \prec$  	&  	 \cellcolor [gray]{0.8}$ \prec$   \\
+				
+			      &  $IBEA_{\varepsilon^+}$  	   		&	\cellcolor [gray]{0.8}$\succ$ 	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	\cellcolor [gray]{0.8}$\succ$ 	&		$\equiv$  &--	&	$\equiv$    \\
+			      &    $SPEA2$       		  		&	\cellcolor [gray]{0.8}$\succ$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+  \hline
+
+
+  \multirow{4}*{\textit{Zeno6}$_{risk}$} & $NSGAII$ 	    			&		-- 					& \cellcolor [gray]{0.8}$ \prec$   		&  \cellcolor [gray]{0.8}$ \prec$  	&$\equiv$   \\
+	      & $IBEA_{\varepsilon^+}$   	   	 	    		&\cellcolor [gray]{0.8}$\succ$ 						&-- 			&\cellcolor [gray]{0.8}$\succ$  	& \cellcolor [gray]{0.8}$\succ$ \\
+	      &  $IBEA_{H^-}$     		&\cellcolor [gray]{0.8}$\succ$ 			&  \cellcolor [gray]{0.8}$ \prec$   						&-- 	 & \cellcolor [gray]{0.8}$\succ$  \\
+	      &  $SPEA2$      		& $\equiv$   &  \cellcolor [gray]{0.8}$ \prec$  			& \cellcolor [gray]{0.8}$ \prec$   & --   \\
+ \hline
+   \hline
+  \multirow{4}*{\textit{Zeno9}$_{cost}$} &$NSGAII$       	     &  --     & 		\cellcolor [gray]{0.8}$ \prec$     &  \cellcolor [gray]{0.8}$ \prec$   	&  	\cellcolor [gray]{0.8}$ \prec$  \\
+				
+			      &  $IBEA_{\varepsilon^+}$  	   			& \cellcolor [gray]{0.8}$\succ$ 	   & 	--       		& 	\cellcolor [gray]{0.8}$ \prec$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	\cellcolor [gray]{0.8}$\succ$ 	&		\cellcolor [gray]{0.8}$\succ$   &--	&	$\equiv$    \\
+			      &    $SPEA2$       		  			& \cellcolor [gray]{0.8}$\succ$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+  \hline
+
+
+  \multirow{4}*{\textit{Zeno9}$_{risk}$} &$NSGAII$       	     &  --     & 		\cellcolor [gray]{0.8}$ \prec$     &  	$\equiv$   	&  	\cellcolor [gray]{0.8}$ \prec$   \\				
+			      &  $IBEA_{\varepsilon^+}$  	   		&	\cellcolor [gray]{0.8}$\succ$  	   & 	--       		& 	\cellcolor [gray]{0.8}$\succ$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	$\equiv$  	&		\cellcolor [gray]{0.8}$ \prec$   &--	&	\cellcolor [gray]{0.8}$ \prec$     \\
+			      &    $SPEA2$       		  			&\cellcolor [gray]{0.8}$\succ$ 	&	$\equiv$ 	&	\cellcolor [gray]{0.8}$\succ$ 			 &  --  \\
+  \hline
+
+\end{tabular} 
+
+\end{center}
+\end{table*}
+
+
+\begin{table*}[h]
+\scriptsize
+\caption{Algorithms comparison according to Kruskal-Wallis test with respect of the I$_{H^-}$ metric.}
+\label{table:tests}
+\centering
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|c|c|c|c|}
+
+   \hline
+    \multirow{2}*{Instances}  &  \multirow{2}*{Algorithms}	 	&  \multicolumn{4}{c|}{ Algorithms}\\
+    \cline{3-6}
+			      &            		 	       		& $NSGAII$  &  $IBEA_{\varepsilon^+}$   & $IBEA_{H^-}$  & $SPEA2$  \\
+   \hline
+  \multirow{4}*{\textit{Zeno3}$_{cost}$} &$NSGAII$       	     &  --     & 		$\equiv$     &  	$\equiv$   	&  	$\equiv$   \\
+				
+			      &  $IBEA_{\varepsilon^+}$  	   			& $\equiv$  	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	$\equiv$  	&		$\equiv$  &--	&	$\equiv$    \\
+			      &    $SPEA2$       		  			& $\equiv$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+  \hline
+  \multirow{4}*{\textit{Zeno3}$_{risk}$} & $NSGAII$ 	    			&		-- 					&$\equiv$  		& $\equiv$  	& $\equiv$ \\
+	      & $IBEA_{\varepsilon^+}$   	   	 	    		&$\equiv$ 						&-- 			&$\equiv$  	&  $\equiv$  \\
+	      &  $IBEA_{H^-}$     		&$\equiv$ 			& $\equiv$  						&-- 	 & $\equiv$   \\
+	      &  $SPEA2$      		&$\equiv$  & $\equiv$ 			&$\equiv$  & --   \\
+ \hline
+ \hline
+  \multirow{4}*{\textit{Zeno6}$_{cost}$} & $NSGAII$ 	    			&		-- 					&  \cellcolor [gray]{0.8}$ \prec$		&  \cellcolor [gray]{0.8}$ \prec$ 	&  \cellcolor [gray]{0.8}$ \prec$ \\
+	      & $IBEA_{\varepsilon^+}$   	   	 	    		&\cellcolor [gray]{0.8}$\succ$ 							&-- 			&$\equiv$  	&  $\equiv$  \\
+	      &  $IBEA_{H^-}$     		&\cellcolor [gray]{0.8}$\succ$ 			& $\equiv$  						&-- 	 & $\equiv$   \\
+	      &  $SPEA2$      		&\cellcolor [gray]{0.8}$\succ$ 	  & $\equiv$ 			&$\equiv$  & --   \\
+ \hline
+ \hline
+ \multirow{4}*{\textit{Zeno6}$_{risk}$} & $NSGAII$ 	    			&		-- 					& \cellcolor [gray]{0.8}$ \prec$   		&  \cellcolor [gray]{0.8}$ \prec$  	&$\equiv$   \\
+	      & $IBEA_{\varepsilon^+}$   	   	 	    		&\cellcolor [gray]{0.8}$\succ$ 						&-- 			&\cellcolor [gray]{0.8}$\succ$  	& \cellcolor [gray]{0.8}$\succ$ \\
+	      &  $IBEA_{H^-}$     		&\cellcolor [gray]{0.8}$\succ$ 			&  \cellcolor [gray]{0.8}$ \prec$   						&-- 	 & \cellcolor [gray]{0.8}$\succ$  \\
+	      &  $SPEA2$      		& $\equiv$   &  \cellcolor [gray]{0.8}$ \prec$  			& \cellcolor [gray]{0.8}$ \prec$   & --   \\
+ \hline
+   \hline
+  \multirow{4}*{\textit{Zeno9}$_{cost}$} &$NSGAII$       	     &  --     & 		\cellcolor [gray]{0.8}$ \prec$      &  	\cellcolor [gray]{0.8}$ \prec$  	&  	\cellcolor [gray]{0.8}$ \prec$  \\
+				
+			      &  $IBEA_{\varepsilon^+}$  	   			& \cellcolor [gray]{0.8}$\succ$ 		   & 	--       		& 	\cellcolor [gray]{0.8}$ \prec$ 	&	\cellcolor [gray]{0.8}$\succ$ 	   \\
+			      &    $IBEA_{H^-}$   	 	        	& 	\cellcolor [gray]{0.8}$\succ$ 		&		\cellcolor [gray]{0.8}$\succ$ 	  &--	&	\cellcolor [gray]{0.8}$\succ$ 	   \\
+			      &    $SPEA2$       		  			& \cellcolor [gray]{0.8}$\succ$ 			&	$\equiv$ 	&	\cellcolor [gray]{0.8}$ \prec$ 			 &  --  \\
+  \hline
+ \multirow{4}*{\textit{Zeno9}$_{risk}$} &$NSGAII$       	     &  --     & 		\cellcolor [gray]{0.8}$ \prec$     &  	$\equiv$   	&  	\cellcolor [gray]{0.8}$ \prec$   \\				
+			      &  $IBEA_{\varepsilon^+}$  	   		&	\cellcolor [gray]{0.8}$\succ$  	   & 	--       		& 	\cellcolor [gray]{0.8}$\succ$ 	&	$\equiv$      \\
+			      &    $IBEA_{H^-}$   	 	        	& 	$\equiv$  	&		\cellcolor [gray]{0.8}$ \prec$   &--	&	\cellcolor [gray]{0.8}$ \prec$     \\
+			      &    $SPEA2$       		  			&\cellcolor [gray]{0.8}$\succ$ 	&	$\equiv$ 	&	\cellcolor [gray]{0.8}$\succ$ 			 &  --  \\
+  \hline
+
+\end{tabular} 
+\end{center}
+\end{table*}
+
+\begin{figure}
+ \centering
+ \subfloat[zeno3$-{cost}$]{ \includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno3e_Add_paramils.eps}}
+ % zeno3e_Add_paramils.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno3$-{risk}$]{\includegraphics[scale=0.55, bb=50 50 410 302]{../plot_archive/zeno3e_Max_paramils.eps}}\\
+ % zeno3e_Max_paramils.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno6$-{cost}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6e_Add_paramils.eps}}
+ % zeno9e_Add_paramils.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno6$-{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6e_Max_paramils.eps}}\\
+ % zeno9e_Add_paramils.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno9$-{cost}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9e_Add_paramils.eps}}
+ % zeno9e_Add_paramils.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \subfloat[zeno9$-{risk}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9e_Max_paramils.eps}}\\
+ % zeno9e_Add_paramils.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{ParamILS trajectory for each algorihtm during the tuning process}
+\end{figure}
+ \newpage
+\clearpage 
+\begin{figure*} 
+ 
+\subfloat[NSGA-II]{ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Add_nsgaII-pareto.eps}
+ % zeno3_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Max_nsgaII-pareto.eps}}\\
+ % zeno3_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[IBEA$_{H^-}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Add_ibeahyper-pareto.eps}
+ % zeno3_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Max_ibeahyper-pareto.eps}}\\
+ % zeno3_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[SPEA2]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Add_ibeaepsilon-pareto.eps}
+ % zeno3_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Max_ibeaepsilon-pareto.eps}}\\
+ % zeno3_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[SPEA2]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Add_spea2-pareto.eps}
+ % zeno3_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Max_spea2-pareto.eps}}
+ % zeno3_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Pareto fronts for zeno3}
+\label{pfzeno3}
+ 
+
+\end{figure*}
+ \clearpage 
+\begin{figure*} 
+ 
+\subfloat[NSGA-II]{ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Add_nsgaII-pareto.eps}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Max_nsgaII-pareto.eps}}\\
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[IBEA$_{H^-}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Add_ibeahyper-pareto.eps}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Max_ibeahyper-pareto.eps}}\\
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[SPEA2]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Add_ibeaepsilon-pareto.eps}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Max_ibeaepsilon-pareto.eps}}\\
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[SPEA2]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Add_spea2-pareto.eps}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Max_spea2-pareto.eps}}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Pareto fronts for zeno6}
+\label{pfzeno6}
+ 
+\end{figure*}
+ 
+\clearpage 
+\begin{figure*} 
+ 
+\subfloat[NSGA-II]{ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Add_nsgaII-pareto.eps}
+ % zeno9_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Max_nsgaII-pareto.eps}}\\
+ % zeno9_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[IBEA$_{H^-}$]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Add_ibeahyper-pareto.eps}
+ % zeno9_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Max_ibeahyper-pareto.eps}}\\
+ % zeno9_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[SPEA2]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Add_ibeaepsilon-pareto.eps}
+ % zeno9_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Max_ibeaepsilon-pareto.eps}}\\
+ % zeno9_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[SPEA2]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Add_spea2-pareto.eps}
+ % zeno9_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Max_spea2-pareto.eps}}
+ % zeno9_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Pareto fronts for zeno9}
+ \label{pfzeno9}
+\end{figure*}
+\clearpage 
+\begin{figure*}
+ \centering
+ \subfloat[zeno3-Cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Add_ExactPareto-pareto.eps}}
+ % zeno3_Max_ExactPareto-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[zeno3-Risk]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3_Max_ExactPareto-pareto.eps}}\\
+ \subfloat[zeno6-Cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Add_ExactPareto-pareto.eps}}
+ \subfloat[zeno6-Risk]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6_Max_ExactPareto-pareto.eps}}\\
+ \subfloat[zeno9-Cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Add_ExactPareto-pareto.eps}}
+ \subfloat[zeno9-Risk]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno9_Max_ExactPareto-pareto.eps}}
+\caption{Exact pareto Pareto fronts for ZenoMulti}
+\end{figure*}
+
+\clearpage 
+
+\begin{figure*} 
+ 
+\subfloat[zeno3 (1-1.1-3)]{ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3i_Add_Exact-pareto.eps}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3i_Max_Exact-pareto.eps}}\\
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[zeno3 (1-2.9-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3s_Add_Exact-pareto.eps}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3s_Max_Exact-pareto.eps}}\\
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[zeno6 (1-1.1-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6i_Add_Exact-pareto.eps}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6i_Max_Exact-pareto.eps}}\\
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[zeno6(1-2.9-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6s_Add_Exact-pareto.eps}
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6s_Max_Exact-pareto.eps}}\\
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\caption{Pareto fronts for zenoMulti}
+\label{pfzeno6}
+ 
+\end{figure*}
+
+\clearpage 
+\begin{figure*}
+\centering
+\subfloat[zeno6:Combined strategies]{\includegraphics[scale=0.9, bb=50 50 410 302]{../plot_archive/zeno6_{cost}:IBEA_{H^-}.eps}} 
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 30}\\
+
+\subfloat[zeno6: Length strategy]{\includegraphics[scale=0.9,bb=50 50 410 302]{../plot_archive/strategy_{cost}:length_{weight}.eps}}   
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \end{figure*}
+
+\begin{figure*}
+\centering
+\subfloat[zeno6: Cost strategy ]{\includegraphics[scale=0.9,bb=50 50 410 302]{../plot_archive/strategy_{cost}:cost_{weight}.eps}}
+ \end{figure*}
+
+\clearpage 
+\begin{figure*}
+\centering
+
+\subfloat[zeno6: Makespan$_{Add}$ strategy ]{\includegraphics[scale=0.9,bb=50 50 410 302]{../plot_archive/strategy_{cost}:makespan_{addWeight}.eps}} 
+
+\subfloat[zeno6: Makespan$_{Max}$ strategy ]{\includegraphics[scale=0.9,bb=50 50 410 302]{../plot_archive/strategy_{cost}:makespan_{maxWeight}.eps}} 
+
+ \end{figure*}
+ 
+\clearpage 
+\begin{figure*}
+ \centering
+ \subfloat[zeno3(30-20-10)-cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3c_{cost}:IBEA_{H^-}.eps}}
+ \subfloat[zeno3(30-11-10)-cost] {\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3ci_{cost}:IBEA_{H^-}.eps}}  \qquad
+ \subfloat[zeno3(30-29-10)-cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3cs_{cost}:IBEA_{H^-}.eps}} \qquad
+
+\end{figure*}
+\begin{figure*}
+ \centering
+ \subfloat[zeno6-cost (30-20-10)-cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6c_{cost}:IBEA_{H^-}.eps}}
+ \subfloat[zeno6(30-11-10)-cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6ci_{cost}:IBEA_{H^-}.eps}} \qquad
+ \subfloat[zeno6(30-29-10)-cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6cs_{cost}:IBEA_{H^-}.eps}} \qquad
+\end{figure*}
+
+\begin{figure*}
+ \centering
+ \subfloat[zeno3-risk (30-20-10)-cost]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3c_{risk}:IBEA_{H^-}.eps}}
+\subfloat[zeno3(30-11-10)-risk ]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3ci_{risk}:IBEA_{H^-}.eps}} \qquad
+\subfloat[zeno3(30-29-10)-risk]{ \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3cs_{risk}:IBEA_{H^-}.eps}} \qquad
+ \end{figure*}
+
+\begin{figure*}
+ \centering
+ \subfloat[zeno6-risk (30-20-10)-risk]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6c_{risk}:IBEA_{H^-}.eps}}
+ \subfloat[zeno6(30-11-10)-risk ]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6ci_{risk}:IBEA_{H^-}.eps}} \qquad
+ \subfloat[zeno6(30-29-10)-risk] {\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6cs_{risk}:IBEA_{H^-}.eps}} \qquad
+
+\end{figure*}
+
+
+\clearpage 
+
+
+
+\begin{figure*}
+
+ \centering
+ 
+ \subfloat[zeno6-risk (30-20-10)-risk]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6c_{risk}:IBEA_{H^-}.eps}}
+ \subfloat[zeno6(30-11-10)-risk ]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6ci_{risk}:IBEA_{H^-}.eps}} \qquad
+ \subfloat[zeno6(30-29-10)-risk] {\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6cs_{risk}:IBEA_{H^-}.eps}} \qquad
+
+
+\end{figure*}
+
+
+\begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$: cost] {\includegraphics[bb=50 50 410 302]{../plot_archive/zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps}} \qquad
+ % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302 
+ \subfloat[IBEA$_{H^-}$: length]{ \includegraphics[bb=50 50 410 302]{../plot_archive/zeno3eStratMax_{risk}:IBEA_{H^-}_length.eps}}\qquad
+ % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\end{figure*}
+%  
+ \begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$:makespan$_{add}$ -- cost]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno3eStratMax_{risk}:IBEA_{H^-}_{makespan_add-cost}.eps}}\qquad
+%  % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[IBEA$_{H^-}$:makespan$_{max}$ -- cost]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno3eStratMax_{risk}:IBEA_{H^-}_{makespan_max-cost}.eps}}\qquad
+% %  % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \end{figure*}
+
+
+
+
+\begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$: cost] {\includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratMax_{risk}:IBEA_{H^-}_{cost}.eps}} \qquad
+ % zeno6eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302 
+ \subfloat[IBEA$_{H^-}$: length]{ \includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratMax_{risk}:IBEA_{H^-}_length.eps}}\qquad
+ % zeno6eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\end{figure*}
+%  
+ \begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$:makespan$_{add}$ -- cost]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratMax_{risk}:IBEA_{H^-}_{makespan_add-cost}.eps}}\qquad
+%  % zeno6eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[IBEA$_{H^-}$:makespan$_{max}$ -- cost]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratMax_{risk}:IBEA_{H^-}_{makespan_max-cost}.eps}}\qquad
+% %  % zeno6eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \end{figure*}
+
+
+\begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$: cost] {\includegraphics[bb=50 50 410 302]{../plot_archive/zeno3eStratAdd_{cost}:IBEA_{H^-}_{cost}.eps}} \qquad
+ % zeno3eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302 
+ \subfloat[IBEA$_{H^-}$: length]{ \includegraphics[bb=50 50 410 302]{../plot_archive/zeno3eStratAdd_{cost}:IBEA_{H^-}_length.eps}}\qquad
+ % zeno3eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\end{figure*}
+%  
+
+ \begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$:makespan$_{add}$ -- cost]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno3eStratAdd_{cost}:IBEA_{H^-}_{makespan_add-cost}.eps}}\qquad
+%  % zeno3eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[IBEA$_{H^-}$:makespan$_{max}$ -- cost]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno3eStratAdd_{cost}:IBEA_{H^-}_{makespan_max-cost}.eps}}\qquad
+% %  % zeno3eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \end{figure*}
+
+
+\begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$: cost] {\includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratAdd_{cost}:IBEA_{H^-}_{cost}.eps}} \qquad
+ % zeno6eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302 
+ \subfloat[IBEA$_{H^-}$:length]{ \includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratAdd_{cost}:IBEA_{H^-}_length.eps}}\qquad
+ % zeno6eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+\end{figure*}
+
+
+ \begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$:makespan$_{add}$  ]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratAdd_{cost}:IBEA_{H^-}_{makespan_add}.eps}}\qquad
+%  % zeno6eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[IBEA$_{H^-}$:makespan$_{max}$  ]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratAdd_{cost}:IBEA_{H^-}_{makespan_max}.eps}}\qquad
+% %  % zeno6eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \end{figure*}
+
+ \begin{figure*}
+ \centering
+ \subfloat[IBEA$_{H^-}$:makespan$_{add}$ -- cost]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratAdd_{cost}:IBEA_{H^-}_{makespan_add-cost}.eps}}\qquad
+%  % zeno6eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \subfloat[IBEA$_{H^-}$:makespan$_{max}$ -- cost]{\includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratAdd_{cost}:IBEA_{H^-}_{makespan_max-cost}.eps}}\qquad
+% %  % zeno6eStratAdd_{Add}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+ \end{figure*}
+% 
+%  
+
+% 
+% 
+% 
+% \begin{figure}
+%  \centering
+%  \includegraphics[bb=50 50 410 302]{../plot_archive/zenoe6StratMax_{risk}:IBEA_{H^-}_{cost}.eps}
+%  % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratMax_{risk}:IBEA_{H^-}_{length}.eps}
+%  % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratMax_{risk}:IBEA_{H^-}_{makespan_add-cost}.eps}
+%  % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[bb=50 50 410 302]{../plot_archive/zeno6eStratMax_{risk}:IBEA_{H^-}_{makespan_max-cost}.eps}
+%  % zeno3eStratMax_{risk}:IBEA_{H^-}_{cost}.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \end{figure}
+% 
+% 
+
+
+
+
+
+
+
+
+
+
+
+
+% \begin{figure*} 
+% 
+% \subfloat[zeno3(1-1.1-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3i_Add_aggrega-pareto.eps}
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3i_Add_ibeahyper-pareto.eps}}\\
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% \subfloat[zeno3(1-1.1-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6i_Add_aggrega-pareto.eps}
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6i_Max_aggrega-pareto.eps}}
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+% 
+% \subfloat[zeno3-cost (1-2.9-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3s_Add_aggrega-pareto.eps} 
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[scale=0.55,bb=50 50 410 302]{./zeno3s_Add_ibeahyper-pareto.eps}}\\
+% \subfloat[zeno3-risk (1-2.9-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno3s_Max_aggrega-pareto.eps} 
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[scale=0.55,bb=50 50 410 302]{./zeno3s_Max_ibeahyper-pareto.eps}}\\
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  
+% \subfloat[zeno6-cost (1-1.1-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6i_Add_aggrega-pareto.eps} 
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[scale=0.55,bb=50 50 410 302]{./zeno6i_Add_ibeahyper-pareto.eps}}\\
+% 
+% \subfloat[zeno6-risk (1-1.1-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6i_Max_aggrega-pareto.eps} 
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[scale=0.55,bb=50 50 410 302]{./zeno6i_Max_ibeahyper-pareto.eps}}\\
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  
+% \subfloat[zeno6-cost (1-2.9-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6s_Add_aggrega-pareto.eps} 
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%   \includegraphics[scale=0.55,bb=50 50 410 302]{./zeno6s_Add_ibeahyper-pareto.eps}}\\
+% 
+% \subfloat[zeno6-risk (1-2.9-3)]{\includegraphics[scale=0.55,bb=50 50 410 302]{../plot_archive/zeno6s_Max_aggrega-pareto.eps} 
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  \includegraphics[scale=0.55,bb=50 50 410 302]{./zeno6s_Max_ibeahyper-pareto.eps}}\\
+%  % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+%  
+% \end{figure*}
+
+\end{document}          

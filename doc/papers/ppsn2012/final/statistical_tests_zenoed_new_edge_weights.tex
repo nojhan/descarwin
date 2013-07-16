@@ -1,0 +1,87 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8x]{inputenc}
+\usepackage[table]{xcolor}
+% \usepackage{amssymb}
+% \usepackage{amsmath}
+\usepackage{graphicx}        % standard LaTeX graphics tool                            % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{url}
+\usepackage{caption,subfig}
+
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{table*}[h]
+\scriptsize
+\caption{Algorithms comparison according to Wilcoxon signed rank test with respect of the I$_{H^-}$ metric.}
+\label{table:tests}
+\centering
+
+\begin{center}
+\scriptsize
+\begin{tabular}{|l|l|c|c|c|c|}
+
+   \hline
+    \multirow{2}*{Instances}  &  \multirow{2}*{Algorithms}	  &  \multicolumn{4}{c|}{ Algorithms}\\
+    \cline{3-6}
+			      &            	 & NSGA-II  &  IBEA$_{\varepsilon^+}$ &IBEA$_{H^-}$  & SPEA2  \\
+   \hline
+  \multirow{4}*{\textit{Zeno3}$_{cost}$} &NSGA-II          		 &  --     & 		$\equiv$     &  	$\equiv$   	&  	$\equiv$   \\
+				
+			      &  IBEA$_{\varepsilon^+}$   		& $\equiv$  	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+			      &    IBEA$_{H^-}$   	 	  	& 	$\equiv$  	&		$\equiv$  &--	&	$\equiv$    \\
+			      &    SPEA2       				& $\equiv$ 		&	$\equiv$ 	&	$\equiv$  			 &  --  \\
+  \hline
+  \multirow{4}*{\textit{Zeno3}$_{risk}$} & NSGA-II 			&		-- 					&$\equiv$  		& $\equiv$  	& $\equiv$ \\
+	      & IBEA$_{\varepsilon^+}$   	   	 		&$\equiv$ 						&-- 			&$\equiv$  	&  $\equiv$  \\
+	      &  IBEA$_{H^-}$  		&$\equiv$ 			& $\equiv$  						&-- 	 & $\equiv$   \\
+	      &  SPEA2  		&$\equiv$  & $\equiv$ 			&$\equiv$  & --   \\
+ \hline
+\hline
+  \multirow{4}*{\textit{Zeno6}$_{cost}$} &NSGA-II       		&  --  			   & 		$\equiv$       &  $\equiv$  	&  $\equiv$  	   \\
+				
+			      &  IBEA$_{\varepsilon^+}$   			& $\equiv$      	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+			      &    IBEA$_{H^-}$   	 	  		& $\equiv$  		& 	$\equiv$ 	&	--		& $\equiv$   \\
+			      &    SPEA2        	   			&  $\equiv$  		&	$\equiv$ 	&	$\equiv$ 		 &  --  \\
+  \hline
+ \multirow{4}*{\textit{Zeno6}$_{risk}$} &NSGA-II       	 		&  --  			   & 		$\equiv$       &  	$\equiv$ &  	 	\cellcolor [gray]{0.8}$\succ$      \\
+				
+			      &  IBEA$_{\varepsilon^+}$       	& $\equiv$      	   & 	--       		& 	$\equiv$ 	&	\cellcolor [gray]{0.8}$\succ$     \\
+			      &    IBEA$_{H^-}$   	   		& $\equiv$ 		& 	$\equiv$ 	&	--		& \cellcolor [gray]{0.8}$\succ$  \\ %(0.001) 
+			      &    SPEA2       	 	& 	$\prec$		&		$\prec$		&		$\prec$			 &  --  \\
+ 
+  \hline
+\hline
+  \multirow{4}*{\textit{Zeno9}$_{cost}$} &NSGA-II       	 	&  --  			   & 		$\equiv$       &  $\equiv$  	&  $\equiv$  	   \\
+				
+			      &  IBEA$_{\varepsilon^+}$  	 
+			& $\equiv$      	   & 	--       		& 	$\equiv$ 	&	$\equiv$      \\
+			      &    IBEA$_{H^-}$   	 	 		& $\equiv$  		& 	$\equiv$ 	&	--		& $\equiv$   \\
+			      &    SPEA2       		 
+    			&  $\equiv$  		&	$\equiv$ 	&	$\equiv$ 		 &  --  \\
+  \hline
+ \multirow{4}*{\textit{Zeno9}$_{risk}$} &NSGA-II       	 		&  --  			   & 		$\equiv$       &  	$\equiv$ &  	 	$\equiv$     \\
+			      &  IBEA$_{\varepsilon^+}$   	& $\equiv$        & 	--       & 	$\equiv$ 	&	$\equiv$   \\
+			      &    IBEA$_{H^-}$   	 	 & $\equiv$ 		& 	$\equiv$ 	&	--	&	$\equiv$  \\
+			      &    SPEA2   			& 	$\prec$		&		$\prec$		&		$\prec$			 &  --  \\
+ 
+  \hline
+\end{tabular} 
+
+\end{center}
+\end{table*}
+
+\end{document}

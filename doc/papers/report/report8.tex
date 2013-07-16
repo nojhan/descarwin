@@ -1,0 +1,150 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{geometry}
+\geometry{hmargin=0.5cm,vmargin=0.5cm}
+\usepackage[utf8x]{inputenc}
+                            % not available on your system
+\usepackage[table]{xcolor}
+% \usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}        % standard LaTeX graphics tool                            % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{url}
+\usepackage{caption,subfig}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+%\maketitle 
+\clearpage 
+  \newpage
+
+ \section{Stratégies }
+  \begin{figure*}[h!]
+ \begin{center}
+   \subfloat[floortile03]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/floortile03DAE_Add__pareto.eps}}
+   \subfloat[openstacks15]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/openstacks15_DAE_Add__pareto.eps}}\\
+   \subfloat[zeno9]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/zeno9GlobLevelDaeYahsp_Add_dae_pareto1.eps}}
+ \end{center}
+ 
+    \caption{Stratégies cost/makespan}
+\end{figure*}
+
+
+  \begin{figure*}[h!]
+ \begin{center}
+ \subfloat[p01-p04-elevators]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/p01-p04_elevators_alpha_arch_pareto.eps}}
+\subfloat[floortile03]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/pfile3_alpha_arch_pareto.eps}}
+ \end{center}
+\end{figure*}
+
+
+
+ \begin{figure*}[h!]
+\centering
+\subfloat[elevators-p01-p04]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/elevators_p01-p04_Add_ibea_pareto.eps} }
+\subfloat[elevators-p05-p07]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/elevators_p05-p07_Add_ibea_pareto.eps}}\\
+\subfloat[elevators-p10]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/elevators_p10_Add_ibea_pareto.eps} }
+% foortile_pfile0__Add_ibeahyper_pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+  \caption{DAE$_Yahsp$}
+ \end{figure*}
+  
+  
+  
+ \section{LPG}
+  \begin{figure*}[h!]
+ \begin{center}
+      \subfloat[p01-p04-elevators]{\includegraphics[bb=50 50 410 302,scale=0.75]{../plot_archive/p01-p04_elevators_lpg_Add_lpg_pareto_norm.eps}}\\
+   \end{center}
+    \caption{LPG}
+
+  \end{figure*}
+  
+\section*{muli-shapes}
+  
+  
+
+
+\begin{figure*}[h!]
+\centering {
+    
+ \subfloat[ Linear]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6di_Add_ibeahyper_pareto.eps} } 
+\subfloat[Customized ]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6di_Add_ibeahyperded_pareto.eps} }\qquad
+\caption{IBEA on zeno6diCost}  }  
+     
+\end{figure*}
+
+
+
+
+\begin{figure*}[h!]
+\centering {
+ \subfloat[ Linear]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6ds_Add_ibeahyper_pareto.eps} } 
+\subfloat[Customized  ]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6ds_Add_ibeahyperded_pareto.eps} }\qquad
+\caption{IBEA on zeno6dsCost}  }  
+
+\end{figure*}
+
+\begin{figure*}[h!]
+\centering {
+ \subfloat[p20-openstacks]{ \includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/p20_openstacks_Add_dae_pareto.eps} }
+ \subfloat[p01-p04-elevators]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/p01-p04_elevators_Add_dae_pareto.eps} }\\
+  \subfloat[p05-openstacks]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/p05_openstacks_Add_dae_pareto.eps} }
+ \subfloat[p15-openstacks]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/p15_openstacks_Add_dae_pareto.eps} }\\
+  \subfloat[p10-openstacks]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/p10_openstacks_Add_dae_pareto.eps} }
+  \subfloat[p01-openstacks]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/p01_openstacks_Add_dae_pareto.eps} }\\
+  \subfloat[pfile0-floortile]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/pfile0_floortile_Add_dae_pareto.eps} }
+  \subfloat[pfile3-floortile]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/pfile3_floortile_Add_dae_pareto.eps} }\\
+    \caption{}  }      
+\end{figure*}
+\begin{figure*}[h!]
+\centering {
+  \subfloat[pfile4-floortile]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/pfile4_floortile_Add_dae_pareto.eps} }
+ \subfloat[pfile4-floortile]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/pfile4_floortile_Add_lpg_pareto1000.eps} }\\
+ \subfloat[pfile3-floortile]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/pfile3_floortile_Add_lpg_pareto1000.eps} }
+   \subfloat[pfile0-floortile]{\includegraphics[bb=50 50 410 302,scale=0.7] {../plot_archive/pfile0_floortile_Add_lpg_pareto1000.eps} }\\
+  \subfloat[p01-p04-elevators]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/p01-p04_elevators_Add_lpg_pareto.eps} }
+      \caption{}  }      
+\end{figure*}
+  \begin{figure*}[h!]
+\centering {
+  \subfloat[p05-openstacks]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/p05_openstacks_1000_lpg_pareto.eps} }\\
+   \subfloat[p10-openstacks]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/p10_openstacks_1000_lpg_pareto.eps} }
+  \subfloat[p15-openstacks ]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/p15_openstacks_1000_lpg_pareto.eps} }\\
+  \subfloat[p20-openstacks]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/p20_openstacks_1000_lpg_pareto.eps} }
+   \subfloat[p01-openstacks]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/p01_openstacks_1000_lpg_pareto.eps} }
+ \caption{} }
+   \end{figure*}
+
+   \begin{figure*}[h!]
+\centering {  
+
+\subfloat[zeno6]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6eMini_Add_dae_pareto.eps}}
+\subfloat[zeno6]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6eMini_Add_lpg_paretofront.eps}} \\
+\subfloat[zeno6]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6eMini_Add_lpg_pareto.eps}}
+
+
+    \caption{}  }      
+\end{figure*}
+
+
+
+\begin{figure*}[h!]
+\centering {
+    
+      \subfloat[ Linear]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6sc_Add_ibeahyper_pareto.eps} } 
+    \subfloat[Customized ]{\includegraphics[bb=50 50 410 302,scale=0.7]{../plot_archive/zeno6sc_Add_ibeahyperded_pareto.eps} }\qquad
+\caption{IBEA on zeno6scCost}  }  
+    
+
+\end{figure*}
+
+
+
+
+
+\end{document}

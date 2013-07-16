@@ -1,0 +1,2049 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: p01_openstacks_1000_lpg_pareto.eps
+%%Creator: gnuplot 4.2 patchlevel 6 
+%%CreationDate: Thu Jan 31 20:00:04 2013
+%%DocumentFonts: (atend)
+%%BoundingBox: 50 50 410 302
+%%EndComments
+%%BeginProlog
+/gnudict 256 dict def
+gnudict begin
+%
+% The following 6 true/false flags may be edited by hand if required
+% The unit line width may also be changed
+%
+/Color true def
+/Blacktext false def
+/Solid false def
+/Dashlength 1 def
+/Landscape false def
+/Level1 false def
+/Rounded false def
+/TransparentPatterns false def
+/gnulinewidth 5.000 def
+/userlinewidth gnulinewidth def
+%
+/vshift -46 def
+/dl1 {
+  10.0 Dashlength mul mul
+  Rounded { currentlinewidth 0.75 mul sub dup 0 le { pop 0.01 } if } if
+} def
+/dl2 {
+  10.0 Dashlength mul mul
+  Rounded { currentlinewidth 0.75 mul add } if
+} def
+/hpt_ 31.5 def
+/vpt_ 31.5 def
+/hpt hpt_ def
+/vpt vpt_ def
+Level1 {} {
+/SDict 10 dict def
+systemdict /pdfmark known not {
+  userdict /pdfmark systemdict /cleartomark get put
+} if
+SDict begin [
+  /Title (p01_openstacks_1000_lpg_pareto.eps)
+  /Subject (gnuplot plot)
+  /Creator (gnuplot 4.2 patchlevel 6 )
+  /Author (Mostepha khouadjia)
+%  /Producer (gnuplot)
+%  /Keywords ()
+  /CreationDate (Thu Jan 31 20:00:04 2013)
+  /DOCINFO pdfmark
+end
+} ifelse
+%
+% Gnuplot Prolog Version 4.2 (August 2006)
+%
+/M {moveto} bind def
+/L {lineto} bind def
+/R {rmoveto} bind def
+/V {rlineto} bind def
+/N {newpath moveto} bind def
+/Z {closepath} bind def
+/C {setrgbcolor} bind def
+/f {rlineto fill} bind def
+/vpt2 vpt 2 mul def
+/hpt2 hpt 2 mul def
+/Lshow {currentpoint stroke M 0 vshift R 
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse} def
+/Rshow {currentpoint stroke M dup stringwidth pop neg vshift R
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse} def
+/Cshow {currentpoint stroke M dup stringwidth pop -2 div vshift R 
+	Blacktext {gsave 0 setgray show grestore} {show} ifelse} def
+/UP {dup vpt_ mul /vpt exch def hpt_ mul /hpt exch def
+  /hpt2 hpt 2 mul def /vpt2 vpt 2 mul def} def
+/DL {Color {setrgbcolor Solid {pop []} if 0 setdash}
+ {pop pop pop 0 setgray Solid {pop []} if 0 setdash} ifelse} def
+/BL {stroke userlinewidth 2 mul setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+/AL {stroke userlinewidth 2 div setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+/UL {dup gnulinewidth mul /userlinewidth exch def
+	dup 1 lt {pop 1} if 10 mul /udl exch def} def
+/PL {stroke userlinewidth setlinewidth
+	Rounded {1 setlinejoin 1 setlinecap} if} def
+% Default Line colors
+/LCw {1 1 1} def
+/LCb {0 0 0} def
+/LCa {0 0 0} def
+/LC0 {1 0 0} def
+/LC1 {0 1 0} def
+/LC2 {0 0 1} def
+/LC3 {1 0 1} def
+/LC4 {0 1 1} def
+/LC5 {1 1 0} def
+/LC6 {0 0 0} def
+/LC7 {1 0.3 0} def
+/LC8 {0.5 0.5 0.5} def
+% Default Line Types
+/LTw {PL [] 1 setgray} def
+/LTb {BL [] LCb DL} def
+/LTa {AL [1 udl mul 2 udl mul] 0 setdash LCa setrgbcolor} def
+/LT0 {PL [] LC0 DL} def
+/LT1 {PL [4 dl1 2 dl2] LC1 DL} def
+/LT2 {PL [2 dl1 3 dl2] LC2 DL} def
+/LT3 {PL [1 dl1 1.5 dl2] LC3 DL} def
+/LT4 {PL [6 dl1 2 dl2 1 dl1 2 dl2] LC4 DL} def
+/LT5 {PL [3 dl1 3 dl2 1 dl1 3 dl2] LC5 DL} def
+/LT6 {PL [2 dl1 2 dl2 2 dl1 6 dl2] LC6 DL} def
+/LT7 {PL [1 dl1 2 dl2 6 dl1 2 dl2 1 dl1 2 dl2] LC7 DL} def
+/LT8 {PL [2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 2 dl2 2 dl1 4 dl2] LC8 DL} def
+/Pnt {stroke [] 0 setdash gsave 1 setlinecap M 0 0 V stroke grestore} def
+/Dia {stroke [] 0 setdash 2 copy vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath stroke
+  Pnt} def
+/Pls {stroke [] 0 setdash vpt sub M 0 vpt2 V
+  currentpoint stroke M
+  hpt neg vpt neg R hpt2 0 V stroke
+ } def
+/Box {stroke [] 0 setdash 2 copy exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath stroke
+  Pnt} def
+/Crs {stroke [] 0 setdash exch hpt sub exch vpt add M
+  hpt2 vpt2 neg V currentpoint stroke M
+  hpt2 neg 0 R hpt2 vpt2 V stroke} def
+/TriU {stroke [] 0 setdash 2 copy vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath stroke
+  Pnt} def
+/Star {2 copy Pls Crs} def
+/BoxF {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath fill} def
+/TriUF {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath fill} def
+/TriD {stroke [] 0 setdash 2 copy vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath stroke
+  Pnt} def
+/TriDF {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath fill} def
+/DiaF {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath fill} def
+/Pent {stroke [] 0 setdash 2 copy gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath stroke grestore Pnt} def
+/PentF {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath fill grestore} def
+/Circle {stroke [] 0 setdash 2 copy
+  hpt 0 360 arc stroke Pnt} def
+/CircleF {stroke [] 0 setdash hpt 0 360 arc fill} def
+/C0 {BL [] 0 setdash 2 copy moveto vpt 90 450 arc} bind def
+/C1 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C2 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C3 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C4 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 180 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C5 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc
+	2 copy moveto
+	2 copy vpt 180 270 arc closepath fill
+	vpt 0 360 arc} bind def
+/C6 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C7 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 270 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C8 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 270 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C9 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 270 450 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C10 {BL [] 0 setdash 2 copy 2 copy moveto vpt 270 360 arc closepath fill
+	2 copy moveto
+	2 copy vpt 90 180 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C11 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 180 arc closepath fill
+	2 copy moveto
+	2 copy vpt 270 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C12 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 180 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C13 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 0 90 arc closepath fill
+	2 copy moveto
+	2 copy vpt 180 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/C14 {BL [] 0 setdash 2 copy moveto
+	2 copy vpt 90 360 arc closepath fill
+	vpt 0 360 arc} bind def
+/C15 {BL [] 0 setdash 2 copy vpt 0 360 arc closepath fill
+	vpt 0 360 arc closepath} bind def
+/Rec {newpath 4 2 roll moveto 1 index 0 rlineto 0 exch rlineto
+	neg 0 rlineto closepath} bind def
+/Square {dup Rec} bind def
+/Bsquare {vpt sub exch vpt sub exch vpt2 Square} bind def
+/S0 {BL [] 0 setdash 2 copy moveto 0 vpt rlineto BL Bsquare} bind def
+/S1 {BL [] 0 setdash 2 copy vpt Square fill Bsquare} bind def
+/S2 {BL [] 0 setdash 2 copy exch vpt sub exch vpt Square fill Bsquare} bind def
+/S3 {BL [] 0 setdash 2 copy exch vpt sub exch vpt2 vpt Rec fill Bsquare} bind def
+/S4 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt Square fill Bsquare} bind def
+/S5 {BL [] 0 setdash 2 copy 2 copy vpt Square fill
+	exch vpt sub exch vpt sub vpt Square fill Bsquare} bind def
+/S6 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill Bsquare} bind def
+/S7 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt vpt2 Rec fill
+	2 copy vpt Square fill Bsquare} bind def
+/S8 {BL [] 0 setdash 2 copy vpt sub vpt Square fill Bsquare} bind def
+/S9 {BL [] 0 setdash 2 copy vpt sub vpt vpt2 Rec fill Bsquare} bind def
+/S10 {BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt Square fill
+	Bsquare} bind def
+/S11 {BL [] 0 setdash 2 copy vpt sub vpt Square fill 2 copy exch vpt sub exch vpt2 vpt Rec fill
+	Bsquare} bind def
+/S12 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill Bsquare} bind def
+/S13 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill
+	2 copy vpt Square fill Bsquare} bind def
+/S14 {BL [] 0 setdash 2 copy exch vpt sub exch vpt sub vpt2 vpt Rec fill
+	2 copy exch vpt sub exch vpt Square fill Bsquare} bind def
+/S15 {BL [] 0 setdash 2 copy Bsquare fill Bsquare} bind def
+/D0 {gsave translate 45 rotate 0 0 S0 stroke grestore} bind def
+/D1 {gsave translate 45 rotate 0 0 S1 stroke grestore} bind def
+/D2 {gsave translate 45 rotate 0 0 S2 stroke grestore} bind def
+/D3 {gsave translate 45 rotate 0 0 S3 stroke grestore} bind def
+/D4 {gsave translate 45 rotate 0 0 S4 stroke grestore} bind def
+/D5 {gsave translate 45 rotate 0 0 S5 stroke grestore} bind def
+/D6 {gsave translate 45 rotate 0 0 S6 stroke grestore} bind def
+/D7 {gsave translate 45 rotate 0 0 S7 stroke grestore} bind def
+/D8 {gsave translate 45 rotate 0 0 S8 stroke grestore} bind def
+/D9 {gsave translate 45 rotate 0 0 S9 stroke grestore} bind def
+/D10 {gsave translate 45 rotate 0 0 S10 stroke grestore} bind def
+/D11 {gsave translate 45 rotate 0 0 S11 stroke grestore} bind def
+/D12 {gsave translate 45 rotate 0 0 S12 stroke grestore} bind def
+/D13 {gsave translate 45 rotate 0 0 S13 stroke grestore} bind def
+/D14 {gsave translate 45 rotate 0 0 S14 stroke grestore} bind def
+/D15 {gsave translate 45 rotate 0 0 S15 stroke grestore} bind def
+/DiaE {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V closepath stroke} def
+/BoxE {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V closepath stroke} def
+/TriUE {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V closepath stroke} def
+/TriDE {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V closepath stroke} def
+/PentE {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  closepath stroke grestore} def
+/CircE {stroke [] 0 setdash 
+  hpt 0 360 arc stroke} def
+/Opaque {gsave closepath 1 setgray fill grestore 0 setgray closepath} def
+/DiaW {stroke [] 0 setdash vpt add M
+  hpt neg vpt neg V hpt vpt neg V
+  hpt vpt V hpt neg vpt V Opaque stroke} def
+/BoxW {stroke [] 0 setdash exch hpt sub exch vpt add M
+  0 vpt2 neg V hpt2 0 V 0 vpt2 V
+  hpt2 neg 0 V Opaque stroke} def
+/TriUW {stroke [] 0 setdash vpt 1.12 mul add M
+  hpt neg vpt -1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt 1.62 mul V Opaque stroke} def
+/TriDW {stroke [] 0 setdash vpt 1.12 mul sub M
+  hpt neg vpt 1.62 mul V
+  hpt 2 mul 0 V
+  hpt neg vpt -1.62 mul V Opaque stroke} def
+/PentW {stroke [] 0 setdash gsave
+  translate 0 hpt M 4 {72 rotate 0 hpt L} repeat
+  Opaque stroke grestore} def
+/CircW {stroke [] 0 setdash 
+  hpt 0 360 arc Opaque stroke} def
+/BoxFill {gsave Rec 1 setgray fill grestore} def
+/Density {
+  /Fillden exch def
+  currentrgbcolor
+  /ColB exch def /ColG exch def /ColR exch def
+  /ColR ColR Fillden mul Fillden sub 1 add def
+  /ColG ColG Fillden mul Fillden sub 1 add def
+  /ColB ColB Fillden mul Fillden sub 1 add def
+  ColR ColG ColB setrgbcolor} def
+/BoxColFill {gsave Rec PolyFill} def
+/PolyFill {gsave Density fill grestore grestore} def
+/h {rlineto rlineto rlineto gsave closepath fill grestore} bind def
+%
+% PostScript Level 1 Pattern Fill routine for rectangles
+% Usage: x y w h s a XX PatternFill
+%	x,y = lower left corner of box to be filled
+%	w,h = width and height of box
+%	  a = angle in degrees between lines and x-axis
+%	 XX = 0/1 for no/yes cross-hatch
+%
+/PatternFill {gsave /PFa [ 9 2 roll ] def
+  PFa 0 get PFa 2 get 2 div add PFa 1 get PFa 3 get 2 div add translate
+  PFa 2 get -2 div PFa 3 get -2 div PFa 2 get PFa 3 get Rec
+  gsave 1 setgray fill grestore clip
+  currentlinewidth 0.5 mul setlinewidth
+  /PFs PFa 2 get dup mul PFa 3 get dup mul add sqrt def
+  0 0 M PFa 5 get rotate PFs -2 div dup translate
+  0 1 PFs PFa 4 get div 1 add floor cvi
+	{PFa 4 get mul 0 M 0 PFs V} for
+  0 PFa 6 get ne {
+	0 1 PFs PFa 4 get div 1 add floor cvi
+	{PFa 4 get mul 0 2 1 roll M PFs 0 V} for
+ } if
+  stroke grestore} def
+%
+/languagelevel where
+ {pop languagelevel} {1} ifelse
+ 2 lt
+	{/InterpretLevel1 true def}
+	{/InterpretLevel1 Level1 def}
+ ifelse
+%
+% PostScript level 2 pattern fill definitions
+%
+/Level2PatternFill {
+/Tile8x8 {/PaintType 2 /PatternType 1 /TilingType 1 /BBox [0 0 8 8] /XStep 8 /YStep 8}
+	bind def
+/KeepColor {currentrgbcolor [/Pattern /DeviceRGB] setcolorspace} bind def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 8 8 L 0 8 M 8 0 L stroke} 
+>> matrix makepattern
+/Pat1 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 8 8 L 0 8 M 8 0 L stroke
+	0 4 M 4 8 L 8 4 L 4 0 L 0 4 L stroke}
+>> matrix makepattern
+/Pat2 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 0 M 0 8 L
+	8 8 L 8 0 L 0 0 L fill}
+>> matrix makepattern
+/Pat3 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -4 8 M 8 -4 L
+	0 12 M 12 0 L stroke}
+>> matrix makepattern
+/Pat4 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -4 0 M 8 12 L
+	0 -4 M 12 8 L stroke}
+>> matrix makepattern
+/Pat5 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -2 8 M 4 -4 L
+	0 12 M 8 -4 L 4 12 M 10 0 L stroke}
+>> matrix makepattern
+/Pat6 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop -2 0 M 4 12 L
+	0 -4 M 8 12 L 4 -4 M 10 8 L stroke}
+>> matrix makepattern
+/Pat7 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 8 -2 M -4 4 L
+	12 0 M -4 8 L 12 4 M 0 10 L stroke}
+>> matrix makepattern
+/Pat8 exch def
+<< Tile8x8
+ /PaintProc {0.5 setlinewidth pop 0 -2 M 12 4 L
+	-4 0 M 12 8 L -4 4 M 8 10 L stroke}
+>> matrix makepattern
+/Pat9 exch def
+/Pattern1 {PatternBgnd KeepColor Pat1 setpattern} bind def
+/Pattern2 {PatternBgnd KeepColor Pat2 setpattern} bind def
+/Pattern3 {PatternBgnd KeepColor Pat3 setpattern} bind def
+/Pattern4 {PatternBgnd KeepColor Landscape {Pat5} {Pat4} ifelse setpattern} bind def
+/Pattern5 {PatternBgnd KeepColor Landscape {Pat4} {Pat5} ifelse setpattern} bind def
+/Pattern6 {PatternBgnd KeepColor Landscape {Pat9} {Pat6} ifelse setpattern} bind def
+/Pattern7 {PatternBgnd KeepColor Landscape {Pat8} {Pat7} ifelse setpattern} bind def
+} def
+%
+%
+%End of PostScript Level 2 code
+%
+/PatternBgnd {
+  TransparentPatterns {} {gsave 1 setgray fill grestore} ifelse
+} def
+%
+% Substitute for Level 2 pattern fill codes with
+% grayscale if Level 2 support is not selected.
+%
+/Level1PatternFill {
+/Pattern1 {0.250 Density} bind def
+/Pattern2 {0.500 Density} bind def
+/Pattern3 {0.750 Density} bind def
+/Pattern4 {0.125 Density} bind def
+/Pattern5 {0.375 Density} bind def
+/Pattern6 {0.625 Density} bind def
+/Pattern7 {0.875 Density} bind def
+} def
+%
+% Now test for support of Level 2 code
+%
+Level1 {Level1PatternFill} {Level2PatternFill} ifelse
+%
+/Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont
+dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall
+currentdict end definefont pop
+/MFshow {
+   { dup 5 get 3 ge
+     { 5 get 3 eq {gsave} {grestore} ifelse }
+     {dup dup 0 get findfont exch 1 get scalefont setfont
+     [ currentpoint ] exch dup 2 get 0 exch R dup 5 get 2 ne {dup dup 6
+     get exch 4 get {show} {stringwidth pop 0 R} ifelse }if dup 5 get 0 eq
+     {dup 3 get {2 get neg 0 exch R pop} {pop aload pop M} ifelse} {dup 5
+     get 1 eq {dup 2 get exch dup 3 get exch 6 get stringwidth pop -2 div
+     dup 0 R} {dup 6 get stringwidth pop -2 div 0 R 6 get
+     show 2 index {aload pop M neg 3 -1 roll neg R pop pop} {pop pop pop
+     pop aload pop M} ifelse }ifelse }ifelse }
+     ifelse }
+   forall} bind def
+/MFwidth {0 exch { dup 5 get 3 ge { 5 get 3 eq { 0 } { pop } ifelse }
+ {dup 3 get{dup dup 0 get findfont exch 1 get scalefont setfont
+     6 get stringwidth pop add} {pop} ifelse} ifelse} forall} bind def
+/MLshow { currentpoint stroke M
+  0 exch R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/MRshow { currentpoint stroke M
+  exch dup MFwidth neg 3 -1 roll R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/MCshow { currentpoint stroke M
+  exch dup MFwidth -2 div 3 -1 roll R
+  Blacktext {gsave 0 setgray MFshow grestore} {MFshow} ifelse } bind def
+/XYsave    { [( ) 1 2 true false 3 ()] } bind def
+/XYrestore { [( ) 1 2 true false 4 ()] } bind def
+end
+%%EndProlog
+gnudict begin
+gsave
+50 50 translate
+0.050 0.050 scale
+0 setgray
+newpath
+(Helvetica) findfont 140 scalefont setfont
+1.000 UL
+LTb
+1.000 UL
+LTa
+770 448 M
+6220 0 V
+stroke
+LTb
+770 448 M
+63 0 V
+6157 0 R
+-63 0 V
+stroke
+686 448 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 10)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+770 1185 M
+6220 0 V
+stroke
+LTb
+770 1185 M
+63 0 V
+6157 0 R
+-63 0 V
+stroke
+686 1185 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 12)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+770 1923 M
+6220 0 V
+stroke
+LTb
+770 1923 M
+63 0 V
+6157 0 R
+-63 0 V
+stroke
+686 1923 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 14)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+770 2660 M
+6220 0 V
+stroke
+LTb
+770 2660 M
+63 0 V
+6157 0 R
+-63 0 V
+stroke
+686 2660 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 16)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+770 3397 M
+6220 0 V
+stroke
+LTb
+770 3397 M
+63 0 V
+6157 0 R
+-63 0 V
+stroke
+686 3397 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 18)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+770 4135 M
+6220 0 V
+stroke
+LTb
+770 4135 M
+63 0 V
+6157 0 R
+-63 0 V
+stroke
+686 4135 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 20)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+770 4872 M
+6220 0 V
+stroke
+LTb
+770 4872 M
+63 0 V
+6157 0 R
+-63 0 V
+stroke
+686 4872 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 22)]
+] -46.7 MRshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+770 448 M
+0 4424 V
+stroke
+LTb
+770 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+770 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 450)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+1335 448 M
+0 4424 V
+stroke
+LTb
+1335 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+1335 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 500)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+1901 448 M
+0 4424 V
+stroke
+LTb
+1901 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+1901 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 550)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+2466 448 M
+0 4424 V
+stroke
+LTb
+2466 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+2466 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 600)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+3032 448 M
+0 4424 V
+stroke
+LTb
+3032 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+3032 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 650)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+3597 448 M
+0 4424 V
+stroke
+LTb
+3597 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+3597 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 700)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+4163 448 M
+0 4424 V
+stroke
+LTb
+4163 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+4163 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 750)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+4728 448 M
+0 4424 V
+stroke
+LTb
+4728 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+4728 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 800)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+5294 448 M
+0 4424 V
+stroke
+LTb
+5294 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+5294 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 850)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+5859 448 M
+0 4424 V
+stroke
+LTb
+5859 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+5859 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 900)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+6425 448 M
+0 4221 V
+0 140 R
+0 63 V
+stroke
+LTb
+6425 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+6425 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 950)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTa
+6990 448 M
+0 4424 V
+stroke
+LTb
+6990 448 M
+0 63 V
+0 4361 R
+0 -63 V
+stroke
+6990 308 M
+[ [(Helvetica) 140.0 0.0 true true 0 ( 1000)]
+] -46.7 MCshow
+1.000 UL
+LTb
+1.000 UL
+LTb
+770 4872 N
+770 448 L
+6220 0 V
+0 4424 V
+-6220 0 V
+Z stroke
+LCb setrgbcolor
+280 2660 M
+currentpoint gsave translate 90 rotate 0 0 moveto
+[ [(Helvetica) 140.0 0.0 true true 0 (Cost)]
+] -46.7 MCshow
+grestore
+LTb
+LCb setrgbcolor
+3880 98 M
+[ [(Helvetica) 140.0 0.0 true true 0 (Makespan)]
+] -46.7 MCshow
+LTb
+1.000 UP
+1.000 UL
+LTb
+2.000 UP
+1.000 UL
+LT0
+0.00 0.00 1.00 C LTb
+6339 4739 M
+[ [(Helvetica) 140.0 0.0 true true 0 (LPG)]
+] -46.7 MRshow
+LT0
+0.00 0.00 1.00 C 1302 4135 TriDF
+1494 4135 TriDF
+1505 4135 TriDF
+1516 3766 TriDF
+1573 4135 TriDF
+1652 4135 TriDF
+1663 4503 TriDF
+1709 3766 TriDF
+1720 4503 TriDF
+1788 4135 TriDF
+1844 3397 TriDF
+1912 4503 TriDF
+2048 1923 TriDF
+2059 3766 TriDF
+2071 4503 TriDF
+2116 4503 TriDF
+2127 4503 TriDF
+2150 3029 TriDF
+2206 3766 TriDF
+2240 3029 TriDF
+2251 3766 TriDF
+2285 4135 TriDF
+2285 4503 TriDF
+2297 3029 TriDF
+2308 3029 TriDF
+2319 4503 TriDF
+2365 4135 TriDF
+2376 2660 TriDF
+2376 3397 TriDF
+2387 3766 TriDF
+2421 2660 TriDF
+2466 3029 TriDF
+2466 3397 TriDF
+2500 4503 TriDF
+2512 2291 TriDF
+2523 2660 TriDF
+2523 4135 TriDF
+2546 4503 TriDF
+2568 3397 TriDF
+2579 2291 TriDF
+2579 3766 TriDF
+2591 1923 TriDF
+2602 3766 TriDF
+2636 2291 TriDF
+2636 3397 TriDF
+2659 4503 TriDF
+2704 3766 TriDF
+2726 3766 TriDF
+2726 4135 TriDF
+2738 3029 TriDF
+2749 3766 TriDF
+2772 3397 TriDF
+2806 4135 TriDF
+2817 3397 TriDF
+2817 4135 TriDF
+2840 3029 TriDF
+2851 3397 TriDF
+2862 3766 TriDF
+2885 2660 TriDF
+2885 4503 TriDF
+2907 3029 TriDF
+2907 3766 TriDF
+2930 2660 TriDF
+2930 3766 TriDF
+2953 3766 TriDF
+2964 4135 TriDF
+2975 3397 TriDF
+3009 3029 TriDF
+3021 4503 TriDF
+3066 3029 TriDF
+3100 3397 TriDF
+3100 4503 TriDF
+3111 3397 TriDF
+3111 4135 TriDF
+3111 4503 TriDF
+3134 3766 TriDF
+3134 4503 TriDF
+3145 4135 TriDF
+3156 3766 TriDF
+3168 3397 TriDF
+3179 3029 TriDF
+3179 3766 TriDF
+3190 4135 TriDF
+3201 2291 TriDF
+3201 3397 TriDF
+3213 3397 TriDF
+3213 4503 TriDF
+3247 2660 TriDF
+3269 3029 TriDF
+3292 3029 TriDF
+3303 2660 TriDF
+3303 4503 TriDF
+3315 1554 TriDF
+3326 3766 TriDF
+3337 2660 TriDF
+3382 2660 TriDF
+3382 3766 TriDF
+3405 3029 TriDF
+3416 3766 TriDF
+3428 4135 TriDF
+3450 3397 TriDF
+3484 4135 TriDF
+3495 1554 TriDF
+3495 2660 TriDF
+3495 3397 TriDF
+3507 2660 TriDF
+3518 3766 TriDF
+3529 3766 TriDF
+3529 4135 TriDF
+3529 4503 TriDF
+3541 3029 TriDF
+3541 3397 TriDF
+3552 3397 TriDF
+3563 2291 TriDF
+3575 2291 TriDF
+3575 3766 TriDF
+3597 2291 TriDF
+3609 3029 TriDF
+3620 3766 TriDF
+3654 3766 TriDF
+3665 2660 TriDF
+3676 4135 TriDF
+3699 2291 TriDF
+3733 4503 TriDF
+3744 2660 TriDF
+3744 4503 TriDF
+3778 3766 TriDF
+3801 2291 TriDF
+3823 3766 TriDF
+3835 1923 TriDF
+3835 3766 TriDF
+3880 2660 TriDF
+3880 3029 TriDF
+3880 3397 TriDF
+3903 2660 TriDF
+3903 3397 TriDF
+3959 1923 TriDF
+3970 2291 TriDF
+3970 2660 TriDF
+3970 4135 TriDF
+3982 3766 TriDF
+3982 4135 TriDF
+4027 3029 TriDF
+4050 3029 TriDF
+4072 2291 TriDF
+4095 2291 TriDF
+4095 3397 TriDF
+4163 3029 TriDF
+4174 817 TriDF
+4174 3029 TriDF
+4174 4135 TriDF
+4197 1923 TriDF
+4231 1923 TriDF
+4231 2660 TriDF
+4242 3397 TriDF
+4253 2660 TriDF
+4253 3029 TriDF
+4253 4135 TriDF
+4276 3397 TriDF
+4287 3029 TriDF
+4298 3029 TriDF
+4298 3766 TriDF
+4355 2660 TriDF
+4366 3766 TriDF
+4378 2660 TriDF
+4389 3029 TriDF
+4400 3029 TriDF
+4400 4135 TriDF
+4412 2291 TriDF
+4412 3029 TriDF
+4412 3766 TriDF
+4423 2660 TriDF
+4445 4503 TriDF
+4468 1554 TriDF
+4468 2660 TriDF
+4479 1923 TriDF
+4502 2291 TriDF
+4525 1923 TriDF
+4547 2660 TriDF
+4559 3397 TriDF
+4581 3397 TriDF
+4604 1185 TriDF
+4604 2660 TriDF
+4615 2291 TriDF
+4626 2660 TriDF
+4626 3397 TriDF
+4638 2660 TriDF
+4649 2660 TriDF
+4649 4135 TriDF
+4660 2291 TriDF
+4660 3029 TriDF
+4672 2660 TriDF
+4683 3766 TriDF
+4683 4135 TriDF
+4717 1923 TriDF
+4751 3766 TriDF
+4751 4503 TriDF
+4762 2291 TriDF
+4796 3397 TriDF
+4841 3029 TriDF
+4864 1923 TriDF
+4864 3029 TriDF
+4898 3397 TriDF
+4909 2291 TriDF
+4943 3029 TriDF
+4988 1185 TriDF
+5000 2660 TriDF
+5011 1185 TriDF
+5034 1923 TriDF
+5056 3397 TriDF
+5090 3766 TriDF
+5147 2660 TriDF
+5158 2660 TriDF
+5203 4135 TriDF
+5260 2291 TriDF
+5260 3766 TriDF
+5316 1923 TriDF
+5316 3766 TriDF
+5339 2660 TriDF
+5350 3397 TriDF
+5373 2291 TriDF
+5441 3766 TriDF
+5452 2291 TriDF
+5452 3397 TriDF
+5463 1923 TriDF
+5520 3029 TriDF
+5554 3029 TriDF
+5633 1923 TriDF
+5644 4135 TriDF
+5656 1185 TriDF
+5780 2291 TriDF
+6040 1185 TriDF
+6164 1554 TriDF
+6198 1923 TriDF
+6572 1554 TriDF
+1290 2660 TriDF
+1358 3766 TriDF
+1437 2660 TriDF
+1697 3029 TriDF
+1697 4503 TriDF
+1709 4135 TriDF
+1743 4503 TriDF
+1833 4135 TriDF
+1890 2660 TriDF
+1935 4135 TriDF
+1946 3029 TriDF
+1969 3397 TriDF
+2003 3766 TriDF
+2048 3029 TriDF
+2048 3766 TriDF
+2082 3397 TriDF
+2093 4503 TriDF
+2104 4135 TriDF
+2116 3397 TriDF
+2127 3397 TriDF
+2150 2660 TriDF
+2218 3029 TriDF
+2218 4503 TriDF
+2229 3766 TriDF
+2229 4135 TriDF
+2240 4135 TriDF
+2263 4503 TriDF
+2274 3766 TriDF
+2274 4135 TriDF
+2285 3766 TriDF
+2308 3029 TriDF
+2319 4503 TriDF
+2353 3029 TriDF
+2399 1923 TriDF
+2410 3766 TriDF
+2410 4135 TriDF
+2421 4135 TriDF
+2534 3766 TriDF
+2546 3766 TriDF
+2557 4503 TriDF
+2591 2660 TriDF
+2602 4135 TriDF
+2613 2660 TriDF
+2670 4135 TriDF
+2681 3029 TriDF
+2681 3766 TriDF
+2704 4135 TriDF
+2704 4503 TriDF
+2715 4135 TriDF
+2749 3766 TriDF
+2760 4135 TriDF
+2772 3397 TriDF
+2772 4135 TriDF
+2783 3766 TriDF
+2783 4135 TriDF
+2828 3029 TriDF
+2828 3397 TriDF
+2840 2291 TriDF
+2873 3029 TriDF
+2873 3766 TriDF
+2873 4503 TriDF
+2930 3029 TriDF
+2941 817 TriDF
+2953 3766 TriDF
+2964 4503 TriDF
+2975 3766 TriDF
+2975 4503 TriDF
+3009 4135 TriDF
+3021 3766 TriDF
+3032 4503 TriDF
+3043 2291 TriDF
+3043 4135 TriDF
+3043 4503 TriDF
+3066 1923 TriDF
+3077 3766 TriDF
+3088 3029 TriDF
+3088 3766 TriDF
+3100 2660 TriDF
+3100 4503 TriDF
+3111 4503 TriDF
+3122 3397 TriDF
+3122 4503 TriDF
+3134 4503 TriDF
+3145 2660 TriDF
+3156 4503 TriDF
+3168 3766 TriDF
+3179 3397 TriDF
+3201 2660 TriDF
+3201 4503 TriDF
+3235 1923 TriDF
+3235 3766 TriDF
+3247 3766 TriDF
+3258 3766 TriDF
+3269 3029 TriDF
+3269 4135 TriDF
+3281 2660 TriDF
+3281 3029 TriDF
+3292 2660 TriDF
+3292 4135 TriDF
+3303 3766 TriDF
+3303 4135 TriDF
+3315 3029 TriDF
+3337 3766 TriDF
+3371 4135 TriDF
+3394 3397 TriDF
+3394 4135 TriDF
+3450 3397 TriDF
+3450 3766 TriDF
+3462 4135 TriDF
+3484 3029 TriDF
+3495 3766 TriDF
+3507 1554 TriDF
+3518 3766 TriDF
+3518 4135 TriDF
+3541 4135 TriDF
+3552 3766 TriDF
+3563 1923 TriDF
+3575 3029 TriDF
+3575 3766 TriDF
+3609 3397 TriDF
+3620 4135 TriDF
+3631 3766 TriDF
+3631 4503 TriDF
+3643 3766 TriDF
+3643 4135 TriDF
+3665 1554 TriDF
+3676 3766 TriDF
+3688 1554 TriDF
+3688 3029 TriDF
+3688 3397 TriDF
+3699 3029 TriDF
+3710 3029 TriDF
+3710 3397 TriDF
+3733 3397 TriDF
+3767 3397 TriDF
+3778 3029 TriDF
+3790 2291 TriDF
+3790 2660 TriDF
+3801 3766 TriDF
+3812 1923 TriDF
+3823 3397 TriDF
+3846 2660 TriDF
+3846 3029 TriDF
+3846 3766 TriDF
+3903 2660 TriDF
+3903 4135 TriDF
+3948 3397 TriDF
+3959 3029 TriDF
+3959 4135 TriDF
+3959 4503 TriDF
+3970 3397 TriDF
+3982 3029 TriDF
+4004 4503 TriDF
+4016 2660 TriDF
+4027 3397 TriDF
+4050 3766 TriDF
+4050 4135 TriDF
+4095 3397 TriDF
+4095 4135 TriDF
+4129 1923 TriDF
+4151 1923 TriDF
+4151 3397 TriDF
+4174 4503 TriDF
+4197 3397 TriDF
+4208 2660 TriDF
+4208 4503 TriDF
+4242 1554 TriDF
+4253 2291 TriDF
+4276 2660 TriDF
+4287 3766 TriDF
+4287 4503 TriDF
+4298 3397 TriDF
+4321 2660 TriDF
+4321 3397 TriDF
+4332 1923 TriDF
+4332 2660 TriDF
+4344 2660 TriDF
+4344 3397 TriDF
+4344 3766 TriDF
+4366 2291 TriDF
+4378 2660 TriDF
+4378 3029 TriDF
+4389 2660 TriDF
+4400 3397 TriDF
+4457 2660 TriDF
+4468 1923 TriDF
+4468 2660 TriDF
+4479 4503 TriDF
+4513 2291 TriDF
+4525 2660 TriDF
+4559 2660 TriDF
+4559 3397 TriDF
+4615 2660 TriDF
+4626 3397 TriDF
+4649 1554 TriDF
+4683 3029 TriDF
+4728 3766 TriDF
+4762 4135 TriDF
+4785 1185 TriDF
+4819 3029 TriDF
+4875 1923 TriDF
+4920 3397 TriDF
+4932 3397 TriDF
+4966 3397 TriDF
+5011 2660 TriDF
+5034 2660 TriDF
+5056 3029 TriDF
+5079 1923 TriDF
+5113 817 TriDF
+5169 2291 TriDF
+5214 3397 TriDF
+5248 3766 TriDF
+5328 4503 TriDF
+5339 2291 TriDF
+5418 3029 TriDF
+5418 4135 TriDF
+5429 4503 TriDF
+5531 3029 TriDF
+5554 2660 TriDF
+5599 3397 TriDF
+5678 3766 TriDF
+5723 4503 TriDF
+5757 1923 TriDF
+5769 3766 TriDF
+5859 2291 TriDF
+5882 4503 TriDF
+5916 3397 TriDF
+5938 4503 TriDF
+5972 2291 TriDF
+5972 3766 TriDF
+6289 1923 TriDF
+1234 3397 TriDF
+1471 3766 TriDF
+1607 3766 TriDF
+1641 3397 TriDF
+1652 3397 TriDF
+1709 2660 TriDF
+1720 4135 TriDF
+1765 3766 TriDF
+1777 2660 TriDF
+1810 4503 TriDF
+1878 3766 TriDF
+1935 4135 TriDF
+1957 4135 TriDF
+2014 3766 TriDF
+2014 4503 TriDF
+2025 3029 TriDF
+2048 4503 TriDF
+2104 4503 TriDF
+2127 3029 TriDF
+2127 3766 TriDF
+2150 4135 TriDF
+2161 4135 TriDF
+2172 3397 TriDF
+2172 4503 TriDF
+2184 3766 TriDF
+2206 3029 TriDF
+2218 4135 TriDF
+2263 1923 TriDF
+2263 3766 TriDF
+2285 1923 TriDF
+2285 3766 TriDF
+2297 3397 TriDF
+2308 3029 TriDF
+2342 3397 TriDF
+2353 4135 TriDF
+2365 4503 TriDF
+2387 3029 TriDF
+2387 4135 TriDF
+2399 4503 TriDF
+2500 4135 TriDF
+2512 4135 TriDF
+2523 3397 TriDF
+2546 4503 TriDF
+2568 4135 TriDF
+2579 3766 TriDF
+2591 2660 TriDF
+2602 3029 TriDF
+2613 4135 TriDF
+2636 4135 TriDF
+2647 3029 TriDF
+2670 4135 TriDF
+2693 3766 TriDF
+2704 3397 TriDF
+2704 4503 TriDF
+2738 4135 TriDF
+2749 2660 TriDF
+2749 4503 TriDF
+2760 3029 TriDF
+2760 3397 TriDF
+2760 4503 TriDF
+2772 3766 TriDF
+2806 2291 TriDF
+2806 3029 TriDF
+2851 3766 TriDF
+2907 2660 TriDF
+2907 4503 TriDF
+2919 3029 TriDF
+2930 2660 TriDF
+2930 4135 TriDF
+2941 3766 TriDF
+2953 3397 TriDF
+2964 2660 TriDF
+2964 3029 TriDF
+2964 3397 TriDF
+2964 3766 TriDF
+2987 4503 TriDF
+2998 2291 TriDF
+2998 3397 TriDF
+2998 4135 TriDF
+3032 3397 TriDF
+3032 4503 TriDF
+3066 3029 TriDF
+3088 4503 TriDF
+3111 4135 TriDF
+3111 4503 TriDF
+3122 4503 TriDF
+3134 3029 TriDF
+3145 3766 TriDF
+3156 3397 TriDF
+3156 4135 TriDF
+3168 2660 TriDF
+3168 3397 TriDF
+3179 4135 TriDF
+3179 4503 TriDF
+3190 4503 TriDF
+3201 3397 TriDF
+3213 2660 TriDF
+3224 2660 TriDF
+3235 3029 TriDF
+3235 3766 TriDF
+3247 2660 TriDF
+3258 3029 TriDF
+3258 4503 TriDF
+3292 1923 TriDF
+3292 3397 TriDF
+3292 4135 TriDF
+3326 3029 TriDF
+3326 3397 TriDF
+3348 3029 TriDF
+3360 2291 TriDF
+3382 3766 TriDF
+3394 3397 TriDF
+3405 3397 TriDF
+3405 4503 TriDF
+3416 3029 TriDF
+3416 4135 TriDF
+3428 3397 TriDF
+3428 4503 TriDF
+3450 1923 TriDF
+3450 3766 TriDF
+3484 4135 TriDF
+3495 3397 TriDF
+3507 3029 TriDF
+3518 3029 TriDF
+3541 4503 TriDF
+3552 3029 TriDF
+3609 3397 TriDF
+3631 1923 TriDF
+3631 3397 TriDF
+3631 4503 TriDF
+3643 4503 TriDF
+3676 3766 TriDF
+3676 4135 TriDF
+3699 2660 TriDF
+3710 3766 TriDF
+3710 4503 TriDF
+3733 4503 TriDF
+3744 4503 TriDF
+3756 3397 TriDF
+3767 4135 TriDF
+3790 3766 TriDF
+3790 4503 TriDF
+3801 2291 TriDF
+3801 2660 TriDF
+3835 4503 TriDF
+3869 3029 TriDF
+3880 3029 TriDF
+3880 4503 TriDF
+3891 3029 TriDF
+3914 2660 TriDF
+3948 2291 TriDF
+3970 1923 TriDF
+3982 3397 TriDF
+3993 1923 TriDF
+4050 1185 TriDF
+4050 3029 TriDF
+4061 3029 TriDF
+4072 2660 TriDF
+4072 3397 TriDF
+4084 2660 TriDF
+4095 2660 TriDF
+4095 4135 TriDF
+4117 3397 TriDF
+4140 3029 TriDF
+4151 3029 TriDF
+4151 4503 TriDF
+4185 2660 TriDF
+4197 2660 TriDF
+4208 3029 TriDF
+4208 4503 TriDF
+4231 4135 TriDF
+4242 3766 TriDF
+4287 1554 TriDF
+4287 3397 TriDF
+4310 2660 TriDF
+4310 3397 TriDF
+4321 2291 TriDF
+4344 3766 TriDF
+4355 3029 TriDF
+4366 3029 TriDF
+4366 3397 TriDF
+4378 2660 TriDF
+4378 3766 TriDF
+4389 2660 TriDF
+4412 3397 TriDF
+4434 3029 TriDF
+4445 3766 TriDF
+4457 3397 TriDF
+4491 2660 TriDF
+4513 2660 TriDF
+4525 3029 TriDF
+4604 3766 TriDF
+4604 4135 TriDF
+4615 3397 TriDF
+4694 3029 TriDF
+4762 2291 TriDF
+4796 3766 TriDF
+4807 1923 TriDF
+4898 2660 TriDF
+4909 1554 TriDF
+4943 3766 TriDF
+4954 3397 TriDF
+5045 2660 TriDF
+5056 1923 TriDF
+5056 3766 TriDF
+5079 2291 TriDF
+5203 3029 TriDF
+5226 2291 TriDF
+5305 2291 TriDF
+5384 2291 TriDF
+5452 3029 TriDF
+5509 2291 TriDF
+5531 4503 TriDF
+5882 1923 TriDF
+6040 4503 TriDF
+6051 2660 TriDF
+1596 3029 TriDF
+1652 4135 TriDF
+1765 3397 TriDF
+1799 3397 TriDF
+1844 4135 TriDF
+1867 3029 TriDF
+1935 4503 TriDF
+1969 4503 TriDF
+1991 4503 TriDF
+2037 3766 TriDF
+2071 3766 TriDF
+2082 4503 TriDF
+2116 3029 TriDF
+2127 3397 TriDF
+2127 3766 TriDF
+2138 4135 TriDF
+2172 2660 TriDF
+2172 3397 TriDF
+2195 3397 TriDF
+2206 3397 TriDF
+2229 3397 TriDF
+2251 4135 TriDF
+2263 4503 TriDF
+2297 2291 TriDF
+2297 2660 TriDF
+2308 3766 TriDF
+2308 4135 TriDF
+2342 4503 TriDF
+2353 3029 TriDF
+2353 4503 TriDF
+2387 4135 TriDF
+2399 4503 TriDF
+2410 4503 TriDF
+2432 2660 TriDF
+2444 2660 TriDF
+2444 3766 TriDF
+2444 4135 TriDF
+2478 4503 TriDF
+2489 4135 TriDF
+2500 3766 TriDF
+2512 3029 TriDF
+2512 4135 TriDF
+2512 4503 TriDF
+2546 3029 TriDF
+2546 3766 TriDF
+2568 3766 TriDF
+2579 3766 TriDF
+2591 2660 TriDF
+2636 4135 TriDF
+2636 4503 TriDF
+2670 4135 TriDF
+2681 3397 TriDF
+2693 3766 TriDF
+2704 3029 TriDF
+2726 3397 TriDF
+2749 3766 TriDF
+2783 3766 TriDF
+2794 3397 TriDF
+2817 2291 TriDF
+2840 3029 TriDF
+2840 3397 TriDF
+2862 1185 TriDF
+2862 4503 TriDF
+2873 3766 TriDF
+2896 3397 TriDF
+2896 3766 TriDF
+2896 4135 TriDF
+2919 3766 TriDF
+2941 4503 TriDF
+2964 3397 TriDF
+3021 3397 TriDF
+3043 4135 TriDF
+3054 4503 TriDF
+3066 1554 TriDF
+3066 3397 TriDF
+3077 3029 TriDF
+3100 3397 TriDF
+3111 3766 TriDF
+3122 3029 TriDF
+3145 3766 TriDF
+3156 4503 TriDF
+3168 1923 TriDF
+3179 4503 TriDF
+3213 3766 TriDF
+3213 4135 TriDF
+3224 1554 TriDF
+3224 3397 TriDF
+3235 3397 TriDF
+3247 3397 TriDF
+3292 3029 TriDF
+3303 2660 TriDF
+3303 3766 TriDF
+3303 4503 TriDF
+3315 3029 TriDF
+3326 3766 TriDF
+3337 1923 TriDF
+3348 4503 TriDF
+3371 3029 TriDF
+3371 3766 TriDF
+3371 4503 TriDF
+3394 4135 TriDF
+3416 3029 TriDF
+3428 2660 TriDF
+3428 4503 TriDF
+3439 3029 TriDF
+3439 3397 TriDF
+3439 4503 TriDF
+3450 3397 TriDF
+3450 4503 TriDF
+3473 3029 TriDF
+3484 4503 TriDF
+3507 3029 TriDF
+3552 4503 TriDF
+3586 2660 TriDF
+3597 2291 TriDF
+3597 2660 TriDF
+3609 4503 TriDF
+3620 4503 TriDF
+3631 3397 TriDF
+3654 4503 TriDF
+3665 2660 TriDF
+3665 3766 TriDF
+3676 4503 TriDF
+3688 2660 TriDF
+3688 3029 TriDF
+3688 3397 TriDF
+3688 4503 TriDF
+3699 4135 TriDF
+3710 2660 TriDF
+3722 4135 TriDF
+3733 3397 TriDF
+3733 4135 TriDF
+3744 4503 TriDF
+3767 4503 TriDF
+3823 3397 TriDF
+3823 4503 TriDF
+3835 3766 TriDF
+3857 3397 TriDF
+3891 4503 TriDF
+3903 3029 TriDF
+3903 3397 TriDF
+3903 4503 TriDF
+3925 4503 TriDF
+3937 3397 TriDF
+3948 3029 TriDF
+3959 3397 TriDF
+3959 3766 TriDF
+3959 4503 TriDF
+3970 2291 TriDF
+3970 4135 TriDF
+3993 2660 TriDF
+3993 4135 TriDF
+4004 3029 TriDF
+4016 4503 TriDF
+4050 4135 TriDF
+4061 3029 TriDF
+4084 2660 TriDF
+4095 2291 TriDF
+4106 3766 TriDF
+4117 3029 TriDF
+4117 3766 TriDF
+4129 3029 TriDF
+4140 2660 TriDF
+4151 2291 TriDF
+4163 3397 TriDF
+4197 2291 TriDF
+4208 3029 TriDF
+4208 3397 TriDF
+4242 2660 TriDF
+4242 3397 TriDF
+4253 4503 TriDF
+4265 3397 TriDF
+4276 3029 TriDF
+4287 3766 TriDF
+4298 3397 TriDF
+4298 4135 TriDF
+4310 2660 TriDF
+4310 3029 TriDF
+4344 2291 TriDF
+4344 3397 TriDF
+4366 4503 TriDF
+4378 4135 TriDF
+4389 3029 TriDF
+4389 4135 TriDF
+4423 2291 TriDF
+4423 4503 TriDF
+4445 2291 TriDF
+4445 3766 TriDF
+4457 2660 TriDF
+4457 3029 TriDF
+4468 4503 TriDF
+4491 2291 TriDF
+4513 3397 TriDF
+4513 4503 TriDF
+4536 3029 TriDF
+4536 4135 TriDF
+4536 4503 TriDF
+4547 3029 TriDF
+4592 3397 TriDF
+4615 3029 TriDF
+4626 3029 TriDF
+4626 3397 TriDF
+4638 3397 TriDF
+4683 3397 TriDF
+4728 3397 TriDF
+4739 4503 TriDF
+4751 2291 TriDF
+4751 2660 TriDF
+4785 3029 TriDF
+4807 3029 TriDF
+4807 3397 TriDF
+4819 3029 TriDF
+4819 3397 TriDF
+4819 4135 TriDF
+4841 2291 TriDF
+4864 3397 TriDF
+4875 2291 TriDF
+4875 3397 TriDF
+4887 2291 TriDF
+4932 3029 TriDF
+4966 3029 TriDF
+5022 3029 TriDF
+5045 1554 TriDF
+5067 3029 TriDF
+5067 3397 TriDF
+5079 1923 TriDF
+5113 3029 TriDF
+5169 4503 TriDF
+5509 3766 TriDF
+5757 3766 TriDF
+5791 4135 TriDF
+6040 2291 TriDF
+6176 3029 TriDF
+6323 4135 TriDF
+6391 3766 TriDF
+1234 4503 TriDF
+1381 3397 TriDF
+1629 4503 TriDF
+1663 3766 TriDF
+1709 1554 TriDF
+1743 3766 TriDF
+1743 4135 TriDF
+1788 3766 TriDF
+1833 4135 TriDF
+1867 2660 TriDF
+1912 4135 TriDF
+1924 4135 TriDF
+2059 2660 TriDF
+2059 3029 TriDF
+2071 3397 TriDF
+2082 3766 TriDF
+2116 3397 TriDF
+2116 4503 TriDF
+2161 3397 TriDF
+2218 4135 TriDF
+2229 4503 TriDF
+2251 2660 TriDF
+2274 3766 TriDF
+2274 4135 TriDF
+2365 4135 TriDF
+2365 4503 TriDF
+2376 4135 TriDF
+2376 4503 TriDF
+2387 4503 TriDF
+2399 3029 TriDF
+2410 3766 TriDF
+2421 3766 TriDF
+2432 3766 TriDF
+2455 3766 TriDF
+2455 4503 TriDF
+2500 4135 TriDF
+2512 4503 TriDF
+2523 3029 TriDF
+2523 3397 TriDF
+2568 3766 TriDF
+2579 3766 TriDF
+2591 4135 TriDF
+2625 4503 TriDF
+2659 3029 TriDF
+2659 4135 TriDF
+2670 2660 TriDF
+2670 3766 TriDF
+2681 4135 TriDF
+2726 4503 TriDF
+2738 2291 TriDF
+2738 3766 TriDF
+2760 2660 TriDF
+2760 4503 TriDF
+2794 4135 TriDF
+2794 4503 TriDF
+2840 4503 TriDF
+2851 4135 TriDF
+2862 4503 TriDF
+2873 3029 TriDF
+2873 4135 TriDF
+2873 4503 TriDF
+2885 3397 TriDF
+2896 2291 TriDF
+2896 3397 TriDF
+2919 4135 TriDF
+2941 3397 TriDF
+2941 4503 TriDF
+2953 4503 TriDF
+2964 3397 TriDF
+2975 2660 TriDF
+2975 3029 TriDF
+2975 3766 TriDF
+2975 4503 TriDF
+2987 4503 TriDF
+2998 4135 TriDF
+3009 2660 TriDF
+3009 3029 TriDF
+3009 4135 TriDF
+3032 3397 TriDF
+3032 4503 TriDF
+3043 3397 TriDF
+3054 3766 TriDF
+3054 4503 TriDF
+3066 3766 TriDF
+3066 4135 TriDF
+3077 4135 TriDF
+3100 3397 TriDF
+3111 3766 TriDF
+3122 3397 TriDF
+3122 4503 TriDF
+3134 3029 TriDF
+3134 3766 TriDF
+3156 3029 TriDF
+3168 1554 TriDF
+3190 3029 TriDF
+3235 1923 TriDF
+3235 3766 TriDF
+3235 4135 TriDF
+3247 3397 TriDF
+3269 3029 TriDF
+3281 2660 TriDF
+3281 4503 TriDF
+3292 3397 TriDF
+3303 2660 TriDF
+3303 4503 TriDF
+3315 4135 TriDF
+3315 4503 TriDF
+3326 4135 TriDF
+3337 2660 TriDF
+3348 3397 TriDF
+3360 3029 TriDF
+3371 4135 TriDF
+3382 1923 TriDF
+3382 3766 TriDF
+3394 3397 TriDF
+3405 3029 TriDF
+3405 4135 TriDF
+3416 3029 TriDF
+3416 3397 TriDF
+3416 3766 TriDF
+3416 4135 TriDF
+3428 3397 TriDF
+3428 4135 TriDF
+3462 4135 TriDF
+3462 4503 TriDF
+3473 3029 TriDF
+3473 3766 TriDF
+3473 4135 TriDF
+3484 3766 TriDF
+3484 4135 TriDF
+3495 2291 TriDF
+3507 2660 TriDF
+3518 3766 TriDF
+3518 4503 TriDF
+3529 4503 TriDF
+3541 4503 TriDF
+3552 3029 TriDF
+3552 3766 TriDF
+3563 1923 TriDF
+3563 4135 TriDF
+3563 4503 TriDF
+3575 3029 TriDF
+3586 3029 TriDF
+3586 4503 TriDF
+3609 3397 TriDF
+3609 4503 TriDF
+3620 1554 TriDF
+3631 4135 TriDF
+3643 2291 TriDF
+3654 2291 TriDF
+3654 3766 TriDF
+3654 4135 TriDF
+3665 3029 TriDF
+3665 3397 TriDF
+3688 3397 TriDF
+3699 1923 TriDF
+3699 3029 TriDF
+3710 4503 TriDF
+3733 3397 TriDF
+3733 3766 TriDF
+3744 1923 TriDF
+3744 3766 TriDF
+3744 4135 TriDF
+3756 2660 TriDF
+3756 4503 TriDF
+3767 3029 TriDF
+3767 3397 TriDF
+3778 4135 TriDF
+3778 4503 TriDF
+3790 3766 TriDF
+3790 4503 TriDF
+3801 3766 TriDF
+3835 3397 TriDF
+3846 3397 TriDF
+3846 3766 TriDF
+3857 4135 TriDF
+3869 3397 TriDF
+3891 2291 TriDF
+3903 4503 TriDF
+3914 3766 TriDF
+3914 4503 TriDF
+3925 2291 TriDF
+3925 4503 TriDF
+3937 4503 TriDF
+3948 2660 TriDF
+3948 3766 TriDF
+3970 3397 TriDF
+3970 3766 TriDF
+3970 4135 TriDF
+4050 3766 TriDF
+4061 2660 TriDF
+4061 4135 TriDF
+4072 3766 TriDF
+4084 3397 TriDF
+4095 3029 TriDF
+4106 2660 TriDF
+4106 4135 TriDF
+4106 4503 TriDF
+4117 2660 TriDF
+4129 2660 TriDF
+4129 3766 TriDF
+4129 4503 TriDF
+4140 3029 TriDF
+4140 3397 TriDF
+4151 4135 TriDF
+4163 3029 TriDF
+4163 4503 TriDF
+4174 4135 TriDF
+4174 4503 TriDF
+4208 1923 TriDF
+4208 2291 TriDF
+4208 3029 TriDF
+4231 3397 TriDF
+4242 4503 TriDF
+4253 3397 TriDF
+4253 3766 TriDF
+4265 4135 TriDF
+4276 2660 TriDF
+4276 3029 TriDF
+4276 3766 TriDF
+4287 4503 TriDF
+4298 3029 TriDF
+4310 2660 TriDF
+4321 3766 TriDF
+4332 4503 TriDF
+4344 3397 TriDF
+4366 3397 TriDF
+4366 4503 TriDF
+4378 2660 TriDF
+4378 3397 TriDF
+4389 3397 TriDF
+4412 3029 TriDF
+4412 4135 TriDF
+4445 2291 TriDF
+4445 3397 TriDF
+4457 1554 TriDF
+4457 3397 TriDF
+4457 4135 TriDF
+4468 2660 TriDF
+4468 3029 TriDF
+4491 4503 TriDF
+4513 1923 TriDF
+4513 2291 TriDF
+4525 3029 TriDF
+4525 4135 TriDF
+4536 2660 TriDF
+4547 3029 TriDF
+4547 3766 TriDF
+4559 3397 TriDF
+4559 4503 TriDF
+4604 2660 TriDF
+4626 3029 TriDF
+4638 2291 TriDF
+4638 3029 TriDF
+4649 2291 TriDF
+4660 4135 TriDF
+4672 3029 TriDF
+4694 3397 TriDF
+4728 2660 TriDF
+4728 3029 TriDF
+4785 2660 TriDF
+4785 4135 TriDF
+4796 4135 TriDF
+4807 3397 TriDF
+4830 3397 TriDF
+4853 2291 TriDF
+4864 1923 TriDF
+4864 2660 TriDF
+4875 3397 TriDF
+4887 3397 TriDF
+4887 4503 TriDF
+4898 2291 TriDF
+4898 3029 TriDF
+4898 4135 TriDF
+4909 2660 TriDF
+4932 3397 TriDF
+4966 2660 TriDF
+4966 3766 TriDF
+4977 2660 TriDF
+5000 3766 TriDF
+5045 2660 TriDF
+5045 3029 TriDF
+5067 1923 TriDF
+5079 4135 TriDF
+5101 1923 TriDF
+5113 2660 TriDF
+5135 3029 TriDF
+5135 4503 TriDF
+5203 2291 TriDF
+5203 3397 TriDF
+5237 4135 TriDF
+5248 3397 TriDF
+5294 3766 TriDF
+5361 3029 TriDF
+5418 2291 TriDF
+5452 3029 TriDF
+5463 4503 TriDF
+5475 3766 TriDF
+5531 3766 TriDF
+5542 1923 TriDF
+5554 3766 TriDF
+5565 2291 TriDF
+5565 3029 TriDF
+5712 1923 TriDF
+5780 4503 TriDF
+5814 4135 TriDF
+5848 1923 TriDF
+5870 3397 TriDF
+5916 1923 TriDF
+5950 3029 TriDF
+5972 4503 TriDF
+5995 2660 TriDF
+6153 3397 TriDF
+6323 3029 TriDF
+6379 3397 TriDF
+6549 2660 TriDF
+6560 2291 TriDF
+6622 4739 TriDF
+1.000 UL
+LTb
+770 4872 N
+770 448 L
+6220 0 V
+0 4424 V
+-6220 0 V
+Z stroke
+1.000 UP
+1.000 UL
+LTb
+stroke
+grestore
+end
+showpage
+%%Trailer
+%%DocumentFonts: Helvetica

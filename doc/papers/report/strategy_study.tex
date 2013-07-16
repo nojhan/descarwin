@@ -1,0 +1,51 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{geometry}
+\geometry{hmargin=0.5cm,vmargin=0.5cm}
+\usepackage[utf8x]{inputenc}
+                            % not available on your system
+\usepackage[table]{xcolor}
+% \usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{graphicx}        % standard LaTeX graphics tool                            % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage{multirow}
+\usepackage{lscape}
+\usepackage{float}
+\usepackage{url}
+\usepackage{caption,subfig}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+%\maketitle
+
+ 
+
+%\section*{}
+
+\begin{figure*}
+\centering
+\subfloat[zeno6:Combined strategies]{\includegraphics[scale=0.9, bb=50 50 410 302]{../plot_archive/zeno6e_{cost}:IBEA_{H^-}.eps} } 
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 30}\\
+
+\subfloat[zeno6: Length strategy]{\includegraphics[scale=0.9,bb=50 50 410 302]{../plot_archive/strategy_{cost}:length_{weight}.eps}}   
+ % zeno6_Add_nsgaII-pareto.eps: 0x0 pixel, 300dpi, 0.00x0.00 cm, bb=50 50 410 302
+
+\subfloat[zeno6: Cost strategy ]{\includegraphics[scale=0.9,bb=50 50 410 302]{../plot_archive/strategy_{cost}:cost_{weight}.eps}}
+
+ \end{figure*}
+
+\begin{figure*}
+\centering
+
+\subfloat[zeno6: Makespan$_{Add}$ strategy ]{\includegraphics[scale=0.9,bb=50 50 410 302]{../plot_archive/strategy_{cost}:makespan_{addWeight}.eps}} 
+
+\subfloat[zeno6: Makespan$_{Max}$ strategy ]{\includegraphics[scale=0.9,bb=50 50 410 302]{../plot_archive/strategy_{cost}:makespan_{maxWeight}.eps}} 
+
+ \end{figure*}
+ 
+  
+\end{document}
