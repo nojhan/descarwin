@@ -282,7 +282,7 @@ bgColorTwo=lavender,
 \headerbox{Motivation}{name=problem,column=0,row=0}{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Real-world problems generally involve several  antagonistic  objectives, like makespan and cost for planning problems. The only approaches to multiobjective AI Planning rely on linear combinations of objectives, and metric sensitive planners, that are able to give different plans for different metrics, and hence to eventually approximate the Pareto front (i.e. the set of optimal trade-offs between the antagonistic objectives).
+Real-world problems generally involve several \textcolor{purple}{\bf antagonistic objectives}, like makespan and cost for planning problems. The only approaches to multiobjective AI Planning rely on linear combinations of objectives, and metric sensitive planners, that are able to give different plans for different metrics, and hence to eventually approximate the \textcolor{purple}{\bf Pareto front} (i.e. the set of optimal trade-offs between the antagonistic objectives).
 
 \vspace{0.3em}
 }
@@ -291,26 +291,25 @@ Real-world problems generally involve several  antagonistic  objectives, like ma
 \headerbox{Multiobjective EA}{name=MOEA,column=0,below=problem}{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Evolutionary Algorithms (EAs) are: metaheuristic stochastic search, using randomized mutations/crossovers to produce solutions and natural selection of the fittest.
+Evolutionary Algorithms (EAs) are: metaheuristic \textcolor{purple}{\bf stochastic search}, using randomized mutations/crossovers to produce solutions and natural selection of the fittest.
 
-The multiobjective method used here is an Indicator Based Evolutionary Algorithms, with the hypervolume indicator (\IBEAH).
+The multiobjective method used here is an Indicator Based Evolutionary Algorithms, with the \textcolor{purple}{\bf hypervolume} indicator (\IBEAH).
 
 \vspace{0.3em}
 }
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \headerbox{Divide-and-Evolve}{name=DAE,column=0,below=MOEA}{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Divide-and-Evolve (\DAE) is an evolutionary planner that embeds a classical planner and feeds it with a sequence of subproblems.
+Divide-and-Evolve (\DAE) is an evolutionary planner that embeds a classical planner and feeds it with a sequence of \textcolor{purple}{\bf subproblems}.
 
 \begin{center}
 \includegraphics[width=1.0\textwidth]{DAEx}
 % \includegraphics[scale=0.3]{DAEx}
 \end{center}
 
-\DAE\ can embed  any  existing  planner. The  lookahead heuristic-based satisficing    planner \YAHSP\
+\DAE\ can embed any existing planner. The lookahead heuristic-based satisficing planner \textcolor{purple}{\bf YAHSP}
 %\cite{Vidal2004} 
 has been demonstrated to be the best choice when used within \DAE.
 %\cite{bibai-EvoCOP2010}
@@ -318,29 +317,26 @@ has been demonstrated to be the best choice when used within \DAE.
 \vspace{0.3em}
 }
 
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \headerbox{Benchmark Domains}{name=bench,column=0,below=DAE}{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Highly simplified version of the well-known IPC domain \ZENOTRAVEL, with the exact Pareto front:
+Highly simplified version of the well-known IPC domain \textcolor{purple}{\bf \sc ZENOTRAVEL}, with the exact Pareto front:
 
 \begin{center}
 \includegraphics[width=0.75\textwidth,angle=180]{../figures/generiqueMiniMulti180}
 \end{center}
 
-Modifications of IPC-2011 problems:\\ \ELEVATORS, \FLOORTILE, \PARCPRINTER\ and \OPENSTACKS.
+Modifications of \textcolor{purple}{\bf IPC-2011 problems}:\\ \ELEVATORS, \FLOORTILE, \PARCPRINTER\ and \OPENSTACKS.
 
 \vspace{0.3em}
 }
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \headerbox{Multiobjective Divide-and-Evolve}{name=MODAE,column=1,span=2,row=0}{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Two modifications of \DAEYAHSP\ are needed to turn it into a MOEA: (i) use a multiobjective selection (e.g. \IBEAH) in lieu of the tournament selection, (ii) use the embedded planner to compute both objectives (e.g., makespan and cost).
+Two modifications of \DAEYAHSP\ are needed to turn it into a MOEA: \textcolor{purple}{\bf (i)} use a \textcolor{purple}{\bf multiobjective selection} (e.g. \IBEAH) in lieu of the tournament selection, \textcolor{purple}{\bf (ii)} use the embedded planner to compute both objectives (e.g., \textcolor{purple}{\bf makespan and cost}).
 
 Because \YAHSP\ is both a temporal planner and a cost planner, two strategies are possible for \YAHSP\ within \MODAE: (i) it can be asked to optimize only the makespan (resp. the cost), (ii) to simply compute the cost (resp. the makespan) when executing the solution plan.
 
@@ -356,7 +352,7 @@ For each individual, the actual strategy is randomly chosen according to those w
 \headerbox{Experiments}{name=experiments,column=1,span=2,below=MODAE}{
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Parameter tuning with \PARAMILS\ on one instance of moderate complexity in each domain. 11 independent runs of 30  minutes each. Implementation within the \PARADISEO\ framework, running on Xeon X5650@2.67GHz processors, on Ubuntu 10.04.
+\textcolor{purple}{\bf Parameter tuning} with \PARAMILS\ on one instance of moderate complexity in each domain. 11 independent runs of \textcolor{purple}{\bf 30  minutes} each. Implementation within the \textcolor{purple}{\bf ParadisEO-MOEO} framework, running on Xeon X5650@2.67GHz processors, on Ubuntu 10.04.
 
 \vspace{0.3em}
 }
@@ -368,7 +364,7 @@ Parameter tuning with \PARAMILS\ on one instance of moderate complexity in each 
 
 % For \ZENOTRAVEL\ (simplified domains):
 \begin{itemize}\compresslist
-\item \MULTIZENO6\ instance: \MOLPG\ is only able to find a few points far away from the Pareto front. On the other hand, \MODAEYAHSP\ perfectly identifies the complete Pareto front in all runs for the ``Linear'' and ``Concave'' cases, while 2 runs out of 11 miss one point each in the ``Convex'' case.
+\item \MULTIZENO6\ instance: \MOLPG\ is only able to find a few points far away from the Pareto front. On the other hand, \MODAEYAHSP\ perfectly identifies the \textcolor{purple}{\bf complete Pareto front} in all runs for the ``Linear'' and ``Concave'' cases, while 2 runs out of 11 miss one point each in the ``Convex'' case.
 \item \MULTIZENO9\ instance: while \MOLPG\ fails to find a single feasible plan, \MODAEYAHSP\ is able to approach the true Pareto front rather robustly.
 \end{itemize}
 
