@@ -53,8 +53,7 @@ eoDualStatSwitch<EOSTAT>& make_dual_stat( std::string name, eoState& state )
     EOSTAT* stat_unfeasible = new EOSTAT(name+DAEX_UNFEASIBILITY_SUFFIX);
     state.storeFunctor( stat_unfeasible );
 
-    eoDualStatSwitch<EOSTAT>* dual_stat
-        = new eoDualStatSwitch<EOSTAT>( *stat_feasible, *stat_unfeasible, DAEX_FEASIBILITY_SEP);
+    eoDualStatSwitch<EOSTAT>* dual_stat = new eoDualStatSwitch<EOSTAT>( *stat_feasible, *stat_unfeasible, DAEX_FEASIBILITY_SEP);
     state.storeFunctor( dual_stat );
 
     return *dual_stat;
@@ -110,12 +109,31 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
 
         // typename OVT::Type m( 0.0, true);
         // typename OVT::Type c( 0.0, true);
-        typename OVT::Type m( std::numeric_limits<int>::max(), false);
-        typename OVT::Type c( std::numeric_limits<int>::max(), false);
-        OVT ref(m,c);
-        moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,ref);
+        //PS typename OVT::Type m( std::numeric_limits<int>::max(), false);
+        //PS typename OVT::Type c( std::numeric_limits<int>::max(), false);
+	//typename OVT::Type m(3000.0, false);
+        //typename OVT::Type c(2000.0, false);
+        //OVT ref(m,c);
+	//OVT* ref = new OVT(m,c); 
+
+	OVT* ref = new OVT(1000.0,false); // FIXME: Variable never deleted!
+
+	//(* ref)[0]= typename OVT::Type(3000.0, false);
+	//(* ref)[1]= typename OVT::Type(2000.0, false);
+	//eo::log << eo::progress << FORMAT_LEFT_FILL_W_PARAM << "******************************** REF_POINT=" << *ref << std::endl;
+
+        //PS moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,ref);
+
+	moeoDualHyperVolumeMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeMetric<OVT>(true,*ref); //PS
+	//moeoDualHyperVolumeMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeMetric<OVT>(true,1.1); //PS
+
+
         // moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,1.1);
-        eoStat<EOT,std::string>& hypervolume = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_hypervolume, "HypVol", state );
+
+        //PS eoStat<EOT,std::string>& hypervolume = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_hypervolume, "HypVol", state );
+
+        eoStat<EOT,std::string>& hypervolume = make_dual_stat_param< moeoUnaryMetricStat<EOT> >( *m_hypervolume, "HypVol", state );
+
         checkpoint.add( hypervolume );
         clog_monitor.add( hypervolume );
 
@@ -258,7 +276,7 @@ eoCheckPoint<EOT> & do_make_checkpoint_op( eoContinue<EOT> & continuator,
 
     if( eo::log.getLevelSelected() >= eo::progress ) {
 
-        // compute stas at each generation
+        // compute stat at each generation
         checkpoint->add( *time_count );
         checkpoint->add( *gen_count );
         checkpoint->add( *feasible_stat );
