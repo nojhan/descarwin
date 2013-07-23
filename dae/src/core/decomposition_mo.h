@@ -7,6 +7,7 @@
 
 #include "goal_mo.h"
 #include "decomposition.h"
+#include "../core/strategies.h"
 
 namespace daex {
 
@@ -14,8 +15,7 @@ namespace daex {
  * Definition of the objective vector traits for multi-objective  for planning problems
  */
 class DecompoMOTraits : public moeoObjectiveVectorTraits
-{
-public:
+{public:
     /**
      * Returns true if the _ith objective have to be minimzed
      * @param _i index of the objective
@@ -34,7 +34,6 @@ public:
     static unsigned int nObjectives() { return 2; }
 };
 
-
 /**
  * Definition of the objective vector for multi-objective planning problems: a vector of doubles
  *
@@ -44,7 +43,6 @@ public:
  * Replacement of population is determined on the fitness, not the objectives.
  */
 typedef moeoDualRealObjectiveVector<DecompoMOTraits, eoMaximizingDualFitness> DecompoMOObjectives;
-
 
 class DecompositionMO : public DecompositionBase<
         GoalMO, // goal type
@@ -61,6 +59,34 @@ public:
     typedef double Diversity;
     typedef MOEO<ObjectiveVector,Fitness,Diversity> MOEOType;
 
+    /*DecompositionMO(std::string strat = "makespan_add", double proba_strategy = 1.0)
+   {
+     if (strat == "random") {eo::log << eo::progress << " = random" << std::endl;
+       std::vector<Strategies::Type> default_strategies;
+       default_strategies.push_back(Strategies::length);
+       default_strategies.push_back(Strategies::cost);
+       default_strategies.push_back(Strategies::makespan_max);
+       default_strategies.push_back(Strategies::makespan_add);
+       std::vector<double> rates;
+       double rate = 1.0/default_strategies.size();
+       for( unsigned int i=0; i < default_strategies.size(); ++i ) {rates.push_back(rate);}
+       strategy(default_strategies[rng.roulette_wheel(rates)]);}
+     else if (strat == "flip-decomposition") {eo::log << eo::progress << " = flip-decomposition" << std::endl;
+       if (rng.flip(proba_strategy)) {strategy(Strategies::makespan_add);}
+       else {strategy(Strategies::cost);}} 
+     else if (strat == "length") {eo::log << eo::progress << " = length" << std::endl;
+       strategy(Strategies::length);}
+     else if (strat == "cost") {eo::log << eo::progress << " = cost" << std::endl;
+       strategy(Strategies::cost);}
+     else if (strat == "makespan-max") {eo::log << eo::progress << " = makespan-max" << std::endl;
+       strategy(Strategies::makespan_max);}
+     else if (strat == "makespan-add") {eo::log << eo::progress << " = makespan-add" << std::endl;
+       strategy(Strategies::makespan_add);}
+     else {throw std::runtime_error("Unknown MO search strategy!");}
+    }
+    */
+    Strategies::Type strategy() {return _strategy;}
+    void strategy(Strategies::Type s) {_strategy = s;}
 
     eoserial::Object* pack(void) const
     {
@@ -190,15 +216,12 @@ public:
         }
     }
 
-    virtual void readFrom(std::istream & is)
-    {
-        eoserial::readFrom( *this, is );
-    }
-    virtual void printOn(std::ostream & out) const
-    {
-        eoserial::printOn( *this, out );
-    }
+    virtual void readFrom(std::istream & is) {eoserial::readFrom( *this, is );}
+    virtual void printOn(std::ostream & out) const {eoserial::printOn( *this, out );}
 
+ protected:
+    //! The objective search strategy to be used by YAHSP at evaluation time: either length, cost, makespan_max or makespan_add.
+    Strategies::Type _strategy;
 };
 
 } // namespace daex

@@ -116,7 +116,7 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         //OVT ref(m,c);
 	//OVT* ref = new OVT(m,c); 
 
-	OVT* ref = new OVT(1000.0,false); // FIXME: Variable never deleted!
+	OVT* ref = new OVT(2.0,false); // FIXME: Variable never deleted!
 
 	//(* ref)[0]= typename OVT::Type(3000.0, false);
 	//(* ref)[1]= typename OVT::Type(2000.0, false);

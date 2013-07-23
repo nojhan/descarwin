@@ -56,18 +56,6 @@ void do_make_variation_param( eoParser & parser )
             "Probability to apply one of the mutation", 'm', "Variation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_mut" << proba_mut << std::endl;
 
-#ifdef DAE_MO
-    // the flip-decomposition seems to be the best option, as stated in the article:
-    // "Pareto-based Multiobjective AI Planning", IJCAI 2013
-    std::string strategy = parser.createParam( (std::string)"flip-decomposition", "strategy",
-            "How to change the search strategy for DAEMO_YAHSP. Either a fixed one, for all goals, among: length, cost, makespan-max or makespan-add; Either a different one for each goal: random, flip-goal (random makespan-add or cost at each goal) or flip-decomposition (random makespan-add or cost for the whole individual)",
-            'y', "Multi-Objective").value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strategy" << strategy << std::endl;
-
-    double proba_strategy = parser.createParam( (double)0.5, "proba-strategy",
-            "Probability to choose makespan-add metric when using the flip-goal or flip-decomposition strategies", 'p', "Multi-Objective" ).value();
-    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_strategy" << proba_strategy << std::endl;
-#endif
     /*
     unsigned int maxtry_candidate = parser.createParam( (unsigned int)11, "maxtry-candidate", 
             "Maximum number of atoms to try when searching for a candidate in the changeAtom mutation", 'y', "Misc" ).value();
@@ -124,10 +112,9 @@ eoGenOp<EOT> & do_make_variation_op( eoParser & parser, eoState & state, pddlLoa
     double proba_mut = parser.valueOf<double>("proba-mut");
 
 #ifdef DAE_MO
-    std::string strategy = parser.valueOf<std::string>("strategy");
-    double proba_strategy = parser.valueOf<double>("proba-strategy");
+    //    std::string strategy = parser.valueOf<std::string>("strategy");
+    //    double proba_strategy = parser.valueOf<double>("proba-strategy");
 #endif
-
 
     unsigned int maxtry_candidate = 0; // deactivated by default: should try every candidates
     unsigned int maxtry_mutex = 0;     // deactivated by default: should try every candidates
@@ -141,7 +128,7 @@ eoGenOp<EOT> & do_make_variation_op( eoParser & parser, eoState & state, pddlLoa
 
     // if we want to use an extern delgoal
     MutationDelGoal<EOT> * delgoal;
-    if( ext_delgoal ) {
+    if (ext_delgoal) {
         delgoal = ext_delgoal;
     } else {
         delgoal = new MutationDelGoal<EOT>;
@@ -177,30 +164,24 @@ eoGenOp<EOT> & do_make_variation_op( eoParser & parser, eoState & state, pddlLoa
     state.storeFunctor( variator );
 
 #ifdef DAE_MO
-    // FIXME permits to choose a different MO search strategies subset from the parser? And rates ?
-    eoMonOp<EOT> * set_strat;
-    if( strategy == "random" ) {
-        set_strat = new daex::StrategyRandom<EOT>(/*default strategies and rates*/);
-    } else if( strategy == "flip-goal" ) {
-        set_strat = new daex::StrategyFlipGoal<EOT>( proba_strategy );
-    } else if( strategy == "flip-decomposition" ) {
-        set_strat = new daex::StrategyFlipDecomposition<EOT>( proba_strategy );
-    } else if( strategy == "length" ) {
-        set_strat = new daex::StrategyFixed<EOT>( Strategies::length );
-    } else if( strategy == "cost" ) {
-        set_strat = new daex::StrategyFixed<EOT>( Strategies::cost );
-    } else if( strategy == "makespan-max" ) {
-        set_strat = new daex::StrategyFixed<EOT>( Strategies::makespan_max );
-    } else if( strategy == "makespan-add" ) {
-        set_strat = new daex::StrategyFixed<EOT>( Strategies::makespan_add );
-    } else {
-        throw std::runtime_error("Unknown MO search strategy");
-    }
-    state.storeFunctor( set_strat );
+    // FIXME Enable to choose a different MO search strategies subset from the parser? And rates ?
+    /*   eoMonOp<EOT> * set_strat;
+                                #ifndef NDEBUG
+                                eo::log << eo::xdebug << "General Strategy =" << strategy << std::endl;
+                                #endif
+    if      (strategy == "random") {set_strat = new daex::StrategyRandom<EOT>();} //default strategies and rates
+    else if (strategy == "flip-goal") {set_strat = new daex::StrategyFlipGoal<EOT>( proba_strategy );}
+    else if (strategy == "flip-decomposition") {set_strat = new daex::StrategyFlipDecomposition<EOT>( proba_strategy );} 
+    else if (strategy == "length") {set_strat = new daex::StrategyFixed<EOT>( Strategies::length );}
+    else if (strategy == "cost") {set_strat = new daex::StrategyFixed<EOT>( Strategies::cost );}
+    else if (strategy == "makespan-max") {set_strat = new daex::StrategyFixed<EOT>( Strategies::makespan_max );}
+    else if (strategy == "makespan-add") {set_strat = new daex::StrategyFixed<EOT>( Strategies::makespan_add );}
+    else {throw std::runtime_error("Unknown MO search strategy");}
+    state.storeFunctor( set_strat );*/
     eoSequentialOp<EOT> * movariat = new eoSequentialOp<EOT>();
     state.storeFunctor( movariat );
     movariat->add(  *variator, 1.0 ); // always call
-    movariat->add( *set_strat, 1.0 ); // always call
+    //    movariat->add( *set_strat, 1.0 ); // always call
 
     return *movariat; // variation + set strategy
 #else

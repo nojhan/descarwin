@@ -14,8 +14,7 @@ namespace daex {
  */
 template<class EOT>
 class StrategyRandom : public eoMonOp<EOT>
-{
-public:
+{public:
 
     StrategyRandom( const std::vector<Strategies::Type> strategies, const std::vector<double> rates )
         : _strategies( strategies ), _rates(rates)
@@ -74,14 +73,12 @@ protected:
     std::vector<double> _rates;
 };
 
-
 /** Configure a different strategy for each goal, either makespan_add or cost.
  *  Given a pobability to use the makespan strategy.
  */
 template<class EOT>
 class StrategyFlipGoal : public eoMonOp<EOT>
-{
-public:
+{public:
     //! @param proba_strategy_makespan Probability to use the makespan search strategy
     StrategyFlipGoal( double proba_strategy_makespan ) : _proba_strategy_makespan(proba_strategy_makespan) {}
 
@@ -90,62 +87,52 @@ public:
         bool modified=false;
         for( typename EOT::iterator igoal=decompo.begin(), end=decompo.end(); igoal!=end; ++igoal) {
             if( rng.flip(_proba_strategy_makespan) ) {
-                if( igoal->strategy() != Strategies::makespan_add ) {
-                    igoal->strategy( Strategies::makespan_add );
-                    modified=true;
-                }
-            } else {
-                if( igoal->strategy() != Strategies::cost ) {
-                    igoal->strategy( Strategies::cost );
-                    modified=true;
-                }
-            }
+                    if( igoal->strategy() != Strategies::makespan_add ) {igoal->strategy( Strategies::makespan_add ); modified=true;}
+            } else {if( igoal->strategy() != Strategies::cost ) {igoal->strategy( Strategies::cost ); modified=true;}}
         } // for igoal in decompo
         return modified;
     }
-
 protected:
     double _proba_strategy_makespan;
 };
-
 
 /** Configure a random strategy for all the goals, either makespan_add or cost.
  */
 template<class EOT>
 class StrategyFlipDecomposition : public eoMonOp<EOT>
-{
-public:
+{public:
     //! @param proba_strategy_makespan Probability to use the makespan search strategy
     StrategyFlipDecomposition( double proba_strategy_makespan ) : _proba_strategy_makespan(proba_strategy_makespan) {}
 
     bool operator()( EOT & decompo )
     {
         Strategies::Type strategy = Strategies::cost;
-        if( rng.flip(_proba_strategy_makespan) ) {
-            strategy = Strategies::makespan_add;
-        }
+        if (rng.flip(_proba_strategy_makespan)) {strategy = Strategies::makespan_add;}
 
-        bool modified=false;
-        for( typename EOT::iterator igoal=decompo.begin(), end=decompo.end(); igoal!=end; ++igoal) {
-            if( igoal->strategy() != strategy ) {
-                igoal->strategy( strategy );
-                modified=true;
-            }
-        } // for igoal in decompo
+	switch(strategy) {
+	  case Strategies::length: {eo::log << eo::progress << " LENGTH!" << std::endl; break;}
+	  case Strategies::cost: {eo::log << eo::progress << " COST!" << std::endl; break;}
+	  case Strategies::makespan_add: {eo::log << eo::progress << " MAKESPAN_ADD!" << std::endl; break;}
+	  case Strategies::makespan_max: {eo::log << eo::progress << " MAKESPAN_MAX!" << std::endl; break;}
+          default: {eo::log << eo::progress << " DEFAULT!" << std::endl; break;}
+	}
+
+        bool modified=false; if (decompo.strategy() != strategy) {decompo.strategy(strategy); modified=true;}
+
+	/*        for( typename EOT::iterator igoal=decompo.begin(), end=decompo.end(); igoal!=end; ++igoal) {
+            if( igoal->strategy() != strategy ) {igoal->strategy( strategy ); modified=true;}
+	    }*/
         return modified;
     }
-
 protected:
     double _proba_strategy_makespan;
 };
-
 
 /** Use the given strategy for each goal in a decomposition
  */
 template<class EOT>
 class StrategyFixed : public eoMonOp<EOT>
-{
-public:
+{public:
     //! @param use_makespan Use the makespan search strategy of true, else the cost one.
     StrategyFixed( Strategies::Type strategy ) : _strategy(strategy) {}
 
@@ -153,20 +140,14 @@ public:
     {
         bool modified=false;
         for( typename EOT::iterator igoal=decompo.begin(), end=decompo.end(); igoal!=end; ++igoal) {
-            if( igoal->strategy() != _strategy ) {
-                igoal->strategy( _strategy );
-                modified=true;
-            }
-        } // for igoal in decompo
+            if( igoal->strategy() != _strategy ) {igoal->strategy( _strategy ); modified=true;}
+        }
         return modified;
     }
-
 protected:
     Strategies::Type _strategy;
 };
 
-
 } // namespace daex
-
 #endif // __MO_STRATEGY_H__
 

@@ -180,10 +180,12 @@ public:
                         intermediate_goal_state[i] =  iatom->fluent();
                         i++;
                     }
-                    assert( i ==  igoal->size());
+                                assert( i ==  igoal->size());
                     //  search a plan towards the current goal
                     bitarray_copy( previous_state, *get_current_state(), fluents_nb );
+
                     code = solve_next( decompo, *igoal, intermediate_goal_state, igoal->size(), daeCptYahspEval<EOT>::_b_max_in );
+
                     free(intermediate_goal_state);
 
                     if( code != PLAN_FOUND ) {
@@ -205,7 +207,7 @@ public:
                     decompo.b_max( daeCptYahspEval<EOT>::_b_max_last ); // VV : set b_max for the decomposition
 
                     bitarray_copy( previous_state, *get_current_state(), fluents_nb );
-                    unsigned int code = solve_next( decompo, *(decompo.end()), goal_state, goal_state_nb, daeCptYahspEval<EOT>::_b_max_last );
+                    unsigned int code = solve_next( decompo, *(decompo.end()), goal_state, goal_state_nb, daeCptYahspEval<EOT>::_b_max_last ); // Sur quoi pointe  *(decompo.end()) ???? (PS)
 
                     if( code == PLAN_FOUND ) {
                         compress( decompo );
@@ -253,13 +255,29 @@ public:
         post_call( decompo );
     };
 
-
 protected:
-
     //! Call yahsp from a built fluent state to another and update decomposition's plans
     unsigned int solve_next( EOT & decompo, typename EOT::AtomType& atom, Fluent** next_state, unsigned int next_state_nb, long max_evaluated_nodes )
-    {
-        pre_step( atom );
+    { //eo::log << eo::progress << "DECOMPO=" << decompo << std::endl;
+      pre_step( atom );
+
+#ifdef DAE_MO // FIXME : A remonter au niveau de l'évaluation de toute la décomposition plutôt qu'à chaque goal.
+       switch( decompo.strategy() ) {
+            case daex::Strategies::length: {//eo::log << eo::progress << " = length" << std::endl;
+	        yahsp_set_optimize_length(); break; } // search for short plans
+            case daex::Strategies::cost: {//eo::log << eo::progress << " = cost" << std::endl;
+                // search for plans with lower (additive) costs
+                // NOTE: YAHSP does only optimize additive cost, but may compute max cost after compression.
+                yahsp_set_optimize_cost(); break; }
+            case daex::Strategies::makespan_add: {//eo::log << eo::progress << " = makespan_add" << std::endl;
+                yahsp_set_optimize_makespan_add(); break; }
+            case daex::Strategies::makespan_max: {//eo::log << eo::progress << " = makespan_max" << std::endl;
+                yahsp_set_optimize_makespan_max(); break; }
+            default: {//eo::log << eo::progress << " = default" << std::endl;
+                /* use default yahsp settings */ break;
+            }
+        } // switch strategy
+#endif
                                  #ifndef NDEBUG
                                  eo::log << eo::xdebug << "ok" << std::endl;
                                  eo::log << eo::xdebug << "\t\tcall the solver...";

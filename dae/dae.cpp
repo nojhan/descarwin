@@ -33,6 +33,16 @@ inline void LOG_LOCATION( eo::Levels level )
 #endif
 */
 
+std::string OrdinalForm(int n)
+{
+    std::stringstream buffer;
+    switch (n % 10) {case 1: buffer << n << "st"; break;
+                     case 2: buffer << n << "nd"; break;
+                     case 3: buffer << n << "rd"; break;
+                     default: buffer << n << "th"; break;}
+    return buffer.str();
+}
+
 int main ( int argc, char* argv[] )
 {
     // SYSTEM
@@ -209,38 +219,50 @@ int main ( int argc, char* argv[] )
      ******************/
 
     daex::Init<T>& init = daex::do_make_init_op<T>( parser, state, pddl );
+    eo::log << eo::progress << "Init completed" << std::endl;
 
     // randomly generate the population with the init operator
     eoPop<T> pop = eoPop<T>( pop_size, init ) ;
+
+    /*#ifdef DAE_MO
+    eo::log << eo::progress << "Initial population strategy status=" << std::endl;
+    for( unsigned int i=1; i<pop.size(); ++i ) {
+        switch( pop[i].strategy() ) {
+            case daex::Strategies::length: {eo::log << eo::progress << "length "; break; }
+            case daex::Strategies::cost: {eo::log << eo::progress << "cost "; break; }
+            case daex::Strategies::makespan_add: {eo::log << eo::progress << "makespan_add "; break; }
+	    case daex::Strategies::makespan_max: {eo::log << eo::progress << "makespan_max "; break; }
+            default: {eo::log << eo::progress << "default" ; break;}
+	}
+      eo::log << eo::progress << std::endl;
+    }
+    #endif*/
 
     // used to pass the eval count through the several eoEvalFuncCounter evaluators
     unsigned int eval_count = 0;
 
     TimeVal best_makespan = INT_MAX;
 
-#ifndef SINGLE_EVAL_ITER_DUMP
-    std::string dump_sep = ".";
-    unsigned int dump_file_count = 1;
-    std::string metadata = "domain " + domain + "\n" + IPC_PLAN_COMMENT + "instance " + instance;
-#endif
+                           #ifndef SINGLE_EVAL_ITER_DUMP
+                               std::string dump_sep = ".";
+                               unsigned int dump_file_count = 1;
+                               std::string metadata = "domain " + domain + "\n" + IPC_PLAN_COMMENT + "instance " + instance;
+                           #endif
 
-#ifndef NDEBUG
-    eo::log << eo::progress << "OK" << std::endl;
-    //eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
-    eo::log.flush();
-    eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
-#endif
+                           #ifndef NDEBUG
+                               eo::log << eo::progress << "OK" << std::endl;
+                               //eo::log << eo::progress << "Note: dual fitness is printed as two numbers: a value followed by a boolean (0=unfeasible, 1=feasible)" << std::endl;
+                               eo::log.flush();
+                               eo::log << eo::debug << "Legend: \n\t- already valid, no eval\n\tx plan not found\n\t* plan found\n\ta add atom\n\tA add goal\n\td delete atom\n\tD delete goal\n\tC crossover" << std::endl;
+                           #endif
 
     unsigned int b_max_fixed = parser.valueOf<unsigned int>("bmax-fixed");
     if( b_max_fixed == 0 ) {
         // Heuristics for the estimation of an optimal b_max
         if( insemination ) {
             b_max_fixed = daex::estimate_bmax_insemination( parser, pddl, pop, init.l_max() );
-        } else {
-            // if not insemination, incremental search strategy
-            b_max_fixed  = daex::estimate_bmax_incremental<T>( 
-                    pop, parser, init.l_max(), eval_count, plan_file, best_makespan, dump_sep, dump_file_count, metadata 
-                    );
+        } else {// if not insemination, incremental search strategy
+            b_max_fixed = daex::estimate_bmax_incremental<T>(pop, parser, init.l_max(), eval_count, plan_file, best_makespan, dump_sep, dump_file_count, metadata);
         }
     }
 
@@ -248,10 +270,10 @@ int main ( int argc, char* argv[] )
     double b_max_last_weight = parser.valueOf<double>("bmax-last-weight"); 
 
     unsigned int b_max_last = static_cast<unsigned int>( std::floor( b_max_in * b_max_last_weight ) );
-#ifndef NDEBUG
-    eo::log << eo::logging << std::endl << "\tb_max for intermediate goals, b_max_in: "   << b_max_in   << std::endl;
-    eo::log << eo::logging              << "\tb_max for        final goal,  b_max_last: " << b_max_last << std::endl;
-#endif
+                           #ifndef NDEBUG
+                               eo::log << eo::logging << std::endl << "\tb_max for intermediate goals, b_max_in: "   << b_max_in   << std::endl;
+                               eo::log << eo::logging              << "\tb_max for        final goal,  b_max_last: " << b_max_last << std::endl;
+                           #endif
 
 # ifdef WITH_MPI
     /***********************
@@ -332,6 +354,7 @@ int main ( int argc, char* argv[] )
     }
 
 # endif // WITH_MPI
+
     // a first evaluation of generated pop
     pop_eval( pop, pop );
 
@@ -377,12 +400,14 @@ int main ( int argc, char* argv[] )
 #endif
             );
 
+    eo::log << eo::progress << "******************* Variator *************"<< std::endl;
     // VARIATION
     daex::MutationDelGoal<T>* delgoal = new daex::MutationDelGoal<T>;
     eoGenOp<T> & variator = daex::do_make_variation_op<T>( parser, state, pddl, delgoal );
 
     // ALGORITHM
 #ifdef DAE_MO // MULTI-OBJECTIVE
+    eo::log << eo::progress << "******************* Metric *************"<< std::endl;
     moeoHypervolumeBinaryMetric<T::ObjectiveVector> metric(rho);
     moeoExpBinaryIndicatorBasedDualFitnessAssignment<T> assignment( metric, kappa );
 
@@ -410,7 +435,7 @@ int main ( int argc, char* argv[] )
     // start at the best element of the init
     T best = pop.best_element();
 #endif
-    unsigned int run = 0;
+    unsigned int run = 1;
 
     // evaluate an empty decomposition, for comparison with decomposed solutions
     T empty_decompo;
@@ -422,6 +447,8 @@ int main ( int argc, char* argv[] )
     }
 # else // WITH_MPI
     eval( empty_decompo );
+    eo::log << eo::progress << "******************* Empty Decomposition Evaluation *************"<< std::endl;
+
 # endif // WITH_MPI
 
     /**
@@ -622,7 +649,7 @@ int main ( int argc, char* argv[] )
             while( true )
             {
 #ifndef NDEBUG
-                eo::log << eo::progress << "Start the " << run << "th run..." << std::endl;
+	      eo::log << eo::progress << "Start the " << OrdinalForm(run) << " run..." << std::endl;
 
                 // call the checkpoint (log and stats output) on the pop from the init
                 checkpoint( pop );

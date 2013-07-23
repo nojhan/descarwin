@@ -26,6 +26,18 @@ void do_make_init_param( eoParser & parser )
     double b_max_increase_coef = parser.createParam( (double)2, "bmax-increase-coef", "Multiplier increment for the computation of b_max", 'K', "Evaluation" ).value();
     eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "b_max_increase_coef" << b_max_increase_coef << std::endl;
 
+#ifdef DAE_MO
+    // the flip-decomposition seems to be the best option, as stated in the article:
+    // "Pareto-based Multiobjective AI Planning", IJCAI 2013
+    std::string strategy = parser.createParam( (std::string)"flip-decomposition", "strategy",
+            "How to change the search strategy for DAEMO_YAHSP. Either a fixed one, for all goals, among: length, cost, makespan-max or makespan-add; Either a different one for each goal: random, flip-goal (random makespan-add or cost at each goal) or flip-decomposition (random makespan-add or cost for the whole individual)",
+            'y', "Multi-Objective").value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "strategy" << strategy << std::endl;
+
+    double proba_strategy = parser.createParam( (double)0.5, "proba-strategy",
+            "Probability to choose makespan-add metric when using the flip-goal or flip-decomposition strategies", 'p', "Multi-Objective" ).value();
+    eo::log << eo::logging << FORMAT_LEFT_FILL_W_PARAM << "proba_strategy" << proba_strategy << std::endl;
+#endif
 }
 
 
@@ -34,24 +46,27 @@ daex::Init<EOT> & do_make_init_op( eoParser & parser, eoState & state, daex::pdd
 {
     unsigned int l_max_init_coef = parser.valueOf<unsigned int>("lmax-initcoef");
     unsigned int l_min = parser.valueOf<unsigned int>("lmin");
-
+#ifdef DAE_MO
+    std::string strategy = parser.valueOf<std::string>("strategy");
+    double proba_strategy = parser.valueOf<double>("proba-strategy");
+    daex::Init<EOT>* init = new daex::Init<EOT>(pddl.chronoPartitionAtom(), strategy, proba_strategy, l_max_init_coef, l_min);
+#else
     // l'initialisation se fait en fonction de la liste des dates au plus tot possibles (start time set)
     // Note : dans le init, l_max est réglé au double du nombre de dates dans la partition
     daex::Init<EOT>* init = new daex::Init<EOT>( pddl.chronoPartitionAtom(), l_max_init_coef, l_min );
+#endif   
     state.storeFunctor( init );
+                           #ifndef NDEBUG
+                               eo::log << eo::logging << std::endl;
+                               eo::log << eo::logging << "\tChrono partition size: " << pddl.chronoPartitionAtom().size() << std::endl;
+                               eo::log << eo::logging << "\tl_max: " << init->l_max() << std::endl;
 
-#ifndef NDEBUG
-    eo::log << eo::logging << std::endl;
-    eo::log << eo::logging << "\tChrono partition size: " << pddl.chronoPartitionAtom().size() << std::endl;
-    eo::log << eo::logging << "\tl_max: " << init->l_max() << std::endl;
-
-    eo::log << eo::debug << "\tChrono partition dates(#atoms): ";
-    for( daex::ChronoPartition::const_iterator it = pddl.chronoPartitionAtom().begin(), end = pddl.chronoPartitionAtom().end(); it != end; ++it ) {
-        eo::log << eo::debug << it->first << "(" << it->second.size() << ") ";
-    }
-    eo::log << eo::debug << std::endl;
-#endif
-
+                               eo::log << eo::debug << "\tChrono partition dates(#atoms): ";
+                               for( daex::ChronoPartition::const_iterator it = pddl.chronoPartitionAtom().begin(), end = pddl.chronoPartitionAtom().end(); it != end; ++it ) {
+                                   eo::log << eo::debug << it->first << "(" << it->second.size() << ") ";
+                               }
+                               eo::log << eo::debug << std::endl;
+                           #endif
     return *init;
 }
 

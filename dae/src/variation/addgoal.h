@@ -87,20 +87,11 @@ public:
 #ifndef NDEBUG
                 eo::log << eo::xdebug << "\tgenerate random goal in ] " << 0 << ", " << decompo.iter_at( 0 )->earliest_start_time() << " ]" << std::endl;
 #endif
-
-
-                typename EOT::AtomType new_goal = random_goal(
-                            0, 
-                            decompo.iter_at( 0 )->earliest_start_time()
-                        );
-
-
+                typename EOT::AtomType new_goal = random_goal(0, decompo.iter_at( 0 )->earliest_start_time());
 #ifndef NDEBUG
                 eo::log << eo::xdebug << "\tgoal: " << new_goal.earliest_start_time() << "(" << new_goal.size() << ")" << std::endl;
                 eo::log << eo::xdebug << "\tpush front" << std::endl;
 #endif
-
-
                 //decompo.insert( decompo.begin(), new_goal );
                 decompo.push_front( new_goal );
 
