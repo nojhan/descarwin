@@ -75,19 +75,19 @@ class daemoYahspEval : public daeYahspEval<EOT>
 
     //! Set YAHSP strategy according to the current decomposition strategy
     void pre_call(EOT& decompo)
-    {eo::log << eo::progress << "Strategy=" << decompo.strategy();
+    {//eo::log << eo::progress << "Strategy=" << decompo.strategy();
        switch (decompo.strategy()) {
-         case daex::Strategies::length: {eo::log << eo::progress << " = length" << std::endl;
+         case daex::Strategies::length: {eo::log << eo::debug << " = length";
 	   yahsp_set_optimize_length(); break; } // search for short plans
-         case daex::Strategies::cost: {eo::log << eo::progress << " = cost" << std::endl;
+         case daex::Strategies::cost: {eo::log << eo::debug << " = cost";
 	   // search for plans with lower (additive) costs
 	   // NOTE: YAHSP does only optimize additive cost, but may compute max cost after compression.
 	   yahsp_set_optimize_cost(); break; }
-         case daex::Strategies::makespan_add: {eo::log << eo::progress << " = makespan_add" << std::endl;
+         case daex::Strategies::makespan_add: {eo::log << eo::debug << " = makespan_add";
 	   yahsp_set_optimize_makespan_add(); break; }
-         case daex::Strategies::makespan_max: {eo::log << eo::progress << " = makespan_max" << std::endl;
+         case daex::Strategies::makespan_max: {eo::log << eo::debug << " = makespan_max";
 	   yahsp_set_optimize_makespan_max(); break; }
-         default: {eo::log << eo::progress << " = default" << std::endl;
+         default: {eo::log << eo::debug << " = default";
 	   /* use default yahsp settings */ break;}
        }
     }

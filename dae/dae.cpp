@@ -313,7 +313,7 @@ int main ( int argc, char* argv[] )
 
     eo::log << eo::progress << "OK" << std::endl;
 
-    eo::log << eo::progress << "Evaluating the first population...";
+    eo::log << eo::progress << "Evaluating the first population..." << std::endl;
     eo::log.flush();
 #endif
 
@@ -441,7 +441,7 @@ int main ( int argc, char* argv[] )
     T empty_decompo;
 
 #ifdef DAE_MO
-    // Set the YAHSP strategy decomposition according to the strategy parameter. FIXMZ : mettre en facteur avec le code dans init.h
+    // Set the YAHSP strategy decomposition according to the strategy parameter. FIXME : mettre en facteur avec le code dans init.h
     std::string strat = parser.valueOf<std::string>("strategy");
     double proba_strategy = parser.valueOf<double>("proba-strategy");
     if (strat == "random") {eo::log << eo::progress << " Empty Decomposition: random" << std::endl;
