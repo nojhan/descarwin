@@ -437,8 +437,37 @@ int main ( int argc, char* argv[] )
 #endif
     unsigned int run = 1;
 
-    // evaluate an empty decomposition, for comparison with decomposed solutions
+    // Evaluate an empty decomposition, for comparison with decomposed solutions
     T empty_decompo;
+
+#ifdef DAE_MO
+    // Set the YAHSP strategy decomposition according to the strategy parameter. FIXMZ : mettre en facteur avec le code dans init.h
+    std::string strat = parser.valueOf<std::string>("strategy");
+    double proba_strategy = parser.valueOf<double>("proba-strategy");
+    if (strat == "random") {eo::log << eo::progress << " Empty Decomposition: random" << std::endl;
+      std::vector<daex::Strategies::Type> default_strategies;
+      default_strategies.push_back(daex::Strategies::length);
+      default_strategies.push_back(daex::Strategies::cost);
+      default_strategies.push_back(daex::Strategies::makespan_max);
+      default_strategies.push_back(daex::Strategies::makespan_add);
+      std::vector<double> rates;
+      double rate = 1.0/default_strategies.size();
+      for (unsigned int i=0; i < default_strategies.size(); ++i) {rates.push_back(rate);}
+      empty_decompo.strategy(default_strategies[rng.roulette_wheel(rates)]);}
+    else if (strat == "flip-decomposition") {eo::log << eo::progress << " Empty Decomposition: flip-decomposition" << std::endl;
+      if (rng.flip(proba_strategy)) { empty_decompo.strategy(daex::Strategies::makespan_add);}
+      else { empty_decompo.strategy(daex::Strategies::cost);}} 
+    else if (strat == "length") {eo::log << eo::progress << " Empty Decomposition: length" << std::endl;
+      empty_decompo.strategy(daex::Strategies::length);}
+    else if (strat == "cost") {eo::log << eo::progress << " Empty Decomposition: cost" << std::endl;
+      empty_decompo.strategy(daex::Strategies::cost);}
+    else if (strat == "makespan-max") {eo::log << eo::progress << " Empty Decomposition: makespan-max" << std::endl;
+      empty_decompo.strategy(daex::Strategies::makespan_max);}
+    else if (strat == "makespan-add") {eo::log << eo::progress << " Empty Decomposition:  makespan-add" << std::endl;
+      empty_decompo.strategy(daex::Strategies::makespan_add);}
+    else {throw std::runtime_error("Unknown MO search strategy");}
+#endif
+
 # ifdef WITH_MPI
     {
         eoPop<T> tempPop;

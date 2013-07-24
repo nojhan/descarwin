@@ -140,7 +140,7 @@ eo::log.flush();
             decompo.push_back( goal );
         } // for idate in t_candidates
 
-#ifdef DAE_MO // FIXME: mettre en facteur avec le code identique dans DecompositionMO
+#ifdef DAE_MO
 	if (_strategy == "random") {eo::log << eo::progress << " Init Strategy: random" << std::endl;
 	  std::vector<Strategies::Type> default_strategies;
 	  default_strategies.push_back(Strategies::length);
@@ -149,7 +149,7 @@ eo::log.flush();
 	  default_strategies.push_back(Strategies::makespan_add);
 	  std::vector<double> rates;
 	  double rate = 1.0/default_strategies.size();
-	  for( unsigned int i=0; i < default_strategies.size(); ++i ) {rates.push_back(rate);}
+	  for (unsigned int i=0; i < default_strategies.size(); ++i) {rates.push_back(rate);}
 	  decompo.strategy(default_strategies[rng.roulette_wheel(rates)]);}
 	else if (_strategy == "flip-decomposition") {eo::log << eo::progress << " Init Strategy: flip-decomposition" << std::endl;
 	  if (rng.flip(_proba_strategy)) { decompo.strategy(Strategies::makespan_add);}

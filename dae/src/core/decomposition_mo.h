@@ -59,32 +59,34 @@ public:
     typedef double Diversity;
     typedef MOEO<ObjectiveVector,Fitness,Diversity> MOEOType;
 
-    /*DecompositionMO(std::string strat = "makespan_add", double proba_strategy = 1.0)
-   {
-     if (strat == "random") {eo::log << eo::progress << " = random" << std::endl;
-       std::vector<Strategies::Type> default_strategies;
-       default_strategies.push_back(Strategies::length);
-       default_strategies.push_back(Strategies::cost);
-       default_strategies.push_back(Strategies::makespan_max);
-       default_strategies.push_back(Strategies::makespan_add);
-       std::vector<double> rates;
-       double rate = 1.0/default_strategies.size();
-       for( unsigned int i=0; i < default_strategies.size(); ++i ) {rates.push_back(rate);}
-       strategy(default_strategies[rng.roulette_wheel(rates)]);}
-     else if (strat == "flip-decomposition") {eo::log << eo::progress << " = flip-decomposition" << std::endl;
-       if (rng.flip(proba_strategy)) {strategy(Strategies::makespan_add);}
-       else {strategy(Strategies::cost);}} 
-     else if (strat == "length") {eo::log << eo::progress << " = length" << std::endl;
-       strategy(Strategies::length);}
-     else if (strat == "cost") {eo::log << eo::progress << " = cost" << std::endl;
-       strategy(Strategies::cost);}
-     else if (strat == "makespan-max") {eo::log << eo::progress << " = makespan-max" << std::endl;
-       strategy(Strategies::makespan_max);}
-     else if (strat == "makespan-add") {eo::log << eo::progress << " = makespan-add" << std::endl;
-       strategy(Strategies::makespan_add);}
-     else {throw std::runtime_error("Unknown MO search strategy!");}
-    }
-    */
+    /*    DecompositionMO() : _strategy(set_strategy()) {};
+    Strategies::Type set_strategy() {
+      std::string strat = parser.valueOf<std::string>("strategy");
+      double proba_strategy = parser.valueOf<double>("proba-strategy");
+      if (strat == "random") {eo::log << eo::progress << " = random" << std::endl;
+	std::vector<Strategies::Type> default_strategies;
+	default_strategies.push_back(Strategies::length);
+	default_strategies.push_back(Strategies::cost);
+	default_strategies.push_back(Strategies::makespan_max);
+	default_strategies.push_back(Strategies::makespan_add);
+	std::vector<double> rates;
+	double rate = 1.0/default_strategies.size();
+	for (unsigned int i=0; i < default_strategies.size(); ++i) {rates.push_back(rate);}
+	return default_strategies[rng.roulette_wheel(rates)];}
+      else if (strat == "flip-decomposition") {eo::log << eo::progress << " = flip-decomposition" << std::endl;
+	if (rng.flip(proba_strategy)) {return Strategies::makespan_add;}
+	else {return Strategies::cost;}}
+      else if (strat == "length") {eo::log << eo::progress << " = length" << std::endl;
+	return Strategies::length;}
+      else if (strat == "cost") {eo::log << eo::progress << " = cost" << std::endl;
+	return Strategies::cost;}
+      else if (strat == "makespan-max") {eo::log << eo::progress << " = makespan-max" << std::endl;
+	return Strategies::makespan_max;}
+      else if (strat == "makespan-add") {eo::log << eo::progress << " = makespan-add" << std::endl;
+	return Strategies::makespan_add;}
+      else {throw std::runtime_error("Unknown MO search strategy!");}
+      }*/
+
     Strategies::Type strategy() {return _strategy;}
     void strategy(Strategies::Type s) {_strategy = s;}
 

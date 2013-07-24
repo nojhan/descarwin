@@ -73,30 +73,24 @@ class daemoYahspEval : public daeYahspEval<EOT>
         decompo.fitness( -1.0, result.is_feasible() );
     }
 
-    //! Set YAHSP strategy according to the current goal strategy
-    /*void pre_step( typename EOT::AtomType& goal )
-    {eo::log << eo::progress << "Strategy=" << goal.strategy();
-        switch( goal.strategy() ) {
-            case daex::Strategies::length: {eo::log << eo::progress << " = length" << std::endl;
-	        yahsp_set_optimize_length(); break; } // search for short plans
-
-            case daex::Strategies::cost: {eo::log << eo::progress << " = cost" << std::endl;
-                // search for plans with lower (additive) costs
-                // NOTE: YAHSP does only optimize additive cost, but may compute max cost after compression.
-                yahsp_set_optimize_cost(); break; }
-
-            case daex::Strategies::makespan_add: {eo::log << eo::progress << " = makespan_add" << std::endl;
-                yahsp_set_optimize_makespan_add(); break; }
-
-            case daex::Strategies::makespan_max: {eo::log << eo::progress << " = makespan_max" << std::endl;
-                yahsp_set_optimize_makespan_max(); break; }
-
-            default: {eo::log << eo::progress << " = default" << std::endl;
-                // use default yahsp settings
-               break;
-            }
-        } // switch strategy
-    }*/
+    //! Set YAHSP strategy according to the current decomposition strategy
+    void pre_call(EOT& decompo)
+    {eo::log << eo::progress << "Strategy=" << decompo.strategy();
+       switch (decompo.strategy()) {
+         case daex::Strategies::length: {eo::log << eo::progress << " = length" << std::endl;
+	   yahsp_set_optimize_length(); break; } // search for short plans
+         case daex::Strategies::cost: {eo::log << eo::progress << " = cost" << std::endl;
+	   // search for plans with lower (additive) costs
+	   // NOTE: YAHSP does only optimize additive cost, but may compute max cost after compression.
+	   yahsp_set_optimize_cost(); break; }
+         case daex::Strategies::makespan_add: {eo::log << eo::progress << " = makespan_add" << std::endl;
+	   yahsp_set_optimize_makespan_add(); break; }
+         case daex::Strategies::makespan_max: {eo::log << eo::progress << " = makespan_max" << std::endl;
+	   yahsp_set_optimize_makespan_max(); break; }
+         default: {eo::log << eo::progress << " = default" << std::endl;
+	   /* use default yahsp settings */ break;}
+       }
+    }
 };
 
 template<class EOT=daex::DecompositionMO>

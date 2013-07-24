@@ -261,23 +261,23 @@ protected:
     { //eo::log << eo::progress << "DECOMPO=" << decompo << std::endl;
       pre_step( atom );
 
-#ifdef DAE_MO // FIXME : A remonter au niveau de l'évaluation de toute la décomposition plutôt qu'à chaque goal.
-       switch( decompo.strategy() ) {
-            case daex::Strategies::length: {//eo::log << eo::progress << " = length" << std::endl;
+      //#ifdef DAE_MO // FIXME : A remonter au niveau de l'évaluation de toute la décomposition plutôt qu'à chaque goal.
+      /*       switch( decompo.strategy() ) {
+            case daex::Strategies::length: {eo::log << eo::progress << " = length" << std::endl;
 	        yahsp_set_optimize_length(); break; } // search for short plans
-            case daex::Strategies::cost: {//eo::log << eo::progress << " = cost" << std::endl;
+            case daex::Strategies::cost: {eo::log << eo::progress << " = cost" << std::endl;
                 // search for plans with lower (additive) costs
                 // NOTE: YAHSP does only optimize additive cost, but may compute max cost after compression.
                 yahsp_set_optimize_cost(); break; }
-            case daex::Strategies::makespan_add: {//eo::log << eo::progress << " = makespan_add" << std::endl;
+            case daex::Strategies::makespan_add: {eo::log << eo::progress << " = makespan_add" << std::endl;
                 yahsp_set_optimize_makespan_add(); break; }
-            case daex::Strategies::makespan_max: {//eo::log << eo::progress << " = makespan_max" << std::endl;
+            case daex::Strategies::makespan_max: {eo::log << eo::progress << " = makespan_max" << std::endl;
                 yahsp_set_optimize_makespan_max(); break; }
-            default: {//eo::log << eo::progress << " = default" << std::endl;
-                /* use default yahsp settings */ break;
+            default: {eo::log << eo::progress << " = default" << std::endl;
+	        break;
             }
-        } // switch strategy
-#endif
+        }*/
+      //#endif
                                  #ifndef NDEBUG
                                  eo::log << eo::xdebug << "ok" << std::endl;
                                  eo::log << eo::xdebug << "\t\tcall the solver...";
