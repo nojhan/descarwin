@@ -87,8 +87,10 @@ public:
       else {throw std::runtime_error("Unknown MO search strategy!");}
       }*/
 
-    Strategies::Type strategy() {return _strategy;}
-    void strategy(Strategies::Type s) {_strategy = s;}
+    std::string strategy() {return _strategy;}
+    void strategy(std::string s) {_strategy = s;}
+    double proba_strategy() {return _proba_strategy;}
+    void proba_strategy (double p) {_proba_strategy = p;}
 
     eoserial::Object* pack(void) const
     {
@@ -223,7 +225,9 @@ public:
 
  protected:
     //! The objective search strategy to be used by YAHSP at evaluation time: either length, cost, makespan_max or makespan_add.
-    Strategies::Type _strategy;
+    //    Strategies::Type _strategy;
+    std::string _strategy;
+    double _proba_strategy;
 };
 
 } // namespace daex

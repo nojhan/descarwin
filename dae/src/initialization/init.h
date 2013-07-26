@@ -141,6 +141,9 @@ eo::log.flush();
         } // for idate in t_candidates
 
 #ifdef DAE_MO
+	decompo.strategy(_strategy);
+	decompo.proba_strategy(_proba_strategy);
+	/*
 	if (_strategy == "random") {eo::log << eo::progress << " Init Strategy: random" << std::endl;
 	  std::vector<Strategies::Type> default_strategies;
 	  default_strategies.push_back(Strategies::length);
@@ -162,10 +165,10 @@ eo::log.flush();
 	  decompo.strategy(Strategies::makespan_max);}
 	else if (_strategy == "makespan-add") {eo::log << eo::progress << " Init Strategy:  makespan-add" << std::endl;
 	  decompo.strategy(Strategies::makespan_add);}
-	else {throw std::runtime_error("Unknown MO search strategy");}
+	else {throw std::runtime_error("Unknown MO search strategy");}*/
 #endif
         decompo.invalidate();
-    } // 
+    }
 
 public:
     void l_max( unsigned int l ) { _l_max = l; }

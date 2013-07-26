@@ -75,21 +75,43 @@ class daemoYahspEval : public daeYahspEval<EOT>
 
     //! Set YAHSP strategy according to the current decomposition strategy
     void pre_call(EOT& decompo)
-    {//eo::log << eo::progress << "Strategy=" << decompo.strategy();
-       switch (decompo.strategy()) {
-         case daex::Strategies::length: {eo::log << eo::debug << " = length";
-	   yahsp_set_optimize_length(); break; } // search for short plans
-         case daex::Strategies::cost: {eo::log << eo::debug << " = cost";
-	   // search for plans with lower (additive) costs
-	   // NOTE: YAHSP does only optimize additive cost, but may compute max cost after compression.
-	   yahsp_set_optimize_cost(); break; }
-         case daex::Strategies::makespan_add: {eo::log << eo::debug << " = makespan_add";
-	   yahsp_set_optimize_makespan_add(); break; }
-         case daex::Strategies::makespan_max: {eo::log << eo::debug << " = makespan_max";
-	   yahsp_set_optimize_makespan_max(); break; }
-         default: {eo::log << eo::debug << " = default";
-	   /* use default yahsp settings */ break;}
-       }
+    {//eo::log << eo::debug << "Strategy=" << decompo.strategy();
+      if (decompo.strategy() == "random") {eo::log << eo::debug << " Init Strategy: random" << std::endl;
+	  std::vector<daex::Strategies::Type> default_strategies;
+	  default_strategies.push_back(daex::Strategies::length);
+	  default_strategies.push_back(daex::Strategies::cost);
+	  default_strategies.push_back(daex::Strategies::makespan_max);
+	  default_strategies.push_back(daex::Strategies::makespan_add);
+	  std::vector<double> rates;
+	  double rate = 1.0/default_strategies.size();
+	  for (unsigned int i=0; i < default_strategies.size(); ++i) {rates.push_back(rate);}
+	  switch (default_strategies[rng.roulette_wheel(rates)]) {
+	  case daex::Strategies::length: {eo::log << eo::debug << " = length (random)";
+	      yahsp_set_optimize_length(); break; } // search for short plans
+	  case daex::Strategies::cost: {eo::log << eo::debug << " = cost (random)";
+	      // search for plans with lower (additive) costs
+	      // NOTE: YAHSP does only optimize additive cost, but may compute max cost after compression.
+	      yahsp_set_optimize_cost(); break; }
+	  case daex::Strategies::makespan_add: {eo::log << eo::debug << " = makespan_add (random)";
+	      yahsp_set_optimize_makespan_add(); break; }
+	  case daex::Strategies::makespan_max: {eo::log << eo::debug << " = makespan_max (random)";
+	      yahsp_set_optimize_makespan_max(); break; }
+	  default: {eo::log << eo::debug << " = default (random)";
+	      /* use default yahsp settings */ break;}
+	  }
+	}
+      else if (decompo.strategy() == "flip-decomposition") {
+	if (rng.flip(decompo.proba_strategy())) {yahsp_set_optimize_makespan_add(); eo::log << eo::debug << " = makespan-add (after flip)" << std::endl;}
+	else  {yahsp_set_optimize_cost(); eo::log << eo::debug << " = cost (after flip)" << std::endl;}}
+      else if (decompo.strategy() == "length") {eo::log << eo::debug << " = length" << std::endl;
+	yahsp_set_optimize_length();}
+      else if (decompo.strategy() == "cost") {eo::log << eo::debug << " = cost" << std::endl;
+	yahsp_set_optimize_cost();}
+      else if (decompo.strategy() == "makespan-max") {eo::log << eo::debug << " = makespan-max" << std::endl;
+	yahsp_set_optimize_makespan_max();}
+      else if (decompo.strategy() == "makespan-add") {eo::log << eo::debug << " = makespan-add" << std::endl;
+	yahsp_set_optimize_makespan_add();}
+      else {throw std::runtime_error("Unknown MO search strategy");}
     }
 };
 

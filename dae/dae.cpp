@@ -442,9 +442,9 @@ int main ( int argc, char* argv[] )
 
 #ifdef DAE_MO
     // Set the YAHSP strategy decomposition according to the strategy parameter. FIXME : mettre en facteur avec le code dans init.h
-    std::string strat = parser.valueOf<std::string>("strategy");
-    double proba_strategy = parser.valueOf<double>("proba-strategy");
-    if (strat == "random") {eo::log << eo::progress << " Empty Decomposition: random" << std::endl;
+    empty_decompo.strategy(parser.valueOf<std::string>("strategy"));
+    empty_decompo.proba_strategy(parser.valueOf<double>("proba-strategy"));
+    /*    if (strat == "random") {eo::log << eo::progress << " Empty Decomposition: random" << std::endl;
       std::vector<daex::Strategies::Type> default_strategies;
       default_strategies.push_back(daex::Strategies::length);
       default_strategies.push_back(daex::Strategies::cost);
@@ -465,7 +465,7 @@ int main ( int argc, char* argv[] )
       empty_decompo.strategy(daex::Strategies::makespan_max);}
     else if (strat == "makespan-add") {eo::log << eo::progress << " Empty Decomposition:  makespan-add" << std::endl;
       empty_decompo.strategy(daex::Strategies::makespan_add);}
-    else {throw std::runtime_error("Unknown MO search strategy");}
+    else {throw std::runtime_error("Unknown MO search strategy");}*/
 #endif
 
 # ifdef WITH_MPI
