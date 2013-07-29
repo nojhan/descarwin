@@ -65,7 +65,7 @@ class daemoYahspEval : public daeYahspEval<EOT>
         decompo.objectiveVector(objVector);
 
         // Update the feasibility but not the fitness.
-        // We use a dummy fitness (which is a diferent concept that the objectives, in MOEO)
+        // We use a dummy fitness (which is a different concept that the objectives, in MOEO)
         // because the feasibility is stored in the fitness, but the fitness is computed in IBEA
         // by the fitness assignement operator (@see moeoExpBinaryIndicatorBasedFitnessAssignment).
         // Here, we update the feasability, which will not change when the fitness will be updated

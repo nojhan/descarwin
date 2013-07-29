@@ -81,7 +81,7 @@ eoDualStatSwitch<EOSTAT>& make_dual_stat_param( T& param, std::string name, eoSt
 template<class EOT>
 void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_monitor, eoState & state, eoPop<EOT>& pop, moeoArchive<EOT>& archive, eoParser & parser )
 {
-    typedef typename EOT::ObjectiveVector OVT;
+  //typedef typename EOT::ObjectiveVector OVT;
 
     // NOTE: this is MANDATORY to update the pareto archive
     moeoArchiveUpdater<EOT> * arch_updater = new moeoArchiveUpdater<EOT>( archive, pop);
@@ -116,7 +116,14 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         //OVT ref(m,c);
 	//OVT* ref = new OVT(m,c); 
 
-	OVT* ref = new OVT(2.0,false); // FIXME: Variable never deleted!
+	//OVT* ref = new OVT(2.0,false); // FIXME: Variable never deleted!
+	typename EOT::ObjectiveVector* ref = new typename EOT::ObjectiveVector;
+	//	typename EOT::ObjectiveVector* ref = new typename EOT::ObjectiveVector(2.0,false);
+	(* ref)[0]= typename EOT::ObjectiveVector::Type(1000.0, false); // sans faire de reserve ?
+	(* ref)[1]= typename EOT::ObjectiveVector::Type(1000.0, false); // sans faire de reserve ?
+
+	//(* ref)[0] = typename EOT::Fitness(1000.0, false); // sans faire de reserve ?
+	//(* ref)[1] = typename EOT::Fitness(1000.0, false); // sans faire de reserve ?
 
 	//(* ref)[0]= typename OVT::Type(3000.0, false);
 	//(* ref)[1]= typename OVT::Type(2000.0, false);
@@ -124,7 +131,7 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
 
         //PS moeoDualHyperVolumeDifferenceMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeDifferenceMetric<OVT>(true,ref);
 
-	moeoDualHyperVolumeMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeMetric<OVT>(true,*ref); //PS
+	moeoDualHyperVolumeMetric<typename EOT::ObjectiveVector> * m_hypervolume = new moeoDualHyperVolumeMetric<typename EOT::ObjectiveVector>(false,*ref); //PS
 	//moeoDualHyperVolumeMetric<OVT> * m_hypervolume = new moeoDualHyperVolumeMetric<OVT>(true,1.1); //PS
 
 
@@ -151,7 +158,7 @@ void add_stats_multi( eoCheckPoint<EOT>& checkpoint, eoOStreamMonitor& clog_moni
         checkpoint.add( average_stat );
         clog_monitor.add( average_stat );
 
-        moeoContributionMetric<OVT> * m_contribution = new moeoContributionMetric<OVT>;
+        moeoContributionMetric<typename EOT::ObjectiveVector> * m_contribution = new moeoContributionMetric<typename EOT::ObjectiveVector>;
         // state.storeFunctor( m_contribution ); // can't store this due to ambiguous base with a different template type // FIXME use smart pointers
         // wrap it in an eoStat
         eoStat<EOT,std::string>& contribution = make_dual_stat_param< moeoBinaryMetricStat<EOT> >( *m_contribution, "Cntrb", state );

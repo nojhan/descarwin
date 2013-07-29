@@ -12,7 +12,7 @@
 namespace daex {
 
 /**
- * Definition of the objective vector traits for multi-objective  for planning problems
+ * Definition of the objective vector traits for multi-objective for planning problems
  */
 class DecompoMOTraits : public moeoObjectiveVectorTraits
 {public:

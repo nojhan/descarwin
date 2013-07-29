@@ -53,9 +53,9 @@ int main ( int , char** )
     daex::StrategyFlipGoal<daex::DecompositionMO> srg( 0.5 ); srg(indiv);
     print_strategies( indiv );
 
-    std::clog << "flip decomposition" << std::endl;
+    /* std::clog << "flip decomposition" << std::endl;
     daex::StrategyFlipDecomposition<daex::DecompositionMO> srd( 0.5 ); srd(indiv);
-    print_strategies( indiv );
+    print_strategies( indiv );*/
 
     std::clog << "fixed" << std::endl;
     daex::StrategyFixed<daex::DecompositionMO> sf( daex::Strategies::makespan_max ); sf(indiv);

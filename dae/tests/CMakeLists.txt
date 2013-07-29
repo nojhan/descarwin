@@ -23,6 +23,9 @@ ADD_EXECUTABLE(test_mo_variation test_mo_variation.cpp)
 ADD_DEPENDENCIES(test_mo_variation daex)
 TARGET_LINK_LIBRARIES(test_mo_variation daex ${COMMON_LIBS})
 
+ADD_EXECUTABLE(test_mo_hypervolume test_mo_hypervolume.cpp)
+ADD_DEPENDENCIES(test_mo_hypervolume daex)
+TARGET_LINK_LIBRARIES(test_mo_hypervolume daex ${COMMON_LIBS})
 
 IF(DAE_WITH_MPI)
     ADD_EXECUTABLE(test_serial test_serialization.cpp)
