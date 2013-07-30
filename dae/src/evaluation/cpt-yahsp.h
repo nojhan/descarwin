@@ -116,9 +116,11 @@ protected:
     return nb;
 };
 
+     double convertMakespan(TimeVal m) {return (double)m * pddl_domain->time_gcd / pddl_domain->time_lcm;};
+
     //! Fitness des décompositions dont on arrive à construire le plan
      //! Note: the call to decomposition.fitness(...) automatically validate the fitness
-      double fitness_feasible( EOT & decompo ){
+      double fitness_feasible( EOT & decompo ) {
     // Pour travailler sur les valeurs affichables, on va partout ramener à la bonne valeur
     //unsigned int Q = solution_plan->makespan;
     double Q = (double) decompo.plan().makespan() * pddl_domain->time_gcd / pddl_domain->time_lcm;

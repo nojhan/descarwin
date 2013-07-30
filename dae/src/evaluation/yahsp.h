@@ -236,7 +236,7 @@ public:
     };
 
     virtual void call( EOT& decompo )
-    {
+    {                     
         Fitness result = solve( decompo );
         decompo.fitness( result.value(), result.is_feasible() );
     }
@@ -347,6 +347,12 @@ protected:
                                 assert(solution_plan != NULL);
                                 // TODO pendant les tests, le plan ne peut pas etre vide, mais en compétition, cela peut arriver, auquel cas il faudra virer l'assert (penser à compiler en NDEBUG)
                                 assert(solution_plan->makespan > 0);
+
+//eo::log << eo::progress << "*** SOLUTION PLAN ***" << std::endl;
+//eo::log << eo::progress << "makespan =" <<  solution_plan->makespan << std::endl;
+//eo::log << eo::progress << "cost_add = " <<  solution_plan->cost_add << std::endl;
+//eo::log << eo::progress << "cost_max = " <<  solution_plan->cost_max << std::endl;
+
                                 #ifndef NDEBUG
                                 eo::log << eo::xdebug << "ok" << std::endl;
                                 eo::log << eo::xdebug << "\t\tsave compressed plan and fitness...";

@@ -12,10 +12,11 @@ class daemoYahspEval : public daeYahspEval<EOT>
     typedef typename EOT::Fitness Fitness;
     typedef typename EOT::ObjectiveVector::Base OVBase;
 
-    virtual OVBase objective_makespan( EOT& decompo )
+    virtual OVBase objective_makespan(EOT& decompo)
     {
-        Fitness f = this->solve( decompo );
-        return OVBase( f.value(), f.is_feasible() );
+      Fitness f = this->solve(decompo);
+      //return OVBase( f.value(), f.is_feasible() );
+      return OVBase(convertMakespan(decompo.plan().makespan()), f.is_feasible()); // PS : l'objectif n'est pas égal à la fitness !!!
     }
 
     //! Handler to be implemented, with either additive or max costs
@@ -38,7 +39,7 @@ class daemoYahspEval : public daeYahspEval<EOT>
 
         // assign value + feasibility to the first objective (makespan)
         // result contains a pair<value,feasibility>
-        objVector[0] = result;
+        objVector[0] = result; // Sans faire de reserve ??
 
         double cost;
         // the feasability is computed only by objective_makespan (where the plan is computed)
@@ -60,7 +61,7 @@ class daemoYahspEval : public daeYahspEval<EOT>
         // assign value + feasibility to the whole objective vector
         // necessary because objective vectors implement Pareto domination (@see DualRealObjectiveVector::dominates)
         objVector.is_feasible( result.is_feasible() );
-
+                                                eo::log << eo::xdebug << "OBJECTIVE VECTOR =" << objVector << std::endl;
         // change the MO objectives
         decompo.objectiveVector(objVector);
 
