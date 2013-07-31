@@ -15,8 +15,8 @@ class daemoYahspEval : public daeYahspEval<EOT>
     virtual OVBase objective_makespan(EOT& decompo)
     {
       Fitness f = this->solve(decompo);
-      //return OVBase( f.value(), f.is_feasible() );
-      return OVBase(convertMakespan(decompo.plan().makespan()), f.is_feasible()); // PS : l'objectif n'est pas égal à la fitness !!!
+      return OVBase( f.value(), f.is_feasible() ); // Front calculé avec la fitness : penser à extraire la solution en fonction des objectifs.
+      //return OVBase(convertMakespan(decompo.plan().makespan()), f.is_feasible()); // Front calculé avec l'objectif.
     }
 
     //! Handler to be implemented, with either additive or max costs
@@ -128,7 +128,10 @@ public:// typedef typename EOT::Fitness Fitness;
 		      double fitness_penalty = 1e6
     ) : daemoYahspEval<EOT>( astar_weight, l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
     {}
-    virtual double objective_cost( EOT& decompo ) {return decompo.plan().cost_add();}
+    virtual double objective_cost( EOT& decompo ) {
+      return decompo.plan().cost_add(); // objective
+      //return fitness_feasible(decompo, (double) decompo.plan().cost_add()); // fitness
+    }
 };
 
 template<class EOT=daex::DecompositionMO>
@@ -143,7 +146,10 @@ public:// typedef typename EOT::Fitness Fitness;
 		      double fitness_penalty = 1e6
     ) : daemoYahspEval<EOT>( astar_weight, l_max_, b_max_in, b_max_last, fitness_weight, fitness_penalty )
     {}
-    virtual double objective_cost( EOT& decompo ) {return decompo.plan().cost_max();}
+    virtual double objective_cost( EOT& decompo ) {
+      return decompo.plan().cost_max(); // objective
+      //return fitness_feasible(decompo, (double) decompo.plan().cost_max()); // fitness
+    }
 };
 #endif // __DAEX_EVAL_YAHSP_MO_H__
 

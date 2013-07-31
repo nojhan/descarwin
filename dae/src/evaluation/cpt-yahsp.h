@@ -118,6 +118,11 @@ protected:
 
      double convertMakespan(TimeVal m) {return (double)m * pddl_domain->time_gcd / pddl_domain->time_lcm;};
 
+     double fitness_feasible(EOT & decompo, double obj) {
+       double Q = obj * pddl_domain->time_gcd / pddl_domain->time_lcm;
+       return Q + ( (double)decompo.size() - (double)decompo.get_number_useful_goals() + 1.0 ) / Q + (double)decompo.get_number_evaluated_nodes() / ( (double)_l_max * (double)decompo.b_max() );
+     }
+
     //! Fitness des décompositions dont on arrive à construire le plan
      //! Note: the call to decomposition.fitness(...) automatically validate the fitness
       double fitness_feasible( EOT & decompo ) {
