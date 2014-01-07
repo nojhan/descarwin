@@ -9,21 +9,27 @@ Here are the steps to build the project:
 COMMON STEPS
 ------------
 
- * copy the file $ROOT/install-dist.cmake and rename to $ROOT/install.cmake
+0) Copy install-dist.cmake files in install.cmake
+ * $ROOT/install-dist.cmake -> $ROOT/install.cmake
+ * $ROOT/dae/install-dist.cmake -> $ROOT/dae/install.cmake
 
-1) EO:
- * edit the file $ROOT/install.cmake and define the variable EO_DIR
+1) ParadisEO:
+ * edit the file $ROOT/dae/install.cmake and define the variable PARADISEO_DIR
  * ensure to compile yourself openmpi statically and define the variable MPI_DIR
  * ensure to compile yourself boost::mpi statically and define the variables BOOST_*
 
-2) use one of the scripts available to build the project (cf. build_gcc_linux_*)
+2) [optional] use one of the scripts available to generate the build scripts the project, either:
+ * use ./configure.py that will prompt for the configuration
+ * mkdir builds/ and run ./make_build_scripts.py that will create all the possible build scripts with different configurations
+ * run your own cmake command in the directory of your choice (for example: mkdir build; cd build; cmake .. for the defaults)
 
-3) go to the new directory created (cf. release, debug, ...)
+3) go to the new directory created (cf. release, debug, ...) and run `make`
 
 4) Location of the generated binaries and libraries:
  * dae binaries are available in the directory dae,
  * cpt-yahsp binaries in cpt-yahsp directory,
  * all the libraries are in lib directory.
+
 
  ---------------------------
  AVAILABLE OPTIONS FOR CMAKE
@@ -31,6 +37,8 @@ COMMON STEPS
 
 You can launch cmake with these options in order to customize your version of dae :
 "-DCMAKE_BUILD_TYPE=Debug" : compilation in debug mode. Without this option, release mode is default.
-"-DDAE_WITH_MPI=yes" : compilation with OpenMPI and Boost::MPI to ensure dae parallelization.
-"-DCPT_WITH_MP=yes" : compilation of cpt-yahsp with OpenMP (shared memory solution for parallelization).
-"-DCPT_WITH_MPI=yes" : comilation of cpt-yahsp with OpenMPI (messsage passage interface for parallelization).
+"-DDAE_WITH_MPI=yes" : compilation with OpenMPI and Boost::MPI  (message passing interface for parallelization).
+"-DDAE_WITH_OMP=yes" : compilation with OpenMP (shared memory solution for parallelization).
+"-DCPT_WITH_OMP=yes" : compilation of cpt-yahsp with OpenMP (shared memory solution for parallelization).
+"-DCPT_WITH_MPI=yes" : compilation of cpt-yahsp with OpenMPI (message passing interface for parallelization).
+"-DBUILD_DAE_MO=yes" : build the Multi-Objective version of DAE
