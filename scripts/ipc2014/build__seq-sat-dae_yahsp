@@ -1,0 +1,20 @@
+#!/bin/sh
+
+here=$(pwd)
+
+echo "Build ParadisEO"
+cd paradiseo
+mkdir -p release
+cd release/
+cmake ..
+make eo eoutils eoserial
+
+echo "Build DAE"
+cd $here/
+mkdir -p release
+cd release/
+cmake -DBUILD_DAE_MO=off -DCMAKE_BUILD_TYPE=Release -DCPT_WITH_MPI=off -DCPT_WITH_OMP=off -DDAE_WITH_MPI=off -DDAE_WITH_OMP=off ..
+make dae
+
+cp ./dae/dae $here/dae_yahsp
+
