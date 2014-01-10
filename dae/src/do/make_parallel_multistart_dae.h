@@ -6,7 +6,7 @@
 /**
  * @brief Dumper for the multi start job.
  */
-struct MultiDumpBestDecompo : public eo::mpi::HandleResponseMultiStart< daex::Decomposition >, public daex::BestPlanDumpper< daex::Decomposition::Fitness >
+struct MultiDumpBestDecompo : public eo::mpi::HandleResponseMultiStart< daex::Decomposition >, public daex::BestPlanDumpper< daex::Decomposition::Fitness, daex::Decomposition >
 {
     MultiDumpBestDecompo(
             std::string afilename,
@@ -16,7 +16,7 @@ struct MultiDumpBestDecompo : public eo::mpi::HandleResponseMultiStart< daex::De
             std::string sep = ".",
             std::string metadata = ""
             )
-        : daex::BestPlanDumpper< daex::Decomposition::Fitness >( afilename, worst, single_file, file_count, sep, metadata)
+        : daex::BestPlanDumpper< daex::Decomposition::Fitness, daex::Decomposition >( afilename, worst, single_file, file_count, sep, metadata)
     {
         // empty
     }

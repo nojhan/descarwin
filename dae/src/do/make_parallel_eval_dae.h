@@ -19,7 +19,7 @@ namespace parallel
      * Filename follow the same configuration that the present one in make_eval :
      * <afilename><sep><file_count>
      */
-    struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >, public daex::BestPlanDumpper<daex::Decomposition::Fitness>
+    struct HandleResponseBestPlanDump : public eo::mpi::HandleResponseParallelApply< daex::Decomposition >, public daex::BestPlanDumpper<daex::Decomposition::Fitness, daex::Decomposition>
     {
         /**
          * @brief Main constructor.
@@ -39,7 +39,7 @@ namespace parallel
                 std::string sep = ".",
                 std::string metadata = ""
                 ) :
-            daex::BestPlanDumpper<daex::Decomposition::Fitness>( afilename, worst, single_file, file_count, sep, metadata )
+            daex::BestPlanDumpper<daex::Decomposition::Fitness, daex::Decomposition>( afilename, worst, single_file, file_count, sep, metadata )
         {
             // empty
         }
