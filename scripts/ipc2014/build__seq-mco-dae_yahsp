@@ -10,7 +10,7 @@ cd paradiseo
 mkdir -p release
 cd release/
 # ParadisEO uses the FindOpenMPI module, that cannot easily bypass /usr/lib, thus we set everything manually
-cmake -DMPI=on -DMPI_CXX_COMPILER="$here/openmpi/" -DMPI_CXX_INCLUDE_PATH="$here/openmpi/include;$here/openmpi/include/openmpi" -DMPI_CXX_LIBRARIES="$here/openmpi/lib/libmpi_cxx.so;$here/openmpi/lib/libmpi.so;$here/openmpi/lib/libopen-rte.so;$here/openmpi/lib/libopen-pal.so;/usr/lib/x86_64-linux-gnu/libdl.so;/usr/lib/x86_64-linux-gnu/libnsl.so;/usr/lib/x86_64-linux-gnu/libutil.so;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libdl.so" ..
+cmake -DMPI=on -DMPI_CXX_COMPILER="$here/openmpi/bin/mpicxx" -DMPI_CXX_INCLUDE_PATH="$here/openmpi/include;$here/openmpi/include/openmpi" -DMPI_CXX_LIBRARIES="$here/openmpi/lib/libmpi_cxx.so;$here/openmpi/lib/libmpi.so;$here/openmpi/lib/libopen-rte.so;$here/openmpi/lib/libopen-pal.so;/usr/lib/x86_64-linux-gnu/libdl.so;/usr/lib/x86_64-linux-gnu/libnsl.so;/usr/lib/x86_64-linux-gnu/libutil.so;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libdl.so" ..
 make eo eoutils eoserial eompi
 
 echo "Build DAE"
