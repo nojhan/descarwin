@@ -2,18 +2,26 @@
 
 here=$(pwd)
 
+cat install-dist.cmake | sed "s,<< PATH_TO_OPEN_MPI_STATIC >>,$here/openmpi," > install.cmake
+cat dae/install-dist.cmake | sed "s,<<PATH_TO_PARADISEO>>,$here/paradiseo," > dae/install.cmake
+
 echo "Build ParadisEO"
 cd paradiseo
 mkdir -p release
 cd release/
-cmake ..
-make eo eoutils eoserial
+# ParadisEO uses the FindOpenMPI module, that cannot easily bypass /usr/lib, thus we set everything manually
+cmake -DMPI=on -DMPI_CXX_COMPILER="$here/openmpi/" -DMPI_CXX_INCLUDE_PATH="$here/openmpi/include;$here/openmpi/include/openmpi" -DMPI_CXX_LIBRARIES="$here/openmpi/lib/libmpi_cxx.so;$here/openmpi/lib/libmpi.so;$here/openmpi/lib/libopen-rte.so;$here/openmpi/lib/libopen-pal.so;/usr/lib/x86_64-linux-gnu/libdl.so;/usr/lib/x86_64-linux-gnu/libnsl.so;/usr/lib/x86_64-linux-gnu/libutil.so;/usr/lib/x86_64-linux-gnu/libm.so;/usr/lib/x86_64-linux-gnu/libdl.so" ..
+make eo eoutils eoserial eompi
 
 echo "Build DAE"
 cd $here/
 mkdir -p release
+# necessary library not installed on the DES
+mkdir -p release/lib
+cp libtermcap.a  release/lib/
+cp libncurses.so release/lib/
 cd release/
-cmake -DBUILD_DAE_MO=off -DCMAKE_BUILD_TYPE=Release -DCPT_WITH_MPI=off -DCPT_WITH_OMP=off -DDAE_WITH_MPI=off -DDAE_WITH_OMP=off ..
+cmake -DBUILD_DAE_MO=off -DCMAKE_BUILD_TYPE=Release -DCPT_WITH_MPI=off -DCPT_WITH_OMP=off -DDAE_WITH_MPI=on -DDAE_WITH_OMP=off ..
 make dae
 
 cp ./dae/dae $here/dae_yahsp

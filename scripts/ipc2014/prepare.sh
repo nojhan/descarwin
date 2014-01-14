@@ -46,11 +46,19 @@ for p in $planners ; do
         adir="$here/$v-$p"
         rm -rf $adir
         cp -r descarwin/ $adir
-        cp build__$v-$p $adir/build
-        cd $adir
 
-        cat install-dist.cmake | sed "s,<< PATH_TO_OPEN_MPI_STATIC >>,$adir/openmpi," > install.cmake
-        cat dae/install-dist.cmake | sed "s,<<PATH_TO_PARADISEO>>,$adir/paradiseo," > dae/install.cmake
+        cp build__$v-$p $adir/build_trt
+        cat build__$v-$p | sed "s,^cmake,/home/CMAKE/bin/cmake," > $adir/build
+        chmod u+x $adir/build
+
+        cp plan $adir/plan
+        chmod u+x $adir/plan
+
+        cp libtermcap.a $adir/
+        cp libncurses.so $adir/
+        cp -r openmpi $adir/
+
+        cd $adir
 
     done # tracks
 done # planners
