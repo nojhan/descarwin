@@ -41,8 +41,8 @@ ENDIF()
 IF(DAE_WITH_MPI)
     MESSAGE("[DAE] Compilation with MPI.")
 
-    #SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
-    SET(CMAKE_CXX_COMPILER "/usr/bin/mpicxx")
+    SET(CMAKE_CXX_COMPILER "${MPI_DIR}/bin/mpicxx")
+    #SET(CMAKE_CXX_COMPILER "/usr/bin/mpicxx")
 
     # headers location
     INCLUDE_DIRECTORIES(${MPI_DIR}/include)
