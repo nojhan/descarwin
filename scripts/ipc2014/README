@@ -1,0 +1,70 @@
+PDDL support questionnaire
+==========================
+
+(1) Name and email address of each member of the team:
+
+Johann Dreo <johann.dreo@thalesgroup.com>
+Pierre Savéant <pierre.saveant@thalesgroup.com>
+Marc Schoenauer <marc.schoenauer@inria.fr>
+Vincent Vidal <Vincent.Vidal@onera.fr>
+
+
+(2) Name and email address of the contact person of the team:
+
+Johann Dreo <johann.dreo@thalesgroup.com>
+
+
+(3) Name of the competing planner(s):
+
+DAE_YAHSP
+
+
+(4) DAE_YAHSP
+ 
+(4.1) Tracks of the competition into which the planner is entered
+
+    [X] Sequential, satisficing
+    [ ] Sequential, optimization
+    [X] Sequential, multi-core
+    [ ] Sequential, agile
+    [X] Temporal, satisficing
+    [ ] Temporal, optimization
+    [ ] Preferences, satisficing
+    [ ] Preferences, optimization
+
+
+If you have comments about tracks that are only partially supported by
+your planner (e.g., the planner does not support negative preconditions
+or ADL), please indicate them here:
+
+The planner does not natively support negative preconditions and conditional effects and will rely on pre-compilation.
+
+The planner does not support ADL and derived predicates.
+
+
+(4.2) The competition machine will run Linux. Please specify the
+programming language(s), compilers and other auxiliary software (e.g.
+CPLEX) required by the planner:
+
+GMP
+OpenMPI
+
+
+(4.3) Particular aspects of the planner that are important to running
+the experiments
+
+    [X] The planner uses randomized algorithms
+    [X] The planner is incremental/anytime
+
+
+Additional particular aspects about your planner you want to let us know
+about:
+
+The planners would be able to participate to a "temporal, satisficing,
+multi-core" track, if it was of some interest.
+
+
+STATEMENT: We agree that the final version of the source code of our
+planner that will participate the competition, will be made publicly
+available through the official IPC-2014 web site.
+
