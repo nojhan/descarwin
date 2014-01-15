@@ -1,0 +1,6 @@
+#!/bin/sh
+
+export PATH="$PATH:/opt/openmpi/1.6.5/bin/"
+export TMPDIR=$(pwd)
+/opt/openmpi/1.6.5/bin/mpirun ./dae_yahsp --domain=$1 --instance=$2 --plan-file=$3 --seed=2014
+

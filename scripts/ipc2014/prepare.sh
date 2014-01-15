@@ -51,7 +51,7 @@ for p in $planners ; do
         cat build__$v-$p | sed "s,^cmake,/home/CMAKE/bin/cmake," > $adir/build
         chmod u+x $adir/build
 
-        cp plan $adir/plan
+        cp plan__$v-$p $adir/plan
         chmod u+x $adir/plan
 
         cp libtermcap.a $adir/
