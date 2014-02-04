@@ -138,7 +138,7 @@ void cmd_line(int argc, const char **argv)
 {
   nb_options = sizeof(long_options) / sizeof(OptItem);
   struct option options[nb_options * 2 + 1];
-  char arg_string[nb_options + 1];
+  char arg_string[nb_options * 2 + 1];
   int c, i, j = 0, k = 0;
 
   for(i = 0; i < nb_options; i++) {
